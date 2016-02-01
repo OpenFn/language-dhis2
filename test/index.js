@@ -25,7 +25,6 @@ describe("execute", () => {
     let state = {}
 
     let finalState = execute()(state)
-    console.log(finalState);
 
     execute()(state)
     .then((finalState) => {
