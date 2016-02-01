@@ -16,7 +16,9 @@ const fixtures = {
         { "dataElement": "msodh3rEMJa", "value": "2013-05-18" }
       ]
     },
-    responseBody: {"httpStatus":"OK","httpStatusCode":200,"status":"OK","message":"Import was successful.","response":{"responseType":"ImportSummaries","imported":3,"updated":0,"deleted":0,"ignored":0,"importSummaries":[{"responseType":"ImportSummary","status":"SUCCESS","importCount":{"imported":3,"updated":0,"ignored":0,"deleted":0},"reference":"rrPOYH80oqG","href":"https://play.dhis2.org/demo/api/events/rrPOYH80oqG"}]}}
+    responseBody: {
+      "httpStatus":"OK",
+      "httpStatusCode":200,"status":"OK","message":"Import was successful.","response":{"responseType":"ImportSummaries","imported":3,"updated":0,"deleted":0,"ignored":0,"importSummaries":[{"responseType":"ImportSummary","status":"SUCCESS","importCount":{"imported":3,"updated":0,"ignored":0,"deleted":0},"reference":"rrPOYH80oqG","href":"https://play.dhis2.org/demo/api/events/rrPOYH80oqG"}]}}
 
 
   }
@@ -25,17 +27,20 @@ const fixtures = {
 export { fixtures };
 
 export default [ {
-  pattern: 'https://play.dhis2.org(.*)',
+  pattern: 'https://play.dhis2.org/demo(.*)',
 
   fixtures( match, params, headers ) {
-
-    if( match[1] === '/demo/api/events' ) {
-
-      return fixtures.event.responseBody 
+    if( match[1] === '/api/events' ) {
+      return {
+        body: fixtures.event.responseBody,
+        params, headers
+      }
     }
+
+    throw new Error( `No Fixture Match\ngot: ${JSON.stringify(match, 2, null)}`)
   },
 
   post(match, data) {
-    return { ok: true, body: data }
+    return { ok: true, match, ...data }
   }
 } ]

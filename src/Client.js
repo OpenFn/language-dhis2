@@ -1,5 +1,4 @@
 import request from 'superagent'
-// curl -d @datavalueset.json "https://play.dhis2.org/demo/api/dataValueSets" -H "Content-Type:application/json" -u admin:district -v
 
 export function post({ username, password, body, url }) {
   return new Promise((resolve, reject) => {
