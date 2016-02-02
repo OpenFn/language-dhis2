@@ -1,4 +1,4 @@
-import { execute as commonExecute } from 'language-common';
+import { execute as commonExecute, expandReferences } from 'language-common';
 import { post } from './Client';
 import { resolve as resolveUrl } from 'url';
 
@@ -37,9 +37,10 @@ export function execute(...operations) {
  * @returns {Operation}
  */
 export function event(eventData) {
-  const body = eventData;
 
   return state => {
+    const body = expandReferences(eventData)(state);
+
     const { username, password, api } = state.configuration.credentials;
 
     const url = resolveUrl(api + '/', 'api/events')
@@ -52,3 +53,4 @@ export function event(eventData) {
   }
 }
 
+export { field, fields, sourceValue } from 'language-common';
