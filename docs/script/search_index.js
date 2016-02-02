@@ -1,8 +1,20 @@
 window.esdocSearchIndex = [
   [
-    "language-dhis2/src/index.js~execute",
+    "language-dhis2/src/adaptor.js~event",
+    "function/index.html#static-function-event",
+    "<span>event</span> <span class=\"search-result-import-path\">language-dhis2/src/Adaptor.js</span>",
+    "function"
+  ],
+  [
+    "language-dhis2/src/adaptor.js~execute",
     "function/index.html#static-function-execute",
-    "<span>execute</span> <span class=\"search-result-import-path\">language-dhis2/src/index.js</span>",
+    "<span>execute</span> <span class=\"search-result-import-path\">language-dhis2/src/Adaptor.js</span>",
+    "function"
+  ],
+  [
+    "language-dhis2/src/client.js~post",
+    "function/index.html#static-function-post",
+    "<span>post</span> <span class=\"search-result-import-path\">language-dhis2/src/Client.js</span>",
     "function"
   ],
   [
@@ -334,6 +346,18 @@ window.esdocSearchIndex = [
     "external/index.html",
     "BuiltinExternal/WebAPIExternal.js~XMLHttpRequest",
     "external"
+  ],
+  [
+    "src/adaptor.js",
+    "file/src/Adaptor.js.html",
+    "src/Adaptor.js",
+    "file"
+  ],
+  [
+    "src/client.js",
+    "file/src/Client.js.html",
+    "src/Client.js",
+    "file"
   ],
   [
     "src/index.js",

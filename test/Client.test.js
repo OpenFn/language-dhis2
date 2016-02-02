@@ -24,6 +24,15 @@ describe("Client", () => {
 
       return post({ body, username, password, url }).then((result) => {
         expect(result.body).to.eql(fixtures.event.responseBody)
+
+        // Check that basic auth is being used.
+        expect(result.headers).
+          to.eql({
+            "Accept": "application/json",
+            "Authorization": "Basic YWRtaW46ZGlzdHJpY3Q=",
+            "Content-Type": "application/json",
+          })
+
       })
     })
 

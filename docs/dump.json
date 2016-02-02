@@ -4,13 +4,13 @@
     "kind": "file",
     "static": true,
     "variation": null,
-    "name": "src/index.js",
+    "name": "src/Adaptor.js",
     "memberof": null,
-    "longname": "src/index.js",
+    "longname": "src/Adaptor.js",
     "access": null,
     "description": null,
     "lineNumber": 1,
-    "content": "import { execute as commonExecute } from 'language-common';\n\n/**\n * Execute a sequence of operations.\n * Wraps `language-common/execute`, and prepends initial state for DHIS2.\n * @example \n * execute(\n *   create('foo'),\n *   delete('bar')\n * )(state)\n * @constructor\n * @param {Operations} operations - Operations to be performed.\n * @returns {Promise}\n */\nexport function execute(...operations) {\n  const initialState = {\n    references: [],\n    data: null\n  }\n\n  return state => {\n    return commonExecute(...operations)({ ...initialState, ...state })\n  };\n\n}\n"
+    "content": "import { execute as commonExecute } from 'language-common';\nimport { post } from './Client';\nimport { resolve as resolveUrl } from 'url';\n\n/**\n * Default adaptor for DHIS2.\n * @namespace Adaptor\n */\n\n/**\n * Execute a sequence of operations.\n * Wraps `language-common/execute`, and prepends initial state for DHIS2.\n * @function execute\n * @memberof Adaptor\n * @example \n * execute(\n *   create('foo'),\n *   delete('bar')\n * )(state)\n * @constructor\n * @param {Operations} operations - Operations to be performed.\n * @returns {Operation}\n */\nexport function execute(...operations) {\n  const initialState = {\n    references: [],\n    data: null\n  }\n\n  return state => {\n    return commonExecute(...operations)({ ...initialState, ...state })\n  };\n\n}\n\n/**\n * Create an event\n * @example \n * execute(\n *   event(data)\n * )(state)\n * @constructor\n * @param {object} eventData - Payload data for the event\n * @returns {Operation}\n */\nexport function event(eventData) {\n  const body = eventData;\n\n  return state => {\n    const { username, password, api } = state.configuration.credentials;\n\n    const url = resolveUrl(api + '/', 'api/events')\n\n    return post({ username, password, body, url })\n    .then((result) => {\n      return { ...state, references: [ result, ...state.references ] }\n    })\n\n  }\n}\n\n"
   },
   {
     "__docId__": 1,
@@ -18,25 +18,33 @@
     "static": true,
     "variation": null,
     "name": "execute",
-    "memberof": "src/index.js",
-    "longname": "src/index.js~execute",
+    "memberof": "src/Adaptor.js",
+    "longname": "src/Adaptor.js~execute",
     "access": null,
     "export": true,
-    "importPath": "language-dhis2/src/index.js",
+    "importPath": "language-dhis2/src/Adaptor.js",
     "importStyle": "{execute}",
     "description": "Execute a sequence of operations.\nWraps `language-common/execute`, and prepends initial state for DHIS2.",
     "examples": [
       "execute(\n  create('foo'),\n  delete('bar')\n)(state)"
     ],
-    "lineNumber": 15,
+    "lineNumber": 24,
     "unknown": [
+      {
+        "tagName": "@function",
+        "tagValue": "execute"
+      },
+      {
+        "tagName": "@memberof",
+        "tagValue": "Adaptor"
+      },
       {
         "tagName": "@constructor",
         "tagValue": ""
       },
       {
         "tagName": "@returns",
-        "tagValue": "{Promise}"
+        "tagValue": "{Operation}"
       }
     ],
     "params": [
@@ -54,7 +62,56 @@
     "return": {
       "nullable": null,
       "types": [
-        "Promise"
+        "Operation"
+      ],
+      "spread": false,
+      "description": ""
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 2,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "event",
+    "memberof": "src/Adaptor.js",
+    "longname": "src/Adaptor.js~event",
+    "access": null,
+    "export": true,
+    "importPath": "language-dhis2/src/Adaptor.js",
+    "importStyle": "{event}",
+    "description": "Create an event",
+    "examples": [
+      "execute(\n  event(data)\n)(state)"
+    ],
+    "lineNumber": 46,
+    "unknown": [
+      {
+        "tagName": "@constructor",
+        "tagValue": ""
+      },
+      {
+        "tagName": "@returns",
+        "tagValue": "{Operation}"
+      }
+    ],
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "object"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "eventData",
+        "description": "Payload data for the event"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Operation"
       ],
       "spread": false,
       "description": ""
@@ -63,6 +120,69 @@
   },
   {
     "__docId__": 3,
+    "kind": "file",
+    "static": true,
+    "variation": null,
+    "name": "src/Client.js",
+    "memberof": null,
+    "longname": "src/Client.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1,
+    "content": "import request from 'superagent'\n\nexport function post({ username, password, body, url }) {\n  return new Promise((resolve, reject) => {\n    request.post(url)\n    .type('json')\n    .accept('json')\n    .auth(username, password)\n    .send(JSON.stringify(body))\n    .end((error, res) => {\n      if (!!error || !res.ok) {\n        reject( error )\n      }\n\n      resolve( res )\n    })\n\n  })\n}\n"
+  },
+  {
+    "__docId__": 4,
+    "kind": "function",
+    "static": true,
+    "variation": null,
+    "name": "post",
+    "memberof": "src/Client.js",
+    "longname": "src/Client.js~post",
+    "access": null,
+    "export": true,
+    "importPath": "language-dhis2/src/Client.js",
+    "importStyle": "{post}",
+    "description": null,
+    "lineNumber": 3,
+    "undocument": true,
+    "params": [
+      {
+        "name": "objectPattern",
+        "types": [
+          "{\"username\": *, \"password\": *, \"body\": *, \"url\": *}"
+        ],
+        "defaultRaw": {
+          "username": null,
+          "password": null,
+          "body": null,
+          "url": null
+        },
+        "defaultValue": "{\"username\":null,\"password\":null,\"body\":null,\"url\":null}"
+      }
+    ],
+    "return": {
+      "types": [
+        "*"
+      ]
+    },
+    "generator": false
+  },
+  {
+    "__docId__": 5,
+    "kind": "file",
+    "static": true,
+    "variation": null,
+    "name": "src/index.js",
+    "memberof": null,
+    "longname": "src/index.js",
+    "access": null,
+    "description": null,
+    "lineNumber": 1,
+    "content": "import * as Adaptor from './Adaptor';\nexport default Adaptor;\n"
+  },
+  {
+    "__docId__": 7,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -75,7 +195,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 4,
+    "__docId__": 8,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -88,7 +208,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 5,
+    "__docId__": 9,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -101,7 +221,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 6,
+    "__docId__": 10,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -114,7 +234,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 7,
+    "__docId__": 11,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -127,7 +247,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 8,
+    "__docId__": 12,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -140,7 +260,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 9,
+    "__docId__": 13,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -153,7 +273,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 10,
+    "__docId__": 14,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -166,7 +286,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 11,
+    "__docId__": 15,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -179,7 +299,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 12,
+    "__docId__": 16,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -192,7 +312,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 13,
+    "__docId__": 17,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -205,7 +325,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 14,
+    "__docId__": 18,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -218,7 +338,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 15,
+    "__docId__": 19,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -231,7 +351,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 16,
+    "__docId__": 20,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -244,7 +364,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 17,
+    "__docId__": 21,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -257,7 +377,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 18,
+    "__docId__": 22,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -270,7 +390,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 19,
+    "__docId__": 23,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -283,7 +403,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 20,
+    "__docId__": 24,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -296,7 +416,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 21,
+    "__docId__": 25,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -309,7 +429,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 22,
+    "__docId__": 26,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -322,7 +442,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 23,
+    "__docId__": 27,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -335,7 +455,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 24,
+    "__docId__": 28,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -348,7 +468,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 25,
+    "__docId__": 29,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -361,7 +481,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 26,
+    "__docId__": 30,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -374,7 +494,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 27,
+    "__docId__": 31,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -387,7 +507,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 28,
+    "__docId__": 32,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -400,7 +520,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 29,
+    "__docId__": 33,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -413,7 +533,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 30,
+    "__docId__": 34,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -426,7 +546,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 31,
+    "__docId__": 35,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -439,7 +559,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 32,
+    "__docId__": 36,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -452,7 +572,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 33,
+    "__docId__": 37,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -465,7 +585,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 34,
+    "__docId__": 38,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -478,7 +598,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 35,
+    "__docId__": 39,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -491,7 +611,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 36,
+    "__docId__": 40,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -504,7 +624,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 37,
+    "__docId__": 41,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -517,7 +637,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 38,
+    "__docId__": 42,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -530,7 +650,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 39,
+    "__docId__": 43,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -543,7 +663,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 40,
+    "__docId__": 44,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -556,7 +676,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 41,
+    "__docId__": 45,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -569,7 +689,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 42,
+    "__docId__": 46,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -582,7 +702,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 43,
+    "__docId__": 47,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -595,7 +715,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 44,
+    "__docId__": 48,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -608,7 +728,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 45,
+    "__docId__": 49,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -621,7 +741,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 46,
+    "__docId__": 50,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -634,7 +754,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 47,
+    "__docId__": 51,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -647,7 +767,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 48,
+    "__docId__": 52,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -660,7 +780,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 49,
+    "__docId__": 53,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -673,7 +793,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 51,
+    "__docId__": 55,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -686,7 +806,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 52,
+    "__docId__": 56,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -699,7 +819,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 53,
+    "__docId__": 57,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -712,7 +832,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 54,
+    "__docId__": 58,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -725,7 +845,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 55,
+    "__docId__": 59,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -738,7 +858,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 56,
+    "__docId__": 60,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -751,7 +871,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 57,
+    "__docId__": 61,
     "kind": "external",
     "static": true,
     "variation": null,
@@ -764,7 +884,7 @@
     "builtinExternal": true
   },
   {
-    "__docId__": 58,
+    "__docId__": 62,
     "kind": "external",
     "static": true,
     "variation": null,

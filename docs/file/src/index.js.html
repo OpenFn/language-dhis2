@@ -32,37 +32,16 @@
 <nav class="navigation" data-ice="nav"><div>
   <ul>
     
-  <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-execute">execute</a></span></span></li>
+  <li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-event">event</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-execute">execute</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-post">post</a></span></span></li>
 </ul>
 </div>
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/index.js</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import { execute as commonExecute } from &apos;language-common&apos;;
-
-/**
- * Execute a sequence of operations.
- * Wraps `language-common/execute`, and prepends initial state for DHIS2.
- * @example 
- * execute(
- *   create(&apos;foo&apos;),
- *   delete(&apos;bar&apos;)
- * )(state)
- * @constructor
- * @param {Operations} operations - Operations to be performed.
- * @returns {Promise}
- */
-export function execute(...operations) {
-  const initialState = {
-    references: [],
-    data: null
-  }
-
-  return state =&gt; {
-    return commonExecute(...operations)({ ...initialState, ...state })
-  };
-
-}
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import * as Adaptor from &apos;./Adaptor&apos;;
+export default Adaptor;
 </code></pre>
 
 </div>

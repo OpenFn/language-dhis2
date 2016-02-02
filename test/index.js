@@ -1,5 +1,7 @@
 import { expect } from 'chai';
-import { execute, event } from '../src';
+
+import Adaptor from '../src';
+const { execute, event } = Adaptor;
 
 import request from 'superagent';
 import superagentMock from 'superagent-mock';
@@ -68,13 +70,6 @@ describe("event", () => {
       expect(lastReference.params).
         to.eql(JSON.stringify(fixtures.event.requestBody))
 
-      // Check that basic auth is being used.
-      expect(lastReference.headers).
-        to.eql({
-          "Accept": "application/json",
-          "Authorization": "Basic aGVsbG86dGhlcmU=",
-          "Content-Type": "application/json",
-        })
     })
 
   })
