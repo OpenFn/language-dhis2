@@ -41,9 +41,9 @@ export function event(eventData) {
   return state => {
     const body = expandReferences(eventData)(state);
 
-    const { username, password, api } = state.configuration.credentials;
+    const { username, password, apiUrl } = state.configuration;
 
-    const url = resolveUrl(api + '/', 'api/events')
+    const url = resolveUrl(apiUrl + '/', 'api/events')
 
     return post({ username, password, body, url })
     .then((result) => {

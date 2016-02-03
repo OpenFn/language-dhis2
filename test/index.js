@@ -52,11 +52,9 @@ describe("event", () => {
   it("posts to API and returns state", () => {
     let state = {
       configuration: {
-        credentials: {
-          username: "hello",
-          password: "there",
-          api: 'https://play.dhis2.org/demo'
-        }
+        username: "hello",
+        password: "there",
+        apiUrl: 'https://play.dhis2.org/demo'
       }
     };
 
