@@ -45,8 +45,11 @@ export function event(eventData) {
 
     const url = resolveUrl(apiUrl + '/', 'api/events')
 
+    console.log("Posting event:");
+
     return post({ username, password, body, url })
     .then((result) => {
+      console.log("Success:", result);
       return { ...state, references: [ result, ...state.references ] }
     })
 
