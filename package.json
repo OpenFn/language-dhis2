@@ -15,6 +15,7 @@
   ],
   "dependencies": {
     "JSONPath": "^0.10.0",
+    "language-common": "github:openfn/language-common",
     "lodash-fp": "^0.10.2",
     "superagent": "^1.7.2"
   },
