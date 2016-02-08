@@ -56,4 +56,7 @@ export function event(eventData) {
   }
 }
 
-export { field, fields, sourceValue } from 'language-common';
+export {
+  field, fields, sourceValue,
+  merge, dataPath, dataValue, lastReferenceValue
+} from 'language-common';
