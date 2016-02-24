@@ -7,6 +7,9 @@ the [DHIS2 API](http://dhis2.github.io/dhis2-docs/master/en/developer/html/dhis2
 Documentation
 -------------
 
+events(...)
+dataValues(...)
+
 [Docs](docs/index)
 
 
@@ -18,4 +21,3 @@ Clone the repo, run `npm install`.
 Run tests using `npm run test` or `npm run test:watch`
 
 Build the project using `make`.
-

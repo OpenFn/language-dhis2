@@ -38,7 +38,7 @@ describe("execute", () => {
         data: null
       })
     })
-  
+
   })
 })
 
@@ -75,5 +75,5 @@ describe("event", () => {
   after(() => {
     mockRequest.unset()
   })
-  
+
 })
