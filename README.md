@@ -8,7 +8,7 @@ Documentation
 -------------
 ## Events API
 
-### Desired `Events API` expression:
+#### Desired `Events API` expression:
 ```js
 events("program", "orgUnit", fields(
   field(...),
@@ -22,7 +22,7 @@ events("program", "orgUnit", fields(
 ))
 ```
 
-// Current `Events API` expression—too bulky
+#### Current `Events API` expression—too bulky
 ```js
 event(
   fields(
@@ -48,7 +48,7 @@ event(
 
 ## Data Values / Data Value Sets API
 
-### Desired `DataValueSets API` expression:
+#### Desired `DataValueSets API` expression:
 ```js
 dataValueSet("dataSet", "orgUnit", fields(
   field(...),
@@ -62,7 +62,7 @@ dataValueSet("dataSet", "orgUnit", fields(
 ))
 ```
 
-// Current `DataValueSets API` expression—too bulky
+#### Current `DataValueSets API` expression—too bulky
 ```js
 dataValueSet(
   fields(
