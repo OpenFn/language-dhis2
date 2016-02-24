@@ -46,6 +46,7 @@ export function event(eventData) {
     const url = resolveUrl(apiUrl + '/', 'api/events')
 
     console.log("Posting event:");
+    console.log(body)
 
     return post({ username, password, body, url })
     .then((result) => {
@@ -67,6 +68,7 @@ export function dataValueSet(dataValueSetData) {
     const url = resolveUrl(apiUrl + '/', 'api/dataValueSets')
 
     console.log("Posting data value set:");
+    console.log(body)
 
     return post({ username, password, body, url })
     .then((result) => {
