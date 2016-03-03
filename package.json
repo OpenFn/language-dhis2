@@ -9,7 +9,7 @@
     "test:watch": "mocha -w --compilers js:babel-core/register"
   },
   "author": "Stuart Corbishley",
-  "license": "GNU GPL",
+  "license": "LGPLv3",
   "files": [
     "lib/"
   ],
