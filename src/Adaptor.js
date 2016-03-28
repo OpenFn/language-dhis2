@@ -80,13 +80,7 @@ export function dataValueSet(dataValueSetData) {
 }
 
 export function dataElement(key, value) {
-  return state => {
-    if (typeof value == "function") {
-      return { dataElement: key, value: value(state) };
-    }
-
-    return { dataElement: key, value };
-  }
+  return { "dataElement": key, "value": value }
 }
 
 export {
