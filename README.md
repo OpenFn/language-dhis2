@@ -37,9 +37,9 @@ event(
     }),
     field("dataValues", function(state) {
       return [
-        { "dataElement": "qrur9Dvnyt5", "value": dataValue("prop_a")(state) },
-        { "dataElement": "oZg33kd9taw", "value": dataValue("prop_b")(state) },
-        { "dataElement": "msodh3rEMJa", "value": dataValue("prop_c")(state) }
+        dataElement("qrur9Dvnyt5", dataValue("prop_a"))(state)
+        dataElement("oZg33kd9taw", dataValue("prop_b"))(state)
+        dataElement("msodh3rEMJa", dataValue("prop_c"))(state)
       ]
     })
   )

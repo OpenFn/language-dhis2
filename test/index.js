@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
 import Adaptor from '../src';
-const { execute, event } = Adaptor;
+const { execute, event, dataElement } = Adaptor;
 
 import request from 'superagent';
 import superagentMock from 'superagent-mock';
@@ -76,4 +76,12 @@ describe("event", () => {
     mockRequest.unset()
   })
 
+})
+
+describe("dataElement", function() {
+  it("creates a on dataElement object object", function() {
+    let result = dataElement("key", function() { return "foo" })()
+
+    expect(result).to.eql({ dataElement: "key", value: "foo" })
+  })
 })
