@@ -2,6 +2,8 @@ import { execute as commonExecute, expandReferences } from 'language-common';
 import { post } from './Client';
 import { resolve as resolveUrl } from 'url';
 
+/** @module Adaptor */
+
 /**
  * Execute a sequence of operations.
  * Wraps `language-common/execute`, and prepends initial state for DHIS2.
