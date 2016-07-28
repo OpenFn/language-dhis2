@@ -32,7 +32,7 @@ export function execute(...operations) {
  * Create an event
  * @example
  * execute(
- *   event(data)
+ *   event(eventData)
  * )(state)
  * @constructor
  * @param {object} eventData - Payload data for the event
@@ -59,11 +59,20 @@ export function event(eventData) {
   }
 }
 
-// Send data values using the dataValueSets resource
-export function dataValueSet(dataValueSetData) {
+/**
+ * Send data values using the dataValueSets resource
+ * @example
+ * execute(
+ *   dataValueSet(data)
+ * )(state)
+ * @constructor
+ * @param {object} data - Payload data for the data value set
+ * @returns {Operation}
+ */
+export function dataValueSet(data) {
 
   return state => {
-    const body = expandReferences(dataValueSetData)(state);
+    const body = expandReferences(data)(state);
 
     const { username, password, apiUrl } = state.configuration;
 
@@ -83,6 +92,114 @@ export function dataValueSet(dataValueSetData) {
 
 export function dataElement(key, value) {
   return { "dataElement": key, "value": value }
+}
+
+/**
+ * Create one or many new Tracked Entity Instances
+ * @example
+ * execute(
+ *   createTEI(data)
+ * )(state)
+ * @constructor
+ * @param {object} data - Payload data for new tracked entity instance(s)
+ * @returns {Operation}
+ */
+export function createTEI(data) {
+
+  return state => {
+
+    const body = expandReferences(data)(state);
+
+    const { username, password, apiUrl } = state.configuration;
+
+    const url = resolveUrl(apiUrl + '/', 'api/trackedEntityInstances')
+
+    console.log("Posting tracked entity instance data:");
+    console.log(body)
+
+    return post({ username, password, body, url })
+    .then((result) => {
+      console.log("Success:", result);
+      return { ...state, references: [ result, ...state.references ] }
+    })
+
+  }
+}
+
+/**
+ * Update existing Tracked Entity Instances
+ * @example
+ * execute(
+ *   updateTEI(data)
+ * )(state)
+ * @constructor
+ * @param {object} data - Payload data for updating tracked entity instance(s)
+ * @returns {Operation}
+ */
+export function updateTEI(data) {
+
+  return state => {
+    const body = expandReferences(data)(state);
+
+    const { username, password, apiUrl } = state.configuration;
+
+    const url = resolveUrl(apiUrl + '/', 'api/trackedEntityInstances')
+
+    console.log("Posting tracked entity instance data:");
+    console.log(body)
+
+    return post({ username, password, body, url })
+    .then((result) => {
+      console.log("Success:", result);
+      return { ...state, references: [ result, ...state.references ] }
+    })
+
+  }
+}
+
+// Create and enroll TrackedEntityInstances
+// export function upsertEnroll(upsertData) {
+//
+//   return state => {
+//     const body = expandReferences(trackedEntityInstanceData)(state);
+//
+//     const { username, password, apiUrl } = state.configuration;
+//
+//     const url = resolveUrl(apiUrl + '/', 'api/trackedEntityInstances')
+//
+//     console.log("Posting tracked entity instance data:");
+//     console.log(body)
+//
+//     return post({ username, password, body, url })
+//     .then((result) => {
+//       console.log("Success:", result);
+//       return { ...state, references: [ result, ...state.references ] }
+//     })
+//
+//   }
+// }
+
+
+// Enroll a tracked entity instance in a program
+export function enroll(enrollmentData) {
+
+  return state => {
+    const body = expandReferences(enrollmentData)(state);
+
+    const { username, password, apiUrl } = state.configuration;
+
+    const url = resolveUrl(apiUrl + '/', 'api/enrollments')
+
+    console.log("Enrolling tracked entity instance:");
+    console.log(body)
+
+    return post({ username, password, body, url })
+    .then((result) => {
+      console.log("Success:", result);
+      return { ...state, references: [ result, ...state.references ] }
+    })
+
+  }
 }
 
 export {
