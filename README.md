@@ -6,6 +6,28 @@ the [DHIS2 API](http://dhis2.github.io/dhis2-docs/master/en/developer/html/dhis2
 
 Documentation
 -------------
+
+## Tracked Entity API
+
+#### Create a new tracked entity instance from a CommCare form submission.
+```js
+createTEI(
+  fields(
+    field("trackedEntity", "nEenWmSyUEp"),
+    field("orgUnit", "DiszpKrYNg8"),
+    field("attributes", function(state) {
+      return [{
+        "attribute": "w75KJ2mc4zz",
+        "value": dataValue("form.first_name")(state)
+      }, {
+        "attribute": "zDhUuAYrxNC",
+        "value": dataValue("form.last_name")(state)
+      }]
+    })
+  )
+)
+```
+
 ## Events API
 
 #### Desired `Events API` expression:
