@@ -30,21 +30,7 @@ createTEI(
 
 ## Events API
 
-#### Desired `Events API` expression:
-```js
-events("program", "orgUnit", fields(
-  field(...),
-  field(...),
-  field(...),
-  dataValues(
-    field("dataElement", "value"),
-    field("dataElement", "value"),
-    field("dataElement", "value")
-  )
-))
-```
-
-#### Current `Events API` expression—too bulky
+#### `Events API` expression
 ```js
 event(
   fields(
@@ -70,33 +56,19 @@ event(
 
 ## Data Values / Data Value Sets API
 
-#### Desired `DataValueSets API` expression:
-```js
-dataValueSet("dataSet", "orgUnit", fields(
-  field(...),
-  field(...),
-  field(...),
-  dataValues(
-    field("dataElement", "value"),
-    field("dataElement", "value"),
-    field("dataElement", "value")
-  )
-))
-```
-
-#### Current `DataValueSets API` expression—too bulky
+#### Current `DataValueSets API` expression
 ```js
 dataValueSet(
   fields(
     field("dataSet", "pBOMPrpg1QX"),
     field("orgUnit", "DiszpKrYNg8"),
     field("period", "201401"),
-    field("completeData", dataValue("date")),
+    field("completeData", dataValue("form.date")),
     field("dataValues", function(state) {
       return [
-        { "dataElement": "f7n9E0hX8qk", "value": dataValue("prop_a")(state) },
-        { "dataElement": "Ix2HsbDMLea", "value": dataValue("prop_b")(state) },
-        { "dataElement": "eY5ehpbEsB7", "value": dataValue("prop_c")(state) }
+        dataElement("qrur9Dvnyt5", dataValue("form.prop_a")(state)),
+        dataElement("oZg33kd9taw", dataValue("form.prop_b")(state)),
+        dataElement("msodh3rEMJa", dataValue("form.prop_c")(state))
       ]
     })
   )
