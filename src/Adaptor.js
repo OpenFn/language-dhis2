@@ -1,6 +1,14 @@
-import { execute as commonExecute, expandReferences } from 'language-common';
-import { post, put } from './Client';
-import { resolve as resolveUrl } from 'url';
+import {
+  execute as commonExecute,
+  expandReferences
+} from 'language-common';
+import {
+  post,
+  put
+} from './Client';
+import {
+  resolve as resolveUrl
+} from 'url';
 
 /** @module Adaptor */
 
@@ -23,7 +31,9 @@ export function execute(...operations) {
   }
 
   return state => {
-    return commonExecute(...operations)({ ...initialState, ...state })
+    return commonExecute(...operations)({...initialState,
+      ...state
+    })
   };
 
 }
@@ -43,18 +53,29 @@ export function event(eventData) {
   return state => {
     const body = expandReferences(eventData)(state);
 
-    const { username, password, apiUrl } = state.configuration;
+    const {
+      username,
+      password,
+      apiUrl
+    } = state.configuration;
 
     const url = resolveUrl(apiUrl + '/', 'api/events')
 
     console.log("Posting event:");
     console.log(body)
 
-    return post({ username, password, body, url })
-    .then((result) => {
-      console.log("Success:", result);
-      return { ...state, references: [ result, ...state.references ] }
-    })
+    return post({
+        username,
+        password,
+        body,
+        url
+      })
+      .then((result) => {
+        console.log("Success:", result);
+        return {...state,
+          references: [result, ...state.references]
+        }
+      })
 
   }
 }
@@ -74,18 +95,29 @@ export function dataValueSet(data) {
   return state => {
     const body = expandReferences(data)(state);
 
-    const { username, password, apiUrl } = state.configuration;
+    const {
+      username,
+      password,
+      apiUrl
+    } = state.configuration;
 
     const url = resolveUrl(apiUrl + '/', 'api/dataValueSets')
 
     console.log("Posting data value set:");
     console.log(body)
 
-    return post({ username, password, body, url })
-    .then((result) => {
-      console.log("Success:", result);
-      return { ...state, references: [ result, ...state.references ] }
-    })
+    return post({
+        username,
+        password,
+        body,
+        url
+      })
+      .then((result) => {
+        console.log("Success:", result);
+        return {...state,
+          references: [result, ...state.references]
+        }
+      })
 
   }
 }
@@ -102,7 +134,10 @@ export function dataValueSet(data) {
  * @returns {Operation}
  */
 export function dataElement(key, value) {
-  return { "dataElement": key, "value": value }
+  return {
+    "dataElement": key,
+    "value": value
+  }
 }
 
 /**
@@ -121,18 +156,29 @@ export function createTEI(data) {
 
     const body = expandReferences(data)(state);
 
-    const { username, password, apiUrl } = state.configuration;
+    const {
+      username,
+      password,
+      apiUrl
+    } = state.configuration;
 
     const url = resolveUrl(apiUrl + '/', 'api/trackedEntityInstances')
 
     console.log("Posting tracked entity instance data:");
     console.log(body)
 
-    return post({ username, password, body, url })
-    .then((result) => {
-      console.log("Success:", result);
-      return { ...state, references: [ result, ...state.references ] }
-    })
+    return post({
+        username,
+        password,
+        body,
+        url
+      })
+      .then((result) => {
+        console.log("Success:", result);
+        return {...state,
+          references: [result, ...state.references]
+        }
+      })
 
   }
 }
@@ -153,18 +199,29 @@ export function updateTEI(tei, data) {
   return state => {
     const body = expandReferences(data)(state);
 
-    const { username, password, apiUrl } = state.configuration;
+    const {
+      username,
+      password,
+      apiUrl
+    } = state.configuration;
 
     const url = apiUrl.concat(`/api/trackedEntityInstances/${tei}`)
 
     console.log(`Updating tracked entity instance ${tei} with data:`);
     console.log(body)
 
-    return put({ username, password, body, url })
-    .then((result) => {
-      console.log("Success:", result);
-      return { ...state, references: [ result, ...state.references ] }
-    })
+    return put({
+        username,
+        password,
+        body,
+        url
+      })
+      .then((result) => {
+        console.log("Success:", result);
+        return {...state,
+          references: [result, ...state.references]
+        }
+      })
 
   }
 }
@@ -216,23 +273,41 @@ export function enroll(tei, enrollmentData) {
     const body = expandReferences(enrollmentData)(state);
     body["trackedEntityInstance"] = tei;
 
-    const { username, password, apiUrl } = state.configuration;
+    const {
+      username,
+      password,
+      apiUrl
+    } = state.configuration;
 
     const url = resolveUrl(apiUrl + '/', 'api/enrollments')
 
     console.log("Enrolling tracked entity instance with data:");
     console.log(body)
 
-    return post({ username, password, body, url })
-    .then((result) => {
-      console.log("Success:", result);
-      return { ...state, references: [ result, ...state.references ] }
-    })
+    return post({
+        username,
+        password,
+        body,
+        url
+      })
+      .then((result) => {
+        console.log("Success:", result);
+        return {...state,
+          references: [result, ...state.references]
+        }
+      })
 
   }
 }
 
 export {
-  field, fields, sourceValue,
-  merge, dataPath, dataValue, lastReferenceValue
-} from 'language-common';
+  field,
+  fields,
+  sourceValue,
+  merge,
+  each,
+  dataPath,
+  dataValue,
+  lastReferenceValue
+}
+from 'language-common';
