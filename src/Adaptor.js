@@ -39,6 +39,46 @@ export function execute(...operations) {
 }
 
 /**
+ * Fetch a dataValueSet
+ * @example
+ * execute(
+ *   fetchData(dataSetId, period, orgUnit)
+ * )(state)
+ * @constructor
+ * @param {string} dataSet - data set ID
+ * @param {string} period - period code
+ * @param {string} orgUnit - org unit ID
+ * @returns {Operation}
+ */
+ export function fetchData(eventData) {
+
+   return state => {
+     const body = expandReferences(eventData)(state);
+    // https://docs.dhis2.org/2.22/en/developer/html/ch01s13.html#d5e1642
+   };
+
+ };
+
+ /**
+  * Fetch an event
+  * @example
+  * execute(
+  *   fetchEvent(eventsQuery)
+  * )(state)
+  * @constructor
+  * @param {object} eventsQuery - data to query for events
+  * @returns {Operation}
+  */
+  export function fetchEvents(params) {
+
+    return state => {
+      const body = expandReferences(params)(state);
+      // https://docs.dhis2.org/2.22/en/developer/html/ch01s15.html#d5e1994
+    };
+
+  };
+
+/**
  * Create an event
  * @example
  * execute(
