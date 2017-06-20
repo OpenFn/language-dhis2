@@ -80,7 +80,7 @@ describe("event", () => {
 
 describe("dataElement", function() {
   it("creates a on dataElement object object", function() {
-    let result = dataElement("key", function() { return "foo" })()
+    let result = dataElement("key", "foo")
 
     expect(result).to.eql({ dataElement: "key", value: "foo" })
   })
