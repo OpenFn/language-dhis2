@@ -1,4 +1,4 @@
-Language DHIS2
+Language DHIS2 [![Build Status](https://travis-ci.org/OpenFn/language-dhis2.svg?branch=master)](https://travis-ci.org/OpenFn/language-dhis2)
 ==============
 
 Language Pack for building expressions and operations for working with
