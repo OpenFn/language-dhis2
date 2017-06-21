@@ -3,6 +3,7 @@ import {
   expandReferences
 } from 'language-common';
 import {
+  get,
   post,
   put
 } from './Client';
@@ -50,14 +51,54 @@ export function execute(...operations) {
  * @param {string} orgUnit - org unit ID
  * @returns {Operation}
  */
- export function fetchData(eventData) {
+export function fetchData(params) {
 
-   return state => {
-     const body = expandReferences(eventData)(state);
+  return state => {
+    const data = expandReferences(params)(state);
+
+    const {username, password, apiUrl} = state.configuration;
+
+    const url = resolveUrl(apiUrl + '/', 'api/dataValueSets.json?')
+
+    const query = data.fields
+
+    console.log("Getting Data Value Sets:");
+
+    return get({username, password, query, url})
+    .then((result) => {
+      console.log("Success:", result);
+      return {
+        ...state,
+        references: [
+          result, ...state.references
+        ]
+      }
+    })
+    .then((nextState) => {
+      if (data.postUrl) {
+        const body = nextState.references[0].body
+
+        const url = data.postUrl
+
+        return post({username, password, body, url}).then((result) => {
+          console.log("Success:", result);
+          return {
+            ...state,
+            references: [
+              result, ...state.references
+            ]
+          }
+        })
+        return data.postUrl
+      }else {
+        console.log(nextState.references[0].body)
+        return nextState
+      }
+    })
     // https://docs.dhis2.org/2.22/en/developer/html/ch01s13.html#d5e1642
-   };
+  };
 
- };
+};
 
  /**
   * Fetch an event
