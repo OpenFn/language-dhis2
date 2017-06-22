@@ -66,22 +66,18 @@ export function fetchData(params) {
 
     return get({username, password, query, url})
     .then((result) => {
-      console.log("Success:", result);
-      return {
-        ...state,
-        references: [
-          result, ...state.references
-        ]
-      }
+      console.log("Get Result:", result.body);
+      return result
     })
-    .then((nextState) => {
+    .then((result) => {
       if (data.postUrl) {
-        const body = nextState.references[0].body
+        const body = result.body
 
         const url = data.postUrl
 
-        return post({username, password, body, url}).then((result) => {
-          console.log("Success:", result);
+        return post({username, password, body, url})
+        .then((result) => {
+          console.log("Post Result:", result.statusCode);
           return {
             ...state,
             references: [
@@ -89,10 +85,13 @@ export function fetchData(params) {
             ]
           }
         })
-        return data.postUrl
-      }else {
-        console.log(nextState.references[0].body)
-        return nextState
+      } else {
+        return {
+          ...state,
+          references: [
+            result, ...state.references
+          ]
+        }
       }
     })
     // https://docs.dhis2.org/2.22/en/developer/html/ch01s13.html#d5e1642
@@ -110,14 +109,52 @@ export function fetchData(params) {
   * @param {object} eventsQuery - data to query for events
   * @returns {Operation}
   */
-  export function fetchEvents(params) {
+export function fetchEvents(params) {
 
-    return state => {
-      const body = expandReferences(params)(state);
-      // https://docs.dhis2.org/2.22/en/developer/html/ch01s15.html#d5e1994
-    };
+  return state => {
+    const data = expandReferences(params)(state);
 
+    const {username, password, apiUrl} = state.configuration;
+
+    const url = resolveUrl(apiUrl + '/', 'api/events.json?')
+
+    const query = data.fields
+
+    console.log("Getting Events Data:");
+
+    return get({username, password, query, url})
+    .then((result) => {
+      console.log("Get Result:", result.body);
+      return result
+    }).then((result) => {
+      if (data.postUrl) {
+        const body = result.body
+
+        const url = data.postUrl
+
+        return post({username, password, body, url})
+        .then((result) => {
+          console.log("Post Result:", result.statusCode);
+          return {
+            ...state,
+            references: [
+              result, ...state.references
+            ]
+          }
+        })
+      } else {
+        return {
+          ...state,
+          references: [
+            result, ...state.references
+          ]
+        }
+      }
+    })
+    // https://docs.dhis2.org/2.22/en/developer/html/ch01s15.html#d5e1994
   };
+
+};
 
 /**
  * Create an event
@@ -198,6 +235,9 @@ export function dataValueSet(data) {
         return {...state,
           references: [result, ...state.references]
         }
+
+        state.references = result
+        return state
       })
 
   }

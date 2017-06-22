@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 
 import Adaptor from '../src';
-const { execute, event, dataElement } = Adaptor;
+const { execute, event, dataElement, fetchData, fetchEvents} = Adaptor;
 
 import request from 'superagent';
 import superagentMock from 'superagent-mock';
@@ -85,3 +85,61 @@ describe("dataElement", function() {
     expect(result).to.eql({ dataElement: "key", value: "foo" })
   })
 })
+
+describe("fetchData", function() {
+
+  it("fetches data set values", function() {
+    let state = {
+      configuration: {
+        username: "admin",
+        password: "district",
+        apiUrl: 'https://play.dhis2.org/demo'
+      }
+    };
+
+    let params = {
+      fields: {
+        dataSet: 'pBOMPrpg1QX',
+        orgUnit: 'DiszpKrYNg8',
+        period: '201401'
+      }
+    }
+
+    return execute(fetchData(params))(state)
+    .then((state) => {
+      let lastReference = state.references[0]
+      expect(lastReference.statusCode).to.eql(200)
+
+    })
+
+  }).timeout(10000)
+});
+
+describe("fetchEvents", function() {
+
+  it("fetches events", function() {
+    let state = {
+      configuration: {
+        username: "admin",
+        password: "district",
+        apiUrl: 'https://play.dhis2.org/demo'
+      }
+    };
+
+    let params = {
+        fields: {
+          orgUnit: 'DiszpKrYNg8',
+          program: 'eBAyeGv0exc',
+          endDate: '2016-01-01'
+        }
+    }
+
+    return execute(fetchEvents(params))(state)
+    .then((state) => {
+      let lastReference = state.references[0]
+      expect(lastReference.statusCode).to.eql(200)
+
+    })
+
+  }).timeout(10000)
+});

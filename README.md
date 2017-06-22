@@ -54,6 +54,18 @@ event(
 )
 ```
 
+#### Current `fetchEvents API` expression (Optional `postUrl` for a complete fetch)
+```js
+fetchEvents({
+  fields: {
+    orgUnit: 'DiszpKrYNg8',
+    program: 'eBAyeGv0exc',
+    endDate: '2016-01-01'
+  },
+  postUrl: "https://www.openfn.org/inbox/123"
+})
+```
+
 ## Data Values / Data Value Sets API
 
 #### Current `DataValueSets API` expression
@@ -73,6 +85,18 @@ dataValueSet(
     })
   )
 )
+```
+
+#### Current `fetchData API` expression (Optional `postUrl` for a complete fetch)
+```js
+fetchData({
+  fields: {
+    dataSet: 'pBOMPrpg1QX',
+    orgUnit: 'DiszpKrYNg8',
+    period: '201401'
+  },
+  postUrl: "https://www.openfn.org/inbox/123"
+})
 ```
 
 [Docs](docs/index)
