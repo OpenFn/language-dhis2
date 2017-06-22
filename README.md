@@ -65,6 +65,7 @@ fetchEvents({
   postUrl: "https://www.openfn.org/inbox/123"
 })
 ```
+#### Reference on how to query and read events https://docs.dhis2.org/2.22/en/developer/html/ch01s15.html#d5e1994
 
 ## Data Values / Data Value Sets API
 
@@ -98,6 +99,8 @@ fetchData({
   postUrl: "https://www.openfn.org/inbox/123"
 })
 ```
+#### Reference on how to read data values https://docs.dhis2.org/2.22/en/developer/html/ch01s13.html#d5e1642
+
 
 [Docs](docs/index)
 

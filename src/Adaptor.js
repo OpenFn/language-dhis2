@@ -94,7 +94,6 @@ export function fetchData(params) {
         }
       }
     })
-    // https://docs.dhis2.org/2.22/en/developer/html/ch01s13.html#d5e1642
   };
 
 };
@@ -151,7 +150,6 @@ export function fetchEvents(params) {
         }
       }
     })
-    // https://docs.dhis2.org/2.22/en/developer/html/ch01s15.html#d5e1994
   };
 
 };
