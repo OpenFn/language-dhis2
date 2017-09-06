@@ -42,13 +42,13 @@ export function execute(...operations) {
 /**
  * Fetch a dataValueSet
  * @example
- * execute(
- *   fetchData(dataSetId, period, orgUnit)
- * )(state)
+ * execute({
+ *   dataSet: 'pBOMPrpg1QX',
+ *   orgUnit: 'DiszpKrYNg8',
+ *   period: '201401'
+ * })(state)
  * @constructor
- * @param {string} dataSet - data set ID
- * @param {string} period - period code
- * @param {string} orgUnit - org unit ID
+ * @param {object} params - data to query for events
  * @returns {Operation}
  */
 export function fetchData(params) {
