@@ -42,11 +42,14 @@ export function execute(...operations) {
 /**
  * Fetch a dataValueSet
  * @example
- * execute({
- *   dataSet: 'pBOMPrpg1QX',
- *   orgUnit: 'DiszpKrYNg8',
- *   period: '201401'
- * })(state)
+ * fetchData({
+ *   fields: {
+ *     dataSet: 'pBOMPrpg1QX',
+ *     orgUnit: 'DiszpKrYNg8',
+ *     period: '201401'
+ *   },
+ *   postUrl: "yourposturl"
+ * })
  * @constructor
  * @param {object} params - data to query for events
  * @returns {Operation}
@@ -101,11 +104,15 @@ export function fetchData(params) {
  /**
   * Fetch an event
   * @example
-  * execute(
-  *   fetchEvent(eventsQuery)
-  * )(state)
+  * fetchEvents({
+  *   fields: {
+  *     orgUnit: 'DiszpKrYNg8',
+  *     period: '201401'
+  *   },
+  *   postUrl: "yourposturl"
+  * })
   * @constructor
-  * @param {object} eventsQuery - data to query for events
+  * @param {object} params - data to query for events
   * @returns {Operation}
   */
 export function fetchEvents(params) {
@@ -380,9 +387,10 @@ export function updateTEI(tei, data) {
  * Enroll a tracked entity instance in a program
  * @example
  * execute(
- *   enroll(enrollmentData)
+ *   enroll(tei, enrollmentData)
  * )(state)
  * @constructor
+ * @param {object} tei
  * @param {object} enrollmentData - Payload data for new enrollment
  * @returns {Operation}
  */
