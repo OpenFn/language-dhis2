@@ -41,6 +41,7 @@ export function execute(...operations) {
 
 /**
  * Fetch a dataValueSet
+ * @public
  * @example
  * fetchData({
  *   fields: {
@@ -103,6 +104,7 @@ export function fetchData(params) {
 
  /**
   * Fetch an event
+  * @public
   * @example
   * fetchEvents({
   *   fields: {
@@ -163,10 +165,9 @@ export function fetchEvents(params) {
 
 /**
  * Create an event
+ * @public
  * @example
- * execute(
- *   event(eventData)
- * )(state)
+ * event(eventData)
  * @constructor
  * @param {object} eventData - Payload data for the event
  * @returns {Operation}
@@ -205,10 +206,9 @@ export function event(eventData) {
 
 /**
  * Send data values using the dataValueSets resource
+ * @public
  * @example
- * execute(
- *   dataValueSet(data)
- * )(state)
+ * dataValueSet(data)
  * @constructor
  * @param {object} data - Payload data for the data value set
  * @returns {Operation}
@@ -250,10 +250,9 @@ export function dataValueSet(data) {
 
 /**
  * Create a "dataElement" pairing for DHIS2.
+ * @public
  * @example
- * execute(
- *   dataElement(key, value)
- * )(state)
+ * dataElement(key, value)
  * @constructor
  * @param {object} key - Payload data for the Data Element key
  * @param {object} value - Payload data for the Data Element value
@@ -268,10 +267,9 @@ export function dataElement(key, value) {
 
 /**
  * Create one or many new Tracked Entity Instances
+ * @public
  * @example
- * execute(
- *   createTEI(data)
- * )(state)
+ * createTEI(data)
  * @constructor
  * @param {object} data - Payload data for new tracked entity instance(s)
  * @returns {Operation}
@@ -311,10 +309,9 @@ export function createTEI(data) {
 
 /**
  * Update existing Tracked Entity Instances
+ * @public
  * @example
- * execute(
- *   updateTEI(tei, data)
- * )(state)
+ * updateTEI(tei, data)
  * @constructor
  * @param {object} tei - Payload data for the TEI to be updated
  * @param {object} data - Payload data for updating a TEI
@@ -385,10 +382,9 @@ export function updateTEI(tei, data) {
 
 /**
  * Enroll a tracked entity instance in a program
+ * @public
  * @example
- * execute(
- *   enroll(tei, enrollmentData)
- * )(state)
+ * enroll(tei, enrollmentData)
  * @constructor
  * @param {object} tei
  * @param {object} enrollmentData - Payload data for new enrollment
@@ -435,6 +431,7 @@ export {
   each,
   dataPath,
   dataValue,
-  lastReferenceValue
+  lastReferenceValue,
+  alterState
 }
 from 'language-common';
