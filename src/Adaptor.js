@@ -272,7 +272,7 @@ export function dataValueSet(data) {
  * @example
  * dataElement(key, value)
  * @constructor
- * @param {string} key - Payload data for the Data Element key
+ * @param {string} dataElement - Payload data for the Data Element key
  * @param {variable} value - Payload data for the Data Element value
  * @param {string} comment - comment for the Data Element
  * @returns {Operation}
