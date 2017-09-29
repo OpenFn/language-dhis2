@@ -1,17 +1,9 @@
-import {
-  execute as commonExecute,
-  expandReferences
-} from 'language-common';
-import {
-  get,
-  post,
-  put
-} from './Client';
-import {
-  resolve as resolveUrl
-} from 'url';
-
 /** @module Adaptor */
+
+import { execute as commonExecute, expandReferences } from 'language-common';
+import { get, post, put } from './Client';
+import { resolve as resolveUrl } from 'url';
+import { mapValues } from 'lodash/fp';
 
 /**
  * Execute a sequence of operations.
@@ -58,6 +50,7 @@ export function execute(...operations) {
 export function fetchData(params) {
 
   return state => {
+
     const data = expandReferences(params)(state);
 
     const {username, password, apiUrl} = state.configuration;
@@ -204,11 +197,35 @@ export function event(eventData) {
   }
 }
 
+function expandDataValues(obj) {
+  return state => {
+    return mapValues(function(value) {
+      if (typeof value == 'object') {
+        return value.map((item) => {
+          return expandDataValues(item)(state)
+        })
+      } else {
+        return typeof value == 'function' ? value(state) : value;
+      }
+    })(obj);
+  }
+}
+
 /**
  * Send data values using the dataValueSets resource
  * @public
  * @example
- * dataValueSet(data)
+ *  dataValueSet({
+ *    dataSet: dataValue("set"),
+ *    orgUnit: "DiszpKrYNg8",
+ *    period: "201402",
+ *    completeData: "2014-03-03",
+ *    dataValues: [
+ *      dataElement("f7n9E0hX8qk", dataValue("name")),
+ *      dataElement("Ix2HsbDMLea", dataValue("age")),
+ *      dataElement("eY5ehpbEsB7", 30)
+ *    ]
+ * });
  * @constructor
  * @param {object} data - Payload data for the data value set
  * @returns {Operation}
@@ -216,7 +233,8 @@ export function event(eventData) {
 export function dataValueSet(data) {
 
   return state => {
-    const body = expandReferences(data)(state);
+
+    const body = expandDataValues(data)(state);
 
     const {
       username,
@@ -236,7 +254,7 @@ export function dataValueSet(data) {
         url
       })
       .then((result) => {
-        console.log("Success:", result);
+        console.log("Success:", result.body);
         return {...state,
           references: [result, ...state.references]
         }
@@ -254,15 +272,13 @@ export function dataValueSet(data) {
  * @example
  * dataElement(key, value)
  * @constructor
- * @param {object} key - Payload data for the Data Element key
- * @param {object} value - Payload data for the Data Element value
+ * @param {string} key - Payload data for the Data Element key
+ * @param {variable} value - Payload data for the Data Element value
+ * @param {string} comment - comment for the Data Element
  * @returns {Operation}
  */
-export function dataElement(key, value) {
-  return {
-    "dataElement": key,
-    "value": value
-  }
+export function dataElement(dataElement, value, comment) {
+  return { dataElement, value, comment }
 }
 
 /**

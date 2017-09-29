@@ -71,21 +71,17 @@ fetchEvents({
 
 #### Current `DataValueSets API` expression
 ```js
-dataValueSet(
-  fields(
-    field("dataSet", "pBOMPrpg1QX"),
-    field("orgUnit", "DiszpKrYNg8"),
-    field("period", "201401"),
-    field("completeData", dataValue("form.date")),
-    field("dataValues", function(state) {
-      return [
-        dataElement("qrur9Dvnyt5", dataValue("form.prop_a")(state)),
-        dataElement("oZg33kd9taw", dataValue("form.prop_b")(state)),
-        dataElement("msodh3rEMJa", dataValue("form.prop_c")(state))
-      ]
-    })
-  )
-)
+dataValueSet({
+  dataSet: dataValue("set"),
+  orgUnit: "DiszpKrYNg8",
+  period: "201402",
+  completeData: "2014-03-03",
+  dataValues: [
+    dataElement("f7n9E0hX8qk", dataValue("data[0].site_school_number")),
+    dataElement("Ix2HsbDMLea", dataValue("age")),
+    dataElement("eY5ehpbEsB7", 30)
+  ]
+});
 ```
 
 #### Current `fetchData API` expression (Optional `postUrl` for a complete fetch)

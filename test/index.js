@@ -79,10 +79,12 @@ describe("event", () => {
 })
 
 describe("dataElement", function() {
-  it("creates a on dataElement object object", function() {
-    let result = dataElement("key", "foo")
+  it("creates a dataElement from key, value, comment args", function() {
+    let element = dataElement("key", "foo")
+    expect(element).to.eql({ dataElement: "key", value: "foo", comment: undefined })
 
-    expect(result).to.eql({ dataElement: "key", value: "foo" })
+    let commentedElement = dataElement("key", "foo", "bar")
+    expect(commentedElement).to.eql({ dataElement: "key", value: "foo", comment: "bar" })
   })
 })
 
