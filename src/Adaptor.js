@@ -47,7 +47,7 @@ export function execute(...operations) {
  * @param {object} params - data to query for events
  * @returns {Operation}
  */
-export function fetchData(params) {
+export function fetchData(params, postUrl) {
 
   return state => {
 
@@ -67,10 +67,10 @@ export function fetchData(params) {
       return result
     })
     .then((result) => {
-      if (data.postUrl) {
+      if (postUrl) {
         const body = result.body
 
-        const url = data.postUrl
+        const url = postUrl
 
         return post({username, password, body, url})
         .then((result) => {
@@ -110,7 +110,7 @@ export function fetchData(params) {
   * @param {object} params - data to query for events
   * @returns {Operation}
   */
-export function fetchEvents(params) {
+export function fetchEvents(params, postUrl) {
 
   return state => {
     const data = expandReferences(params)(state);
@@ -128,10 +128,10 @@ export function fetchEvents(params) {
       console.log("Get Result:", result.body);
       return result
     }).then((result) => {
-      if (data.postUrl) {
+      if (postUrl) {
         const body = result.body
 
-        const url = data.postUrl
+        const url = postUrl
 
         return post({username, password, body, url})
         .then((result) => {
