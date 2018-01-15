@@ -57,7 +57,7 @@ export function fetchData(params) {
 
     const url = resolveUrl(apiUrl + '/', 'api/dataValueSets.json?')
 
-    const query = data.fields
+    const query = data.fields || expandDataValues(params)(state);
 
     console.log("Getting Data Value Sets:");
 
@@ -119,7 +119,7 @@ export function fetchEvents(params) {
 
     const url = resolveUrl(apiUrl + '/', 'api/events.json?')
 
-    const query = data.fields
+    const query = data.fields || expandDataValues(params)(state);
 
     console.log("Getting Events Data:");
 
