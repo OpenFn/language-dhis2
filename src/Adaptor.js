@@ -40,11 +40,12 @@ export function execute(...operations) {
  *     dataSet: 'pBOMPrpg1QX',
  *     orgUnit: 'DiszpKrYNg8',
  *     period: '201401'
- *   },
+ *   }},
  *   postUrl: "yourposturl"
- * })
+ * )
  * @constructor
  * @param {object} params - data to query for events
+ * @param {String} postUrl - (optional) URL to post the result
  * @returns {Operation}
  */
 export function fetchData(params, postUrl) {
@@ -103,11 +104,12 @@ export function fetchData(params, postUrl) {
   *   fields: {
   *     orgUnit: 'DiszpKrYNg8',
   *     period: '201401'
-  *   },
+  *   }},
   *   postUrl: "yourposturl"
-  * })
+  * )
   * @constructor
   * @param {object} params - data to query for events
+  * @param {String} postUrl - (optional) URL to post the result
   * @returns {Operation}
   */
 export function fetchEvents(params, postUrl) {
