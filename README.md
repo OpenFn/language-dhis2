@@ -90,7 +90,7 @@ fetchData({
   fields: {
     dataSet: 'pBOMPrpg1QX',
     orgUnit: 'DiszpKrYNg8',
-    period: '201401'
+    period: '201711'
   },
   postUrl: "https://www.openfn.org/inbox/123"
 })
