@@ -12,19 +12,19 @@ Documentation
 #### Create a new tracked entity instance from a CommCare form submission.
 ```js
 createTEI(
-  fields(
-    field("trackedEntity", "nEenWmSyUEp"),
-    field("orgUnit", "DiszpKrYNg8"),
-    field("attributes", function(state) {
-      return [{
+  {
+    "trackedEntity": "nEenWmSyUEp",
+    "orgUnit": "DiszpKrYNg8",
+    "attributes":
+    [ {
         "attribute": "w75KJ2mc4zz",
         "value": dataValue("form.first_name")(state)
-      }, {
+      },
+      {
         "attribute": "zDhUuAYrxNC",
         "value": dataValue("form.last_name")(state)
       }]
-    })
-  )
+  }
 )
 ```
 
@@ -33,24 +33,24 @@ createTEI(
 #### `Events API` expression
 ```js
 event(
-  fields(
-    field("program", "eBAyeGv0exc"),
-    field("orgUnit", "DiszpKrYNg8"),
-    field("eventDate", dataValue("date")),
-    field("status", "COMPLETED"),
-    field("storedBy", "admin"),
-    field("coordinate", {
+  {
+    "program": "eBAyeGv0exc",
+    "orgUnit": "DiszpKrYNg8",
+    "eventDate": "2018-15-02",
+    "status": "COMPLETED",
+    "storedBy": "admin",
+    "coordinate": {
       "latitude": "59.8",
       "longitude": "10.9"
-    }),
-    field("dataValues", function(state) {
-      return [
-        dataElement("qrur9Dvnyt5", dataValue("prop_a"))(state)
-        dataElement("oZg33kd9taw", dataValue("prop_b"))(state)
-        dataElement("msodh3rEMJa", dataValue("prop_c"))(state)
-      ]
-    })
-  )
+    },
+    "dataValues":
+    [
+      dataElement("qrur9Dvnyt5", dataValue("prop_a")),
+      dataElement("oZg33kd9taw", dataValue("prop_b")),
+      dataElement("msodh3rEMJa", dataValue("prop_c"))
+    ]
+
+  )}
 )
 ```
 

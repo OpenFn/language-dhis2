@@ -52,13 +52,11 @@ export function fetchData(params, postUrl) {
 
   return state => {
 
-    const data = expandReferences(params)(state);
+    const query = expandReferences(params)(state);
 
     const {username, password, apiUrl} = state.configuration;
 
-    const url = resolveUrl(apiUrl + '/', 'api/dataValueSets.json?')
-
-    const query = data.fields || expandDataValues(params)(state);
+    const url = resolveUrl(apiUrl + '/', 'api/dataValueSets.json?');
 
     console.log("Getting Data Value Sets:");
 
@@ -115,13 +113,11 @@ export function fetchData(params, postUrl) {
 export function fetchEvents(params, postUrl) {
 
   return state => {
-    const data = expandReferences(params)(state);
+    const query = expandReferences(params)(state);
 
     const {username, password, apiUrl} = state.configuration;
 
-    const url = resolveUrl(apiUrl + '/', 'api/events.json?')
-
-    const query = data.fields || expandDataValues(params)(state);
+    const url = resolveUrl(apiUrl + '/', 'api/events.json?');
 
     console.log("Getting Events Data:");
 
