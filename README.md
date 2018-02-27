@@ -7,6 +7,21 @@ the [DHIS2 API](http://dhis2.github.io/dhis2-docs/master/en/developer/html/dhis2
 Documentation
 -------------
 
+## Analytics API
+```js
+fetchAnalytics({
+  query: {
+    dimension: [
+      "dx:CYI5LEmm3cG;GDVU1o5rTNF",
+      "pe:LAST_6_MONTHS"
+    ],
+    filter: "ou:GHlyx9Pg9mn",
+    displayProperty: "NAME",
+    outputIdScheme: "UID"
+  }
+});
+```
+
 ## Tracked Entity API
 
 #### Create a new tracked entity instance from a CommCare form submission.
