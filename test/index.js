@@ -100,11 +100,9 @@ describe("fetchData", function() {
     };
 
     let params = {
-      fields: {
-        dataSet: 'pBOMPrpg1QX',
-        orgUnit: 'DiszpKrYNg8',
-        period: '201401'
-      }
+      dataSet: 'pBOMPrpg1QX',
+      orgUnit: 'DiszpKrYNg8',
+      period: '201401'
     }
 
     return execute(fetchData(params))(state)
@@ -129,11 +127,9 @@ describe("fetchEvents", function() {
     };
 
     let params = {
-        fields: {
-          orgUnit: 'DiszpKrYNg8',
-          program: 'eBAyeGv0exc',
-          endDate: '2016-01-01'
-        }
+      orgUnit: 'DiszpKrYNg8',
+      program: 'eBAyeGv0exc',
+      endDate: '2016-01-01'
     }
 
     return execute(fetchEvents(params))(state)
