@@ -61,3 +61,24 @@ export function get({
       })
   })
 }
+
+export function getUsingQueryString({
+  username,
+  password,
+  query,
+  url}) {
+  return new Promise((resolve, reject) => {
+    request.get(url)
+      .query(query)
+      .options({useQuerystring: true})
+      .type('json')
+      .accept('json')
+      .auth(username, password)
+      .end((error, res) => {
+        if (!!error || !res.ok) {
+          reject(error)
+        }
+        resolve(res)
+      })
+  })
+}

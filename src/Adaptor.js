@@ -441,6 +441,72 @@ export function enroll(tei, enrollmentData) {
   }
 }
 
+/**
+ * Fetch analytics
+ * @public
+ * @example
+ * fetchAnalytics({
+ *   query: {
+ *     dimension: ["dx:CYI5LEmm3cG", "pe:LAST_6_MONTHS"],
+ *     filter: "ou:t7vi7vJqWvi",
+ *     displayProperty: "NAME",
+ *     outputIdScheme: "UID"
+ *   }},
+ *   postUrl: "yourposturl"
+ * )
+ * @constructor
+ * @param {object} params - data to query for events
+ * @param {String} postUrl - (optional) URL to post the result
+ * @returns {Operation}
+ */
+export function fetchAnalytics(params, postUrl) {
+
+ return state => {
+
+   const data = expandReferences(params)(state);
+
+   const {username, password, apiUrl} = state.configuration;
+
+   const url = resolveUrl(apiUrl + '/', 'api/26/analytics.json?')
+
+   const query = data.query || expandDataValues(params)(state);
+
+   console.log(`Getting analytics data for query: ${query}`);
+
+   return get({username, password, query, url})
+   .then((result) => {
+     console.log("Get Result:", result.body);
+     return result
+   })
+   .then((result) => {
+     if (postUrl) {
+       const body = result.body
+
+       const url = postUrl
+
+       return post({username, password, body, url})
+       .then((result) => {
+         console.log("Post Result:", result.statusCode);
+         return {
+           ...state,
+           references: [
+             result, ...state.references
+           ]
+         }
+       })
+     } else {
+       return {
+         ...state,
+         references: [
+           result, ...state.references
+         ]
+       }
+     }
+   })
+ };
+
+};
+
 export {
   field,
   fields,

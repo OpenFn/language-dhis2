@@ -1,6 +1,6 @@
 {
   "name": "language-dhis2",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "DHIS2 Language Pack for OpenFn",
   "main": "lib/index.js",
   "scripts": {
