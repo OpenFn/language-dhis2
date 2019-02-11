@@ -1,6 +1,6 @@
 {
   "name": "language-dhis2",
-  "version": "0.3.0",
+  "version": "1.0.1",
   "description": "DHIS2 Language Pack for OpenFn",
   "main": "lib/index.js",
   "scripts": {
@@ -15,8 +15,8 @@
   ],
   "dependencies": {
     "language-common": "github:openfn/language-common#v0.2.0",
-    "lodash": "^4.17.4",
-    "superagent": "^1.7.2"
+    "lodash": "^4.17.11",
+    "superagent": "^4.1.0"
   },
   "devDependencies": {
     "assertion-error": "^1.0.1",

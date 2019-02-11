@@ -6,8 +6,25 @@ the [DHIS2 API](http://dhis2.github.io/dhis2-docs/master/en/developer/html/dhis2
 
 Documentation
 -------------
+## Sample State
+```json
+{
+  "configuration": {
+    "username": "admin",
+    "password": "district",
+    "apiUrl": "https://play.dhis2.org/2.31.1"
+  },
+  "data": {
+    "a": 1,
+    "b": 2,
+  }
+}
+```
+
 
 ## Analytics API
+
+#### Fetch analytics data for PMTCT data over last 6 months.
 ```js
 fetchAnalytics({
   query: {
