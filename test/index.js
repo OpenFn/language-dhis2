@@ -54,7 +54,7 @@ describe("event", () => {
       configuration: {
         username: "hello",
         password: "there",
-        apiUrl: 'https://play.dhis2.org/demo'
+        hostUrl: 'https://play.dhis2.org/demo'
       }
     };
 
@@ -95,7 +95,7 @@ describe("fetchData", function() {
       configuration: {
         username: "admin",
         password: "district",
-        apiUrl: 'https://play.dhis2.org/demo'
+        hostUrl: 'https://play.dhis2.org/demo'
       }
     };
 
@@ -124,7 +124,7 @@ describe("fetchEvents", function() {
       configuration: {
         username: "admin",
         password: "district",
-        apiUrl: 'https://play.dhis2.org/demo'
+        hostUrl: 'https://play.dhis2.org/demo'
       }
     };
 

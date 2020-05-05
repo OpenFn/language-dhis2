@@ -12,7 +12,7 @@ Documentation
   "configuration": {
     "username": "admin",
     "password": "district",
-    "apiUrl": "https://play.dhis2.org/2.31.1"
+    "hostUrl": "https://play.dhis2.org/2.31.1"
   },
   "data": {
     "a": 1,
