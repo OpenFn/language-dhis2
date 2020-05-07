@@ -43,10 +43,9 @@ export function execute(...operations) {
 function configMigrationHelper(state) {
   const { hostUrl, apiUrl } = state.configuration;
   if (!hostUrl) {
-    return {
-      ...state,
-      configuration: { ...state.configruation, hostUrl: apiUrl },
-    };
+    console.log('DEPRECATION WARNING: Please migrate instance address from `apiUrl` to `hostUrl`.')
+    state.configuration.hostUrl = apiUrl;
+    return state;
   }
   return state;
 }
