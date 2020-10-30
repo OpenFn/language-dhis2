@@ -333,6 +333,50 @@ export function updateTEI(tei, data) {
   };
 }
 
+/**
+ * Create or updateone or many new Tracked Entity Instances
+ * @public
+ * @example
+ * upsertTEI(data)
+ * @constructor
+ * @param {object} data - Payload data for new tracked entity instance(s)
+ * @returns {Operation}
+ */
+export function upsertTEI(data) {
+
+  return state => {
+
+    const body = expandReferences(data)(state);
+
+    const {
+      username,
+      password,
+      apiUrl
+    } = state.configuration;
+
+    const url = resolveUrl(apiUrl + '/', 'api/trackedEntityInstances?strategy=CREATE_AND_UPDATE')
+
+    console.log("Posting tracked entity instance data:");
+    console.log(body)
+
+    return post({
+        username,
+        password,
+        body,
+        url
+      })
+      .then((result) => {
+        console.log("Success:", result);
+        return {...state,
+          references: [result, ...state.references]
+        }
+      })
+
+  }
+}
+
+
+
 // /**
 //  * Create and enroll TrackedEntityInstances
 //  * @example
