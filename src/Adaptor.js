@@ -339,7 +339,7 @@ export function updateTEI(tei, data) {
  * @example
  * upsertTEI(data)
  * @constructor
- * @param {object} data - Payload data for new tracked entity instance(s)
+ * @param {object} data - Payload data for new/updated tracked entity instance(s)
  * @returns {Operation}
  */
 export function upsertTEI(data) {
