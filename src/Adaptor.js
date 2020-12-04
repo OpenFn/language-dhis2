@@ -1,5 +1,5 @@
 /** @module Adaptor */
-
+import axios from 'axios';
 import { execute as commonExecute, expandReferences } from 'language-common';
 import { get, post, put } from './Client';
 import { resolve as resolveUrl } from 'url';
@@ -345,11 +345,10 @@ export function updateTEI(tei, data) {
 export function upsertTEI(data) {
   return state => {
     const body = expandReferences(data)(state);
-
-    const { username, password, apiUrl } = state.configuration;
+    const { username, password, hostUrl } = state.configuration;
 
     const url = resolveUrl(
-      apiUrl + '/',
+      hostUrl + '/',
       'api/trackedEntityInstances?strategy=CREATE_AND_UPDATE'
     );
 
@@ -485,6 +484,8 @@ export function fetchAnalytics(params, postUrl) {
       });
   };
 }
+
+exports.axios = axios;
 
 export {
   field,
