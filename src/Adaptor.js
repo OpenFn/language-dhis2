@@ -342,15 +342,12 @@ export function updateTEI(tei, data) {
  * @param {object} data - Payload data for new/updated tracked entity instance(s)
  * @returns {Operation}
  */
-export function upsertTEI(data) {
+export function upsertTEI(uuid, data) {
   return state => {
     const body = expandReferences(data)(state);
     const { username, password, hostUrl } = state.configuration;
 
-    const url = resolveUrl(
-      hostUrl + '/',
-      'api/trackedEntityInstances?strategy=CREATE_AND_UPDATE'
-    );
+    const url = resolveUrl(hostUrl + '/', `api/trackedEntityInstances`);
 
     console.log(
       `Upserting tracked entity instance of type '${
@@ -363,12 +360,16 @@ export function upsertTEI(data) {
     );
 
     return post({
+      query: {
+        strategy: 'CREATE_AND_UPDATE',
+        trackedEntityIdScheme: uuid,
+      },
       username,
       password,
       body,
       url,
     }).then(result => {
-      console.log('Success:', result);
+      console.log(JSON.parse(result.text));
       return { ...state, references: [result, ...state.references] };
     });
   };
