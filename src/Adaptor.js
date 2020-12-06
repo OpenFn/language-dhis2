@@ -342,7 +342,7 @@ export function updateTEI(tei, data) {
  * @param {object} data - Payload data for new/updated tracked entity instance(s)
  * @returns {Operation}
  */
-export function upsertTEI(uuid, data) {
+/*export function upsertTEI(uuid, data) {
   return state => {
     const body = expandReferences(data)(state);
     const { username, password, hostUrl } = state.configuration;
@@ -372,6 +372,85 @@ export function upsertTEI(uuid, data) {
       console.log(JSON.parse(result.text));
       return { ...state, references: [result, ...state.references] };
     });
+  };
+}
+*/
+export function upsertTEI(payload) {
+  return async state => {
+    try {
+      const { query, tei, data } = payload;
+      const { password, username, hostUrl } = state.configuration;
+      const url = resolveUrl(hostUrl + '/', `api/trackedEntityInstances`);
+
+      console.log(
+        `Searching for Tracked Entity Instance ${tei}, with query : ${JSON.stringify(
+          query,
+          null,
+          2
+        )}...`
+      );
+
+      const existingTEI = await get({ username, password, query, url });
+
+      if (existingTEI) {
+        console.log(
+          `Tracked Entity Instance ${JSON.stringify(
+            existingTEI,
+            null,
+            2
+          )} found! Proceeding to PUT...`
+        );
+        try {
+          const putUrl = `${url}/${tei}`;
+          const putResponse = await put({
+            username,
+            password,
+            data,
+            putUrl,
+            query,
+          });
+          console.log(
+            `PUT succeeded with response : ${JSON.stringify(
+              putResponse,
+              null,
+              2
+            )}`
+          );
+          return { ...state, references: [putResponse, ...state.references] };
+        } catch (error) {
+          console.log(`Updating Tracked Entity Instance ${tei} failed!`);
+          throw error;
+        }
+      } else {
+        console.log(
+          `Tracked Entity Instance ${tei} not found! Proceeding to POST...`
+        );
+        try {
+          const postUrl = url;
+          const postResponse = await post({
+            username,
+            password,
+            data,
+            postUrl,
+            query: null,
+          });
+          console.log(
+            `POST succeeded with response : ${JSON.stringify(
+              postResponse,
+              null,
+              2
+            )}`
+          );
+          return { ...state, references: [postResponse, ...state.references] };
+        } catch (error) {
+          console.log(`Posting Tracked Entity Instance ${tei} failed!`);
+          throw error;
+        }
+      }
+    } catch (error) {
+      console.log(`Fetching existing Tracked Entity Instance failed!`);
+      throw error;
+    }
   };
 }
 
