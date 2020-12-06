@@ -377,11 +377,10 @@ export function updateTEI(tei, data) {
 */
 export function upsertTEI(payload) {
   return async state => {
+    const { query, tei, data } = payload;
+    const { password, username, hostUrl } = state.configuration;
+    const url = resolveUrl(hostUrl + '/', `api/trackedEntityInstances`);
     try {
-      const { query, tei, data } = payload;
-      const { password, username, hostUrl } = state.configuration;
-      const url = resolveUrl(hostUrl + '/', `api/trackedEntityInstances`);
-
       console.log(
         `Searching for Tracked Entity Instance ${tei}, with query : ${JSON.stringify(
           query,
@@ -425,8 +424,8 @@ export function upsertTEI(payload) {
         console.log(
           `Tracked Entity Instance ${tei} not found! Proceeding to POST...`
         );
+        const postUrl = url;
         try {
-          const postUrl = url;
           const postResponse = await post({
             username,
             password,
