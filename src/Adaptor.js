@@ -380,78 +380,254 @@ export function updateTEI(tei, data) {
  * Create or update one or many new Tracked Entity Instances
  * @public
  * @example
- * upsertTEI(tei, query, data)
+ * upsertTEI(uniqueAttributeId, data)
  * @constructor
- * @param {object} tei - Tracked Entity Instance identifier object, with `uniqueAttribute` and `uniqueAttributeValue` used during matching
- * @param {object} query - Query parameters, must include `ou` and `filter`
+ * @param {string} uniqueAttributeId - Tracked Entity Instance unique identifier used during matching
  * @param {object} data - Payload data for new/updated tracked entity instance(s)
  * @returns {Operation}
  */
-export function upsertTEI(tei, query, data) {
+export function upsertTEI(uniqueAttributeId, data) {
   return state => {
-    console.log(`params ${tei},${query}`);
     const body = expandReferences(data)(state);
 
     const { password, username, hostUrl } = state.configuration;
 
     const url = resolveUrl(hostUrl + '/', `api/trackedEntityInstances`);
 
+    const uniqueAttributeUrl = `${hostUrl}/api/trackedEntityAttributes/${uniqueAttributeId}`;
+
+    const trackedEntityType = state.data.trackedEntityType;
+
+    const trackedEntityTypeUrl = `${hostUrl}/api/trackedEntityTypes/${trackedEntityType}?fields=*`;
+
+    const uniqueAttributeValue = state.data.attributes.find(
+      obj => obj.attribute === uniqueAttributeId
+    ).value;
+
+    const query = {
+      ou: state.data.orgUnit,
+      ouMode: 'ACCESSIBLE',
+      filter: `${uniqueAttributeId}:EQ:${uniqueAttributeValue}`,
+      skipPaging: true,
+    };
+
     console.log(
-      `Matching on unique attribute: ${JSON.stringify(
-        tei
-      )} , with query : ${JSON.stringify(query, null, 2)}`
+      `Checking if Tracked Entity Type ${trackedEntityType} exists...`
     );
 
     return get({
       username,
       password,
-      query,
-      url,
+      query: null,
+      url: trackedEntityTypeUrl,
     }).then(result => {
-      if (result) {
-        console.log(
-          `Tracked Entity Instance found! Proceeding to PUT... ${JSON.stringify(
-            result,
-            null,
-            2
-          )} `
-        );
-        const row1 = result.trackedEntityInstances[0];
-        const putUrl = `${url}/${row1.trackedEntityInstance}`;
+      let tet = JSON.parse(result.text);
 
-        return put({
+      console.log(
+        `Tracked Entity Type ${trackedEntityType}(${tet.name}) found!`
+      );
+
+      console.log(
+        `${JSON.stringify(tet.trackedEntityTypeAttributes, null, 2)}`
+      );
+
+      console.log(
+        `Checking if attribute ${uniqueAttributeId} is assigned to ${tet.name} Entity Type... `
+      );
+      const attribute = tet.trackedEntityTypeAttributes.find(
+        obj => obj.trackedEntityAttribute.id === uniqueAttributeId
+      );
+      if (attribute) {
+        console.log(
+          `Attribute ${attribute.name}(${uniqueAttributeId}) is assigned to ${
+            tet.name
+          }! \n ${JSON.stringify(attribute, null, 2)}`
+        );
+
+        console.log(
+          `Checking if attribute ${attribute.name}(${uniqueAttributeId}) is unique...`
+        );
+
+        return get({
           username,
           password,
-          body,
-          putUrl,
-          query,
+          query: null,
+          url: uniqueAttributeUrl,
         }).then(result => {
+          const foundAttribute = JSON.parse(result.text);
+
           console.log(
-            `PUT succeeded with response : ${JSON.stringify(result, null, 2)}`
+            `Attribute details for ${attribute.name}\n ${JSON.stringify(
+              foundAttribute,
+              null,
+              2
+            )}`
           );
-          return { ...state, references: [result, ...state.references] };
+
+          if (foundAttribute.unique) {
+            console.log(
+              `Tracked Entity Attribute ${attribute.name}(${uniqueAttributeId}) is unique! Proceeding to checking if Tracked Entity Instance exists...`
+            );
+            return get({
+              username,
+              password,
+              query,
+              url,
+            }).then(result => {
+              console.log(`query ${JSON.stringify(query, null, 2)}`);
+              if (!result.trackedEntityInstances) {
+                console.log(
+                  `Tracked Entity Instance  with filter ${query.filter} not found, proceeding to POST...`
+                );
+
+                console.log(`Body is ${JSON.stringify(body, null, 2)}`);
+
+                return post({
+                  username,
+                  password,
+                  body,
+                  url,
+                  query: null,
+                }).then(result => {
+                  console.log(
+                    `POST succeeded with response : ${JSON.stringify(
+                      result,
+                      null,
+                      2
+                    )}`
+                  );
+
+                  return {
+                    ...state,
+                    references: [result, ...state.references],
+                  };
+                });
+              } else {
+                const row1 = result.trackedEntityInstances[0];
+
+                const putUrl = `${url}/${row1.trackedEntityInstance}`;
+
+                console.log(
+                  `Tracked Entity Instance  with filter ${query.filter} found, proceeding to PUT...`
+                );
+                // should we use PATCH? PUT requires that we send the full body otherwise the other fields would be kicked off!
+                return put({
+                  username,
+                  password,
+                  body,
+                  putUrl,
+                  query: null,
+                }).then(result => {
+                  console.log(
+                    `PUT succeeded with response : ${JSON.stringify(
+                      result,
+                      null,
+                      2
+                    )}`
+                  );
+
+                  return {
+                    ...state,
+                    references: [result, ...state.references],
+                  };
+                });
+              }
+            });
+          } else {
+            throw new Error(
+              `Attribute ${attribute.name}(${uniqueAttributeId}) is not unique! Ensure, in DHIS2, this tracked entity attribute is marked as unique!`
+            );
+          }
         });
       } else {
-        console.log(
-          `Tracked Entity Instance ${JSON.stringify(
-            tei
-          )} not found! Proceeding to POST...`
+        throw new Error(
+          `Tracked Entity Attribute ${uniqueAttributeId} is not assigned to ${body.name} Entity Type! Ensure, in DHIS2, this tracked entity attribute is assigned to ${body.name} and that it is marked as unique!`
         );
-        const postUrl = url;
-        return post({
-          username,
-          password,
-          body,
-          postUrl,
-          query: null,
-        }).then(result => {
-          console.log(
-            `POST succeeded with response : ${JSON.stringify(result, null, 2)}`
-          );
-          return { ...state, references: [result, ...state.references] };
-        });
       }
     });
+    // 2. Validate that the attribute is assigned to this type
+    // 3. Validate
+    // console.log(`Matching on unique attribute: ${uniqueAttributeId}`);
+    /*   
+    return get({ username, password, query: null, url: uniqueAttributeUrl }).then(
+      result => {
+        if (!result) {
+          throw new Error(
+            `Attribute ${uniqueAttributeId} does not exist! ${uniqueAttributeUrl}`
+          );
+        } else if (!result.unique) {
+          throw new Error(
+            `Attribute ${result.name}(${uniqueAttributeId}) is not unique. Ensure it is marked unique in DHIS2 before running this job! ${uniqueAttributeUrl}`
+          );
+        }
+        console.log(
+          `Unique attribute ${result.name}(${uniqueAttributeId}) found ( ${uniqueAttributeUrl} )! Proceeding to GET TEI...`
+        );
+
+        return get({
+          username,
+          password,
+          query,
+          url,
+        }).then(result => {
+          if (result) {
+            console.log(
+              `Tracked Entity Instance found! Proceeding to PUT... ${JSON.stringify(
+                result,
+                null,
+                2
+              )} `
+            );
+
+            const row1 = result.trackedEntityInstances[0];
+
+            const putUrl = `${url}/${row1.trackedEntityInstance}`;
+
+            return put({
+              username,
+              password,
+              body,
+              putUrl,
+              query : null,
+            }).then(result => {
+              console.log(
+                `PUT succeeded with response : ${JSON.stringify(
+                  result,
+                  null,
+                  2
+                )}`
+              );
+
+              return { ...state, references: [result, ...state.references] };
+            });
+          } else {
+            console.log(
+              `Tracked Entity Instance with attribute${} not found! Proceeding to POST...`
+            );
+
+            const postUrl = url;
+
+            return post({
+              username,
+              password,
+              body,
+              postUrl,
+              query: null,
+            }).then(result => {
+              console.log(
+                `POST succeeded with response : ${JSON.stringify(
+                  result,
+                  null,
+                  2
+                )}`
+              );
+
+              return { ...state, references: [result, ...state.references] };
+            });
+          }
+        });
+      }
+    );*/
   };
 }
 
