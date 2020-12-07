@@ -375,83 +375,83 @@ export function updateTEI(tei, data) {
   };
 }
 */
-export function upsertTEI(payload) {
-  return async state => {
-    const { query, tei, data } = payload;
+
+/**
+ * Create or update one or many new Tracked Entity Instances
+ * @public
+ * @example
+ * upsertTEI(tei, query, data)
+ * @constructor
+ * @param {object} tei - Tracked Entity Instance identifier object, with `uniqueAttribute` and `uniqueAttributeValue` used during matching
+ * @param {object} query - Query parameters, must include `ou` and `filter`
+ * @param {object} data - Payload data for new/updated tracked entity instance(s)
+ * @returns {Operation}
+ */
+export function upsertTEI(tei, query, data) {
+  return state => {
+    console.log(`params ${tei},${query}`);
     const body = expandReferences(data)(state);
+
     const { password, username, hostUrl } = state.configuration;
+
     const url = resolveUrl(hostUrl + '/', `api/trackedEntityInstances`);
-    console.log(`hostUrl ${hostUrl}`);
-    try {
-      console.log(
-        `Searching for Tracked Entity Instance ${tei}, with query : ${JSON.stringify(
-          query,
-          null,
-          2
-        )}...`
-      );
 
-      const existingTEI = await get({ username, password, query, url });
+    console.log(
+      `Matching on unique attribute: ${JSON.stringify(
+        tei
+      )} , with query : ${JSON.stringify(query, null, 2)}`
+    );
 
-      if (existingTEI) {
+    return get({
+      username,
+      password,
+      query,
+      url,
+    }).then(result => {
+      if (result) {
         console.log(
-          `Tracked Entity Instance ${JSON.stringify(
-            existingTEI,
+          `Tracked Entity Instancefound! Proceeding to PUT... ${JSON.stringify(
+            result,
             null,
             2
-          )} found! Proceeding to PUT...`
+          )} `
         );
-        try {
-          const putUrl = `${url}/${tei}`;
-          const putResponse = await put({
-            username,
-            password,
-            body,
-            putUrl,
-            query,
-          });
+
+        const putUrl = `${url}/${tei.uniqueAttributeValue}`;
+
+        return put({
+          username,
+          password,
+          body,
+          putUrl,
+          query,
+        }).then(result => {
           console.log(
-            `PUT succeeded with response : ${JSON.stringify(
-              putResponse,
-              null,
-              2
-            )}`
+            `PUT succeeded with response : ${JSON.stringify(result, null, 2)}`
           );
-          return { ...state, references: [putResponse, ...state.references] };
-        } catch (error) {
-          console.log(`Updating Tracked Entity Instance ${tei} failed!`);
-          throw error;
-        }
+          return { ...state, references: [result, ...state.references] };
+        });
       } else {
         console.log(
-          `Tracked Entity Instance ${tei} not found! Proceeding to POST...`
+          `Tracked Entity Instance ${JSON.stringify(
+            tei
+          )} not found! Proceeding to POST...`
         );
         const postUrl = url;
-        try {
-          const postResponse = await post({
-            username,
-            password,
-            body,
-            postUrl,
-            query: null,
-          });
+        return post({
+          username,
+          password,
+          body,
+          postUrl,
+          query: null,
+        }).then(result => {
           console.log(
-            `POST succeeded with response : ${JSON.stringify(
-              postResponse,
-              null,
-              2
-            )}`
+            `POST succeeded with response : ${JSON.stringify(result, null, 2)}`
           );
-          return { ...state, references: [postResponse, ...state.references] };
-        } catch (error) {
-          console.log(`Posting Tracked Entity Instance ${tei} failed!`);
-          throw error;
-        }
+          return { ...state, references: [result, ...state.references] };
+        });
       }
-    } catch (error) {
-      console.log(`Fetching existing Tracked Entity Instance failed!`);
-      throw error;
-    }
+    });
   };
 }
 
