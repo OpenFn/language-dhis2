@@ -410,14 +410,14 @@ export function upsertTEI(tei, query, data) {
     }).then(result => {
       if (result) {
         console.log(
-          `Tracked Entity Instancefound! Proceeding to PUT... ${JSON.stringify(
+          `Tracked Entity Instance found! Proceeding to PUT... ${JSON.stringify(
             result,
             null,
             2
           )} `
         );
-
-        const putUrl = `${url}/${tei.uniqueAttributeValue}`;
+        const row1 = result.trackedEntityInstances[0];
+        const putUrl = `${url}/${row1.trackedEntityInstance}`;
 
         return put({
           username,
