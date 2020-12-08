@@ -4,7 +4,6 @@ import { execute as commonExecute, expandReferences } from 'language-common';
 import { get, post, put, patch } from './Client';
 import { resolve as resolveUrl } from 'url';
 import { mapValues } from 'lodash/fp';
-import { options } from 'superagent';
 
 /**
  * Execute a sequence of operations.
@@ -338,7 +337,7 @@ export function updateTEI(tei, data) {
  * Create or update one or many new Tracked Entity Instances
  * @public
  * @example
- * upsertTEI(uniqueAttributeId, data)
+ * upsertTEI('w75KJ2mc4zz', state.data, { replace: true })
  * @constructor
  * @param {string} uniqueAttributeId - Tracked Entity Instance unique identifier used during matching
  * @param {object} data - Payload data for new/updated tracked entity instance(s)
@@ -347,18 +346,13 @@ export function updateTEI(tei, data) {
  */
 export function upsertTEI(uniqueAttributeId, data, options) {
   return state => {
-    const body = expandReferences(data)(state);
-
+    const { password, username, hostUrl } = state.configuration;
     const { replace } = options;
 
-    const { password, username, hostUrl } = state.configuration;
-
+    const body = expandReferences(data)(state);
     const url = resolveUrl(hostUrl + '/', `api/trackedEntityInstances`);
-
     const uniqueAttributeUrl = `${hostUrl}/api/trackedEntityAttributes/${uniqueAttributeId}`;
-
     const trackedEntityType = state.data.trackedEntityType;
-
     const trackedEntityTypeUrl = `${hostUrl}/api/trackedEntityTypes/${trackedEntityType}?fields=*`;
 
     const uniqueAttributeValue = state.data.attributes.find(
@@ -427,7 +421,7 @@ export function upsertTEI(uniqueAttributeId, data, options) {
 
               if (tei_body.trackedEntityInstances.length <= 0) {
                 console.log(
-                  `Tracked Entity Instance  with filter ${query.filter} not found, proceeding to POST...`
+                  `Tracked Entity Instance  with filter ${query.filter} not found, proceeding to create...`
                 );
 
                 return post({
@@ -480,8 +474,9 @@ export function upsertTEI(uniqueAttributeId, data, options) {
                   url: updateUrl,
                   query: null,
                 }).then(result => {
+                  console.log(`Upsert succeeded. Updated TEI: ${updateUrl}`);
                   console.log(
-                    `Upsert succeeded. See updated TEI here ${updateUrl}\nSummary:\n${JSON.stringify(
+                    `Summary:\n${JSON.stringify(
                       JSON.parse(result.text),
                       null,
                       2
