@@ -1,9 +1,10 @@
 /** @module Adaptor */
 import axios from 'axios';
 import { execute as commonExecute, expandReferences } from 'language-common';
-import { get, post, put } from './Client';
+import { get, post, put, patch } from './Client';
 import { resolve as resolveUrl } from 'url';
 import { mapValues } from 'lodash/fp';
+import { options } from 'superagent';
 
 /**
  * Execute a sequence of operations.
@@ -337,56 +338,14 @@ export function updateTEI(tei, data) {
  * Create or update one or many new Tracked Entity Instances
  * @public
  * @example
- * upsertTEI(data)
- * @constructor
- * @param {object} data - Payload data for new/updated tracked entity instance(s)
- * @returns {Operation}
- */
-/*export function upsertTEI(uuid, data) {
-  return state => {
-    const body = expandReferences(data)(state);
-    const { username, password, hostUrl } = state.configuration;
-
-    const url = resolveUrl(hostUrl + '/', `api/trackedEntityInstances`);
-
-    console.log(
-      `Upserting tracked entity instance of type '${
-        body.trackedEntityType
-      }' to org unit '${body.orgUnit}' with ${
-        body.attributes && body.attributes.length
-      } attributes and ${
-        body.enrollments && body.enrollments.length
-      } enrollments.`
-    );
-
-    return post({
-      query: {
-        strategy: 'CREATE_AND_UPDATE',
-        trackedEntityIdScheme: uuid,
-      },
-      username,
-      password,
-      body,
-      url,
-    }).then(result => {
-      console.log(JSON.parse(result.text));
-      return { ...state, references: [result, ...state.references] };
-    });
-  };
-}
-*/
-
-/**
- * Create or update one or many new Tracked Entity Instances
- * @public
- * @example
  * upsertTEI(uniqueAttributeId, data)
  * @constructor
  * @param {string} uniqueAttributeId - Tracked Entity Instance unique identifier used during matching
  * @param {object} data - Payload data for new/updated tracked entity instance(s)
+ * @param {object} options - Optional options argument for the update method. It can be a `PUT` or `PATCH`. Defaults to `PATCH`
  * @returns {Operation}
  */
-export function upsertTEI(uniqueAttributeId, data) {
+export function upsertTEI(uniqueAttributeId, data, options) {
   return state => {
     const body = expandReferences(data)(state);
 
@@ -403,7 +362,7 @@ export function upsertTEI(uniqueAttributeId, data) {
     const uniqueAttributeValue = state.data.attributes.find(
       obj => obj.attribute === uniqueAttributeId
     ).value;
-    // In the morning, investigate the filter
+
     const query = {
       ou: state.data.orgUnit,
       ouMode: 'ACCESSIBLE',
@@ -424,7 +383,7 @@ export function upsertTEI(uniqueAttributeId, data) {
       let tet = JSON.parse(result.text);
 
       console.log(
-        `Tracked Entity Type ${trackedEntityType}(${tet.name}) found!`
+        `Tracked Entity Type ${trackedEntityType}(${tet.name}) found.`
       );
 
       console.log(
@@ -435,7 +394,7 @@ export function upsertTEI(uniqueAttributeId, data) {
       );
       if (attribute) {
         console.log(
-          `Attribute ${attribute.name}(${uniqueAttributeId}) is assigned to ${tet.name}!`
+          `Attribute ${attribute.name}(${uniqueAttributeId}) is assigned to ${tet.name}.`
         );
 
         console.log(
@@ -450,17 +409,9 @@ export function upsertTEI(uniqueAttributeId, data) {
         }).then(result => {
           const foundAttribute = JSON.parse(result.text);
 
-          console.log(
-            `Attribute details for ${attribute.name}\n ${JSON.stringify(
-              foundAttribute,
-              null,
-              2
-            )}`
-          );
-
           if (foundAttribute.unique) {
             console.log(
-              `Tracked Entity Attribute ${attribute.name}(${uniqueAttributeId}) is unique! Proceeding to checking if Tracked Entity Instance exists...`
+              `Tracked Entity Attribute ${attribute.name}(${uniqueAttributeId}) is unique. Proceeding to checking if Tracked Entity Instance exists...`
             );
             return get({
               username,
@@ -475,8 +426,6 @@ export function upsertTEI(uniqueAttributeId, data) {
                   `Tracked Entity Instance  with filter ${query.filter} not found, proceeding to POST...`
                 );
 
-                console.log(`Result is ${JSON.stringify(result, null, 2)}`);
-
                 return post({
                   username,
                   password,
@@ -485,7 +434,7 @@ export function upsertTEI(uniqueAttributeId, data) {
                   query: null,
                 }).then(result => {
                   console.log(
-                    `POST succeeded! ${
+                    `POST succeeded. ${
                       result.header.location
                     }\nSummary:\n${JSON.stringify(
                       JSON.parse(result.text),
@@ -502,23 +451,23 @@ export function upsertTEI(uniqueAttributeId, data) {
               } else {
                 const row1 = tei_body.trackedEntityInstances[0];
 
-                const putUrl = `${url}/${row1.trackedEntityInstance}`;
+                const updateUrl = `${url}/${row1.trackedEntityInstance}`;
+
+                const method = options.method === 'PUT' ? put : patch;
 
                 console.log(
-                  `Tracked Entity Instance  with filter ${query.filter} found(${row1.trackedEntityInstance}), proceeding to PUT... \n PUT Url ${putUrl}`
+                  `Tracked Entity Instance  with filter ${query.filter} found(${row1.trackedEntityInstance}), proceeding to ${method}... \n ${method} Url ${updateUrl}`
                 );
 
-                // should we use PATCH? PUT requires that we send the full body otherwise the other fields would be kicked off!
-
-                return put({
+                return method({
                   username,
                   password,
                   body,
-                  url: putUrl,
+                  url: updateUrl,
                   query: null,
                 }).then(result => {
                   console.log(
-                    `PUT succeeded! Summary: \n ${JSON.stringify(
+                    `${method.toString()} succeeded. Summary: \n ${JSON.stringify(
                       JSON.parse(result.text),
                       null,
                       2
@@ -534,13 +483,13 @@ export function upsertTEI(uniqueAttributeId, data) {
             });
           } else {
             throw new Error(
-              `Attribute ${attribute.name}(${uniqueAttributeId}) is not unique! Ensure, in DHIS2, this tracked entity attribute is marked as unique!`
+              `Attribute ${attribute.name}(${uniqueAttributeId}) is not unique. Ensure, in DHIS2, this tracked entity attribute is marked as unique.`
             );
           }
         });
       } else {
         throw new Error(
-          `Tracked Entity Attribute ${uniqueAttributeId} is not assigned to ${tet.name} Entity Type! Ensure, in DHIS2, this tracked entity attribute is assigned to ${tet.name} and that it is marked as unique!`
+          `Tracked Entity Attribute ${uniqueAttributeId} is not assigned to ${tet.name} Entity Type. Ensure, in DHIS2, this tracked entity attribute is assigned to ${tet.name} and that it is marked as unique.`
         );
       }
     });
