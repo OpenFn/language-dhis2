@@ -1,7 +1,7 @@
 /** @module Adaptor */
 import axios from 'axios';
 import { execute as commonExecute, expandReferences } from 'language-common';
-import { get, post, put } from './Client';
+import { get, post, put, patch } from './Client';
 import { resolve as resolveUrl } from 'url';
 import { mapValues } from 'lodash/fp';
 
@@ -337,121 +337,171 @@ export function updateTEI(tei, data) {
  * Create or update one or many new Tracked Entity Instances
  * @public
  * @example
- * upsertTEI(data)
+ * upsertTEI('w75KJ2mc4zz', state.data, { replace: true })
  * @constructor
+ * @param {string} uniqueAttributeId - Tracked Entity Instance unique identifier used during matching
  * @param {object} data - Payload data for new/updated tracked entity instance(s)
+ * @param {object} options - Optional options for update method. Defaults to usePUT=true
  * @returns {Operation}
  */
-/*export function upsertTEI(uuid, data) {
+export function upsertTEI(uniqueAttributeId, data, options) {
   return state => {
-    const body = expandReferences(data)(state);
-    const { username, password, hostUrl } = state.configuration;
+    const { password, username, hostUrl } = state.configuration;
+    const { replace } = options;
 
+    const body = expandReferences(data)(state);
     const url = resolveUrl(hostUrl + '/', `api/trackedEntityInstances`);
+    const uniqueAttributeUrl = `${hostUrl}/api/trackedEntityAttributes/${uniqueAttributeId}`;
+    const trackedEntityType = state.data.trackedEntityType;
+    const trackedEntityTypeUrl = `${hostUrl}/api/trackedEntityTypes/${trackedEntityType}?fields=*`;
+
+    const uniqueAttributeValue = state.data.attributes.find(
+      obj => obj.attribute === uniqueAttributeId
+    ).value;
+
+    const query = {
+      ou: state.data.orgUnit,
+      ouMode: 'ACCESSIBLE',
+      filter: `${uniqueAttributeId}:EQ:${uniqueAttributeValue}`,
+      skipPaging: true,
+    };
 
     console.log(
-      `Upserting tracked entity instance of type '${
-        body.trackedEntityType
-      }' to org unit '${body.orgUnit}' with ${
-        body.attributes && body.attributes.length
-      } attributes and ${
-        body.enrollments && body.enrollments.length
-      } enrollments.`
+      `Checking if Tracked Entity Type ${trackedEntityType} exists...`
     );
 
-    return post({
-      query: {
-        strategy: 'CREATE_AND_UPDATE',
-        trackedEntityIdScheme: uuid,
-      },
+    return get({
       username,
       password,
-      body,
-      url,
+      query: null,
+      url: trackedEntityTypeUrl,
     }).then(result => {
-      console.log(JSON.parse(result.text));
-      return { ...state, references: [result, ...state.references] };
-    });
-  };
-}
-*/
-export function upsertTEI(payload) {
-  return async state => {
-    const { query, tei, data } = payload;
-    const body = expandReferences(data)(state);
-    const { password, username, hostUrl } = state.configuration;
-    const url = resolveUrl(hostUrl + '/', `api/trackedEntityInstances`);
-    console.log(`hostUrl ${hostUrl}`);
-    try {
+      let tet = JSON.parse(result.text);
+
       console.log(
-        `Searching for Tracked Entity Instance ${tei}, with query : ${JSON.stringify(
-          query,
-          null,
-          2
-        )}...`
+        `Tracked Entity Type ${trackedEntityType}(${tet.name}) found.`
       );
 
-      const existingTEI = await get({ username, password, query, url });
+      console.log(
+        `Checking if attribute ${uniqueAttributeId} is assigned to ${tet.name} Entity Type... `
+      );
+      const attribute = tet.trackedEntityTypeAttributes.find(
+        obj => obj.trackedEntityAttribute.id === uniqueAttributeId
+      );
+      if (attribute) {
+        console.log(
+          `Attribute ${attribute.name}(${uniqueAttributeId}) is assigned to ${tet.name}.`
+        );
 
-      if (existingTEI) {
         console.log(
-          `Tracked Entity Instance ${JSON.stringify(
-            existingTEI,
-            null,
-            2
-          )} found! Proceeding to PUT...`
+          `Checking if attribute ${attribute.name}(${uniqueAttributeId}) is unique...`
         );
-        try {
-          const putUrl = `${url}/${tei}`;
-          const putResponse = await put({
-            username,
-            password,
-            body,
-            putUrl,
-            query,
-          });
-          console.log(
-            `PUT succeeded with response : ${JSON.stringify(
-              putResponse,
-              null,
-              2
-            )}`
-          );
-          return { ...state, references: [putResponse, ...state.references] };
-        } catch (error) {
-          console.log(`Updating Tracked Entity Instance ${tei} failed!`);
-          throw error;
-        }
+
+        return get({
+          username,
+          password,
+          query: null,
+          url: uniqueAttributeUrl,
+        }).then(result => {
+          const foundAttribute = JSON.parse(result.text);
+
+          if (foundAttribute.unique) {
+            console.log(
+              `Tracked Entity Attribute ${attribute.name}(${uniqueAttributeId}) is unique. Proceeding to checking if Tracked Entity Instance exists...`
+            );
+            return get({
+              username,
+              password,
+              query,
+              url,
+            }).then(result => {
+              console.log(`query ${JSON.stringify(query, null, 2)}`);
+
+              let tei_body = JSON.parse(result.text);
+
+              if (tei_body.trackedEntityInstances.length <= 0) {
+                console.log(
+                  `Tracked Entity Instance  with filter ${query.filter} not found, proceeding to create...`
+                );
+
+                return post({
+                  username,
+                  password,
+                  body,
+                  url,
+                  query: null,
+                }).then(result => {
+                  console.log(
+                    `POST succeeded. ${
+                      result.header.location
+                    }\nSummary:\n${JSON.stringify(
+                      JSON.parse(result.text),
+                      null,
+                      2
+                    )}`
+                  );
+
+                  return {
+                    ...state,
+                    references: [result, ...state.references],
+                  };
+                });
+              } else {
+                const row1 = tei_body.trackedEntityInstances[0];
+
+                const payload = replace
+                  ? body
+                  : {
+                      ...row1,
+                      ...body,
+                      attributes: [...row1.attributes, ...body.attributes],
+                    };
+
+                const updateUrl = `${url}/${row1.trackedEntityInstance}`;
+
+                console.log(
+                  `Tracked Entity Instance  with filter ${query.filter} found(${
+                    row1.trackedEntityInstance
+                  }), proceeding to ${
+                    replace ? 'replace' : 'merge data with'
+                  } the existing TEI...`
+                );
+
+                return put({
+                  username,
+                  password,
+                  body: payload,
+                  url: updateUrl,
+                  query: null,
+                }).then(result => {
+                  console.log(`Upsert succeeded. Updated TEI: ${updateUrl}`);
+                  console.log(
+                    `Summary:\n${JSON.stringify(
+                      JSON.parse(result.text),
+                      null,
+                      2
+                    )}`
+                  );
+
+                  return {
+                    ...state,
+                    references: [result, ...state.references],
+                  };
+                });
+              }
+            });
+          } else {
+            throw new Error(
+              `Attribute ${attribute.name}(${uniqueAttributeId}) is not unique. Ensure, in DHIS2, this tracked entity attribute is marked as unique.`
+            );
+          }
+        });
       } else {
-        console.log(
-          `Tracked Entity Instance ${tei} not found! Proceeding to POST...`
+        throw new Error(
+          `Tracked Entity Attribute ${uniqueAttributeId} is not assigned to ${tet.name} Entity Type. Ensure, in DHIS2, this tracked entity attribute is assigned to ${tet.name} and that it is marked as unique.`
         );
-        const postUrl = url;
-        try {
-          const postResponse = await post({
-            username,
-            password,
-            body,
-            postUrl,
-            query: null,
-          });
-          console.log(
-            `POST succeeded with response : ${JSON.stringify(
-              postResponse,
-              null,
-              2
-            )}`
-          );
-          return { ...state, references: [postResponse, ...state.references] };
-        } catch (error) {
-          console.log(`Posting Tracked Entity Instance ${tei} failed!`);
-          throw error;
-        }
       }
-    } catch (error) {
-      console.log(`Fetching existing Tracked Entity Instance failed!`);
-      throw error;
-    }
+    });
   };
 }
 
