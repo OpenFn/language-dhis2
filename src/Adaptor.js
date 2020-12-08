@@ -342,7 +342,7 @@ export function updateTEI(tei, data) {
  * @constructor
  * @param {string} uniqueAttributeId - Tracked Entity Instance unique identifier used during matching
  * @param {object} data - Payload data for new/updated tracked entity instance(s)
- * @param {object} options - Optional options argument for the update method. It can be a `PUT` or `PATCH`. Defaults to `PATCH`
+ * @param {object} options - Optional options for update method. Defaults to usePUT=true
  * @returns {Operation}
  */
 export function upsertTEI(uniqueAttributeId, data, options) {
@@ -420,7 +420,9 @@ export function upsertTEI(uniqueAttributeId, data, options) {
               url,
             }).then(result => {
               console.log(`query ${JSON.stringify(query, null, 2)}`);
+
               let tei_body = JSON.parse(result.text);
+
               if (tei_body.trackedEntityInstances.length <= 0) {
                 console.log(
                   `Tracked Entity Instance  with filter ${query.filter} not found, proceeding to POST...`
@@ -451,23 +453,29 @@ export function upsertTEI(uniqueAttributeId, data, options) {
               } else {
                 const row1 = tei_body.trackedEntityInstances[0];
 
+                const patchPayload = {
+                  ...row1,
+                  ...body,
+                  attributes: [...row1.attributes, ...body.attributes],
+                };
+
                 const updateUrl = `${url}/${row1.trackedEntityInstance}`;
 
-                const method = options.method === 'PUT' ? put : patch;
+                const method = options?.usePUT === true ? 'PUT' : 'PATCH';
 
                 console.log(
-                  `Tracked Entity Instance  with filter ${query.filter} found(${row1.trackedEntityInstance}), proceeding to ${method}... \n ${method} Url ${updateUrl}`
+                  `Tracked Entity Instance  with filter ${query.filter} found(${row1.trackedEntityInstance}), proceeding to ${method}... \n Url to updated entity instance: ${updateUrl}`
                 );
 
-                return method({
+                return put({
                   username,
                   password,
-                  body,
+                  body: method === 'PUT' ? body : patchPayload,
                   url: updateUrl,
                   query: null,
                 }).then(result => {
                   console.log(
-                    `${method.toString()} succeeded. Summary: \n ${JSON.stringify(
+                    `${method} succeeded. Summary: \n ${JSON.stringify(
                       JSON.parse(result.text),
                       null,
                       2
