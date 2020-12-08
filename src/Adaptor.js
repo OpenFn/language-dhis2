@@ -349,6 +349,8 @@ export function upsertTEI(uniqueAttributeId, data, options) {
   return state => {
     const body = expandReferences(data)(state);
 
+    const { replace } = options;
+
     const { password, username, hostUrl } = state.configuration;
 
     const url = resolveUrl(hostUrl + '/', `api/trackedEntityInstances`);
@@ -453,33 +455,37 @@ export function upsertTEI(uniqueAttributeId, data, options) {
               } else {
                 const row1 = tei_body.trackedEntityInstances[0];
 
-                const patchPayload = {
-                  ...row1,
-                  ...body,
-                  attributes: [...row1.attributes, ...body.attributes],
-                };
+                const payload = replace
+                  ? body
+                  : {
+                      ...row1,
+                      ...body,
+                      attributes: [...row1.attributes, ...body.attributes],
+                    };
 
                 const updateUrl = `${url}/${row1.trackedEntityInstance}`;
 
-                const method = options?.usePUT === true ? 'PUT' : 'PATCH';
-
                 console.log(
-                  `Tracked Entity Instance  with filter ${query.filter} found(${row1.trackedEntityInstance}), proceeding to ${method}... \n Url to updated entity instance: ${updateUrl}`
+                  `Tracked Entity Instance  with filter ${query.filter} found(${
+                    row1.trackedEntityInstance
+                  }), proceeding to ${
+                    replace ? 'replace' : 'merge data with'
+                  } the existing TEI...`
                 );
 
                 return put({
                   username,
                   password,
-                  body: method === 'PUT' ? body : patchPayload,
+                  body: payload,
                   url: updateUrl,
                   query: null,
                 }).then(result => {
                   console.log(
-                    `${method} succeeded. Summary: \n ${JSON.stringify(
+                    `Upsert succeeded. See updated TEI here ${updateUrl}\nSummary:\n${JSON.stringify(
                       JSON.parse(result.text),
                       null,
                       2
-                    )}}`
+                    )}`
                   );
 
                   return {
