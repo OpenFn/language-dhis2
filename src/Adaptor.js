@@ -1,7 +1,7 @@
 /** @module Adaptor */
 import axios from 'axios';
 import { execute as commonExecute, expandReferences } from 'language-common';
-import { get, post, put, patch } from './Client';
+import { get, post, put } from './Client';
 import { resolve as resolveUrl } from 'url';
 import { mapValues } from 'lodash/fp';
 

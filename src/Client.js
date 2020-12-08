@@ -35,23 +35,7 @@ export function put({ username, password, body, url, query }) {
       });
   });
 }
-export function patch({ username, password, body, url, query }) {
-  return new Promise((resolve, reject) => {
-    request
-      .patch(url)
-      .query(query)
-      .type('json')
-      .accept('json')
-      .auth(username, password)
-      .send(JSON.stringify(body))
-      .end((error, res) => {
-        if (!!error || !res.ok) {
-          reject(error);
-        }
-        resolve(res);
-      });
-  });
-}
+
 export function get({ username, password, query, url }) {
   return new Promise((resolve, reject) => {
     request
