@@ -61,9 +61,9 @@ function configMigrationHelper(state) {
  *     dataSet: 'pBOMPrpg1QX',
  *     orgUnit: 'DiszpKrYNg8',
  *     period: '201401'
- *   }},
+ *   },
  *   postUrl: "yourposturl"
- * )
+ * });
  * @constructor
  * @param {object} params - data to query for events
  * @param {String} postUrl - (optional) URL to post the result
@@ -341,7 +341,7 @@ export function updateTEI(tei, data) {
  * @constructor
  * @param {string} uniqueAttributeId - Tracked Entity Instance unique identifier used during matching
  * @param {object} data - Payload data for new/updated tracked entity instance(s)
- * @param {object} options - Optional options for update method. Defaults to usePUT=true
+ * @param {object} options - Optional options for update method. Defaults to {replace: true}
  * @returns {Operation}
  */
 export function upsertTEI(uniqueAttributeId, data, options) {
