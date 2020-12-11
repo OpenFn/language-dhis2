@@ -3,6 +3,7 @@ import axios from 'axios';
 import { execute as commonExecute, expandReferences } from 'language-common';
 import { resolve as resolveUrl } from 'url';
 import { mapValues } from 'lodash/fp';
+import { eq, filter, some } from 'lodash';
 
 /**
  * Execute a sequence of operations.
@@ -63,6 +64,46 @@ function expandDataValues(obj) {
       }
     })(obj);
   };
+}
+
+function isLike(string, words) {
+  const wordsArrary = words.match(/([^\W]+[^\s,]*)/).splice(0, 1);
+  const isFound = word => RegExp(word, 'i').test(string);
+  return some(wordsArrary, isFound);
+}
+const dhis2OperatorMap = {
+  eq: eq,
+  like: isLike,
+};
+
+function applyFilter(arrObject, filterTokens) {
+  try {
+    return filter(arrObject, obj =>
+      Reflect.apply(filterTokens[1], obj, [
+        obj[filterTokens[0]],
+        filterTokens[2],
+      ])
+    );
+  } catch (error) {
+    console.log(
+      `Returned unfiltered data. Failed to apply custom filter(${JSON.stringify(
+        {
+          property: filterTokens[0],
+          operator: filterTokens[1] ?? null,
+          value: filterTokens[2],
+        },
+        null,
+        2
+      )}) on this collection. The operator you supplied maybe unsupported on this resource at the moment.`
+    );
+    return arrObject;
+  }
+}
+
+function parseFilter(filterExpression) {
+  const args = filterExpression.split(':');
+  args[1] = dhis2OperatorMap[args[1]];
+  return args;
 }
 
 /**
@@ -239,37 +280,12 @@ export function upsertTEI(uniqueAttributeId, data, options) {
 }
 */
 
-export function getResources() {
+export function getResources(params, callback) {
   return state => {
-    const {
-      username,
-      password,
-      hostUrl,
-      apiVersion,
-      inboxUrl,
-    } = state.configuration;
+    const { username, password, hostUrl, apiVersion } = state.configuration;
 
-    const url = resolveUrl(hostUrl + '/api/resources');
+    const url = resolveUrl(hostUrl + '/', 'api/resources');
 
-    return get({ username, password, query: null, url }).then(result => {
-      return {
-        ...state,
-        references: [JSON.parse(result.text), ...state.references],
-      };
-    });
-  };
-}
-
-export function getSchema(resourceType) {
-  return state => {
-    const {
-      username,
-      password,
-      hostUrl,
-      apiVersion,
-      inboxUrl,
-    } = state.configuration;
-    const url = resolveUrl(hostUrl + '/', `api/schemas/${resourceType}`);
     return axios
       .request({
         method: 'GET',
@@ -278,10 +294,59 @@ export function getSchema(resourceType) {
           username,
           password,
         },
+        transformResponse: [
+          function (data) {
+            return applyFilter(
+              JSON.parse(data)?.resources,
+              parseFilter(params?.filter)
+            );
+          },
+        ],
       })
       .then(result => {
-        console.log(result.data);
-        return { ...state, data: result.data };
+        const nextState = {
+          ...state,
+          data: result.data,
+          references: [...state.references, result.data],
+        };
+
+        if (callback) return callback(nextState);
+
+        return nextState;
+      });
+  };
+}
+
+export function getSchema(resourceType, params, options, callback) {
+  return state => {
+    const { username, password, hostUrl, apiVersion } = state.configuration;
+
+    const url = resolveUrl(hostUrl + '/', `api/schemas/${resourceType}`);
+
+    return axios
+      .request({
+        method: 'GET',
+        url,
+        auth: {
+          username,
+          password,
+        },
+        params,
+      })
+      .then(result => {
+        console.log(
+          `getSchema('${resourceType}') succeeded. The body of this result will be available in state.data or in your callback`
+        );
+
+        const nextState = {
+          ...state,
+          data: result.data,
+          references: [...state.references, result.data],
+        };
+
+        if (callback) return callback(nextState);
+
+        return nextState;
       });
   };
 }
