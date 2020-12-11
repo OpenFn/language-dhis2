@@ -616,6 +616,99 @@ export function fetchAnalytics(params, postUrl) {
   };
 }
 
+export function listResources() {
+  return state => {
+    const {
+      username,
+      password,
+      hostUrl,
+      apiVersion,
+      inboxUrl,
+    } = state.configuration;
+
+    const url = resolveUrl(hostUrl + '/api/resources');
+
+    return get({ username, password, query: null, url }).then(result => {
+      return {
+        ...state,
+        references: [JSON.parse(result.text), ...state.references],
+      };
+    });
+  };
+}
+
+export function describe(resourceType) {
+  return state => {
+    const {
+      username,
+      password,
+      hostUrl,
+      apiVersion,
+      inboxUrl,
+    } = state.configuration;
+
+    const url = resolveUrl(hostUrl + '/', `api/schemas/${resourceType}`);
+
+    return get({ username, password, query: null, url }).then(result => {
+      console.log(`result:`, result);
+      return {
+        ...state,
+        references: [JSON.parse(result.text), ...state.references],
+      };
+    });
+  };
+}
+
+export function fetchData2(resourceType, params, options) {
+  return state => {
+    const {
+      username,
+      password,
+      hostUrl,
+      apiVersion,
+      inboxUrl,
+    } = state.configuration;
+
+    const query = expandDataValues(params)(state);
+
+    const url = resolveUrl(hostUrl + '/', `api/${resourceType}`);
+
+    return get({ username, password, query, url }).then(result => {
+      return {
+        ...state,
+        references: [JSON.parse(result.text), ...state.references],
+      };
+    });
+  };
+}
+
+export function fetchMetadata(resources, params, options) {
+  return state => {
+    const {
+      username,
+      password,
+      hostUrl,
+      apiVersion,
+      inboxUrl,
+    } = state.configuration;
+
+    const query = expandDataValues({ ...resources, ...params })(state);
+
+    const url = resolveUrl(hostUrl + '/', `api/metadata`);
+
+    console.log(`Query ${JSON.stringify(query)}`);
+
+    return get({ username, password, query, url }).then(result => {
+      let parsed_result = JSON.parse(result?.text);
+      options?.includeSystem ? true : delete parsed_result.system;
+      return {
+        ...state,
+        references: [parsed_result, ...state.references],
+      };
+    });
+  };
+}
+
 exports.axios = axios;
 
 export {
