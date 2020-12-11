@@ -1,7 +1,6 @@
 /** @module Adaptor */
 import axios from 'axios';
 import { execute as commonExecute, expandReferences } from 'language-common';
-import { get, post, put } from './Client';
 import { resolve as resolveUrl } from 'url';
 import { mapValues } from 'lodash/fp';
 
@@ -52,140 +51,6 @@ function configMigrationHelper(state) {
   return state;
 }
 
-/**
- * Fetch a dataValueSet
- * @public
- * @example
- * fetchData({
- *   fields: {
- *     dataSet: 'pBOMPrpg1QX',
- *     orgUnit: 'DiszpKrYNg8',
- *     period: '201401'
- *   },
- *   postUrl: "yourposturl"
- * });
- * @constructor
- * @param {object} params - data to query for events
- * @param {String} postUrl - (optional) URL to post the result
- * @returns {Operation}
- */
-export function fetchData(params, postUrl) {
-  return state => {
-    const data = expandReferences(params)(state);
-    const { username, password, hostUrl } = state.configuration;
-    const url = resolveUrl(hostUrl + '/', 'api/dataValueSets.json?');
-    const query = data.fields || expandDataValues(params)(state);
-
-    console.log('Getting Data Value Sets:');
-
-    return get({ username, password, query, url })
-      .then(result => {
-        console.log('Get Result:', result.body);
-        return result;
-      })
-      .then(result => {
-        if (postUrl) {
-          const body = result.body;
-          const url = postUrl;
-
-          return post({ username, password, body, url }).then(result => {
-            console.log('Post Result:', result.statusCode);
-            return {
-              ...state,
-              references: [result, ...state.references],
-            };
-          });
-        } else {
-          return {
-            ...state,
-            references: [result, ...state.references],
-          };
-        }
-      });
-  };
-}
-
-/**
- * Fetch an event
- * @public
- * @example
- * fetchEvents({
- *   fields: {
- *     orgUnit: 'DiszpKrYNg8',
- *     period: '201401'
- *   }},
- *   postUrl: "yourposturl"
- * )
- * @constructor
- * @param {object} params - data to query for events
- * @param {String} postUrl - (optional) URL to post the result
- * @returns {Operation}
- */
-export function fetchEvents(params, postUrl) {
-  return state => {
-    const data = expandReferences(params)(state);
-    const { username, password, hostUrl } = state.configuration;
-    const url = resolveUrl(hostUrl + '/', 'api/events.json?');
-    const query = data.fields || expandDataValues(params)(state);
-
-    console.log('Getting Events Data:');
-
-    return get({ username, password, query, url })
-      .then(result => {
-        console.log('Get Result:', result.body);
-        return result;
-      })
-      .then(result => {
-        if (postUrl) {
-          const body = result.body;
-          const url = postUrl;
-
-          return post({ username, password, body, url }).then(result => {
-            console.log('Post Result:', result.statusCode);
-            return {
-              ...state,
-              references: [result, ...state.references],
-            };
-          });
-        } else {
-          return {
-            ...state,
-            references: [result, ...state.references],
-          };
-        }
-      });
-  };
-}
-
-/**
- * Create an event
- * @public
- * @example
- * event(eventData)
- * @constructor
- * @param {object} eventData - Payload data for the event
- * @returns {Operation}
- */
-export function event(eventData) {
-  return state => {
-    const body = expandReferences(eventData)(state);
-    const { username, password, hostUrl } = state.configuration;
-    const url = resolveUrl(hostUrl + '/', 'api/events');
-
-    console.log(`Posting event to org unit '${body.orgUnit}'.`);
-
-    return post({
-      username,
-      password,
-      body,
-      url,
-    }).then(result => {
-      console.log('Result:', JSON.stringify(result.body, null, 2));
-      return { ...state, references: [result, ...state.references] };
-    });
-  };
-}
-
 function expandDataValues(obj) {
   return state => {
     return mapValues(function (value) {
@@ -201,139 +66,6 @@ function expandDataValues(obj) {
 }
 
 /**
- * Send data values using the dataValueSets resource
- * @public
- * @example
- *  dataValueSet({
- *    dataSet: dataValue("set"),
- *    orgUnit: "DiszpKrYNg8",
- *    period: "201402",
- *    completeData: "2014-03-03",
- *    dataValues: [
- *      dataElement("f7n9E0hX8qk", dataValue("name")),
- *      dataElement("Ix2HsbDMLea", dataValue("age")),
- *      dataElement("eY5ehpbEsB7", 30)
- *    ]
- * });
- * @constructor
- * @param {object} data - Payload data for the data value set
- * @returns {Operation}
- */
-export function dataValueSet(data) {
-  return state => {
-    const body = expandDataValues(data)(state);
-    const { username, password, hostUrl } = state.configuration;
-    const url = resolveUrl(hostUrl + '/', 'api/dataValueSets');
-
-    console.log(
-      `Posting data value set ${body.dataSet} to org unit '${
-        body.orgUnit
-      }' with ${body.dataValues && body.dataValues.length} data values.`
-    );
-
-    return post({
-      username,
-      password,
-      body,
-      url,
-    }).then(result => {
-      console.log('Result:', JSON.stringify(result.body, null, 2));
-      return { ...state, references: [result, ...state.references] };
-    });
-  };
-}
-
-/**
- * Create a "dataElement" pairing for DHIS2.
- * @public
- * @example
- * dataElement(key, value)
- * @constructor
- * @param {string} dataElement - Payload data for the Data Element key
- * @param {variable} value - Payload data for the Data Element value
- * @param {string} comment - comment for the Data Element
- * @returns {Operation}
- */
-export function dataElement(dataElement, value, comment) {
-  return { dataElement, value, comment };
-}
-
-/**
- * Create one or many new Tracked Entity Instances
- * @public
- * @example
- * createTEI(data)
- * @constructor
- * @param {object} data - Payload data for new tracked entity instance(s)
- * @returns {Operation}
- */
-export function createTEI(data) {
-  return state => {
-    const body = expandReferences(data)(state);
-    const { username, password, hostUrl } = state.configuration;
-    const url = resolveUrl(hostUrl + '/', 'api/trackedEntityInstances');
-
-    console.log(
-      `Posting tracked entity instance of type '${
-        body.trackedEntityType
-      }' to org unit '${body.orgUnit}' with ${
-        body.attributes && body.attributes.length
-      } attributes and ${
-        body.enrollments && body.enrollments.length
-      } enrollments.`
-    );
-
-    return post({
-      username,
-      password,
-      body,
-      url,
-    }).then(result => {
-      console.log('Result:', JSON.stringify(result.body, null, 2));
-      return { ...state, references: [result, ...state.references] };
-    });
-  };
-}
-
-/**
- * Update existing Tracked Entity Instances
- * @public
- * @example
- * updateTEI(tei, data)
- * @constructor
- * @param {object} tei - identifier for the TEI to be updated
- * @param {object} data - Payload data for updating a TEI
- * @returns {Operation}
- */
-export function updateTEI(tei, data) {
-  return state => {
-    const body = expandReferences(data)(state);
-    const { username, password, hostUrl } = state.configuration;
-    const url = hostUrl.concat(`/api/trackedEntityInstances/${tei}`);
-
-    console.log(
-      `Updating tracked entity instance of type '${
-        body.trackedEntityType
-      }' to org unit '${body.orgUnit}' with ${
-        body.attributes && body.attributes.length
-      } attributes and ${
-        body.enrollments && body.enrollments.length
-      } enrollments.`
-    );
-
-    return put({
-      username,
-      password,
-      body,
-      url,
-    }).then(result => {
-      console.log('Result:', JSON.stringify(result.body, null, 2));
-      return { ...state, references: [result, ...state.references] };
-    });
-  };
-}
-
-/**
  * Create or update one or many new Tracked Entity Instances
  * @public
  * @example
@@ -344,6 +76,7 @@ export function updateTEI(tei, data) {
  * @param {object} options - Optional options for update method. Defaults to {replace: true}
  * @returns {Operation}
  */
+/*
 export function upsertTEI(uniqueAttributeId, data, options) {
   return state => {
     const { password, username, hostUrl } = state.configuration;
@@ -504,119 +237,9 @@ export function upsertTEI(uniqueAttributeId, data, options) {
     });
   };
 }
+*/
 
-// /**
-//  * Create and enroll TrackedEntityInstances
-//  * @example
-//  * execute(
-//  *   createEnrollTEI(te, orgUnit, attributes, enrollments)
-//  * )(state)
-//  * @constructor
-//  * @param {object} enrollmentData - Payload data for new enrollment
-//  * @returns {Operation}
-//  */
-// export function upsertEnroll(upsertData) {
-//
-//   return state => {
-//     const body = expandReferences(trackedEntityInstanceData)(state);
-//     const { username, password, hostUrl } = state.configuration;
-//     const url = resolveUrl(hostUrl + '/', 'api/trackedEntityInstances')
-//
-//     return post({ username, password, body, url })
-//     .then((result) => {
-//       console.log("Result:", JSON.stringify(result.body, null, 2));
-//       return { ...state, references: [ result, ...state.references ] }
-//     })
-//
-//   }
-// }
-
-/**
- * Enroll a tracked entity instance in a program
- * @public
- * @example
- * enroll(tei, enrollmentData)
- * @constructor
- * @param {object} tei
- * @param {object} enrollmentData - Payload data for new enrollment
- * @returns {Operation}
- */
-export function enroll(tei, enrollmentData) {
-  return state => {
-    const body = expandReferences(enrollmentData)(state);
-    body['trackedEntityInstance'] = tei;
-    const { username, password, hostUrl } = state.configuration;
-    const url = resolveUrl(hostUrl + '/', 'api/enrollments');
-
-    console.log('Enrolling tracked entity instance.');
-
-    return post({
-      username,
-      password,
-      body,
-      url,
-    }).then(result => {
-      console.log('Result:', JSON.stringify(result.body, null, 2));
-      return { ...state, references: [result, ...state.references] };
-    });
-  };
-}
-
-/**
- * Fetch analytics
- * @public
- * @example
- * fetchAnalytics({
- *   query: {
- *     dimension: ["dx:CYI5LEmm3cG", "pe:LAST_6_MONTHS"],
- *     filter: "ou:t7vi7vJqWvi",
- *     displayProperty: "NAME",
- *     outputIdScheme: "UID"
- *   }},
- *   postUrl: "yourposturl"
- * )
- * @constructor
- * @param {object} params - data to query for events
- * @param {String} postUrl - (optional) URL to post the result
- * @returns {Operation}
- */
-export function fetchAnalytics(params, postUrl) {
-  return state => {
-    const data = expandReferences(params)(state);
-    const { username, password, hostUrl } = state.configuration;
-    const url = resolveUrl(hostUrl + '/', 'api/26/analytics.json?');
-    const query = data.query || expandDataValues(params)(state);
-
-    console.log(`Getting analytics data for query: ${query}`);
-
-    return get({ username, password, query, url })
-      .then(result => {
-        console.log('Get Result:', result.body);
-        return result;
-      })
-      .then(result => {
-        if (postUrl) {
-          const body = result.body;
-          const url = postUrl;
-
-          return post({ username, password, body, url }).then(result => {
-            console.log('Post Result:', result.statusCode);
-            return {
-              ...state,
-              references: [result, ...state.references],
-            };
-          });
-        } else {
-          return {
-            ...state,
-            references: [result, ...state.references],
-          };
-        }
-      });
-  };
-}
-
-export function listResources() {
+export function getResources() {
   return state => {
     const {
       username,
@@ -637,7 +260,7 @@ export function listResources() {
   };
 }
 
-export function describe(resourceType) {
+export function getSchema(resourceType) {
   return state => {
     const {
       username,
@@ -646,20 +269,24 @@ export function describe(resourceType) {
       apiVersion,
       inboxUrl,
     } = state.configuration;
-
     const url = resolveUrl(hostUrl + '/', `api/schemas/${resourceType}`);
-
-    return get({ username, password, query: null, url }).then(result => {
-      console.log(`result:`, result);
-      return {
-        ...state,
-        references: [JSON.parse(result.text), ...state.references],
-      };
-    });
+    return axios
+      .request({
+        method: 'GET',
+        url,
+        auth: {
+          username,
+          password,
+        },
+      })
+      .then(result => {
+        console.log(result.data);
+        return { ...state, data: result.data };
+      });
   };
 }
 
-export function fetchData2(resourceType, params, options) {
+export function getData(resourceType, params, options) {
   return state => {
     const {
       username,
@@ -682,7 +309,7 @@ export function fetchData2(resourceType, params, options) {
   };
 }
 
-export function fetchMetadata(resources, params, options) {
+export function getMetadata(resources, params, options) {
   return state => {
     const {
       username,
@@ -707,6 +334,28 @@ export function fetchMetadata(resources, params, options) {
       };
     });
   };
+}
+
+export function postData(resourceType, data, params, options) {
+  return state;
+}
+
+export function upsertData(
+  resourceType,
+  uniqueAttribute,
+  data,
+  params,
+  options
+) {
+  return state;
+}
+
+export function updateData(resourceType, query, data, params, options) {
+  return state;
+}
+
+export function deleteData(resourceType, query, params, options) {
+  return state;
 }
 
 exports.axios = axios;
