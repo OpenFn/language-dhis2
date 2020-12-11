@@ -3,7 +3,7 @@ import axios from 'axios';
 import { execute as commonExecute, expandReferences } from 'language-common';
 import { resolve as resolveUrl } from 'url';
 import { mapValues } from 'lodash/fp';
-import { eq, filter, some } from 'lodash';
+import { eq, filter, negate, some } from 'lodash';
 
 /**
  * Execute a sequence of operations.
@@ -77,33 +77,39 @@ const dhis2OperatorMap = {
 };
 
 function applyFilter(arrObject, filterTokens) {
-  try {
-    return filter(arrObject, obj =>
-      Reflect.apply(filterTokens[1], obj, [
-        obj[filterTokens[0]],
-        filterTokens[2],
-      ])
-    );
-  } catch (error) {
-    console.log(
-      `Returned unfiltered data. Failed to apply custom filter(${JSON.stringify(
-        {
-          property: filterTokens[0],
-          operator: filterTokens[1] ?? null,
-          value: filterTokens[2],
-        },
-        null,
-        2
-      )}) on this collection. The operator you supplied maybe unsupported on this resource at the moment.`
-    );
-    return arrObject;
+  if (filterTokens) {
+    try {
+      return filter(arrObject, obj =>
+        Reflect.apply(filterTokens[1], obj, [
+          obj[filterTokens[0]],
+          filterTokens[2],
+        ])
+      );
+    } catch (error) {
+      console.log(
+        `Returned unfiltered data. Failed to apply custom filter(${JSON.stringify(
+          {
+            property: filterTokens[0] ?? null,
+            operator: filterTokens[1] ?? null,
+            value: filterTokens[2] ?? null,
+          },
+          null,
+          2
+        )}) on this collection. The operator you supplied maybe unsupported on this resource at the moment.`
+      );
+      return arrObject;
+    }
   }
+  console.log(`No filters applied, returned all records on this resource.`);
+  return arrObject;
 }
 
 function parseFilter(filterExpression) {
-  const args = filterExpression.split(':');
-  args[1] = dhis2OperatorMap[args[1]];
-  return args;
+  const filterTokens = filterExpression?.split(':');
+  filterTokens
+    ? (filterTokens[1] = dhis2OperatorMap[filterTokens[1] ?? null])
+    : null;
+  return filterTokens;
 }
 
 /**
@@ -304,6 +310,13 @@ export function getResources(params, callback) {
         ],
       })
       .then(result => {
+        console.log(
+          `Request params:\n${JSON.stringify(
+            params ?? {},
+            null,
+            2
+          )}\ngetResources succeeded.\nThe body of this result will be available in state.data or in your callback`
+        );
         const nextState = {
           ...state,
           data: result.data,
