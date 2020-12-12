@@ -4,6 +4,7 @@ import { execute as commonExecute, expandReferences } from 'language-common';
 import { resolve as resolveUrl } from 'url';
 import { mapValues } from 'lodash/fp';
 import { eq, filter, negate, some } from 'lodash';
+import { Log, prettyJson } from './utils';
 
 /**
  * Execute a sequence of operations.
@@ -286,6 +287,15 @@ export function upsertTEI(uniqueAttributeId, data, options) {
 }
 */
 
+export function getSampleState(resourceType, operation) {
+  return state;
+}
+export function showSampleExpression(resourceType, sampleState, operation) {
+  return state;
+}
+export function discoverParams(resourceType) {
+  return state;
+}
 export function getResources(params, callback) {
   return state => {
     const { username, password, hostUrl, apiVersion } = state.configuration;
@@ -310,11 +320,9 @@ export function getResources(params, callback) {
         ],
       })
       .then(result => {
-        console.log(
-          `Request params:\n${JSON.stringify(
-            params ?? {},
-            null,
-            2
+        Log.info(
+          `Request params:\n${prettyJson(
+            params ?? {}
           )}\ngetResources succeeded.\nThe body of this result will be available in state.data or in your callback`
         );
         const nextState = {
@@ -347,7 +355,7 @@ export function getSchema(resourceType, params, options, callback) {
         params,
       })
       .then(result => {
-        console.log(
+        Log.info(
           `getSchema('${resourceType}') succeeded. The body of this result will be available in state.data or in your callback`
         );
 
@@ -401,7 +409,7 @@ export function getMetadata(resources, params, options) {
 
     const url = resolveUrl(hostUrl + '/', `api/metadata`);
 
-    console.log(`Query ${JSON.stringify(query)}`);
+    Log.info(`Query ${prettyJson(query)}`);
 
     return get({ username, password, query, url }).then(result => {
       let parsed_result = JSON.parse(result?.text);
