@@ -1,12 +1,10 @@
 /** @module Adaptor */
 import axios from 'axios';
 import { execute as commonExecute, expandReferences } from 'language-common';
-import { resolve as resolveUrl } from 'url';
 import { mapValues } from 'lodash/fp';
 
 import {
   Log,
-  prettyJson,
   composeSuccessMessage,
   composeNextState,
   HTTP_METHODS,
