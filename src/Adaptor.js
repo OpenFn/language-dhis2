@@ -3,7 +3,7 @@ import axios from 'axios';
 import { execute as commonExecute, expandReferences } from 'language-common';
 import { resolve as resolveUrl } from 'url';
 import { mapValues } from 'lodash/fp';
-import { eq, filter, negate, some, isEmpty, method } from 'lodash';
+
 import {
   Log,
   prettyJson,
@@ -14,6 +14,10 @@ import {
   logWaitingForServer,
   buildUrl,
   logApiVersion,
+  applyFilter,
+  parseFilter,
+  HTTP_HEADERS,
+  MEDIA_TYPES,
 } from './utils_lang_dhis2';
 
 /**
@@ -84,59 +88,16 @@ axios.interceptors.response.use(
   },
   function (error) {
     // TODO Cleanup sensitive info
-    Log.error(`${error.message}`);
+    Log.error(`${error?.message}`);
     return Promise.reject({
-      status: error.response.status,
-      message: error.message,
-      url: error.response.config.url,
-      responseData: error.response.data,
-      isAxiosError: error.isAxiosError,
+      status: error?.response?.status,
+      message: error?.message,
+      url: error?.response?.config?.url,
+      responseData: error?.response?.data,
+      isAxiosError: error?.isAxiosError,
     });
   }
 );
-
-function isLike(string, words) {
-  const wordsArrary = words.match(/([^\W]+[^\s,]*)/).splice(0, 1);
-  const isFound = word => RegExp(word, 'i').test(string);
-  return some(wordsArrary, isFound);
-}
-
-const dhis2OperatorMap = {
-  eq: eq,
-  like: isLike,
-};
-
-function applyFilter(arrObject, filterTokens) {
-  if (filterTokens) {
-    try {
-      return filter(arrObject, obj =>
-        Reflect.apply(filterTokens[1], obj, [
-          obj[filterTokens[0]],
-          filterTokens[2],
-        ])
-      );
-    } catch (error) {
-      Log.warn(
-        `Returned unfiltered data. Failed to apply custom filter(${prettyJson({
-          property: filterTokens[0] ?? null,
-          operator: filterTokens[1] ?? null,
-          value: filterTokens[2] ?? null,
-        })}) on this collection. The operator you supplied maybe unsupported on this resource at the moment.`
-      );
-      return arrObject;
-    }
-  }
-  Log.info(`No filters applied, returned all records on this resource.`);
-  return arrObject;
-}
-
-function parseFilter(filterExpression) {
-  const filterTokens = filterExpression?.split(':');
-  filterTokens
-    ? (filterTokens[1] = dhis2OperatorMap[filterTokens[1] ?? null])
-    : null;
-  return filterTokens;
-}
 
 /**
  * Create or update one or many new Tracked Entity Instances
@@ -313,6 +274,8 @@ export function upsertTEI(uniqueAttributeId, data, options) {
 */
 
 /**
+ * TODO
+ *
  * Clean JSON object
  * Useful for deep-removing certain keys in an object(recursively), or de-identifying sensitive data
  * @param {*} data
@@ -324,6 +287,8 @@ export function clean(data, options, ...fields) {
 }
 
 /**
+ * TODO
+ *
  * Load JSON from file
  * @param {*} filePath
  */
@@ -332,6 +297,8 @@ export function loadJsonFromFile(filePath) {
 }
 
 /**
+ * TODO
+ *
  * Load and parse csv file
  * @param {string} filePath
  */
@@ -340,6 +307,8 @@ export function parseCsvFromFile(filePath) {
 }
 
 /**
+ * TODO
+ *
  * Transform JSON object, applying the transformer function on each element that meets the condition of the predicate
  * @example
  * transformData(state.data, state.data.attributes.DcnX8jrjh, this => this.value = 'new_value')
@@ -355,6 +324,8 @@ export function transformData(data, predicate, transformer, step) {
 }
 
 /**
+ * TODO
+ *
  * Get Sample State for a given operation on a resource
  * @example
  * getSampleSate('getData', 'trackedEntityInstances')
@@ -366,6 +337,8 @@ export function getSampleState(operation, resourceType) {
 }
 
 /**
+ * TODO
+ *
  * Show Sample Expression for a given operation on a resource
  * @example
  * showSampleExpression('postData', 'trackedEntityInstances',{sampleState})
@@ -378,6 +351,8 @@ export function showSampleExpression(operation, resourceType, sampleState) {
 }
 
 /**
+ * TODO
+ *
  * Discover available parameters and allowed operators for a given resource's endpoint
  * @example
  * discoverParams('trackedEntityInstances')
@@ -398,56 +373,51 @@ export function discoverParams(operation, resourceType) {
  */
 export function getResources(params, options, callback) {
   return state => {
-    const { username, password, hostUrl, apiVersion } = state?.configuration;
+    const { username, password } = state?.configuration;
 
     const { filter } = params;
 
-    const { supportApiVersion } = options;
+    const url = buildUrl(getResources, null, state?.configuration, options);
 
-    const path =
-      supportApiVersion === true
-        ? `${apiVersion ?? 'api_version_missing'}/resources`
-        : 'resources';
+    logApiVersion(state?.configuration, options);
 
-    const url = resolveUrl(hostUrl + '/api/', path);
+    logWaitingForServer(url, params);
 
-    Log.info(`url ${url}`);
+    warnExpectLargeResult(params, url);
 
     return axios
       .request({
-        method: 'GET',
+        method: HTTP_METHODS.GET,
         url,
         auth: {
           username,
           password,
         },
+        responseType: MEDIA_TYPES.APP_JSON.alias,
         transformResponse: [
           function (data, headers) {
-            if (headers['content-type']?.split(';')[0] === 'application/json')
-              return applyFilter(
-                JSON.parse(data)?.resources,
-                parseFilter(filter)
-              );
+            if (
+              headers[HTTP_HEADERS.CONTENT_TYPE]?.split(';')[0] ??
+              null === MEDIA_TYPES.APP_JSON.value
+            ) {
+              let temp = JSON.parse(data);
+              return {
+                ...temp,
+                resources: applyFilter(temp.resources, parseFilter(filter)),
+              };
+            }
             return data;
           },
         ],
       })
       .then(result => {
-        Log.info(`Request filter: ${filter ?? {}}`);
-
         Log.info(
-          'getResources succeeded.The body of this result will be available in state.data or in your callback.'
+          composeSuccessMessage(getResources, null, params, options, callback)
         );
 
-        const nextState = {
-          ...state,
-          data: result?.data,
-          references: [...state?.references, result?.data],
-        };
+        if (callback) return callback(composeNextState(state, result));
 
-        if (callback) return callback(nextState);
-
-        return nextState;
+        return composeNextState(state, result);
       });
   };
 }

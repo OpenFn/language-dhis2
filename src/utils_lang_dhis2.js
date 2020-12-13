@@ -1,17 +1,22 @@
-import { isEmpty } from 'lodash';
-// Create a DHIS2 UID
+import { eq, filter, some, isEmpty } from 'lodash';
+
+/**
+ * TODO
+ *
+ * Create a DHIS2 UID-Useful for client generated Ids compatible with DHIS2
+ */
 export function generateUID() {
   return;
 }
 
 /**
+ * TODO
+ *
  * Validate if valid DHIS2 UID
  * @example
  * isValidUID('MmwcGkxy876')
  * // true
  * isValidUID(12345)
- * // false
- * isValidUID('MmwcGkxy876 ')
  * // false
  *
  */
@@ -20,7 +25,7 @@ export function isValidUID(target) {
 }
 
 /**
- * Print easy-readable JSON objects.
+ * Print easy-readable JSON objects, uses JSON.stringify.
  *
  */
 
@@ -29,7 +34,7 @@ export function prettyJson(data) {
 }
 
 /**
- * Custom logger with timestamps
+ * Custom logger with timestamps and colors
  *
  */
 export class Log {
@@ -127,7 +132,7 @@ export function composeSuccessMessage(func, ...args) {
 }
 
 /**
- * Compose next state base on the result of a given operation
+ * Compose next state based on the result of a given operation
  * @param {Object} result - Success result of an http call
  */
 export function composeNextState(state, result) {
@@ -155,10 +160,10 @@ export const HTTP_METHODS = {
  * @param {string} endpointUrl - endpoint url for a resourceType
  *
  */
-export function warnExpectLargeResult(resourceType, endpointUrl) {
-  if (isEmpty(resourceType))
+export function warnExpectLargeResult(paramOrResourceType, endpointUrl) {
+  if (isEmpty(paramOrResourceType))
     Log.warn(
-      `This may take a while. This endpoint(${endpointUrl}) may return a large collection of records, since 'resourceType' is not specified. We recommend you specify 'resourceType' or use 'filter' parameter to limit the content of the result.`
+      `\x1b[33m Missing params or resourceType. This may take a while\x1b[0m. This endpoint(\x1b[33m${endpointUrl}\x1b[0m) may return a large collection of records, since 'params' or 'resourceType' is not specified. We recommend you specify 'params' or 'resourceType' or use 'filter' parameter to limit the content of the result.`
     );
 }
 
@@ -217,3 +222,54 @@ export function logApiVersion(configuration, options) {
   if (supportApiVersion === true) Log.warn(message);
   else Log.warn(`Using \x1b[33m latest \x1b[0m version of DHIS2 api.`);
 }
+
+export function isLike(string, words) {
+  const wordsArrary = words?.match(/([^\W]+[^\s,]*)/)?.splice(0, 1);
+  const isFound = word => RegExp(word, 'i')?.test(string);
+  return some(wordsArrary, isFound);
+}
+
+export const dhis2OperatorMap = {
+  eq: eq,
+  like: isLike,
+};
+
+export function applyFilter(arrObject, filterTokens) {
+  if (filterTokens) {
+    try {
+      return filter(arrObject, obj =>
+        Reflect.apply(filterTokens[1], obj, [
+          obj[filterTokens[0]],
+          filterTokens[2],
+        ])
+      );
+    } catch (error) {
+      Log.warn(
+        `Returned unfiltered data. Failed to apply custom filter(${prettyJson({
+          property: filterTokens[0] ?? null,
+          operator: filterTokens[1] ?? null,
+          value: filterTokens[2] ?? null,
+        })}) on this collection. The operator you supplied maybe unsupported on this resource at the moment.`
+      );
+      return arrObject;
+    }
+  }
+  Log.info(`No filters applied, returned all records on this resource.`);
+  return arrObject;
+}
+
+export function parseFilter(filterExpression) {
+  const filterTokens = filterExpression?.split(':');
+  filterTokens
+    ? (filterTokens[1] = dhis2OperatorMap[filterTokens[1] ?? null])
+    : null;
+  return filterTokens;
+}
+
+export const HTTP_HEADERS = {
+  CONTENT_TYPE: 'content-type',
+};
+
+export const MEDIA_TYPES = {
+  APP_JSON: { value: 'application/json', alias: 'json' },
+};
