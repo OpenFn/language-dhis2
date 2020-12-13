@@ -480,57 +480,132 @@ export function getSchema(resourceType, params, options, callback) {
   };
 }
 
-export function getData(resourceType, params, options) {
+/**
+ *
+ * @param {*} resourceType
+ * @param {*} params
+ * @param {*} options
+ * @example
+ * getData(
+ * 'trackedEntityInstances',
+ * {
+ *  fields: '*',
+    ou: 'DiszpKrYNg8',
+    entityType: 'nEenWmSyUEp',
+    // filter: 'id:eq:FQ2o8UBlcrS',
+    skipPaging: true,
+    async: true,
+    // filter: 'id:eq:PWxgadk4sCG',
+  },
+  {
+    includeSystem: false,
+  }
+);
+ */
+export function getData(resourceType, params, options, callback) {
   return state => {
-    const {
-      username,
-      password,
-      hostUrl,
-      apiVersion,
-      inboxUrl,
-    } = state.configuration;
+    const { username, password } = state?.configuration;
 
-    const query = expandDataValues(params)(state);
+    const url = buildUrl(getData, resourceType, state?.configuration, options);
 
-    const url = resolveUrl(hostUrl + '/', `api/${resourceType}`);
+    logApiVersion(state.configuration, options);
 
-    return get({ username, password, query, url }).then(result => {
-      return {
-        ...state,
-        references: [JSON.parse(result.text), ...state.references],
-      };
-    });
+    logWaitingForServer(url, params);
+
+    warnExpectLargeResult(resourceType, url);
+
+    return axios
+      .request({
+        method: HTTP_METHODS.GET,
+        url,
+        auth: {
+          username,
+          password,
+        },
+        params,
+      })
+      .then(result => {
+        Log.info(
+          composeSuccessMessage(
+            getData,
+            resourceType,
+            params,
+            options,
+            callback
+          )
+        );
+
+        if (callback) return callback(composeNextState(state, result));
+
+        return composeNextState(state, result);
+      });
   };
 }
 
-export function getMetadata(resources, params, options) {
+/**
+ * Get metadata
+ * @param {*} resources 
+ * @param {*} params 
+ * @param {*} options 
+ * @param {*} callback 
+ * @example
+ * getMetadata(
+  'attributes',
+  {
+    fields: '*',
+    // filter: 'id:eq:PWxgadk4sCG',
+  },
+  {
+    includeSystem: false,
+  }
+);
+ */
+export function getMetadata(resources, params, options, callback) {
   return state => {
-    const {
-      username,
-      password,
-      hostUrl,
-      apiVersion,
-      inboxUrl,
-    } = state.configuration;
+    const { username, password } = state.configuration;
 
-    const query = expandDataValues({ ...resources, ...params })(state);
+    const queryParams = expandDataValues({ ...resources, ...params })(state);
 
-    const url = resolveUrl(hostUrl + '/', `api/metadata`);
+    const url = buildUrl(getMetadata, resources, state?.configuration, options);
 
-    Log.info(`Query ${prettyJson(query)}`);
+    logApiVersion(state.configuration, options);
 
-    return get({ username, password, query, url }).then(result => {
-      let parsed_result = JSON.parse(result?.text);
-      options?.includeSystem ? true : delete parsed_result.system;
-      return {
-        ...state,
-        references: [parsed_result, ...state.references],
-      };
-    });
+    logWaitingForServer(url, queryParams);
+
+    warnExpectLargeResult(resources, url);
+
+    return axios
+      .request({
+        method: HTTP_METHODS.GET,
+        url,
+        auth: {
+          username,
+          password,
+        },
+        params: queryParams,
+      })
+      .then(result => {
+        Log.info(
+          composeSuccessMessage(
+            getMetadata,
+            resources,
+            queryParams,
+            options,
+            callback
+          )
+        );
+
+        if (callback) return callback(composeNextState(state, result));
+
+        return composeNextState(state, result);
+      });
   };
 }
 
 export function postData(resourceType, data, params, options) {
+  return state;
+}
+export function postMetadata(resourceType, data, params, options) {
   return state;
 }
 
@@ -543,15 +618,27 @@ export function upsertData(
 ) {
   return state;
 }
-
+export function upsertMetadata(
+  resourceType,
+  uniqueAttribute,
+  data,
+  params,
+  options
+) {
+  return state;
+}
 export function updateData(resourceType, query, data, params, options) {
   return state;
 }
-
+export function updateMetadata(resourceType, query, data, params, options) {
+  return state;
+}
 export function deleteData(resourceType, query, params, options) {
   return state;
 }
-
+export function deleteMetadata(resourceType, query, params, options) {
+  return state;
+}
 exports.axios = axios;
 
 export {
