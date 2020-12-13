@@ -275,3 +275,9 @@ export const HTTP_HEADERS = {
 export const MEDIA_TYPES = {
   APP_JSON: { value: 'application/json', alias: 'json' },
 };
+
+export const PUNCTUATIONS = {
+  COMMA: ',',
+  SEMI_COLON: ';',
+  FULL_COLON: ':',
+};

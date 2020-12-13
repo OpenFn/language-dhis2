@@ -18,6 +18,7 @@ import {
   parseFilter,
   HTTP_HEADERS,
   MEDIA_TYPES,
+  PUNCTUATIONS,
 } from './utils_lang_dhis2';
 
 /**
@@ -397,7 +398,9 @@ export function getResources(params, options, callback) {
         transformResponse: [
           function (data, headers) {
             if (
-              headers[HTTP_HEADERS.CONTENT_TYPE]?.split(';')[0] ??
+              headers[HTTP_HEADERS.CONTENT_TYPE]?.split(
+                PUNCTUATIONS.SEMI_COLON
+              )[0] ??
               null === MEDIA_TYPES.APP_JSON.value
             ) {
               let tempData = JSON.parse(data);
