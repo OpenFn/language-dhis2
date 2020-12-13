@@ -3,8 +3,18 @@ import axios from 'axios';
 import { execute as commonExecute, expandReferences } from 'language-common';
 import { resolve as resolveUrl } from 'url';
 import { mapValues } from 'lodash/fp';
-import { eq, filter, negate, some, isEmpty } from 'lodash';
-import { Log, prettyJson } from './utils';
+import { eq, filter, negate, some, isEmpty, method } from 'lodash';
+import {
+  Log,
+  prettyJson,
+  composeSuccessMessage,
+  composeNextState,
+  HTTP_METHODS,
+  warnExpectLargeResult,
+  logWaitingForServer,
+  buildUrl,
+  logApiVersion,
+} from './utils_lang_dhis2';
 
 /**
  * Execute a sequence of operations.
@@ -69,11 +79,11 @@ function expandDataValues(obj) {
 
 axios.interceptors.response.use(
   function (response) {
-    // Cleanup sensitive info
+    // TODO Cleanup sensitive info
     return response;
   },
   function (error) {
-    // Cleanup sensitive info
+    // TODO Cleanup sensitive info
     Log.error(`${error.message}`);
     return Promise.reject({
       status: error.response.status,
@@ -451,27 +461,24 @@ export function getResources(params, options, callback) {
  */
 export function getSchema(resourceType, params, options, callback) {
   return state => {
-    const { username, password, hostUrl, apiVersion } = state?.configuration;
+    const { username, password } = state?.configuration;
 
-    const supportApiVersion = options?.supportApiVersion ?? false;
+    const url = buildUrl(
+      getSchema,
+      resourceType,
+      state?.configuration,
+      options
+    );
 
-    const path =
-      supportApiVersion === true
-        ? `${apiVersion ?? 'api_version_missing'}/schemas/${resourceType}`
-        : `/schemas/${resourceType}`;
+    logApiVersion(state.configuration, options);
 
-    const url = hostUrl + '/api/' + path;
+    logWaitingForServer(url, params);
 
-    Log.info(`url ${url}`);
-    if (isEmpty(resourceType))
-      Log.warn(
-        `This endpoint may return a large collection of schemas, since 'resourceType' is not specified. We recommend you specify 'resourceType' or use 'filter' parameter to limit the content of the result.`
-      );
-    Log.info(`params ${prettyJson(params)}`);
+    warnExpectLargeResult(resourceType, url);
 
     return axios
       .request({
-        method: 'GET',
+        method: HTTP_METHODS.GET,
         url,
         auth: {
           username,
@@ -481,18 +488,18 @@ export function getSchema(resourceType, params, options, callback) {
       })
       .then(result => {
         Log.info(
-          `getSchema('${resourceType}') succeeded. The body of this result will be available in state.data or in your callback.`
+          composeSuccessMessage(
+            getSchema,
+            resourceType,
+            params,
+            options,
+            callback
+          )
         );
 
-        const nextState = {
-          ...state,
-          data: result?.data,
-          references: [...state?.references, result?.data],
-        };
+        if (callback) return callback(composeNextState(state, result));
 
-        if (callback) return callback(nextState);
-
-        return nextState;
+        return composeNextState(state, result);
       });
   };
 }
