@@ -3,7 +3,7 @@ import axios from 'axios';
 import { execute as commonExecute, expandReferences } from 'language-common';
 import { resolve as resolveUrl } from 'url';
 import { mapValues } from 'lodash/fp';
-import { eq, filter, negate, some } from 'lodash';
+import { eq, filter, negate, some, isEmpty } from 'lodash';
 import { Log, prettyJson } from './utils';
 
 /**
@@ -44,7 +44,7 @@ export function execute(...operations) {
 function configMigrationHelper(state) {
   const { hostUrl, apiUrl } = state.configuration;
   if (!hostUrl) {
-    console.log(
+    Log.warn(
       'DEPRECATION WARNING: Please migrate instance address from `apiUrl` to `hostUrl`.'
     );
     state.configuration.hostUrl = apiUrl;
@@ -67,11 +67,30 @@ function expandDataValues(obj) {
   };
 }
 
+axios.interceptors.response.use(
+  function (response) {
+    // Cleanup sensitive info
+    return response;
+  },
+  function (error) {
+    // Cleanup sensitive info
+    Log.error(`${error.message}`);
+    return Promise.reject({
+      status: error.response.status,
+      message: error.message,
+      url: error.response.config.url,
+      responseData: error.response.data,
+      isAxiosError: error.isAxiosError,
+    });
+  }
+);
+
 function isLike(string, words) {
   const wordsArrary = words.match(/([^\W]+[^\s,]*)/).splice(0, 1);
   const isFound = word => RegExp(word, 'i').test(string);
   return some(wordsArrary, isFound);
 }
+
 const dhis2OperatorMap = {
   eq: eq,
   like: isLike,
@@ -87,21 +106,17 @@ function applyFilter(arrObject, filterTokens) {
         ])
       );
     } catch (error) {
-      console.log(
-        `Returned unfiltered data. Failed to apply custom filter(${JSON.stringify(
-          {
-            property: filterTokens[0] ?? null,
-            operator: filterTokens[1] ?? null,
-            value: filterTokens[2] ?? null,
-          },
-          null,
-          2
-        )}) on this collection. The operator you supplied maybe unsupported on this resource at the moment.`
+      Log.warn(
+        `Returned unfiltered data. Failed to apply custom filter(${prettyJson({
+          property: filterTokens[0] ?? null,
+          operator: filterTokens[1] ?? null,
+          value: filterTokens[2] ?? null,
+        })}) on this collection. The operator you supplied maybe unsupported on this resource at the moment.`
       );
       return arrObject;
     }
   }
-  console.log(`No filters applied, returned all records on this resource.`);
+  Log.info(`No filters applied, returned all records on this resource.`);
   return arrObject;
 }
 
@@ -287,20 +302,106 @@ export function upsertTEI(uniqueAttributeId, data, options) {
 }
 */
 
-export function getSampleState(resourceType, operation) {
+/**
+ * Clean JSON object
+ * Useful for deep-removing certain keys in an object(recursively), or de-identifying sensitive data
+ * @param {*} data
+ * @param {*} options
+ * @param  {...any} fields
+ */
+export function clean(data, options, ...fields) {
   return state;
 }
-export function showSampleExpression(resourceType, sampleState, operation) {
-  return state;
-}
-export function discoverParams(resourceType) {
-  return state;
-}
-export function getResources(params, callback) {
-  return state => {
-    const { username, password, hostUrl, apiVersion } = state.configuration;
 
-    const url = resolveUrl(hostUrl + '/', 'api/resources');
+/**
+ * Load JSON from file
+ * @param {*} filePath
+ */
+export function loadJsonFromFile(filePath) {
+  return state;
+}
+
+/**
+ * Load and parse csv file
+ * @param {string} filePath
+ */
+export function parseCsvFromFile(filePath) {
+  return state;
+}
+
+/**
+ * Transform JSON object, applying the transformer function on each element that meets the condition of the predicate
+ * @example
+ * transformData(state.data, state.data.attributes.DcnX8jrjh, this => this.value = 'new_value')
+ * @param {*} data
+ * @param {*} predicate - Can be a function or expression that evaluates to true or false
+ * @param {*} transformer - Transformer function, applied on  each element where predicate evaluates to true
+ * @param {Object} step - Object specifying details about a given transformation step
+ * @param {string} step.name - Step name
+ * @param {string} step.description - Step description
+ */
+export function transformData(data, predicate, transformer, step) {
+  return state;
+}
+
+/**
+ * Get Sample State for a given operation on a resource
+ * @example
+ * getSampleSate('getData', 'trackedEntityInstances')
+ * @param {*} operation
+ * @param {*} resourceType
+ */
+export function getSampleState(operation, resourceType) {
+  return state;
+}
+
+/**
+ * Show Sample Expression for a given operation on a resource
+ * @example
+ * showSampleExpression('postData', 'trackedEntityInstances',{sampleState})
+ * @param {*} resourceType
+ * @param {*} sampleState
+ * @param {*} operation
+ */
+export function showSampleExpression(operation, resourceType, sampleState) {
+  return state;
+}
+
+/**
+ * Discover available parameters and allowed operators for a given resource's endpoint
+ * @example
+ * discoverParams('trackedEntityInstances')
+ * @param {*} operation
+ * @param {*} resourceType
+ */
+export function discoverParams(operation, resourceType) {
+  return state;
+}
+
+/**
+ * Get DHIS2 resources
+ * @param {Object} params - The optional query parameters for this endpoint.
+ * @param {string} params.filter - The optional filter parameter, specifiying the filter expression.
+ * @param {Object} options - The optional flags to control behavior of function
+ * @param {boolean} options.supportApiVersion - The optional flag, only set to `true` if endpoint supports use of api versions in url. Defaults to `false`
+ * @param {Function} callback - The optional function that will be called to handle data returned by this function. Defaults to `state.data`
+ */
+export function getResources(params, options, callback) {
+  return state => {
+    const { username, password, hostUrl, apiVersion } = state?.configuration;
+
+    const { filter } = params;
+
+    const { supportApiVersion } = options;
+
+    const path =
+      supportApiVersion === true
+        ? `${apiVersion ?? 'api_version_missing'}/resources`
+        : 'resources';
+
+    const url = resolveUrl(hostUrl + '/api/', path);
+
+    Log.info(`url ${url}`);
 
     return axios
       .request({
@@ -311,24 +412,27 @@ export function getResources(params, callback) {
           password,
         },
         transformResponse: [
-          function (data) {
-            return applyFilter(
-              JSON.parse(data)?.resources,
-              parseFilter(params?.filter)
-            );
+          function (data, headers) {
+            if (headers['content-type']?.split(';')[0] === 'application/json')
+              return applyFilter(
+                JSON.parse(data)?.resources,
+                parseFilter(filter)
+              );
+            return data;
           },
         ],
       })
       .then(result => {
+        Log.info(`Request filter: ${filter ?? {}}`);
+
         Log.info(
-          `Request params:\n${prettyJson(
-            params ?? {}
-          )}\ngetResources succeeded.\nThe body of this result will be available in state.data or in your callback`
+          'getResources succeeded.The body of this result will be available in state.data or in your callback.'
         );
+
         const nextState = {
           ...state,
-          data: result.data,
-          references: [...state.references, result.data],
+          data: result?.data,
+          references: [...state?.references, result?.data],
         };
 
         if (callback) return callback(nextState);
@@ -338,11 +442,32 @@ export function getResources(params, callback) {
   };
 }
 
+/**
+ *
+ * @param {string} resourceType
+ * @param {*} params
+ * @param {*} options
+ * @param {*} callback
+ */
 export function getSchema(resourceType, params, options, callback) {
   return state => {
-    const { username, password, hostUrl, apiVersion } = state.configuration;
+    const { username, password, hostUrl, apiVersion } = state?.configuration;
 
-    const url = resolveUrl(hostUrl + '/', `api/schemas/${resourceType}`);
+    const supportApiVersion = options?.supportApiVersion ?? false;
+
+    const path =
+      supportApiVersion === true
+        ? `${apiVersion ?? 'api_version_missing'}/schemas/${resourceType}`
+        : `/schemas/${resourceType}`;
+
+    const url = hostUrl + '/api/' + path;
+
+    Log.info(`url ${url}`);
+    if (isEmpty(resourceType))
+      Log.warn(
+        `This endpoint may return a large collection of schemas, since 'resourceType' is not specified. We recommend you specify 'resourceType' or use 'filter' parameter to limit the content of the result.`
+      );
+    Log.info(`params ${prettyJson(params)}`);
 
     return axios
       .request({
@@ -356,13 +481,13 @@ export function getSchema(resourceType, params, options, callback) {
       })
       .then(result => {
         Log.info(
-          `getSchema('${resourceType}') succeeded. The body of this result will be available in state.data or in your callback`
+          `getSchema('${resourceType}') succeeded. The body of this result will be available in state.data or in your callback.`
         );
 
         const nextState = {
           ...state,
-          data: result.data,
-          references: [...state.references, result.data],
+          data: result?.data,
+          references: [...state?.references, result?.data],
         };
 
         if (callback) return callback(nextState);
