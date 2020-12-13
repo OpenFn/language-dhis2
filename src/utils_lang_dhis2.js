@@ -234,21 +234,23 @@ export const dhis2OperatorMap = {
   like: isLike,
 };
 
-export function applyFilter(arrObject, filterTokens) {
-  if (filterTokens) {
+export function applyFilter(
+  arrObject,
+  targetProperty,
+  operator,
+  valueToCompareWith
+) {
+  if (targetProperty && operator && valueToCompareWith) {
     try {
       return filter(arrObject, obj =>
-        Reflect.apply(filterTokens[1], obj, [
-          obj[filterTokens[0]],
-          filterTokens[2],
-        ])
+        Reflect.apply(operator, obj, [obj[targetProperty], valueToCompareWith])
       );
     } catch (error) {
       Log.warn(
         `Returned unfiltered data. Failed to apply custom filter(${prettyJson({
-          property: filterTokens[0] ?? null,
-          operator: filterTokens[1] ?? null,
-          value: filterTokens[2] ?? null,
+          targetProperty: targetProperty ?? null,
+          operator: operator ?? null,
+          value: valueToCompareWith ?? null,
         })}) on this collection. The operator you supplied maybe unsupported on this resource at the moment.`
       );
       return arrObject;

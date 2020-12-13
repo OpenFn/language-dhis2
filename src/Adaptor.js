@@ -400,10 +400,13 @@ export function getResources(params, options, callback) {
               headers[HTTP_HEADERS.CONTENT_TYPE]?.split(';')[0] ??
               null === MEDIA_TYPES.APP_JSON.value
             ) {
-              let temp = JSON.parse(data);
+              let tempData = JSON.parse(data);
               return {
-                ...temp,
-                resources: applyFilter(temp.resources, parseFilter(filter)),
+                ...tempData,
+                resources: applyFilter(
+                  tempData.resources,
+                  ...parseFilter(filter)
+                ),
               };
             }
             return data;
