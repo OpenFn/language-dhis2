@@ -7,18 +7,14 @@ import {
   Log,
   composeSuccessMessage,
   composeNextState,
-  HTTP_METHODS,
   warnExpectLargeResult,
   logWaitingForServer,
   buildUrl,
   logApiVersion,
   applyFilter,
   parseFilter,
-  HTTP_HEADERS,
-  MEDIA_TYPES,
   CONTENT_TYPES,
-  PUNCTUATIONS,
-} from './utils_lang_dhis2';
+} from './Utils';
 
 /**
  * Execute a sequence of operations.
@@ -276,90 +272,13 @@ export function upsertTEI(uniqueAttributeId, data, options) {
 /**
  * TODO
  *
- * Clean JSON object
- * Useful for deep-removing certain keys in an object(recursively), or de-identifying sensitive data
- * @param {*} data
- * @param {*} options
- * @param  {...any} fields
- */
-export function clean(data, options, ...fields) {
-  return state;
-}
-
-/**
- * TODO
- *
- * Load JSON from file
- * @param {*} filePath
- */
-export function loadJsonFromFile(filePath) {
-  return state;
-}
-
-/**
- * TODO
- *
- * Load and parse csv file
- * @param {string} filePath
- */
-export function parseCsvFromFile(filePath) {
-  return state;
-}
-
-/**
- * TODO
- *
- * Transform JSON object, applying the transformer function on each element that meets the condition of the predicate
- * @example
- * transformData(state.data, state.data.attributes.DcnX8jrjh, this => this.value = 'new_value')
- * @param {*} data
- * @param {*} predicate - Can be a function or expression that evaluates to true or false
- * @param {*} transformer - Transformer function, applied on  each element where predicate evaluates to true
- * @param {Object} step - Object specifying details about a given transformation step
- * @param {string} step.name - Step name
- * @param {string} step.description - Step description
- */
-export function transformData(data, predicate, transformer, step) {
-  return state;
-}
-
-/**
- * TODO
- *
- * Get Sample State for a given operation on a resource
- * @example
- * getSampleSate('getData', 'trackedEntityInstances')
- * @param {*} operation
- * @param {*} resourceType
- */
-export function getSampleState(operation, resourceType) {
-  return state;
-}
-
-/**
- * TODO
- *
- * Show Sample Expression for a given operation on a resource
- * @example
- * showSampleExpression('postData', 'trackedEntityInstances',{sampleState})
- * @param {*} resourceType
- * @param {*} sampleState
- * @param {*} operation
- */
-export function showSampleExpression(operation, resourceType, sampleState) {
-  return state;
-}
-
-/**
- * TODO
- *
  * Discover available parameters and allowed operators for a given resource's endpoint
  * @example
- * discoverParams('trackedEntityInstances')
+ * discover('getData, /api/trackedEntityInstances')
  * @param {*} operation
  * @param {*} resourceType
  */
-export function discoverParams(operation, resourceType) {
+export function discover(operation, resourceType) {
   return state;
 }
 
@@ -373,13 +292,13 @@ export function discoverParams(operation, resourceType) {
  */
 export function getResources(params, options, callback) {
   return state => {
-    const { username, password } = state?.configuration;
+    const { username, password } = state.configuration;
 
     const { filter } = params;
 
-    const url = buildUrl(getResources, null, state?.configuration, options);
+    const url = buildUrl(getResources, null, state.configuration, options);
 
-    logApiVersion(state?.configuration, options);
+    logApiVersion(state.configuration, options);
 
     logWaitingForServer(url, params);
 
@@ -387,20 +306,18 @@ export function getResources(params, options, callback) {
 
     return axios
       .request({
-        method: HTTP_METHODS.GET,
+        method: 'GET',
         url,
         auth: {
           username,
           password,
         },
-        responseType: MEDIA_TYPES.JSON,
+        responseType: 'json',
         transformResponse: [
           function (data, headers) {
             if (
-              headers[HTTP_HEADERS.CONTENT_TYPE]?.split(
-                PUNCTUATIONS.SEMI_COLON
-              )[0] ??
-              null === CONTENT_TYPES.APPLICATION_JSON
+              headers['content-type']?.split(';')[0] ??
+              null === CONTENT_TYPES.JSON
             ) {
               let tempData = JSON.parse(data);
               return {
@@ -453,7 +370,7 @@ export function getSchema(resourceType, params, options, callback) {
 
     return axios
       .request({
-        method: HTTP_METHODS.GET,
+        method: 'GET',
         url,
         auth: {
           username,
@@ -515,7 +432,7 @@ export function getData(resourceType, params, options, callback) {
 
     return axios
       .request({
-        method: HTTP_METHODS.GET,
+        method: 'GET',
         url,
         auth: {
           username,
@@ -575,7 +492,7 @@ export function getMetadata(resources, params, options, callback) {
 
     return axios
       .request({
-        method: HTTP_METHODS.GET,
+        method: 'GET',
         url,
         auth: {
           username,
