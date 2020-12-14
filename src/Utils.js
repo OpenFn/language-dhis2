@@ -1,4 +1,5 @@
 import { eq, filter, some, isEmpty } from 'lodash';
+import axios from 'axios';
 
 /**
  * TODO
@@ -149,12 +150,29 @@ export function composeNextState(state, result) {
  *
  */
 export function warnExpectLargeResult(paramOrResourceType, endpointUrl) {
-  // TODO : Refactor to send a HEAD request to read Content-Length header to check the file size before we can send the actual request
-  // This will give us a sense of how big the result would be and warn the user, accordingly
   if (isEmpty(paramOrResourceType))
     Log.warn(
       `\x1b[33m Missing params or resourceType. This may take a while\x1b[0m. This endpoint(\x1b[33m${endpointUrl}\x1b[0m) may return a large collection of records, since 'params' or 'resourceType' is not specified. We recommend you specify 'params' or 'resourceType' or use 'filter' parameter to limit the content of the result.`
     );
+}
+
+/**
+ * Send a HEAD request to read Content-Length header to check the file size before we can send
+ * the actual request
+ * This will give us a sense of how big the result would be and warn the user, accordingly
+ * @param {string} endpointUrl - url for the endpoint
+ */
+export function requestHttpHead(endpointUrl, { username, password }) {
+  return axios
+    .request({
+      method: 'HEAD',
+      url: endpointUrl,
+      auth: {
+        username,
+        password,
+      },
+    })
+    .then(result => result.headers['content-length']);
 }
 
 /**

@@ -1,4 +1,32 @@
-"use strict";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Utils.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Utils.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -22,29 +50,29 @@ var _lodash = require("lodash");
 
 var _axios = _interopRequireDefault(require("axios"));
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _interopRequireDefault(obj) { return obj &amp;&amp; obj.__esModule ? obj : { "default": obj }; }
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" &amp;&amp; o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" &amp;&amp; Symbol.iterator in Object(iter)) return Array.from(iter); }
 
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i &lt; len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+function _objectSpread(target) { for (var i = 1; i &lt; arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+function _defineProperties(target, props) { for (var i = 0; i &lt; props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
@@ -189,7 +217,7 @@ var _MAIN_TAG = {
 function composeSuccessMessage(func) {
   var _ref, _ref2, _ref3, _name, _ref4, _ref5;
 
-  return "".concat(func === null || func === void 0 ? void 0 : func.name, "('").concat(JSON.stringify((_ref = arguments.length <= 1 ? undefined : arguments[1]) !== null && _ref !== void 0 ? _ref : null), "', ").concat(JSON.stringify((_ref2 = arguments.length <= 2 ? undefined : arguments[2]) !== null && _ref2 !== void 0 ? _ref2 : null), ", ").concat(JSON.stringify((_ref3 = arguments.length <= 3 ? undefined : arguments[3]) !== null && _ref3 !== void 0 ? _ref3 : null), ", ").concat((0, _lodash.isEmpty)((_name = (_ref4 = arguments.length <= 4 ? undefined : arguments[4]) === null || _ref4 === void 0 ? void 0 : _ref4.name) !== null && _name !== void 0 ? _name : '-unused-') ? '(state)=>{}' : (_ref5 = arguments.length <= 4 ? undefined : arguments[4]) === null || _ref5 === void 0 ? void 0 : _ref5.name, ") succeeded. The body of this result will be available in state.data or in your callback.");
+  return "".concat(func === null || func === void 0 ? void 0 : func.name, "('").concat(JSON.stringify((_ref = arguments.length &lt;= 1 ? undefined : arguments[1]) !== null &amp;&amp; _ref !== void 0 ? _ref : null), "', ").concat(JSON.stringify((_ref2 = arguments.length &lt;= 2 ? undefined : arguments[2]) !== null &amp;&amp; _ref2 !== void 0 ? _ref2 : null), ", ").concat(JSON.stringify((_ref3 = arguments.length &lt;= 3 ? undefined : arguments[3]) !== null &amp;&amp; _ref3 !== void 0 ? _ref3 : null), ", ").concat((0, _lodash.isEmpty)((_name = (_ref4 = arguments.length &lt;= 4 ? undefined : arguments[4]) === null || _ref4 === void 0 ? void 0 : _ref4.name) !== null &amp;&amp; _name !== void 0 ? _name : '-unused-') ? '(state)=>{}' : (_ref5 = arguments.length &lt;= 4 ? undefined : arguments[4]) === null || _ref5 === void 0 ? void 0 : _ref5.name, ") succeeded. The body of this result will be available in state.data or in your callback.");
 }
 /**
  * Compose next state based on the result of a given operation
@@ -221,19 +249,9 @@ function warnExpectLargeResult(paramOrResourceType, endpointUrl) {
  */
 
 
-function requestHttpHead(endpointUrl, _ref6) {
-  var username = _ref6.username,
-      password = _ref6.password;
-  Log.info("password ".concat(password));
-  return _axios["default"].request({
-    method: 'HEAD',
-    url: endpointUrl,
-    auth: {
-      username: username,
-      password: password
-    }
-  }).then(function (result) {
-    return Log.info(prettyJson(result.headers));
+function requestHttpHead(endpointUrl) {
+  return _axios["default"].head(endpointUrl).then(function (result) {
+    return Log.info(result.data);
   });
 }
 /**
@@ -278,8 +296,8 @@ function buildUrl(operation, resourceType, configuration, options) {
 
   var hostUrl = configuration.hostUrl,
       apiVersion = configuration.apiVersion;
-  var supportApiVersion = (_options$supportApiVe = options === null || options === void 0 ? void 0 : options.supportApiVersion) !== null && _options$supportApiVe !== void 0 ? _options$supportApiVe : false;
-  var path = supportApiVersion === true ? "".concat(apiVersion !== null && apiVersion !== void 0 ? apiVersion : 'api_version_missing', "/").concat(pathSuffix) : "".concat(pathSuffix);
+  var supportApiVersion = (_options$supportApiVe = options === null || options === void 0 ? void 0 : options.supportApiVersion) !== null &amp;&amp; _options$supportApiVe !== void 0 ? _options$supportApiVe : false;
+  var path = supportApiVersion === true ? "".concat(apiVersion !== null &amp;&amp; apiVersion !== void 0 ? apiVersion : 'api_version_missing', "/").concat(pathSuffix) : "".concat(pathSuffix);
   var url = hostUrl + '/api/' + path;
   return url;
 }
@@ -292,8 +310,8 @@ function logApiVersion(configuration, options) {
   var _options$supportApiVe2;
 
   var apiVersion = configuration.apiVersion;
-  var supportApiVersion = (_options$supportApiVe2 = options === null || options === void 0 ? void 0 : options.supportApiVersion) !== null && _options$supportApiVe2 !== void 0 ? _options$supportApiVe2 : false;
-  var message = supportApiVersion === true && apiVersion ? "Using DHIS2 api version \x1B[33m ".concat(apiVersion, "\x1B[0m") : '\x1b[33m Attempting to use apiVersion without providing it in state.configuration\x1b[0m. You may encounter errors.\x1b[33m api_version_missing\x1b[0m. If `supportApiVersion = true` in the `options` parameter, then you need to set `apiVersion` in state.configuration.';
+  var supportApiVersion = (_options$supportApiVe2 = options === null || options === void 0 ? void 0 : options.supportApiVersion) !== null &amp;&amp; _options$supportApiVe2 !== void 0 ? _options$supportApiVe2 : false;
+  var message = supportApiVersion === true &amp;&amp; apiVersion ? "Using DHIS2 api version \x1B[33m ".concat(apiVersion, "\x1B[0m") : '\x1b[33m Attempting to use apiVersion without providing it in state.configuration\x1b[0m. You may encounter errors.\x1b[33m api_version_missing\x1b[0m. If `supportApiVersion = true` in the `options` parameter, then you need to set `apiVersion` in state.configuration.';
   if (supportApiVersion === true) Log.warn(message);else Log.warn("Using \x1B[33m latest \x1B[0m version of DHIS2 api.");
 }
 
@@ -318,16 +336,16 @@ var dhis2OperatorMap = {
 exports.dhis2OperatorMap = dhis2OperatorMap;
 
 function applyFilter(arrObject, targetProperty, operator, valueToCompareWith) {
-  if (targetProperty && operator && valueToCompareWith) {
+  if (targetProperty &amp;&amp; operator &amp;&amp; valueToCompareWith) {
     try {
       return (0, _lodash.filter)(arrObject, function (obj) {
         return Reflect.apply(operator, obj, [obj[targetProperty], valueToCompareWith]);
       });
     } catch (error) {
       Log.warn("Returned unfiltered data. Failed to apply custom filter(".concat(prettyJson({
-        targetProperty: targetProperty !== null && targetProperty !== void 0 ? targetProperty : null,
-        operator: operator !== null && operator !== void 0 ? operator : null,
-        value: valueToCompareWith !== null && valueToCompareWith !== void 0 ? valueToCompareWith : null
+        targetProperty: targetProperty !== null &amp;&amp; targetProperty !== void 0 ? targetProperty : null,
+        operator: operator !== null &amp;&amp; operator !== void 0 ? operator : null,
+        value: valueToCompareWith !== null &amp;&amp; valueToCompareWith !== void 0 ? valueToCompareWith : null
       }), ") on this collection. The operator you supplied maybe unsupported on this resource at the moment."));
       return arrObject;
     }
@@ -341,7 +359,7 @@ function parseFilter(filterExpression) {
   var _filterTokens$;
 
   var filterTokens = filterExpression === null || filterExpression === void 0 ? void 0 : filterExpression.split(':');
-  filterTokens ? filterTokens[1] = dhis2OperatorMap[(_filterTokens$ = filterTokens[1]) !== null && _filterTokens$ !== void 0 ? _filterTokens$ : null] : null;
+  filterTokens ? filterTokens[1] = dhis2OperatorMap[(_filterTokens$ = filterTokens[1]) !== null &amp;&amp; _filterTokens$ !== void 0 ? _filterTokens$ : null] : null;
   return filterTokens;
 }
 
@@ -386,7 +404,7 @@ var CONTENT_TYPES = {
  * the rootJunction parameter
  * 
  * Example: Filtering where the logical operator has been switched to OR and now only one of the filters must match to have a result returned
-/api/dataElements.json?filter=id:in:[id1,id2]&filter=code:eq:code1&rootJunction=OR
+/api/dataElements.json?filter=id:in:[id1,id2]&amp;filter=code:eq:code1&amp;rootJunction=OR
  */
 
 exports.CONTENT_TYPES = CONTENT_TYPES;
@@ -537,23 +555,23 @@ var OBJECT_FILTER_OPERATORS = [{
 }];
 exports.OBJECT_FILTER_OPERATORS = OBJECT_FILTER_OPERATORS;
 var FIELD_FILTERS_SYNTAX = [{
-  operator: '<field-name>',
+  operator: '&lt;field-name>',
   description: 'Include property with name, if it exists.',
   example: 'id'
 }, {
-  operator: '<object>[<field-name>, ...]',
+  operator: '&lt;object>[&lt;field-name>, ...]',
   description: 'Includes a field within either a collection (will be applied to every object in that collection), or just on a single object.',
   example: 'properties[id,name]'
 }, {
-  operator: '!<field-name>, <object>[!<field-name>',
+  operator: '!&lt;field-name>, &lt;object>[!&lt;field-name>',
   description: 'Do not include this field name, also works inside objects/collections. Useful when you use a preset to inlude fields.',
   example: '!userAccess, attributes[!properties.userAccess]'
 }, {
-  operator: '*, <object>[*]',
+  operator: '*, &lt;object>[*]',
   description: 'Include all fields on a certain object, if applied to a collection, it will include all fields on all objects on that collection.',
   example: '*, enrollments[*]'
 }, {
-  operator: ':<preset>',
+  operator: ':&lt;preset>',
   description: 'Alias to select multiple fields. Three presets are currently available, run discoverFieldFilterPresets() for descriptions.',
   example: ':all'
 }];
@@ -672,3 +690,26 @@ curl -X PATCH -d @file.json -H "Content-Type: application/json"
  */
 
 exports.FIELD_TRANSFORMERS = FIELD_TRANSFORMERS;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="configMigrationHelper.html">configMigrationHelper</a></li><li><a href="execute.html">execute</a></li></ul><h3>Global</h3><ul><li><a href="global.html#buildUrl">buildUrl</a></li><li><a href="global.html#composeNextState">composeNextState</a></li><li><a href="global.html#CONTENT_TYPES">CONTENT_TYPES</a></li><li><a href="global.html#discover">discover</a></li><li><a href="global.html#FIELD_FILTERS_PRESETS">FIELD_FILTERS_PRESETS</a></li><li><a href="global.html#FIELD_TRANSFORMERS">FIELD_TRANSFORMERS</a></li><li><a href="global.html#generateUID">generateUID</a></li><li><a href="global.html#getData">getData</a></li><li><a href="global.html#getMetadata">getMetadata</a></li><li><a href="global.html#getResources">getResources</a></li><li><a href="global.html#getSchema">getSchema</a></li><li><a href="global.html#HTTP_METHODS">HTTP_METHODS</a></li><li><a href="global.html#isValidUID">isValidUID</a></li><li><a href="global.html#Log">Log</a></li><li><a href="global.html#logApiVersion">logApiVersion</a></li><li><a href="global.html#logWaitingForServer">logWaitingForServer</a></li><li><a href="global.html#prettyJson">prettyJson</a></li><li><a href="global.html#PUNCTUATIONS">PUNCTUATIONS</a></li><li><a href="global.html#QUERY_PARAMETERS">QUERY_PARAMETERS</a></li><li><a href="global.html#requestHttpHead">requestHttpHead</a></li><li><a href="global.html#warnExpectLargeResult">warnExpectLargeResult</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Mon Dec 14 2020 20:29:34 GMT+0200 (Central Africa Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

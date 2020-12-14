@@ -47,9 +47,12 @@
 <p>Language Pack for building expressions and operations for working with
 the <a href="http://dhis2.github.io/dhis2-docs/master/en/developer/html/dhis2_developer_manual.html">DHIS2 API</a>.</p>
 <h2>Documentation</h2>
+<<<<<<< HEAD
 <p>View the <a href="https://openfn.github.io/language-dhis2/">docs site</a> for full
 technical documentation. Below, find a samples of the most commonly used helper
 functions.</p>
+=======
+>>>>>>> 478d1bf... Add requestHttpHead helper method, for #3
 <h2>Sample State</h2>
 <pre class="prettyprint source lang-json"><code>{
   &quot;configuration&quot;: {
@@ -59,7 +62,11 @@ functions.</p>
   },
   &quot;data&quot;: {
     &quot;a&quot;: 1,
+<<<<<<< HEAD
     &quot;b&quot;: 2
+=======
+    &quot;b&quot;: 2,
+>>>>>>> 478d1bf... Add requestHttpHead helper method, for #3
   }
 }
 </code></pre>
@@ -67,16 +74,25 @@ functions.</p>
 <h4>Fetch analytics data for PMTCT data over last 6 months.</h4>
 <pre class="prettyprint source lang-js"><code>fetchAnalytics({
   query: {
+<<<<<<< HEAD
     dimension: ['dx:CYI5LEmm3cG;GDVU1o5rTNF', 'pe:LAST_6_MONTHS'],
     filter: 'ou:GHlyx9Pg9mn',
     displayProperty: 'NAME',
     outputIdScheme: 'UID',
   },
+=======
+    dimension: [&quot;dx:CYI5LEmm3cG;GDVU1o5rTNF&quot;, &quot;pe:LAST_6_MONTHS&quot;],
+    filter: &quot;ou:GHlyx9Pg9mn&quot;,
+    displayProperty: &quot;NAME&quot;,
+    outputIdScheme: &quot;UID&quot;
+  }
+>>>>>>> 478d1bf... Add requestHttpHead helper method, for #3
 });
 </code></pre>
 <h2>Tracked Entity API</h2>
 <h4>Create a new tracked entity instance and enroll them from a CommCare form submission.</h4>
 <pre class="prettyprint source lang-js"><code>createTEI({
+<<<<<<< HEAD
   trackedEntityType: 'nEenWmSyUEp',
   orgUnit: 'g8upMTyEZGZ',
   attributes: [
@@ -118,6 +134,30 @@ functions.</p>
   }
 );
 </code></pre>
+=======
+  &quot;trackedEntityType&quot;: &quot;nEenWmSyUEp&quot;,
+  &quot;orgUnit&quot;: &quot;g8upMTyEZGZ&quot;,
+  &quot;attributes&quot;: [
+    {
+      &quot;attribute&quot;: &quot;w75KJ2mc4zz&quot;,
+      &quot;value&quot;: dataValue(&quot;form.first_name&quot;)(state)
+    },
+    {
+      &quot;attribute&quot;: &quot;zDhUuAYrxNC&quot;,
+      &quot;value&quot;: dataValue(&quot;form.last_name&quot;)(state)
+    }
+  ],
+  &quot;enrollments&quot;: [
+    {
+        &quot;orgUnit&quot;: &quot;g8upMTyEZGZ&quot;,
+        &quot;program&quot;: &quot;IpHINAT79UW&quot;,
+        &quot;enrollmentDate&quot;: &quot;2019-04-08&quot;,
+        &quot;incidentDate&quot;: &quot;2019-04-08&quot;
+     }
+   ]
+});
+</code></pre>
+>>>>>>> 478d1bf... Add requestHttpHead helper method, for #3
 <h2>Events API</h2>
 <h4><code>Events API</code> expression</h4>
 <pre class="prettyprint source lang-js"><code>event(
@@ -146,15 +186,23 @@ functions.</p>
   fields: {
     orgUnit: 'DiszpKrYNg8',
     program: 'eBAyeGv0exc',
+<<<<<<< HEAD
     endDate: '2016-01-01',
   },
   postUrl: 'https://www.openfn.org/inbox/123',
 });
+=======
+    endDate: '2016-01-01'
+  },
+  postUrl: &quot;https://www.openfn.org/inbox/123&quot;
+})
+>>>>>>> 478d1bf... Add requestHttpHead helper method, for #3
 </code></pre>
 <h4>Reference on how to query and read events https://docs.dhis2.org/2.22/en/developer/html/ch01s15.html#d5e1994</h4>
 <h2>Data Values / Data Value Sets API</h2>
 <h4>Current <code>DataValueSets API</code> expression</h4>
 <pre class="prettyprint source lang-js"><code>dataValueSet({
+<<<<<<< HEAD
   dataSet: dataValue('set'),
   orgUnit: 'DiszpKrYNg8',
   period: '201402',
@@ -164,6 +212,17 @@ functions.</p>
     dataElement('Ix2HsbDMLea', dataValue('age')),
     dataElement('eY5ehpbEsB7', 30),
   ],
+=======
+  dataSet: dataValue(&quot;set&quot;),
+  orgUnit: &quot;DiszpKrYNg8&quot;,
+  period: &quot;201402&quot;,
+  completeData: &quot;2014-03-03&quot;,
+  dataValues: [
+    dataElement(&quot;f7n9E0hX8qk&quot;, dataValue(&quot;data[0].site_school_number&quot;)),
+    dataElement(&quot;Ix2HsbDMLea&quot;, dataValue(&quot;age&quot;)),
+    dataElement(&quot;eY5ehpbEsB7&quot;, 30)
+  ]
+>>>>>>> 478d1bf... Add requestHttpHead helper method, for #3
 });
 </code></pre>
 <h4>Current <code>fetchData API</code> expression (Optional <code>postUrl</code> for a complete fetch)</h4>
@@ -171,10 +230,17 @@ functions.</p>
   fields: {
     dataSet: 'pBOMPrpg1QX',
     orgUnit: 'DiszpKrYNg8',
+<<<<<<< HEAD
     period: '201711',
   },
   postUrl: 'https://www.openfn.org/inbox/123',
 });
+=======
+    period: '201711'
+  },
+  postUrl: &quot;https://www.openfn.org/inbox/123&quot;
+})
+>>>>>>> 478d1bf... Add requestHttpHead helper method, for #3
 </code></pre>
 <h4>Reference on how to read data values https://docs.dhis2.org/2.22/en/developer/html/ch01s13.html#d5e1642</h4>
 <p><a href="docs/index">Docs</a></p>
@@ -192,13 +258,21 @@ functions.</p>
 </div>
 
 <nav>
+<<<<<<< HEAD
     <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="configMigrationHelper.html">configMigrationHelper</a></li><li><a href="createTEI.html">createTEI</a></li><li><a href="dataElement.html">dataElement</a></li><li><a href="dataValueSet.html">dataValueSet</a></li><li><a href="enroll.html">enroll</a></li><li><a href="event.html">event</a></li><li><a href="execute.html">execute</a></li><li><a href="fetchAnalytics.html">fetchAnalytics</a></li><li><a href="fetchData.html">fetchData</a></li><li><a href="fetchEvents.html">fetchEvents</a></li><li><a href="updateTEI.html">updateTEI</a></li><li><a href="upsertTEI.html">upsertTEI</a></li></ul>
+=======
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="configMigrationHelper.html">configMigrationHelper</a></li><li><a href="execute.html">execute</a></li></ul><h3>Global</h3><ul><li><a href="global.html#buildUrl">buildUrl</a></li><li><a href="global.html#composeNextState">composeNextState</a></li><li><a href="global.html#CONTENT_TYPES">CONTENT_TYPES</a></li><li><a href="global.html#discover">discover</a></li><li><a href="global.html#FIELD_FILTERS_PRESETS">FIELD_FILTERS_PRESETS</a></li><li><a href="global.html#FIELD_TRANSFORMERS">FIELD_TRANSFORMERS</a></li><li><a href="global.html#generateUID">generateUID</a></li><li><a href="global.html#getData">getData</a></li><li><a href="global.html#getMetadata">getMetadata</a></li><li><a href="global.html#getResources">getResources</a></li><li><a href="global.html#getSchema">getSchema</a></li><li><a href="global.html#HTTP_METHODS">HTTP_METHODS</a></li><li><a href="global.html#isValidUID">isValidUID</a></li><li><a href="global.html#Log">Log</a></li><li><a href="global.html#logApiVersion">logApiVersion</a></li><li><a href="global.html#logWaitingForServer">logWaitingForServer</a></li><li><a href="global.html#prettyJson">prettyJson</a></li><li><a href="global.html#PUNCTUATIONS">PUNCTUATIONS</a></li><li><a href="global.html#QUERY_PARAMETERS">QUERY_PARAMETERS</a></li><li><a href="global.html#requestHttpHead">requestHttpHead</a></li><li><a href="global.html#warnExpectLargeResult">warnExpectLargeResult</a></li></ul>
+>>>>>>> 478d1bf... Add requestHttpHead helper method, for #3
 </nav>
 
 <br class="clear">
 
 <footer>
+<<<<<<< HEAD
     Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Mon Dec 14 2020 11:22:43 GMT-0500 (Eastern Standard Time)
+=======
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Mon Dec 14 2020 20:29:34 GMT+0200 (Central Africa Time)
+>>>>>>> 478d1bf... Add requestHttpHead helper method, for #3
 </footer>
 
 <script> prettyPrint(); </script>

@@ -1,4 +1,32 @@
-"use strict";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: utils_lang_dhis2.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: utils_lang_dhis2.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -9,42 +37,37 @@ exports.prettyJson = prettyJson;
 exports.composeSuccessMessage = composeSuccessMessage;
 exports.composeNextState = composeNextState;
 exports.warnExpectLargeResult = warnExpectLargeResult;
-exports.requestHttpHead = requestHttpHead;
 exports.logWaitingForServer = logWaitingForServer;
 exports.buildUrl = buildUrl;
 exports.logApiVersion = logApiVersion;
 exports.isLike = isLike;
 exports.applyFilter = applyFilter;
 exports.parseFilter = parseFilter;
-exports.FIELD_TRANSFORMERS = exports.FIELD_FILTERS_PRESETS = exports.FIELD_FILTERS_SYNTAX = exports.OBJECT_FILTER_OPERATORS = exports.CONTENT_TYPES = exports.dhis2OperatorMap = exports.Log = void 0;
+exports.FIELD_TRANSFORMERS = exports.FIELD_FILTERS_PRESETS = exports.FIELD_FILTERS_SYNTAX = exports.OBJECT_FILTER_OPERATORS = exports.QUERY_PARAMETERS = exports.PUNCTUATIONS = exports.CONTENT_TYPES = exports.MEDIA_TYPES = exports.HTTP_HEADERS = exports.dhis2OperatorMap = exports.HTTP_METHODS = exports.Log = void 0;
 
 var _lodash = require("lodash");
-
-var _axios = _interopRequireDefault(require("axios"));
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" &amp;&amp; o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" &amp;&amp; Symbol.iterator in Object(iter)) return Array.from(iter); }
 
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i &lt; len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+function _objectSpread(target) { for (var i = 1; i &lt; arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+function _defineProperties(target, props) { for (var i = 0; i &lt; props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
@@ -189,7 +212,7 @@ var _MAIN_TAG = {
 function composeSuccessMessage(func) {
   var _ref, _ref2, _ref3, _name, _ref4, _ref5;
 
-  return "".concat(func === null || func === void 0 ? void 0 : func.name, "('").concat(JSON.stringify((_ref = arguments.length <= 1 ? undefined : arguments[1]) !== null && _ref !== void 0 ? _ref : null), "', ").concat(JSON.stringify((_ref2 = arguments.length <= 2 ? undefined : arguments[2]) !== null && _ref2 !== void 0 ? _ref2 : null), ", ").concat(JSON.stringify((_ref3 = arguments.length <= 3 ? undefined : arguments[3]) !== null && _ref3 !== void 0 ? _ref3 : null), ", ").concat((0, _lodash.isEmpty)((_name = (_ref4 = arguments.length <= 4 ? undefined : arguments[4]) === null || _ref4 === void 0 ? void 0 : _ref4.name) !== null && _name !== void 0 ? _name : '-unused-') ? '(state)=>{}' : (_ref5 = arguments.length <= 4 ? undefined : arguments[4]) === null || _ref5 === void 0 ? void 0 : _ref5.name, ") succeeded. The body of this result will be available in state.data or in your callback.");
+  return "".concat(func === null || func === void 0 ? void 0 : func.name, "('").concat(JSON.stringify((_ref = arguments.length &lt;= 1 ? undefined : arguments[1]) !== null &amp;&amp; _ref !== void 0 ? _ref : null), "', ").concat(JSON.stringify((_ref2 = arguments.length &lt;= 2 ? undefined : arguments[2]) !== null &amp;&amp; _ref2 !== void 0 ? _ref2 : null), ", ").concat(JSON.stringify((_ref3 = arguments.length &lt;= 3 ? undefined : arguments[3]) !== null &amp;&amp; _ref3 !== void 0 ? _ref3 : null), ", ").concat((0, _lodash.isEmpty)((_name = (_ref4 = arguments.length &lt;= 4 ? undefined : arguments[4]) === null || _ref4 === void 0 ? void 0 : _ref4.name) !== null &amp;&amp; _name !== void 0 ? _name : '-unused-') ? '(state)=>{}' : (_ref5 = arguments.length &lt;= 4 ? undefined : arguments[4]) === null || _ref5 === void 0 ? void 0 : _ref5.name, ") succeeded. The body of this result will be available in state.data or in your callback.");
 }
 /**
  * Compose next state based on the result of a given operation
@@ -204,37 +227,30 @@ function composeNextState(state, result) {
   });
 }
 /**
+ * Helper constant for http verbs
+ */
+
+
+var HTTP_METHODS = {
+  GET: 'GET',
+  POST: 'POST',
+  PATCH: 'PATCH',
+  PUT: 'PUT',
+  HEAD: 'HEAD',
+  OPTIONS: 'OPTIONS'
+};
+/**
  * Warn user when there is too much data expected to be returned on a given resource type
  * @param {string} endpointUrl - endpoint url for a resourceType
  *
  */
 
+exports.HTTP_METHODS = HTTP_METHODS;
 
 function warnExpectLargeResult(paramOrResourceType, endpointUrl) {
+  // TODO : Refactor to send a HEAD request to read Content-Length header to check the file size before we can send the actual request
+  // This will give us a sense of how big the result would be and warn the user, accordingly
   if ((0, _lodash.isEmpty)(paramOrResourceType)) Log.warn("\x1B[33m Missing params or resourceType. This may take a while\x1B[0m. This endpoint(\x1B[33m".concat(endpointUrl, "\x1B[0m) may return a large collection of records, since 'params' or 'resourceType' is not specified. We recommend you specify 'params' or 'resourceType' or use 'filter' parameter to limit the content of the result."));
-}
-/**
- * Send a HEAD request to read Content-Length header to check the file size before we can send
- * the actual request
- * This will give us a sense of how big the result would be and warn the user, accordingly
- * @param {string} endpointUrl - url for the endpoint
- */
-
-
-function requestHttpHead(endpointUrl, _ref6) {
-  var username = _ref6.username,
-      password = _ref6.password;
-  Log.info("password ".concat(password));
-  return _axios["default"].request({
-    method: 'HEAD',
-    url: endpointUrl,
-    auth: {
-      username: username,
-      password: password
-    }
-  }).then(function (result) {
-    return Log.info(prettyJson(result.headers));
-  });
 }
 /**
  * Inform user, you are waiting for the server to respond on a given url with params
@@ -278,8 +294,8 @@ function buildUrl(operation, resourceType, configuration, options) {
 
   var hostUrl = configuration.hostUrl,
       apiVersion = configuration.apiVersion;
-  var supportApiVersion = (_options$supportApiVe = options === null || options === void 0 ? void 0 : options.supportApiVersion) !== null && _options$supportApiVe !== void 0 ? _options$supportApiVe : false;
-  var path = supportApiVersion === true ? "".concat(apiVersion !== null && apiVersion !== void 0 ? apiVersion : 'api_version_missing', "/").concat(pathSuffix) : "".concat(pathSuffix);
+  var supportApiVersion = (_options$supportApiVe = options === null || options === void 0 ? void 0 : options.supportApiVersion) !== null &amp;&amp; _options$supportApiVe !== void 0 ? _options$supportApiVe : false;
+  var path = supportApiVersion === true ? "".concat(apiVersion !== null &amp;&amp; apiVersion !== void 0 ? apiVersion : 'api_version_missing', "/").concat(pathSuffix) : "".concat(pathSuffix);
   var url = hostUrl + '/api/' + path;
   return url;
 }
@@ -292,8 +308,8 @@ function logApiVersion(configuration, options) {
   var _options$supportApiVe2;
 
   var apiVersion = configuration.apiVersion;
-  var supportApiVersion = (_options$supportApiVe2 = options === null || options === void 0 ? void 0 : options.supportApiVersion) !== null && _options$supportApiVe2 !== void 0 ? _options$supportApiVe2 : false;
-  var message = supportApiVersion === true && apiVersion ? "Using DHIS2 api version \x1B[33m ".concat(apiVersion, "\x1B[0m") : '\x1b[33m Attempting to use apiVersion without providing it in state.configuration\x1b[0m. You may encounter errors.\x1b[33m api_version_missing\x1b[0m. If `supportApiVersion = true` in the `options` parameter, then you need to set `apiVersion` in state.configuration.';
+  var supportApiVersion = (_options$supportApiVe2 = options === null || options === void 0 ? void 0 : options.supportApiVersion) !== null &amp;&amp; _options$supportApiVe2 !== void 0 ? _options$supportApiVe2 : false;
+  var message = supportApiVersion === true &amp;&amp; apiVersion ? "Using DHIS2 api version \x1B[33m ".concat(apiVersion, "\x1B[0m") : '\x1b[33m Attempting to use apiVersion without providing it in state.configuration\x1b[0m. You may encounter errors.\x1b[33m api_version_missing\x1b[0m. If `supportApiVersion = true` in the `options` parameter, then you need to set `apiVersion` in state.configuration.';
   if (supportApiVersion === true) Log.warn(message);else Log.warn("Using \x1B[33m latest \x1B[0m version of DHIS2 api.");
 }
 
@@ -318,16 +334,16 @@ var dhis2OperatorMap = {
 exports.dhis2OperatorMap = dhis2OperatorMap;
 
 function applyFilter(arrObject, targetProperty, operator, valueToCompareWith) {
-  if (targetProperty && operator && valueToCompareWith) {
+  if (targetProperty &amp;&amp; operator &amp;&amp; valueToCompareWith) {
     try {
       return (0, _lodash.filter)(arrObject, function (obj) {
         return Reflect.apply(operator, obj, [obj[targetProperty], valueToCompareWith]);
       });
     } catch (error) {
       Log.warn("Returned unfiltered data. Failed to apply custom filter(".concat(prettyJson({
-        targetProperty: targetProperty !== null && targetProperty !== void 0 ? targetProperty : null,
-        operator: operator !== null && operator !== void 0 ? operator : null,
-        value: valueToCompareWith !== null && valueToCompareWith !== void 0 ? valueToCompareWith : null
+        targetProperty: targetProperty !== null &amp;&amp; targetProperty !== void 0 ? targetProperty : null,
+        operator: operator !== null &amp;&amp; operator !== void 0 ? operator : null,
+        value: valueToCompareWith !== null &amp;&amp; valueToCompareWith !== void 0 ? valueToCompareWith : null
       }), ") on this collection. The operator you supplied maybe unsupported on this resource at the moment."));
       return arrObject;
     }
@@ -341,25 +357,241 @@ function parseFilter(filterExpression) {
   var _filterTokens$;
 
   var filterTokens = filterExpression === null || filterExpression === void 0 ? void 0 : filterExpression.split(':');
-  filterTokens ? filterTokens[1] = dhis2OperatorMap[(_filterTokens$ = filterTokens[1]) !== null && _filterTokens$ !== void 0 ? _filterTokens$ : null] : null;
+  filterTokens ? filterTokens[1] = dhis2OperatorMap[(_filterTokens$ = filterTokens[1]) !== null &amp;&amp; _filterTokens$ !== void 0 ? _filterTokens$ : null] : null;
   return filterTokens;
 }
 
+var HTTP_HEADERS = {
+  CONTENT_TYPE: 'content-type'
+};
+exports.HTTP_HEADERS = HTTP_HEADERS;
+var MEDIA_TYPES = {
+  JSON: 'json'
+};
+exports.MEDIA_TYPES = MEDIA_TYPES;
 var CONTENT_TYPES = {
-  XML: 'application/xml',
-  JSON: 'application/json',
-  PDF: 'application/pdf',
-  CSV: 'application/csv',
-  XLS: 'application/vnd.ms-excel'
+  APPLICATION_XML: 'application/xml',
+  APPLICATION_JSON: 'application/json',
+  APPLICATION_PDF: 'application/pdf',
+  APPLICATION_CSV: 'application/csv',
+  APPLICATION_XLS: 'application/vnd.ms-excel'
+};
+exports.CONTENT_TYPES = CONTENT_TYPES;
+var PUNCTUATIONS = {
+  COMMA: ',',
+  SEMI_COLON: ';',
+  FULL_COLON: ':'
 };
 /**
  * The following query parameters are available for customizing your request.
- * Replace with : curl 'https://dhis2.github.io/dhis2-api-specification/spec/metadata_openapi.json' \
-  // -H 'Accept: application/json,*/
-// -H 'Referer: https://dhis2.github.io/dhis2-api-specification/swagger-ui/' \
-// -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36' \
-// --compressed
+ */
 
+exports.PUNCTUATIONS = PUNCTUATIONS;
+var QUERY_PARAMETERS = [{
+  param: 'assumeTrue',
+  type: 'boolean',
+  required: false,
+  defaultValue: true,
+  options: [true, false],
+  isDataParam: true,
+  isMetadataParam: true,
+  isMetadataCreateUpdateParam: false,
+  isMetadataExportParam: true,
+  isMetadataImportParam: false,
+  description: 'Indicates whether to get all resources or no resources by default.'
+}, {
+  param: 'viewClass',
+  type: 'enum',
+  required: false,
+  defaultValue: 'export',
+  options: ['export', 'basic', 'detailed'],
+  isDataParam: true,
+  isMetadataParam: true,
+  isMetadataCreateUpdateParam: false,
+  isMetadataExportParam: true,
+  isMetadataImportParam: false,
+  description: 'Alternative views of the metadata. Please note that only metadata exported with viewClass=export or detailed can be used for import.'
+}, {
+  param: 'dryRun',
+  type: 'boolean',
+  required: false,
+  defaultValue: false,
+  options: [false, true],
+  isDataParam: true,
+  isMetadataParam: true,
+  isMetadataCreateUpdateParam: false,
+  isMetadataExportParam: true,
+  isMetadataImportParam: false,
+  description: 'If you set this to true, the actual import will not happen. Instead the system will generate a summary of what would have been done.'
+}, {
+  param: '{resources}',
+  type: 'boolean',
+  required: false,
+  defaultValue: true,
+  options: [true, false],
+  isDataParam: true,
+  isMetadataParam: true,
+  isMetadataCreateUpdateParam: false,
+  isMetadataExportParam: true,
+  isMetadataImportParam: false,
+  description: 'Default depends on assumeTrue. Run getResources() to see available resources. Indicates which resources to include in the response.'
+}, {
+  param: 'lastUpdated',
+  type: 'date',
+  required: false,
+  defaultValue: null,
+  options: ['yyyy', 'yyyy-MM', 'yyyy-MM-dd', 'yyyyMM', 'yyyyMMdd'],
+  isDataParam: true,
+  isMetadataParam: true,
+  isMetadataCreateUpdateParam: false,
+  isMetadataExportParam: true,
+  isMetadataImportParam: false,
+  description: 'Filters the metadata based on the lastUpdated field.'
+}, {
+  param: 'preheatCache',
+  type: 'boolean',
+  required: false,
+  defaultValue: true,
+  options: [true, false],
+  isDataParam: true,
+  isMetadataParam: true,
+  isMetadataCreateUpdateParam: false,
+  isMetadataExportParam: true,
+  isMetadataImportParam: false,
+  description: "Turn cache-map preheating on/off. This is on by default, turning this off will make initial load time for importer much shorter (but will make the import itself slower). This is mostly used for cases where you have a small XML/JSON file you want to import, and don't want to wait for cache-map preheating."
+}, {
+  param: 'strategy',
+  type: 'enum',
+  required: false,
+  defaultValue: 'CREATE_AND_UPDATE',
+  options: ['CREATE_AND_UPDATE', 'CREATE', 'UPDATE', 'DELETE'],
+  isDataParam: true,
+  isMetadataParam: true,
+  isMetadataCreateUpdateParam: false,
+  isMetadataExportParam: true,
+  isMetadataImportParam: false,
+  description: 'Import strategy to use. CREATE_AND_UPDATE=Allows creation and updating of objects. CREATE=Allows creation of objects only. UPDATE=Allows update of objects only. DELETE=Allows deletes of objects only.'
+}, {
+  param: 'sharing',
+  type: 'boolean',
+  required: false,
+  defaultValue: false,
+  options: [false, true],
+  isDataParam: true,
+  isMetadataParam: true,
+  isMetadataCreateUpdateParam: false,
+  isMetadataExportParam: true,
+  isMetadataImportParam: false,
+  description: 'Should sharing be supported or not. The default is false, which is the old behavior. You can set this to true to allow updating user, publicAccess and userGroupAccesses fields (if not they are cleared out on create, and not touched on update).'
+}, {
+  param: 'mergeMode',
+  type: 'enum',
+  required: false,
+  defaultValue: 'REPLACE',
+  options: ['REPLACE', 'MERGE'],
+  isDataParam: true,
+  isMetadataParam: true,
+  isMetadataCreateUpdateParam: false,
+  isMetadataExportParam: true,
+  isMetadataImportParam: false,
+  description: 'Strategy for merging of objects when doing updates. REPLACE will just overwrite the propery with the new value provided, MERGE will only set the property if its not null (only if the property was provided).'
+}, {
+  param: 'async',
+  type: 'boolean',
+  required: false,
+  defaultValue: false,
+  options: [false, false],
+  isDataParam: true,
+  isMetadataParam: true,
+  isMetadataCreateUpdateParam: false,
+  isMetadataExportParam: true,
+  isMetadataImportParam: false,
+  description: 'Indicates wether the import should be done async or not, the default is false which means the client will wait until the import is done, this is probably what you want for small imports (as you will get the import summary directly back to you). For large imports, the client might time out, so async=true is recommended, and the client connection will be dropped when the payload is uploaded.'
+}, {
+  param: 'fields',
+  type: 'collection',
+  required: false,
+  defaultValue: ':owner',
+  options: [FIELD_FILTERS_SYNTAX, FIELD_FILTERS_PRESETS],
+  isDataParam: true,
+  isMetadataParam: true,
+  isMetadataCreateUpdateParam: false,
+  isMetadataExportParam: true,
+  isMetadataImportParam: false,
+  description: 'Default field filter to apply for all types, default is :owner.'
+}, {
+  param: 'filter',
+  type: 'string',
+  required: false,
+  defaultValue: 'none',
+  options: OBJECT_FILTER_OPERATORS,
+  isDataParam: true,
+  isMetadataParam: true,
+  isMetadataCreateUpdateParam: false,
+  isMetadataExportParam: true,
+  isMetadataImportParam: false,
+  description: 'Default object filter to apply for all types, default is none.'
+}, {
+  param: 'order',
+  type: 'string',
+  required: false,
+  defaultValue: 'name',
+  options: ['&lt;propertyName>:desc', '&lt;propertyName>:asc'],
+  isDataParam: true,
+  isMetadataParam: true,
+  isMetadataCreateUpdateParam: false,
+  isMetadataExportParam: true,
+  isMetadataImportParam: false,
+  description: 'Default order to apply to all types, default is name if available, or created if not.'
+}, {
+  param: 'translate',
+  type: 'boolean',
+  required: false,
+  defaultValue: false,
+  options: [false, true],
+  isDataParam: true,
+  isMetadataParam: true,
+  isMetadataCreateUpdateParam: false,
+  isMetadataExportParam: true,
+  isMetadataImportParam: false,
+  description: 'Enable translations. Be aware that this is turned off by default (in other endpoints this is on by default).'
+}, {
+  param: 'locale',
+  type: 'string',
+  required: false,
+  defaultValue: 'user locale',
+  options: '&lt;locale>',
+  isDataParam: true,
+  isMetadataParam: true,
+  isMetadataCreateUpdateParam: false,
+  isMetadataExportParam: true,
+  isMetadataImportParam: false,
+  description: 'Change from user locale, to your own custom locale.'
+}, {
+  param: 'importMode',
+  type: 'enum',
+  required: false,
+  defaultValue: 'COMMIT',
+  options: ['COMMIT', 'VALIDATE'],
+  isDataParam: true,
+  isMetadataParam: true,
+  isMetadataCreateUpdateParam: false,
+  isMetadataExportParam: false,
+  isMetadataImportParam: true,
+  description: 'Sets overall import mode, decides whether or not to only VALIDATE or also COMMIT the metadata, this have similar functionality as our old dryRun flag.'
+}, {
+  param: 'identifier',
+  type: 'enum',
+  required: false,
+  defaultValue: 'UID',
+  options: ['UID', 'CODE', 'AUTO'],
+  isDataParam: true,
+  isMetadataParam: true,
+  isMetadataCreateUpdateParam: false,
+  isMetadataExportParam: false,
+  isMetadataImportParam: true,
+  description: 'Sets the identifier scheme to use for reference matching. AUTO means try UID first, then CODE.'
+}];
 /**
  * To filter the metadata there are several filter operations that can be applied to the returned list of
  *  metadata.
@@ -386,10 +618,10 @@ var CONTENT_TYPES = {
  * the rootJunction parameter
  * 
  * Example: Filtering where the logical operator has been switched to OR and now only one of the filters must match to have a result returned
-/api/dataElements.json?filter=id:in:[id1,id2]&filter=code:eq:code1&rootJunction=OR
+/api/dataElements.json?filter=id:in:[id1,id2]&amp;filter=code:eq:code1&amp;rootJunction=OR
  */
 
-exports.CONTENT_TYPES = CONTENT_TYPES;
+exports.QUERY_PARAMETERS = QUERY_PARAMETERS;
 var OBJECT_FILTER_OPERATORS = [{
   operator: 'eq',
   types: ['string', 'boolean', 'integer', 'float', 'enum', 'collection', 'date'],
@@ -537,23 +769,23 @@ var OBJECT_FILTER_OPERATORS = [{
 }];
 exports.OBJECT_FILTER_OPERATORS = OBJECT_FILTER_OPERATORS;
 var FIELD_FILTERS_SYNTAX = [{
-  operator: '<field-name>',
+  operator: '&lt;field-name>',
   description: 'Include property with name, if it exists.',
   example: 'id'
 }, {
-  operator: '<object>[<field-name>, ...]',
+  operator: '&lt;object>[&lt;field-name>, ...]',
   description: 'Includes a field within either a collection (will be applied to every object in that collection), or just on a single object.',
   example: 'properties[id,name]'
 }, {
-  operator: '!<field-name>, <object>[!<field-name>',
+  operator: '!&lt;field-name>, &lt;object>[!&lt;field-name>',
   description: 'Do not include this field name, also works inside objects/collections. Useful when you use a preset to inlude fields.',
   example: '!userAccess, attributes[!properties.userAccess]'
 }, {
-  operator: '*, <object>[*]',
+  operator: '*, &lt;object>[*]',
   description: 'Include all fields on a certain object, if applied to a collection, it will include all fields on all objects on that collection.',
   example: '*, enrollments[*]'
 }, {
-  operator: ':<preset>',
+  operator: ':&lt;preset>',
   description: 'Alias to select multiple fields. Three presets are currently available, run discoverFieldFilterPresets() for descriptions.',
   example: ':all'
 }];
@@ -672,3 +904,26 @@ curl -X PATCH -d @file.json -H "Content-Type: application/json"
  */
 
 exports.FIELD_TRANSFORMERS = FIELD_TRANSFORMERS;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="configMigrationHelper.html">configMigrationHelper</a></li><li><a href="execute.html">execute</a></li></ul><h3>Global</h3><ul><li><a href="global.html#buildUrl">buildUrl</a></li><li><a href="global.html#composeNextState">composeNextState</a></li><li><a href="global.html#CONTENT_TYPES">CONTENT_TYPES</a></li><li><a href="global.html#discover">discover</a></li><li><a href="global.html#FIELD_FILTERS_PRESETS">FIELD_FILTERS_PRESETS</a></li><li><a href="global.html#FIELD_TRANSFORMERS">FIELD_TRANSFORMERS</a></li><li><a href="global.html#generateUID">generateUID</a></li><li><a href="global.html#getData">getData</a></li><li><a href="global.html#getMetadata">getMetadata</a></li><li><a href="global.html#getResources">getResources</a></li><li><a href="global.html#getSchema">getSchema</a></li><li><a href="global.html#HTTP_METHODS">HTTP_METHODS</a></li><li><a href="global.html#isValidUID">isValidUID</a></li><li><a href="global.html#Log">Log</a></li><li><a href="global.html#logApiVersion">logApiVersion</a></li><li><a href="global.html#logWaitingForServer">logWaitingForServer</a></li><li><a href="global.html#prettyJson">prettyJson</a></li><li><a href="global.html#PUNCTUATIONS">PUNCTUATIONS</a></li><li><a href="global.html#QUERY_PARAMETERS">QUERY_PARAMETERS</a></li><li><a href="global.html#requestHttpHead">requestHttpHead</a></li><li><a href="global.html#warnExpectLargeResult">warnExpectLargeResult</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Mon Dec 14 2020 20:29:34 GMT+0200 (Central Africa Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

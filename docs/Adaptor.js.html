@@ -32,6 +32,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.execute = execute;
+<<<<<<< HEAD
 exports.fetchData = fetchData;
 exports.fetchEvents = fetchEvents;
 exports.event = event;
@@ -42,6 +43,21 @@ exports.updateTEI = updateTEI;
 exports.upsertTEI = upsertTEI;
 exports.enroll = enroll;
 exports.fetchAnalytics = fetchAnalytics;
+=======
+exports.discover = discover;
+exports.getResources = getResources;
+exports.getSchema = getSchema;
+exports.getData = getData;
+exports.getMetadata = getMetadata;
+exports.postData = postData;
+exports.postMetadata = postMetadata;
+exports.upsertData = upsertData;
+exports.upsertMetadata = upsertMetadata;
+exports.updateData = updateData;
+exports.updateMetadata = updateMetadata;
+exports.deleteData = deleteData;
+exports.deleteMetadata = deleteMetadata;
+>>>>>>> 478d1bf... Add requestHttpHead helper method, for #3
 Object.defineProperty(exports, "field", {
   enumerable: true,
   get: function get() {
@@ -101,6 +117,7 @@ var _axios = _interopRequireDefault(require("axios"));
 
 var _languageCommon = require("language-common");
 
+<<<<<<< HEAD
 var _Client = require("./Client");
 
 var _url4 = require("url");
@@ -110,6 +127,13 @@ var _fp = require("lodash/fp");
 function _interopRequireDefault(obj) { return obj &amp;&amp; obj.__esModule ? obj : { "default": obj }; }
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" &amp;&amp; typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj &amp;&amp; typeof Symbol === "function" &amp;&amp; obj.constructor === Symbol &amp;&amp; obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+=======
+var _fp = require("lodash/fp");
+
+var _Utils = require("./Utils");
+
+function _interopRequireDefault(obj) { return obj &amp;&amp; obj.__esModule ? obj : { "default": obj }; }
+>>>>>>> 478d1bf... Add requestHttpHead helper method, for #3
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
@@ -123,6 +147,11 @@ function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToAr
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i &lt; len; i++) { arr2[i] = arr[i]; } return arr2; }
 
+<<<<<<< HEAD
+=======
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" &amp;&amp; typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj &amp;&amp; typeof Symbol === "function" &amp;&amp; obj.constructor === Symbol &amp;&amp; obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+>>>>>>> 478d1bf... Add requestHttpHead helper method, for #3
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i &lt; arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
@@ -171,13 +200,19 @@ function configMigrationHelper(state) {
       apiUrl = _state$configuration.apiUrl;
 
   if (!hostUrl) {
+<<<<<<< HEAD
     console.log('DEPRECATION WARNING: Please migrate instance address from `apiUrl` to `hostUrl`.');
+=======
+    _Utils.Log.warn('DEPRECATION WARNING: Please migrate instance address from `apiUrl` to `hostUrl`.');
+
+>>>>>>> 478d1bf... Add requestHttpHead helper method, for #3
     state.configuration.hostUrl = apiUrl;
     return state;
   }
 
   return state;
 }
+<<<<<<< HEAD
 /**
  * Fetch a dataValueSet
  * @public
@@ -330,6 +365,8 @@ function event(eventData) {
     });
   };
 }
+=======
+>>>>>>> 478d1bf... Add requestHttpHead helper method, for #3
 
 function expandDataValues(obj) {
   return function (state) {
@@ -344,6 +381,7 @@ function expandDataValues(obj) {
     })(obj);
   };
 }
+<<<<<<< HEAD
 /**
  * Send data values using the dataValueSets resource
  * @public
@@ -474,6 +512,26 @@ function updateTEI(tei, data) {
     });
   };
 }
+=======
+
+_axios["default"].interceptors.response.use(function (response) {
+  // TODO Cleanup sensitive info
+  return response;
+}, function (error) {
+  var _error$response, _error$response2, _error$response2$conf, _error$response3;
+
+  // TODO Cleanup sensitive info
+  _Utils.Log.error("".concat(error === null || error === void 0 ? void 0 : error.message));
+
+  return Promise.reject({
+    status: error === null || error === void 0 ? void 0 : (_error$response = error.response) === null || _error$response === void 0 ? void 0 : _error$response.status,
+    message: error === null || error === void 0 ? void 0 : error.message,
+    url: error === null || error === void 0 ? void 0 : (_error$response2 = error.response) === null || _error$response2 === void 0 ? void 0 : (_error$response2$conf = _error$response2.config) === null || _error$response2$conf === void 0 ? void 0 : _error$response2$conf.url,
+    responseData: error === null || error === void 0 ? void 0 : (_error$response3 = error.response) === null || _error$response3 === void 0 ? void 0 : _error$response3.data,
+    isAxiosError: error === null || error === void 0 ? void 0 : error.isAxiosError
+  });
+});
+>>>>>>> 478d1bf... Add requestHttpHead helper method, for #3
 /**
  * Create or update one or many new Tracked Entity Instances
  * @public
@@ -486,6 +544,7 @@ function updateTEI(tei, data) {
  * @returns {Operation}
  */
 
+<<<<<<< HEAD
 
 function upsertTEI(uniqueAttributeId, data, options) {
   return function (state) {
@@ -577,10 +636,157 @@ function upsertTEI(uniqueAttributeId, data, options) {
                   return _objectSpread({}, state, {
                     references: [result].concat(_toConsumableArray(state.references))
                   });
+=======
+/*
+export function upsertTEI(uniqueAttributeId, data, options) {
+  return state => {
+    const { password, username, hostUrl } = state.configuration;
+    const { replace } = options;
+
+    const body = expandReferences(data)(state);
+    const url = resolveUrl(hostUrl + '/', `api/trackedEntityInstances`);
+    const uniqueAttributeUrl = `${hostUrl}/api/trackedEntityAttributes/${uniqueAttributeId}`;
+    const trackedEntityType = state.data.trackedEntityType;
+    const trackedEntityTypeUrl = `${hostUrl}/api/trackedEntityTypes/${trackedEntityType}?fields=*`;
+
+    const uniqueAttributeValue = state.data.attributes.find(
+      obj => obj.attribute === uniqueAttributeId
+    ).value;
+
+    const query = {
+      ou: state.data.orgUnit,
+      ouMode: 'ACCESSIBLE',
+      filter: `${uniqueAttributeId}:EQ:${uniqueAttributeValue}`,
+      skipPaging: true,
+    };
+
+    console.log(
+      `Checking if Tracked Entity Type ${trackedEntityType} exists...`
+    );
+
+    return get({
+      username,
+      password,
+      query: null,
+      url: trackedEntityTypeUrl,
+    }).then(result => {
+      let tet = JSON.parse(result.text);
+
+      console.log(
+        `Tracked Entity Type ${trackedEntityType}(${tet.name}) found.`
+      );
+
+      console.log(
+        `Checking if attribute ${uniqueAttributeId} is assigned to ${tet.name} Entity Type... `
+      );
+      const attribute = tet.trackedEntityTypeAttributes.find(
+        obj => obj.trackedEntityAttribute.id === uniqueAttributeId
+      );
+      if (attribute) {
+        console.log(
+          `Attribute ${attribute.name}(${uniqueAttributeId}) is assigned to ${tet.name}.`
+        );
+
+        console.log(
+          `Checking if attribute ${attribute.name}(${uniqueAttributeId}) is unique...`
+        );
+
+        return get({
+          username,
+          password,
+          query: null,
+          url: uniqueAttributeUrl,
+        }).then(result => {
+          const foundAttribute = JSON.parse(result.text);
+
+          if (foundAttribute.unique) {
+            console.log(
+              `Tracked Entity Attribute ${attribute.name}(${uniqueAttributeId}) is unique. Proceeding to checking if Tracked Entity Instance exists...`
+            );
+            return get({
+              username,
+              password,
+              query,
+              url,
+            }).then(result => {
+              console.log(`query ${JSON.stringify(query, null, 2)}`);
+
+              let tei_body = JSON.parse(result.text);
+
+              if (tei_body.trackedEntityInstances.length &lt;= 0) {
+                console.log(
+                  `Tracked Entity Instance  with filter ${query.filter} not found, proceeding to create...`
+                );
+
+                return post({
+                  username,
+                  password,
+                  body,
+                  url,
+                  query: null,
+                }).then(result => {
+                  console.log(
+                    `POST succeeded. ${
+                      result.header.location
+                    }\nSummary:\n${JSON.stringify(
+                      JSON.parse(result.text),
+                      null,
+                      2
+                    )}`
+                  );
+
+                  return {
+                    ...state,
+                    references: [result, ...state.references],
+                  };
+                });
+              } else {
+                const row1 = tei_body.trackedEntityInstances[0];
+
+                const payload = replace
+                  ? body
+                  : {
+                      ...row1,
+                      ...body,
+                      attributes: [...row1.attributes, ...body.attributes],
+                    };
+
+                const updateUrl = `${url}/${row1.trackedEntityInstance}`;
+
+                console.log(
+                  `Tracked Entity Instance  with filter ${query.filter} found(${
+                    row1.trackedEntityInstance
+                  }), proceeding to ${
+                    replace ? 'replace' : 'merge data with'
+                  } the existing TEI...`
+                );
+
+                return put({
+                  username,
+                  password,
+                  body: payload,
+                  url: updateUrl,
+                  query: null,
+                }).then(result => {
+                  console.log(`Upsert succeeded. Updated TEI: ${updateUrl}`);
+                  console.log(
+                    `Summary:\n${JSON.stringify(
+                      JSON.parse(result.text),
+                      null,
+                      2
+                    )}`
+                  );
+
+                  return {
+                    ...state,
+                    references: [result, ...state.references],
+                  };
+>>>>>>> 478d1bf... Add requestHttpHead helper method, for #3
                 });
               }
             });
           } else {
+<<<<<<< HEAD
             throw new Error("Attribute ".concat(attribute.name, "(").concat(uniqueAttributeId, ") is not unique. Ensure, in DHIS2, this tracked entity attribute is marked as unique."));
           }
         });
@@ -647,10 +853,88 @@ function enroll(tei, enrollmentData) {
       return _objectSpread({}, state, {
         references: [result].concat(_toConsumableArray(state.references))
       });
+=======
+            throw new Error(
+              `Attribute ${attribute.name}(${uniqueAttributeId}) is not unique. Ensure, in DHIS2, this tracked entity attribute is marked as unique.`
+            );
+          }
+        });
+      } else {
+        throw new Error(
+          `Tracked Entity Attribute ${uniqueAttributeId} is not assigned to ${tet.name} Entity Type. Ensure, in DHIS2, this tracked entity attribute is assigned to ${tet.name} and that it is marked as unique.`
+        );
+      }
+    });
+  };
+}
+*/
+
+/**
+ * TODO
+ *
+ * Discover available parameters and allowed operators for a given resource's endpoint
+ * @example
+ * discover('getData, /api/trackedEntityInstances')
+ * @param {*} operation
+ * @param {*} resourceType
+ */
+
+
+function discover(operation, resourceType) {
+  return state;
+}
+/**
+ * Get DHIS2 resources
+ * @param {Object} params - The optional query parameters for this endpoint.
+ * @param {string} params.filter - The optional filter parameter, specifiying the filter expression.
+ * @param {Object} options - The optional flags to control behavior of function
+ * @param {boolean} options.supportApiVersion - The optional flag, only set to `true` if endpoint supports use of api versions in url. Defaults to `false`
+ * @param {Function} callback - The optional function that will be called to handle data returned by this function. Defaults to `state.data`
+ */
+
+
+function getResources(params, options, callback) {
+  return function (state) {
+    var _state$configuration2 = state.configuration,
+        username = _state$configuration2.username,
+        password = _state$configuration2.password;
+    var filter = params.filter;
+    var url = (0, _Utils.buildUrl)(getResources, null, state.configuration, options);
+    (0, _Utils.logApiVersion)(state.configuration, options);
+    (0, _Utils.logWaitingForServer)(url, params);
+    (0, _Utils.requestHttpHead)(url);
+    (0, _Utils.warnExpectLargeResult)(params, url);
+    return _axios["default"].request({
+      method: 'GET',
+      url: url,
+      auth: {
+        username: username,
+        password: password
+      },
+      responseType: 'json',
+      transformResponse: [function (data, headers) {
+        var _headers$contentType, _headers$contentType2;
+
+        if ((_headers$contentType = (_headers$contentType2 = headers['content-type']) === null || _headers$contentType2 === void 0 ? void 0 : _headers$contentType2.split(';')[0]) !== null &amp;&amp; _headers$contentType !== void 0 ? _headers$contentType : null === _Utils.CONTENT_TYPES.JSON) {
+          var tempData = JSON.parse(data);
+          return _objectSpread({}, tempData, {
+            resources: _Utils.applyFilter.apply(void 0, [tempData.resources].concat(_toConsumableArray((0, _Utils.parseFilter)(filter))))
+          });
+        }
+
+        return data;
+      }]
+    }).then(function (result) {
+      _Utils.Log.info((0, _Utils.composeSuccessMessage)(getResources, null, params, options, callback));
+
+      if (callback) return callback((0, _Utils.composeNextState)(state, result));
+      return (0, _Utils.composeNextState)(state, result);
+>>>>>>> 478d1bf... Add requestHttpHead helper method, for #3
     });
   };
 }
 /**
+<<<<<<< HEAD
  * Fetch analytics
  * @public
  * @example
@@ -708,10 +992,172 @@ function fetchAnalytics(params, postUrl) {
           references: [result].concat(_toConsumableArray(state.references))
         });
       }
+=======
+ *
+ * @param {string} resourceType
+ * @param {*} params
+ * @param {*} options
+ * @param {*} callback
+ */
+
+
+function getSchema(resourceType, params, options, callback) {
+  return function (state) {
+    var _state$configuration3 = state.configuration,
+        username = _state$configuration3.username,
+        password = _state$configuration3.password;
+    var url = (0, _Utils.buildUrl)(getSchema, resourceType, state === null || state === void 0 ? void 0 : state.configuration, options);
+    (0, _Utils.logApiVersion)(state.configuration, options);
+    (0, _Utils.logWaitingForServer)(url, params);
+    (0, _Utils.warnExpectLargeResult)(resourceType, url);
+    return _axios["default"].request({
+      method: 'GET',
+      url: url,
+      auth: {
+        username: username,
+        password: password
+      },
+      params: params
+    }).then(function (result) {
+      _Utils.Log.info((0, _Utils.composeSuccessMessage)(getSchema, resourceType, params, options, callback));
+
+      if (callback) return callback((0, _Utils.composeNextState)(state, result));
+      return (0, _Utils.composeNextState)(state, result);
+    });
+  };
+}
+/**
+ *
+ * @param {*} resourceType
+ * @param {*} params
+ * @param {*} options
+ * @example
+ * getData(
+ * 'trackedEntityInstances',
+ * {
+ *  fields: '*',
+    ou: 'DiszpKrYNg8',
+    entityType: 'nEenWmSyUEp',
+    // filter: 'id:eq:FQ2o8UBlcrS',
+    skipPaging: true,
+    async: true,
+    // filter: 'id:eq:PWxgadk4sCG',
+  },
+  {
+    includeSystem: false,
+  }
+);
+ */
+
+
+function getData(resourceType, params, options, callback) {
+  return function (state) {
+    var _state$configuration4 = state.configuration,
+        username = _state$configuration4.username,
+        password = _state$configuration4.password;
+    var url = (0, _Utils.buildUrl)(getData, resourceType, state === null || state === void 0 ? void 0 : state.configuration, options);
+    (0, _Utils.logApiVersion)(state.configuration, options);
+    (0, _Utils.logWaitingForServer)(url, params);
+    (0, _Utils.warnExpectLargeResult)(resourceType, url);
+    return _axios["default"].request({
+      method: 'GET',
+      url: url,
+      auth: {
+        username: username,
+        password: password
+      },
+      params: params
+    }).then(function (result) {
+      _Utils.Log.info((0, _Utils.composeSuccessMessage)(getData, resourceType, params, options, callback));
+
+      if (callback) return callback((0, _Utils.composeNextState)(state, result));
+      return (0, _Utils.composeNextState)(state, result);
+    });
+  };
+}
+/**
+ * Get metadata
+ * @param {*} resources 
+ * @param {*} params 
+ * @param {*} options 
+ * @param {*} callback 
+ * @example
+ * getMetadata(
+  'attributes',
+  {
+    fields: '*',
+    // filter: 'id:eq:PWxgadk4sCG',
+  },
+  {
+    includeSystem: false,
+  }
+);
+ */
+
+
+function getMetadata(resources, params, options, callback) {
+  return function (state) {
+    var _state$configuration5 = state.configuration,
+        username = _state$configuration5.username,
+        password = _state$configuration5.password;
+    var queryParams = expandDataValues(_objectSpread({}, resources, {}, params))(state);
+    var url = (0, _Utils.buildUrl)(getMetadata, resources, state.configuration, options);
+    (0, _Utils.logApiVersion)(state.configuration, options);
+    (0, _Utils.logWaitingForServer)(url, queryParams);
+    (0, _Utils.warnExpectLargeResult)(resources, url);
+    return _axios["default"].request({
+      method: 'GET',
+      url: url,
+      auth: {
+        username: username,
+        password: password
+      },
+      params: queryParams
+    }).then(function (result) {
+      _Utils.Log.info((0, _Utils.composeSuccessMessage)(getMetadata, resources, queryParams, options, callback));
+
+      if (callback) return callback((0, _Utils.composeNextState)(state, result));
+      return (0, _Utils.composeNextState)(state, result);
+>>>>>>> 478d1bf... Add requestHttpHead helper method, for #3
     });
   };
 }
 
+<<<<<<< HEAD
+=======
+function postData(resourceType, data, params, options) {
+  return state;
+}
+
+function postMetadata(resourceType, data, params, options) {
+  return state;
+}
+
+function upsertData(resourceType, uniqueAttribute, data, params, options) {
+  return state;
+}
+
+function upsertMetadata(resourceType, uniqueAttribute, data, params, options) {
+  return state;
+}
+
+function updateData(resourceType, query, data, params, options) {
+  return state;
+}
+
+function updateMetadata(resourceType, query, data, params, options) {
+  return state;
+}
+
+function deleteData(resourceType, query, params, options) {
+  return state;
+}
+
+function deleteMetadata(resourceType, query, params, options) {
+  return state;
+}
+
+>>>>>>> 478d1bf... Add requestHttpHead helper method, for #3
 exports.axios = _axios["default"];
 </code></pre>
         </article>
@@ -723,13 +1169,21 @@ exports.axios = _axios["default"];
 </div>
 
 <nav>
+<<<<<<< HEAD
     <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="configMigrationHelper.html">configMigrationHelper</a></li><li><a href="createTEI.html">createTEI</a></li><li><a href="dataElement.html">dataElement</a></li><li><a href="dataValueSet.html">dataValueSet</a></li><li><a href="enroll.html">enroll</a></li><li><a href="event.html">event</a></li><li><a href="execute.html">execute</a></li><li><a href="fetchAnalytics.html">fetchAnalytics</a></li><li><a href="fetchData.html">fetchData</a></li><li><a href="fetchEvents.html">fetchEvents</a></li><li><a href="updateTEI.html">updateTEI</a></li><li><a href="upsertTEI.html">upsertTEI</a></li></ul>
+=======
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="configMigrationHelper.html">configMigrationHelper</a></li><li><a href="execute.html">execute</a></li></ul><h3>Global</h3><ul><li><a href="global.html#buildUrl">buildUrl</a></li><li><a href="global.html#composeNextState">composeNextState</a></li><li><a href="global.html#CONTENT_TYPES">CONTENT_TYPES</a></li><li><a href="global.html#discover">discover</a></li><li><a href="global.html#FIELD_FILTERS_PRESETS">FIELD_FILTERS_PRESETS</a></li><li><a href="global.html#FIELD_TRANSFORMERS">FIELD_TRANSFORMERS</a></li><li><a href="global.html#generateUID">generateUID</a></li><li><a href="global.html#getData">getData</a></li><li><a href="global.html#getMetadata">getMetadata</a></li><li><a href="global.html#getResources">getResources</a></li><li><a href="global.html#getSchema">getSchema</a></li><li><a href="global.html#HTTP_METHODS">HTTP_METHODS</a></li><li><a href="global.html#isValidUID">isValidUID</a></li><li><a href="global.html#Log">Log</a></li><li><a href="global.html#logApiVersion">logApiVersion</a></li><li><a href="global.html#logWaitingForServer">logWaitingForServer</a></li><li><a href="global.html#prettyJson">prettyJson</a></li><li><a href="global.html#PUNCTUATIONS">PUNCTUATIONS</a></li><li><a href="global.html#QUERY_PARAMETERS">QUERY_PARAMETERS</a></li><li><a href="global.html#requestHttpHead">requestHttpHead</a></li><li><a href="global.html#warnExpectLargeResult">warnExpectLargeResult</a></li></ul>
+>>>>>>> 478d1bf... Add requestHttpHead helper method, for #3
 </nav>
 
 <br class="clear">
 
 <footer>
+<<<<<<< HEAD
     Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Mon Dec 14 2020 11:22:43 GMT-0500 (Eastern Standard Time)
+=======
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Mon Dec 14 2020 20:29:34 GMT+0200 (Central Africa Time)
+>>>>>>> 478d1bf... Add requestHttpHead helper method, for #3
 </footer>
 
 <script> prettyPrint(); </script>

@@ -14,6 +14,7 @@ import {
   applyFilter,
   parseFilter,
   CONTENT_TYPES,
+  requestHttpHead,
 } from './Utils';
 
 /**
@@ -353,14 +354,9 @@ export function getResources(params, options, callback) {
  */
 export function getSchema(resourceType, params, options, callback) {
   return state => {
-    const { username, password } = state?.configuration;
+    const { username, password } = state.configuration;
 
-    const url = buildUrl(
-      getSchema,
-      resourceType,
-      state?.configuration,
-      options
-    );
+    const url = buildUrl(getSchema, resourceType, state.configuration, options);
 
     logApiVersion(state.configuration, options);
 
@@ -420,9 +416,9 @@ export function getSchema(resourceType, params, options, callback) {
  */
 export function getData(resourceType, params, options, callback) {
   return state => {
-    const { username, password } = state?.configuration;
+    const { username, password } = state.configuration;
 
-    const url = buildUrl(getData, resourceType, state?.configuration, options);
+    const url = buildUrl(getData, resourceType, state.configuration, options);
 
     logApiVersion(state.configuration, options);
 
@@ -482,7 +478,7 @@ export function getMetadata(resources, params, options, callback) {
 
     const queryParams = expandDataValues({ ...resources, ...params })(state);
 
-    const url = buildUrl(getMetadata, resources, state?.configuration, options);
+    const url = buildUrl(getMetadata, resources, state.configuration, options);
 
     logApiVersion(state.configuration, options);
 
