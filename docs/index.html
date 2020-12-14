@@ -47,6 +47,9 @@
 <p>Language Pack for building expressions and operations for working with
 the <a href="http://dhis2.github.io/dhis2-docs/master/en/developer/html/dhis2_developer_manual.html">DHIS2 API</a>.</p>
 <h2>Documentation</h2>
+<p>View the <a href="https://openfn.github.io/language-dhis2/">docs site</a> for full
+technical documentation. Below, find a samples of the most commonly used helper
+functions.</p>
 <h2>Sample State</h2>
 <pre class="prettyprint source lang-json"><code>{
   &quot;configuration&quot;: {
@@ -56,7 +59,7 @@ the <a href="http://dhis2.github.io/dhis2-docs/master/en/developer/html/dhis2_de
   },
   &quot;data&quot;: {
     &quot;a&quot;: 1,
-    &quot;b&quot;: 2,
+    &quot;b&quot;: 2
   }
 }
 </code></pre>
@@ -64,37 +67,56 @@ the <a href="http://dhis2.github.io/dhis2-docs/master/en/developer/html/dhis2_de
 <h4>Fetch analytics data for PMTCT data over last 6 months.</h4>
 <pre class="prettyprint source lang-js"><code>fetchAnalytics({
   query: {
-    dimension: [&quot;dx:CYI5LEmm3cG;GDVU1o5rTNF&quot;, &quot;pe:LAST_6_MONTHS&quot;],
-    filter: &quot;ou:GHlyx9Pg9mn&quot;,
-    displayProperty: &quot;NAME&quot;,
-    outputIdScheme: &quot;UID&quot;
-  }
+    dimension: ['dx:CYI5LEmm3cG;GDVU1o5rTNF', 'pe:LAST_6_MONTHS'],
+    filter: 'ou:GHlyx9Pg9mn',
+    displayProperty: 'NAME',
+    outputIdScheme: 'UID',
+  },
 });
 </code></pre>
 <h2>Tracked Entity API</h2>
 <h4>Create a new tracked entity instance and enroll them from a CommCare form submission.</h4>
 <pre class="prettyprint source lang-js"><code>createTEI({
-  &quot;trackedEntityType&quot;: &quot;nEenWmSyUEp&quot;,
-  &quot;orgUnit&quot;: &quot;g8upMTyEZGZ&quot;,
-  &quot;attributes&quot;: [
+  trackedEntityType: 'nEenWmSyUEp',
+  orgUnit: 'g8upMTyEZGZ',
+  attributes: [
     {
-      &quot;attribute&quot;: &quot;w75KJ2mc4zz&quot;,
-      &quot;value&quot;: dataValue(&quot;form.first_name&quot;)(state)
+      attribute: 'w75KJ2mc4zz',
+      value: dataValue('form.first_name')(state),
     },
     {
-      &quot;attribute&quot;: &quot;zDhUuAYrxNC&quot;,
-      &quot;value&quot;: dataValue(&quot;form.last_name&quot;)(state)
-    }
+      attribute: 'zDhUuAYrxNC',
+      value: dataValue('form.last_name')(state),
+    },
   ],
-  &quot;enrollments&quot;: [
+  enrollments: [
     {
-        &quot;orgUnit&quot;: &quot;g8upMTyEZGZ&quot;,
-        &quot;program&quot;: &quot;IpHINAT79UW&quot;,
-        &quot;enrollmentDate&quot;: &quot;2019-04-08&quot;,
-        &quot;incidentDate&quot;: &quot;2019-04-08&quot;
-     }
-   ]
+      orgUnit: 'g8upMTyEZGZ',
+      program: 'IpHINAT79UW',
+      enrollmentDate: '2019-04-08',
+      incidentDate: '2019-04-08',
+    },
+  ],
 });
+</code></pre>
+<h4>Upsert a tracked entity instance from a CommCare form submission.</h4>
+<pre class="prettyprint source lang-js"><code>upsertTEI(
+  'w75KJ2mc4zz', // match on 'patientID', a custom external ID in dhis2
+  {
+    trackedEntityType: 'nEenWmSyUEp',
+    orgUnit: 'g8upMTyEZGZ',
+    attributes: [
+      {
+        attribute: 'w75KJ2mc4zz',
+        value: dataValue('form.first_name')(state),
+      },
+      {
+        attribute: 'zDhUuAYrxNC',
+        value: dataValue('form.last_name')(state),
+      },
+    ],
+  }
+);
 </code></pre>
 <h2>Events API</h2>
 <h4><code>Events API</code> expression</h4>
@@ -124,24 +146,24 @@ the <a href="http://dhis2.github.io/dhis2-docs/master/en/developer/html/dhis2_de
   fields: {
     orgUnit: 'DiszpKrYNg8',
     program: 'eBAyeGv0exc',
-    endDate: '2016-01-01'
+    endDate: '2016-01-01',
   },
-  postUrl: &quot;https://www.openfn.org/inbox/123&quot;
-})
+  postUrl: 'https://www.openfn.org/inbox/123',
+});
 </code></pre>
 <h4>Reference on how to query and read events https://docs.dhis2.org/2.22/en/developer/html/ch01s15.html#d5e1994</h4>
 <h2>Data Values / Data Value Sets API</h2>
 <h4>Current <code>DataValueSets API</code> expression</h4>
 <pre class="prettyprint source lang-js"><code>dataValueSet({
-  dataSet: dataValue(&quot;set&quot;),
-  orgUnit: &quot;DiszpKrYNg8&quot;,
-  period: &quot;201402&quot;,
-  completeData: &quot;2014-03-03&quot;,
+  dataSet: dataValue('set'),
+  orgUnit: 'DiszpKrYNg8',
+  period: '201402',
+  completeData: '2014-03-03',
   dataValues: [
-    dataElement(&quot;f7n9E0hX8qk&quot;, dataValue(&quot;data[0].site_school_number&quot;)),
-    dataElement(&quot;Ix2HsbDMLea&quot;, dataValue(&quot;age&quot;)),
-    dataElement(&quot;eY5ehpbEsB7&quot;, 30)
-  ]
+    dataElement('f7n9E0hX8qk', dataValue('data[0].site_school_number')),
+    dataElement('Ix2HsbDMLea', dataValue('age')),
+    dataElement('eY5ehpbEsB7', 30),
+  ],
 });
 </code></pre>
 <h4>Current <code>fetchData API</code> expression (Optional <code>postUrl</code> for a complete fetch)</h4>
@@ -149,10 +171,10 @@ the <a href="http://dhis2.github.io/dhis2-docs/master/en/developer/html/dhis2_de
   fields: {
     dataSet: 'pBOMPrpg1QX',
     orgUnit: 'DiszpKrYNg8',
-    period: '201711'
+    period: '201711',
   },
-  postUrl: &quot;https://www.openfn.org/inbox/123&quot;
-})
+  postUrl: 'https://www.openfn.org/inbox/123',
+});
 </code></pre>
 <h4>Reference on how to read data values https://docs.dhis2.org/2.22/en/developer/html/ch01s13.html#d5e1642</h4>
 <p><a href="docs/index">Docs</a></p>
@@ -176,7 +198,7 @@ the <a href="http://dhis2.github.io/dhis2-docs/master/en/developer/html/dhis2_de
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Mon Dec 14 2020 11:14:52 GMT-0500 (Eastern Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Mon Dec 14 2020 11:22:43 GMT-0500 (Eastern Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>
