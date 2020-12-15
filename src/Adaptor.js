@@ -1,7 +1,6 @@
 /** @module Adaptor */
 import axios from 'axios';
 import { execute as commonExecute, expandReferences } from 'language-common';
-import { mapValues } from 'lodash/fp';
 
 import {
   Log,
@@ -11,10 +10,8 @@ import {
   logWaitingForServer,
   buildUrl,
   logApiVersion,
-  applyFilter,
-  parseFilter,
-  CONTENT_TYPES,
-  requestHttpHead,
+  handleResponse,
+  getApiResources,
 } from './Utils';
 
 /**
@@ -64,19 +61,19 @@ function configMigrationHelper(state) {
   return state;
 }
 
-function expandDataValues(obj) {
-  return state => {
-    return mapValues(function (value) {
-      if (typeof value == 'object') {
-        return value.map(item => {
-          return expandDataValues(item)(state);
-        });
-      } else {
-        return typeof value == 'function' ? value(state) : value;
-      }
-    })(obj);
-  };
-}
+// function expandDataValues(obj) {
+//   return state => {
+//     return mapValues(function (value) {
+//       if (typeof value == 'object') {
+//         return value.map(item => {
+//           return expandDataValues(item)(state);
+//         });
+//       } else {
+//         return typeof value == 'function' ? value(state) : value;
+//       }
+//     })(obj);
+//   };
+// }
 
 axios.interceptors.response.use(
   function (response) {
@@ -284,64 +281,52 @@ export function discover(operation, resourceType) {
 }
 
 /**
- * Get DHIS2 resources
- * @param {Object} params - The optional query parameters for this endpoint.
- * @param {string} params.filter - The optional filter parameter, specifiying the filter expression.
- * @param {Object} options - The optional flags to control behavior of function
+ * Get DHIS2 api resources
+ * @param {Object} params - The optional query parameters for this endpoint. E.g `{filter: 'singular:like:attribute'}`
+ * @param {string} params.filter - The optional filter parameter, specifiying the filter expression. E.g. `singular:eq:attribute`
+ * @param {string} responseType - The optional response type. Defaults to `json`
+ * @param {Object} options - The optional flags to control behavior of function. E.g `{supportApiVersion: true}`
  * @param {boolean} options.supportApiVersion - The optional flag, only set to `true` if endpoint supports use of api versions in url. Defaults to `false`
  * @param {Function} callback - The optional function that will be called to handle data returned by this function. Defaults to `state.data`
  */
-export function getResources(params, options, callback) {
+export function getResources(params, responseType, options, callback) {
   return state => {
     const { username, password } = state.configuration;
 
-    const { filter } = params;
+    const { hostUrl, apiVersion } = state.configuration;
 
-    const url = buildUrl(getResources, null, state.configuration, options);
+    const supportApiVersion = options?.supportApiVersion;
 
-    logApiVersion(state.configuration, options);
+    const auth = {
+      username,
+      password,
+    };
 
-    logWaitingForServer(url, params);
+    const queryParams = expandReferences(params)(state);
 
-    warnExpectLargeResult(params, url);
+    const path = '/resources';
 
-    return axios
-      .request({
-        method: 'GET',
-        url,
-        auth: {
-          username,
-          password,
-        },
-        responseType: 'json',
-        transformResponse: [
-          function (data, headers) {
-            if (
-              headers['content-type']?.split(';')[0] ??
-              null === CONTENT_TYPES.JSON
-            ) {
-              let tempData = JSON.parse(data);
-              return {
-                ...tempData,
-                resources: applyFilter(
-                  tempData.resources,
-                  ...parseFilter(filter)
-                ),
-              };
-            }
-            return data;
-          },
-        ],
-      })
-      .then(result => {
-        Log.info(
-          composeSuccessMessage(getResources, null, params, options, callback)
-        );
+    const url = buildUrl(path, hostUrl, apiVersion, supportApiVersion);
 
-        if (callback) return callback(composeNextState(state, result));
-
-        return composeNextState(state, result);
-      });
+    return getApiResources(
+      url,
+      responseType,
+      auth,
+      queryParams,
+      state.configuration,
+      options
+    ).then(result => {
+      Log.info(
+        composeSuccessMessage(
+          'getResources',
+          null,
+          queryParams,
+          options,
+          callback
+        )
+      );
+      return handleResponse(result, state);
+    });
   };
 }
 
@@ -356,11 +341,13 @@ export function getSchema(resourceType, params, options, callback) {
   return state => {
     const { username, password } = state.configuration;
 
+    const queryParams = expandReferences(params)(state);
+
     const url = buildUrl(getSchema, resourceType, state.configuration, options);
 
     logApiVersion(state.configuration, options);
 
-    logWaitingForServer(url, params);
+    logWaitingForServer(url, queryParams);
 
     warnExpectLargeResult(resourceType, url);
 
@@ -372,22 +359,19 @@ export function getSchema(resourceType, params, options, callback) {
           username,
           password,
         },
-        params,
+        params: queryParams,
       })
       .then(result => {
         Log.info(
           composeSuccessMessage(
             getSchema,
             resourceType,
-            params,
+            queryParams,
             options,
             callback
           )
         );
-
-        if (callback) return callback(composeNextState(state, result));
-
-        return composeNextState(state, result);
+        handleResponse(result, state);
       });
   };
 }
@@ -418,11 +402,13 @@ export function getData(resourceType, params, options, callback) {
   return state => {
     const { username, password } = state.configuration;
 
+    const queryParams = expandReferences(params)(state);
+
     const url = buildUrl(getData, resourceType, state.configuration, options);
 
     logApiVersion(state.configuration, options);
 
-    logWaitingForServer(url, params);
+    logWaitingForServer(url, queryParams);
 
     warnExpectLargeResult(resourceType, url);
 
@@ -434,14 +420,14 @@ export function getData(resourceType, params, options, callback) {
           username,
           password,
         },
-        params,
+        params: queryParams,
       })
       .then(result => {
         Log.info(
           composeSuccessMessage(
             getData,
             resourceType,
-            params,
+            queryParams,
             options,
             callback
           )
@@ -476,7 +462,7 @@ export function getMetadata(resources, params, options, callback) {
   return state => {
     const { username, password } = state.configuration;
 
-    const queryParams = expandDataValues({ ...resources, ...params })(state);
+    const queryParams = expandReferences({ ...resources, ...params })(state);
 
     const url = buildUrl(getMetadata, resources, state.configuration, options);
 
@@ -514,8 +500,49 @@ export function getMetadata(resources, params, options, callback) {
   };
 }
 
-export function postData(resourceType, data, params, options) {
-  return state;
+export function postData(resourceType, data, params, options, callback) {
+  return state => {
+    const { username, password } = state.configuration;
+
+    const queryParams = expandReferences(params)(state);
+
+    const payload = expandReferences(data);
+
+    const url = buildUrl(postData, resourceType, state.configuration, options);
+
+    logApiVersion(state.configuration, options);
+
+    logWaitingForServer(url, queryParams);
+
+    warnExpectLargeResult(resourceType, url);
+
+    return axios
+      .request({
+        method: 'POST',
+        url,
+        auth: {
+          username,
+          password,
+        },
+        params: queryParams,
+        data: payload,
+      })
+      .then(result => {
+        Log.info(
+          composeSuccessMessage(
+            getMetadata,
+            resources,
+            queryParams,
+            options,
+            callback
+          )
+        );
+
+        if (callback) return callback(composeNextState(state, result));
+
+        return composeNextState(state, result);
+      });
+  };
 }
 export function postMetadata(resourceType, data, params, options) {
   return state;

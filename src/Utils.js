@@ -1,5 +1,42 @@
 import { eq, filter, some, isEmpty } from 'lodash';
-import axios from 'axios';
+import { get } from './Client';
+
+export function getApiResources(
+  url,
+  responseType,
+  auth,
+  params,
+  configuration,
+  options
+) {
+  const filter = params?.filter;
+
+  const transformResponse = function (data, headers) {
+    if (filter) {
+      if (
+        headers['content-type']?.split(';')[0] ??
+        null === CONTENT_TYPES.JSON
+      ) {
+        let tempData = JSON.parse(data);
+        return {
+          ...tempData,
+          resources: applyFilter(tempData.resources, ...parseFilter(filter)),
+        };
+      }
+    }
+    return JSON.parse(data);
+  };
+
+  logApiVersion(configuration, options);
+
+  logWaitingForServer(url, params);
+
+  warnExpectLargeResult(params, url);
+
+  return get({ url, auth, responseType, transformResponse }).then(
+    result => result
+  );
+}
 
 /**
  * TODO
@@ -124,11 +161,17 @@ export class Log {
  * Compose success message
  */
 
-export function composeSuccessMessage(func, ...args) {
-  return `${func?.name}('${JSON.stringify(args[0] ?? null)}', ${JSON.stringify(
-    args[1] ?? null
-  )}, ${JSON.stringify(args[2] ?? null)}, ${
-    isEmpty(args[3]?.name ?? '-unused-') ? '(state)=>{}' : args[3]?.name
+export function composeSuccessMessage(
+  operation,
+  responseType,
+  params,
+  options,
+  callback
+) {
+  return `${operation}('${responseType ?? ''}', ${JSON.stringify(
+    params ?? null
+  )}, ${JSON.stringify(options ?? '')}, ${
+    isEmpty(callback ?? '-unused-') ? '(state)=>{}' : callback
   }) succeeded. The body of this result will be available in state.data or in your callback.`;
 }
 
@@ -174,6 +217,60 @@ export function requestHttpHead(endpointUrl, { username, password }) {
     })
     .then(result => result.headers['content-length']);
 }
+/***
+ * Validate payload against schema
+ * @example
+ * POST /api/schemas/constant
+{ payload }
+A simple (non-validating) example would be:
+
+curl -X POST -d "{\"name\": \"some name\"}" -H "Content-Type: application/json" 
+-u admin:district https://play.dhis2.org/dev/api/schemas/dataElement
+Which would yield the result:
+
+[
+   {
+      "message" : "Required property missing.",
+      "property" : "type"
+   },
+   {
+      "property" : "aggregationOperator",
+      "message" : "Required property missing."
+   },
+   {
+      "property" : "domainType",
+      "message" : "Required property missing."
+   },
+   {
+      "property" : "shortName",
+      "message" : "Required property missing."
+   }
+]
+ */
+export function validateMetadataPayload(payload, resourceType) {
+  return axios
+    .request({
+      method: 'POST',
+      url: `https://play.dhis2.org/dev/api/schemas/${resourceType}`,
+      auth: {
+        username: 'admin',
+        password: 'distict',
+      },
+      data: payload,
+    })
+    .then(result => result.data);
+}
+
+/**
+ * Handle http response
+ * @param {*} url
+ * @param {*} params
+ */
+export function handleResponse(result, state, callback) {
+  if (callback) return callback(composeNextState(state, result));
+
+  return composeNextState(state, result);
+}
 
 /**
  * Inform user, you are waiting for the server to respond on a given url with params
@@ -182,40 +279,21 @@ export function requestHttpHead(endpointUrl, { username, password }) {
 export function logWaitingForServer(url, params) {
   Log.info(`url ${url}`);
   Log.info(`params ${prettyJson(params)}`);
-  Log.info(`Waiting for server response on ${url}...`);
+  Log.info(`Waiting for server response on ${url} ...`);
 }
 
 /**
  * Build url for a given operation
  */
-export function buildUrl(operation, resourceType, configuration, options) {
-  let pathSuffix = '';
+export function buildUrl(path, hostUrl, apiVersion, supportApiVersion) {
+  const useApiVersion = supportApiVersion ?? false;
 
-  switch (operation?.name) {
-    case 'getSchema':
-      pathSuffix = `schemas/${resourceType}`;
-      break;
-    case 'getResources':
-      pathSuffix = `resources`;
-      break;
-    case 'getData':
-      pathSuffix = resourceType;
-      break;
-    case 'getMetadata':
-      pathSuffix = `metadata`;
-    default:
-  }
+  const pathSuffix =
+    useApiVersion === true
+      ? `${apiVersion ?? 'api_version_missing'}${path}`
+      : `${path}`;
 
-  const { hostUrl, apiVersion } = configuration;
-
-  const supportApiVersion = options?.supportApiVersion ?? false;
-
-  const path =
-    supportApiVersion === true
-      ? `${apiVersion ?? 'api_version_missing'}/${pathSuffix}`
-      : `${pathSuffix}`;
-
-  const url = hostUrl + '/api/' + path;
+  const url = hostUrl + '/api' + pathSuffix;
 
   return url;
 }
