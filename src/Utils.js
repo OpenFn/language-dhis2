@@ -139,11 +139,18 @@ export function getSchema(resourceType, params, options, callback) {
  */
 export function getData(resourceType, params, options, callback) {
   return state => {
-    const { username, password } = state.configuration;
+    const { username, password, hostUrl, apiVersion } = state.configuration;
 
     const queryParams = expandReferences(params)(state);
 
-    const url = buildUrl(getData, resourceType, state.configuration, options);
+    const useApiVersion = options?.supportApiVersion;
+
+    const url = buildUrl(
+      `/${resourceType}`,
+      hostUrl,
+      apiVersion,
+      useApiVersion
+    );
 
     logApiVersion(state.configuration, options);
 
@@ -164,17 +171,14 @@ export function getData(resourceType, params, options, callback) {
       .then(result => {
         Log.info(
           composeSuccessMessage(
-            getData,
+            'getData',
             resourceType,
             queryParams,
             options,
             callback
           )
         );
-
-        if (callback) return callback(composeNextState(state, result));
-
-        return composeNextState(state, result);
+        return handleResponse(result, state);
       });
   };
 }
@@ -199,11 +203,13 @@ export function getData(resourceType, params, options, callback) {
  */
 export function getMetadata(resources, params, options, callback) {
   return state => {
-    const { username, password } = state.configuration;
+    const { username, password, hostUrl, apiVersion } = state.configuration;
 
     const queryParams = expandReferences({ ...resources, ...params })(state);
 
-    const url = buildUrl(getMetadata, resources, state.configuration, options);
+    const useApiVersion = options?.supportApiVersion;
+
+    const url = buildUrl('/metadata', hostUrl, apiVersion, useApiVersion);
 
     logApiVersion(state.configuration, options);
 
@@ -224,17 +230,14 @@ export function getMetadata(resources, params, options, callback) {
       .then(result => {
         Log.info(
           composeSuccessMessage(
-            getMetadata,
+            'getMetadata',
             resources,
             queryParams,
             options,
             callback
           )
         );
-
-        if (callback) return callback(composeNextState(state, result));
-
-        return composeNextState(state, result);
+        return handleResponse(result, state);
       });
   };
 }
