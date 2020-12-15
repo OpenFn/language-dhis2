@@ -191,7 +191,7 @@ export function getData(resourceType, params, options, callback) {
  * @param {*} callback 
  * @example
  * getMetadata(
-  'attributes',
+  {attributes: true, organisationUnits: true},
   {
     fields: '*',
     // filter: 'id:eq:PWxgadk4sCG',

@@ -273,9 +273,7 @@ export function discover(operation, resourceType) {
  */
 export function getResources(params, responseType, options, callback) {
   return state => {
-    const { username, password } = state.configuration;
-
-    const { hostUrl, apiVersion } = state.configuration;
+    const { username, password, hostUrl, apiVersion } = state.configuration;
 
     const supportApiVersion = options?.supportApiVersion;
 
