@@ -1,5 +1,5 @@
 import { eq, filter, some, isEmpty } from 'lodash';
-import { get } from './Client';
+import { req } from './Client';
 
 export function getApiResources(
   url,
@@ -24,7 +24,7 @@ export function getApiResources(
         };
       }
     }
-    return JSON.parse(data);
+    return data;
   };
 
   logApiVersion(configuration, options);
@@ -33,9 +33,7 @@ export function getApiResources(
 
   warnExpectLargeResult(params, url);
 
-  return get({ url, auth, responseType, transformResponse }).then(
-    result => result
-  );
+  return req({ url, auth, responseType, transformResponse });
 }
 
 /**
@@ -218,14 +216,11 @@ export function requestHttpHead(endpointUrl, { username, password }) {
     .then(result => result.headers['content-length']);
 }
 /***
- * Validate payload against schema
+ * Manually validate payload against schema
  * @example
- * POST /api/schemas/constant
-{ payload }
+ *
 A simple (non-validating) example would be:
-
-curl -X POST -d "{\"name\": \"some name\"}" -H "Content-Type: application/json" 
--u admin:district https://play.dhis2.org/dev/api/schemas/dataElement
+validateMetadataPayload({name: "some name"}, 'dataElement')
 Which would yield the result:
 
 [
@@ -368,33 +363,7 @@ export const CONTENT_TYPES = {
   XLS: 'application/vnd.ms-excel',
 };
 
-/**
- * The following query parameters are available for customizing your request.
- * Replace with : curl 'https://dhis2.github.io/dhis2-api-specification/spec/metadata_openapi.json' \
-  // -H 'Accept: application/json,*/
-// -H 'Referer: https://dhis2.github.io/dhis2-api-specification/swagger-ui/' \
-// -H 'User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36' \
-// --compressed
-
-/**
- * To filter the metadata there are several filter operations that can be applied to the returned list of
- *  metadata.
- *  The format of the filter itself is straight-forward and follows the pattern property:operator:value,
- *  where property is the property on the metadata you want to filter on, operator is the
- * comparison operator you want to perform and value is the value to check
- * against (not all operators require value).
- *  Please see the schema , by running getSchema(), to discover which properties are available.
- *  Recursive filtering, ie. filtering on associated objects or collection of objects, are supported as
- *  well.
- *
- * Operators will be applied as logical and query, if you need a or query, use `in` operator.
- * The filtering mechanism allows for recursion.
- * 
- * You can do filtering within collections, e.g. 
- * to get data elements which are members of the "ANC" data element group you can use the following
- *  query using the id property of the associated data element groups:
-/api/26/dataElements.json?filter=dataElementGroups.id:eq:qfxEYY9xAl6
- * 
+/* 
  * The default logical operator applied to the filters are AND which means that all object filters must 
  * be matched. 
  * There are however cases where you want to match on one of several filters (maybe id and code field)

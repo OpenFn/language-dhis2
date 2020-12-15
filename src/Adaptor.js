@@ -75,24 +75,6 @@ function configMigrationHelper(state) {
 //   };
 // }
 
-axios.interceptors.response.use(
-  function (response) {
-    // TODO Cleanup sensitive info
-    return response;
-  },
-  function (error) {
-    // TODO Cleanup sensitive info
-    Log.error(`${error?.message}`);
-    return Promise.reject({
-      status: error?.response?.status,
-      message: error?.message,
-      url: error?.response?.config?.url,
-      responseData: error?.response?.data,
-      isAxiosError: error?.isAxiosError,
-    });
-  }
-);
-
 /**
  * Create or update one or many new Tracked Entity Instances
  * @public
@@ -310,7 +292,7 @@ export function getResources(params, responseType, options, callback) {
 
     return getApiResources(
       url,
-      responseType,
+      responseType ?? 'json',
       auth,
       queryParams,
       state.configuration,
