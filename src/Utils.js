@@ -45,6 +45,49 @@ export function warnExpectLargeResult(paramOrResourceType, endpointUrl) {
 }
 
 /**
+ * Inform user, you are waiting for the server to respond on a given url with params
+ *
+ */
+export function logWaitingForServer(url, params) {
+  Log.info(`url ${COLORS.FgGreen}${url}\x1b[0m`);
+  Log.info(`params ${prettyJson(params)}`);
+  Log.info(`Waiting for server response on ${url} ...`);
+}
+
+/**
+ * Log api version
+ */
+export function logApiVersion(configuration, options) {
+  const { apiVersion } = configuration;
+
+  const supportApiVersion = options?.supportApiVersion ?? false;
+
+  const message =
+    supportApiVersion === true && apiVersion
+      ? `Using DHIS2 api version \x1b[33m ${apiVersion}\x1b[0m`
+      : '\x1b[33m Attempting to use apiVersion without providing it in state.configuration\x1b[0m. You may encounter errors.\x1b[33m api_version_missing\x1b[0m. If `supportApiVersion = true` in the `options` parameter, then you need to set `apiVersion` in state.configuration.';
+
+  if (supportApiVersion === true) Log.warn(message);
+  else Log.warn(`Using \x1b[33m latest \x1b[0m version of DHIS2 api.`);
+}
+
+/**
+ * Build url for a given operation
+ */
+export function buildUrl(path, hostUrl, apiVersion, supportApiVersion) {
+  const useApiVersion = supportApiVersion ?? false;
+
+  const pathSuffix =
+    useApiVersion === true
+      ? `${apiVersion ?? 'api_version_missing'}${path}`
+      : `${path}`;
+
+  const url = hostUrl + '/api' + pathSuffix;
+
+  return url;
+}
+
+/**
  * Send a HEAD request to read Content-Length header to check the file size before we can send
  * the actual request
  * This will give us a sense of how big the result would be and warn the user, accordingly
@@ -115,16 +158,6 @@ export function handleResponse(result, state, callback) {
 }
 
 /**
- * Inform user, you are waiting for the server to respond on a given url with params
- *
- */
-export function logWaitingForServer(url, params) {
-  Log.info(`url ${url}`);
-  Log.info(`params ${prettyJson(params)}`);
-  Log.info(`Waiting for server response on ${url} ...`);
-}
-
-/**
  * TODO
  *
  * Create a DHIS2 UID-Useful for client generated Ids compatible with DHIS2
@@ -157,6 +190,44 @@ export function prettyJson(data) {
 }
 
 /**
+ * Colors
+ */
+/*
+  * For example, \x1b[31m is an escape sequence that will be intercepted by the terminal 
+    and instructs it to switch to the red color. 
+    In fact, \x1b is the code for the non-printable control character escape. 
+    Escape sequences dealing only with colors and styles are also known as ANSI escape code(https://en.wikipedia.org/wiki/ANSI_escape_code#Colors) 
+    and are standardized, so therefore they (should) work on any platform
+  */
+const COLORS = {
+  Reset: '\x1b[0m',
+  Bright: '\x1b[1m',
+  Dim: '\x1b[2m',
+  Underscore: '\x1b[4m',
+  Blink: '\x1b[5m',
+  Reverse: '\x1b[7m',
+  Hidden: '\x1b[8m',
+
+  FgBlack: '\x1b[30m',
+  FgRed: '\x1b[31m',
+  FgGreen: '\x1b[32m',
+  FgYellow: '\x1b[33m',
+  FgBlue: '\x1b[34m',
+  FgMagenta: '\x1b[35m',
+  FgCyan: '\x1b[36m',
+  FgWhite: '\x1b[37m',
+
+  BgBlack: '\x1b[40m',
+  BgRed: '\x1b[41m',
+  BgGreen: '\x1b[42m',
+  BgYellow: '\x1b[43m',
+  BgBlue: '\x1b[44m',
+  BgMagenta: '\x1b[45m',
+  BgCyan: '\x1b[46m',
+  BgWhite: '\x1b[47m',
+};
+
+/**
  * Custom logger with timestamps and colors
  *
  */
@@ -166,40 +237,6 @@ export class Log {
     WARN: 'WARN',
     ERROR: 'ERROR',
   };
-  /*
-  * For example, \x1b[31m is an escape sequence that will be intercepted by the terminal 
-    and instructs it to switch to the red color. 
-    In fact, \x1b is the code for the non-printable control character escape. 
-    Escape sequences dealing only with colors and styles are also known as ANSI escape code(https://en.wikipedia.org/wiki/ANSI_escape_code#Colors) 
-    and are standardized, so therefore they (should) work on any platform
-  */
-  static #COLORS = {
-    Reset: '\x1b[0m',
-    Bright: '\x1b[1m',
-    Dim: '\x1b[2m',
-    Underscore: '\x1b[4m',
-    Blink: '\x1b[5m',
-    Reverse: '\x1b[7m',
-    Hidden: '\x1b[8m',
-
-    FgBlack: '\x1b[30m',
-    FgRed: '\x1b[31m',
-    FgGreen: '\x1b[32m',
-    FgYellow: '\x1b[33m',
-    FgBlue: '\x1b[34m',
-    FgMagenta: '\x1b[35m',
-    FgCyan: '\x1b[36m',
-    FgWhite: '\x1b[37m',
-
-    BgBlack: '\x1b[40m',
-    BgRed: '\x1b[41m',
-    BgGreen: '\x1b[42m',
-    BgYellow: '\x1b[43m',
-    BgBlue: '\x1b[44m',
-    BgMagenta: '\x1b[45m',
-    BgCyan: '\x1b[46m',
-    BgWhite: '\x1b[47m',
-  };
 
   static #MAIN_TAG = 'openfn';
 
@@ -208,7 +245,7 @@ export class Log {
       case Log.#OPTIONS.WARN:
         console.warn(
           `${Log.#MAIN_TAG} ${
-            Log.#COLORS.FgYellow
+            COLORS.FgYellow
           }%s\x1b[0m ${new Date()}\n ${message}`,
           Log.#OPTIONS.WARN
         );
@@ -216,7 +253,7 @@ export class Log {
       case Log.#OPTIONS.ERROR:
         console.error(
           `${Log.#MAIN_TAG} ${
-            Log.#COLORS.FgRed
+            COLORS.FgRed
           }%s\x1b[0m ${new Date()}\n ${message}`,
           Log.#OPTIONS.ERROR
         );
@@ -224,7 +261,7 @@ export class Log {
       default:
         console.info(
           `${Log.#MAIN_TAG} ${
-            Log.#COLORS.FgGreen
+            COLORS.FgGreen
           }%s\x1b[0m ${new Date()}\n ${message}`,
           Log.#OPTIONS.INFO
         );
@@ -240,39 +277,6 @@ export class Log {
   static error(message) {
     return Log.#printMessage(Log.#OPTIONS.ERROR, message);
   }
-}
-
-/**
- * Build url for a given operation
- */
-export function buildUrl(path, hostUrl, apiVersion, supportApiVersion) {
-  const useApiVersion = supportApiVersion ?? false;
-
-  const pathSuffix =
-    useApiVersion === true
-      ? `${apiVersion ?? 'api_version_missing'}${path}`
-      : `${path}`;
-
-  const url = hostUrl + '/api' + pathSuffix;
-
-  return url;
-}
-
-/**
- * Log api version
- */
-export function logApiVersion(configuration, options) {
-  const { apiVersion } = configuration;
-
-  const supportApiVersion = options?.supportApiVersion ?? false;
-
-  const message =
-    supportApiVersion === true && apiVersion
-      ? `Using DHIS2 api version \x1b[33m ${apiVersion}\x1b[0m`
-      : '\x1b[33m Attempting to use apiVersion without providing it in state.configuration\x1b[0m. You may encounter errors.\x1b[33m api_version_missing\x1b[0m. If `supportApiVersion = true` in the `options` parameter, then you need to set `apiVersion` in state.configuration.';
-
-  if (supportApiVersion === true) Log.warn(message);
-  else Log.warn(`Using \x1b[33m latest \x1b[0m version of DHIS2 api.`);
 }
 
 export function isLike(string, words) {

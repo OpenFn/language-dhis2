@@ -80,16 +80,18 @@ axios.interceptors.response.use(
       .split(';')[0]
       .split(',');
 
-    if (indexOf(acceptHeaders, contentType) === -1) {
-      const newError = {
-        status: 404,
-        message: 'Unexpected content,returned',
-        responseData: response.data,
-      };
+    if (response.config.method === 'get') {
+      if (indexOf(acceptHeaders, contentType) === -1) {
+        const newError = {
+          status: 404,
+          message: 'Unexpected content,returned',
+          responseData: response.data,
+        };
 
-      Log.error(newError.message);
+        Log.error(newError.message);
 
-      return Promise.reject(newError);
+        return Promise.reject(newError);
+      }
     }
 
     if (
@@ -372,11 +374,14 @@ export function getResources(params, responseType, options, callback) {
             callback
           )
         );
-        return {
+        const nextState = {
           ...state,
           data: result?.data,
           references: [...state?.references, result?.data],
         };
+        if (callback) return callback(nextState);
+
+        return nextState;
       });
   };
 }
@@ -384,16 +389,27 @@ export function getResources(params, responseType, options, callback) {
  *
  * @param {string} resourceType
  * @param {*} params
+ * @param {*} responseType
  * @param {*} options
  * @param {*} callback
  */
-export function getSchema(resourceType, params, options, callback) {
+export function getSchema(
+  resourceType,
+  params,
+  responseType,
+  options,
+  callback
+) {
   return state => {
     const { username, password, hostUrl, apiVersion } = state.configuration;
 
     const queryParams = expandReferences(params)(state);
 
     const useApiVersion = options?.supportApiVersion;
+
+    const headers = {
+      Accept: CONTENT_TYPES[responseType] ?? 'application/json',
+    };
 
     const url = buildUrl(
       `/schemas/${resourceType}`,
@@ -416,7 +432,9 @@ export function getSchema(resourceType, params, options, callback) {
           username,
           password,
         },
+        responseType,
         params: queryParams,
+        headers,
       })
       .then(result => {
         Log.info(
@@ -428,7 +446,14 @@ export function getSchema(resourceType, params, options, callback) {
             callback
           )
         );
-        return handleResponse(result, state);
+        const nextState = {
+          ...state,
+          data: result?.data,
+          references: [...state?.references, result?.data],
+        };
+        if (callback) return callback(nextState);
+
+        return nextState;
       });
   };
 }
@@ -455,13 +480,17 @@ export function getSchema(resourceType, params, options, callback) {
   }
 );
  */
-export function getData(resourceType, params, options, callback) {
+export function getData(resourceType, params, responseType, options, callback) {
   return state => {
     const { username, password, hostUrl, apiVersion } = state.configuration;
 
     const queryParams = expandReferences(params)(state);
 
     const useApiVersion = options?.supportApiVersion;
+
+    const headers = {
+      Accept: CONTENT_TYPES[responseType] ?? 'application/json',
+    };
 
     const url = buildUrl(
       `/${resourceType}`,
@@ -484,7 +513,9 @@ export function getData(resourceType, params, options, callback) {
           username,
           password,
         },
+        responseType,
         params: queryParams,
+        headers,
       })
       .then(result => {
         Log.info(
@@ -496,7 +527,14 @@ export function getData(resourceType, params, options, callback) {
             callback
           )
         );
-        return handleResponse(result, state);
+        const nextState = {
+          ...state,
+          data: result?.data,
+          references: [...state?.references, result?.data],
+        };
+        if (callback) return callback(nextState);
+
+        return nextState;
       });
   };
 }
@@ -519,13 +557,23 @@ export function getData(resourceType, params, options, callback) {
   }
 );
  */
-export function getMetadata(resources, params, options, callback) {
+export function getMetadata(
+  resources,
+  params,
+  responseType,
+  options,
+  callback
+) {
   return state => {
     const { username, password, hostUrl, apiVersion } = state.configuration;
 
     const queryParams = expandReferences({ ...resources, ...params })(state);
 
     const useApiVersion = options?.supportApiVersion;
+
+    const headers = {
+      Accept: CONTENT_TYPES[responseType] ?? 'application/json',
+    };
 
     const url = buildUrl('/metadata', hostUrl, apiVersion, useApiVersion);
 
@@ -543,7 +591,9 @@ export function getMetadata(resources, params, options, callback) {
           username,
           password,
         },
+        responseType,
         params: queryParams,
+        headers,
       })
       .then(result => {
         Log.info(
@@ -555,21 +605,37 @@ export function getMetadata(resources, params, options, callback) {
             callback
           )
         );
-        return handleResponse(result, state);
+        const nextState = {
+          ...state,
+          data: result?.data,
+          references: [...state?.references, result?.data],
+        };
+        if (callback) return callback(nextState);
+
+        return nextState;
       });
   };
 }
 
 export function postData(resourceType, data, params, options, callback) {
   return state => {
-    const { username, password } = state.configuration;
+    const { username, password, hostUrl, apiVersion } = state.configuration;
 
     const queryParams = expandReferences(params)(state);
 
-    const payload = expandReferences(data);
+    // const payload = expandReferences(data);
+    const payload = data;
 
-    const url = buildUrl(postData, resourceType, state.configuration, options);
+    const useApiVersion = options?.supportApiVersion;
 
+    const url = buildUrl(
+      '/' + resourceType,
+      hostUrl,
+      apiVersion,
+      useApiVersion
+    );
+
+    console.log(`${JSON.stringify(payload)}`);
     logApiVersion(state.configuration, options);
 
     logWaitingForServer(url, queryParams);
@@ -590,17 +656,21 @@ export function postData(resourceType, data, params, options, callback) {
       .then(result => {
         Log.info(
           composeSuccessMessage(
-            getMetadata,
-            resources,
+            'postData',
+            resourceType,
             queryParams,
             options,
             callback
           )
         );
+        const nextState = {
+          ...state,
+          data: result?.data,
+          references: [...state?.references, result?.data],
+        };
+        if (callback) return callback(nextState);
 
-        if (callback) return callback(composeNextState(state, result));
-
-        return composeNextState(state, result);
+        return nextState;
       });
   };
 }
