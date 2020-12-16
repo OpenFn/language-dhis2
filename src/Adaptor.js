@@ -1,6 +1,7 @@
 /** @module Adaptor */
 import axios from 'axios';
 import { execute as commonExecute, expandReferences } from 'language-common';
+import { indexOf } from 'lodash';
 
 import {
   Log,
@@ -11,7 +12,10 @@ import {
   buildUrl,
   logApiVersion,
   handleResponse,
-  getApiResources,
+  prettyJson,
+  CONTENT_TYPES,
+  applyFilter,
+  parseFilter,
 } from './Utils';
 
 /**
@@ -61,19 +65,57 @@ function configMigrationHelper(state) {
   return state;
 }
 
-// function expandDataValues(obj) {
-//   return state => {
-//     return mapValues(function (value) {
-//       if (typeof value == 'object') {
-//         return value.map(item => {
-//           return expandDataValues(item)(state);
-//         });
-//       } else {
-//         return typeof value == 'function' ? value(state) : value;
-//       }
-//     })(obj);
-//   };
-// }
+/**
+ * Axios response interceptor
+ * Intercepts every response, checks if the content type received is same as we send, the reject.
+ * We reject if response type differs from request's accept type because DHIS2 server sends us
+ * html pages when a wrong url is sent other than the one with /api
+ * We also parse response.data because sometimes we receive text data
+ */
+axios.interceptors.response.use(
+  function (response) {
+    const contentType = response.headers['content-type']?.split(';')[0];
+
+    const acceptHeaders = response.config.headers['Accept']
+      .split(';')[0]
+      .split(',');
+
+    if (indexOf(acceptHeaders, contentType) === -1) {
+      const newError = {
+        status: 404,
+        message: 'Unexpected content,returned',
+        responseData: response.data,
+      };
+
+      Log.error(newError.message);
+
+      return Promise.reject(newError);
+    }
+
+    if (
+      typeof response?.data === 'string' &&
+      contentType === CONTENT_TYPES?.json
+    ) {
+      try {
+        response = { ...response, data: JSON.parse(response.data) };
+      } catch (error) {
+        /** Keep quiet */
+      }
+    }
+    return response;
+  },
+  function (error) {
+    Log.error(`${error?.message}`);
+    // {
+    //   status: error?.response?.status,
+    //   message: error?.message,
+    //   url: error?.response?.config?.url,
+    //   responseData: error?.response?.data,
+    //   isAxiosError: error?.isAxiosError,
+    // }
+    return Promise.reject(error);
+  }
+);
 
 /**
  * Create or update one or many new Tracked Entity Instances
@@ -277,37 +319,324 @@ export function getResources(params, responseType, options, callback) {
 
     const supportApiVersion = options?.supportApiVersion;
 
-    const auth = {
-      username,
-      password,
-    };
-
     const queryParams = expandReferences(params)(state);
+
+    const filter = params?.filter;
+
+    const headers = {
+      Accept: CONTENT_TYPES[responseType] ?? 'application/json',
+    };
 
     const path = '/resources';
 
     const url = buildUrl(path, hostUrl, apiVersion, supportApiVersion);
 
-    return getApiResources(
-      url,
-      responseType ?? 'json',
-      auth,
-      queryParams,
-      state.configuration,
-      options
-    ).then(result => {
-      Log.info(
-        composeSuccessMessage(
-          'getResources',
-          null,
-          queryParams,
-          options,
-          callback
-        )
-      );
-      return handleResponse(result, state);
-    });
+    const transformResponse = function (data, headers) {
+      if (filter) {
+        if (
+          headers['content-type']?.split(';')[0] ??
+          null === CONTENT_TYPES.json
+        ) {
+          let tempData = JSON.parse(data);
+          return {
+            ...tempData,
+            resources: applyFilter(tempData.resources, ...parseFilter(filter)),
+          };
+        }
+      }
+      return data;
+    };
+
+    logApiVersion(state.configuration, options);
+
+    logWaitingForServer(url, queryParams);
+
+    warnExpectLargeResult(queryParams, url);
+
+    return axios
+      .request({
+        url,
+        method: 'GET',
+        auth: { username, password },
+        responseType,
+        headers,
+        transformResponse,
+      })
+      .then(result => {
+        Log.info(
+          composeSuccessMessage(
+            'getResources',
+            null,
+            queryParams,
+            options,
+            callback
+          )
+        );
+        return {
+          ...state,
+          data: result?.data,
+          references: [...state?.references, result?.data],
+        };
+      });
   };
+}
+/**
+ *
+ * @param {string} resourceType
+ * @param {*} params
+ * @param {*} options
+ * @param {*} callback
+ */
+export function getSchema(resourceType, params, options, callback) {
+  return state => {
+    const { username, password, hostUrl, apiVersion } = state.configuration;
+
+    const queryParams = expandReferences(params)(state);
+
+    const useApiVersion = options?.supportApiVersion;
+
+    const url = buildUrl(
+      `/schemas/${resourceType}`,
+      hostUrl,
+      apiVersion,
+      useApiVersion
+    );
+
+    logApiVersion(state.configuration, options);
+
+    logWaitingForServer(url, queryParams);
+
+    warnExpectLargeResult(resourceType, url);
+
+    return axios
+      .request({
+        method: 'GET',
+        url,
+        auth: {
+          username,
+          password,
+        },
+        params: queryParams,
+      })
+      .then(result => {
+        Log.info(
+          composeSuccessMessage(
+            'getSchema',
+            resourceType,
+            queryParams,
+            options,
+            callback
+          )
+        );
+        return handleResponse(result, state);
+      });
+  };
+}
+
+/**
+ *
+ * @param {*} resourceType
+ * @param {*} params
+ * @param {*} options
+ * @example
+ * getData(
+ * 'trackedEntityInstances',
+ * {
+ *  fields: '*',
+    ou: 'DiszpKrYNg8',
+    entityType: 'nEenWmSyUEp',
+    // filter: 'id:eq:FQ2o8UBlcrS',
+    skipPaging: true,
+    async: true,
+    // filter: 'id:eq:PWxgadk4sCG',
+  },
+  {
+    includeSystem: false,
+  }
+);
+ */
+export function getData(resourceType, params, options, callback) {
+  return state => {
+    const { username, password, hostUrl, apiVersion } = state.configuration;
+
+    const queryParams = expandReferences(params)(state);
+
+    const useApiVersion = options?.supportApiVersion;
+
+    const url = buildUrl(
+      `/${resourceType}`,
+      hostUrl,
+      apiVersion,
+      useApiVersion
+    );
+
+    logApiVersion(state.configuration, options);
+
+    logWaitingForServer(url, queryParams);
+
+    warnExpectLargeResult(resourceType, url);
+
+    return axios
+      .request({
+        method: 'GET',
+        url,
+        auth: {
+          username,
+          password,
+        },
+        params: queryParams,
+      })
+      .then(result => {
+        Log.info(
+          composeSuccessMessage(
+            'getData',
+            resourceType,
+            queryParams,
+            options,
+            callback
+          )
+        );
+        return handleResponse(result, state);
+      });
+  };
+}
+
+/**
+ * Get metadata
+ * @param {*} resources 
+ * @param {*} params 
+ * @param {*} options 
+ * @param {*} callback 
+ * @example
+ * getMetadata(
+  {attributes: true, organisationUnits: true},
+  {
+    fields: '*',
+    // filter: 'id:eq:PWxgadk4sCG',
+  },
+  {
+    includeSystem: false,
+  }
+);
+ */
+export function getMetadata(resources, params, options, callback) {
+  return state => {
+    const { username, password, hostUrl, apiVersion } = state.configuration;
+
+    const queryParams = expandReferences({ ...resources, ...params })(state);
+
+    const useApiVersion = options?.supportApiVersion;
+
+    const url = buildUrl('/metadata', hostUrl, apiVersion, useApiVersion);
+
+    logApiVersion(state.configuration, options);
+
+    logWaitingForServer(url, queryParams);
+
+    warnExpectLargeResult(resources, url);
+
+    return axios
+      .request({
+        method: 'GET',
+        url,
+        auth: {
+          username,
+          password,
+        },
+        params: queryParams,
+      })
+      .then(result => {
+        Log.info(
+          composeSuccessMessage(
+            'getMetadata',
+            resources,
+            queryParams,
+            options,
+            callback
+          )
+        );
+        return handleResponse(result, state);
+      });
+  };
+}
+
+export function postData(resourceType, data, params, options, callback) {
+  return state => {
+    const { username, password } = state.configuration;
+
+    const queryParams = expandReferences(params)(state);
+
+    const payload = expandReferences(data);
+
+    const url = buildUrl(postData, resourceType, state.configuration, options);
+
+    logApiVersion(state.configuration, options);
+
+    logWaitingForServer(url, queryParams);
+
+    warnExpectLargeResult(resourceType, url);
+
+    return axios
+      .request({
+        method: 'POST',
+        url,
+        auth: {
+          username,
+          password,
+        },
+        params: queryParams,
+        data: payload,
+      })
+      .then(result => {
+        Log.info(
+          composeSuccessMessage(
+            getMetadata,
+            resources,
+            queryParams,
+            options,
+            callback
+          )
+        );
+
+        if (callback) return callback(composeNextState(state, result));
+
+        return composeNextState(state, result);
+      });
+  };
+}
+export function postMetadata(resourceType, data, params, options) {
+  return state;
+}
+
+export function upsertData(
+  resourceType,
+  uniqueAttribute,
+  data,
+  params,
+  options
+) {
+  return state;
+}
+export function upsertMetadata(
+  resourceType,
+  uniqueAttribute,
+  data,
+  params,
+  options
+) {
+  return state;
+}
+export function updateData(resourceType, query, data, params, options) {
+  return state;
+}
+export function updateMetadata(resourceType, query, data, params, options) {
+  return state;
+}
+export function deleteData(resourceType, query, params, options) {
+  return state;
+}
+export function deleteMetadata(resourceType, query, params, options) {
+  return state;
 }
 
 exports.axios = axios;
@@ -323,17 +652,3 @@ export {
   lastReferenceValue,
   alterState,
 } from 'language-common';
-
-export {
-  getSchema,
-  getData,
-  getMetadata,
-  postData,
-  postMetadata,
-  upsertData,
-  upsertMetadata,
-  updateData,
-  updateMetadata,
-  deleteData,
-  deleteMetadata,
-} from './Utils';
