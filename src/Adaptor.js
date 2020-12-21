@@ -617,7 +617,7 @@ export function getMetadata(
   };
 }
 
-export function postData(resourceType, data, params, options, callback) {
+export function post(resourceType, data, params, options, callback) {
   return state => {
     const { username, password, hostUrl, apiVersion } = state.configuration;
 
@@ -635,7 +635,6 @@ export function postData(resourceType, data, params, options, callback) {
       useApiVersion
     );
 
-    console.log(`${JSON.stringify(payload)}`);
     logApiVersion(state.configuration, options);
 
     logWaitingForServer(url, queryParams);
@@ -644,7 +643,7 @@ export function postData(resourceType, data, params, options, callback) {
 
     return axios
       .request({
-        method: 'POST',
+        method: 'post',
         url,
         auth: {
           username,
@@ -674,38 +673,20 @@ export function postData(resourceType, data, params, options, callback) {
       });
   };
 }
-export function postMetadata(resourceType, data, params, options) {
+
+export function update(resourceType, query, data, params, options) {
   return state;
 }
 
-export function upsertData(
-  resourceType,
-  uniqueAttribute,
-  data,
-  params,
-  options
-) {
+export function del(resourceType, query, params, options) {
   return state;
 }
-export function upsertMetadata(
-  resourceType,
-  uniqueAttribute,
-  data,
-  params,
-  options
-) {
+
+export function patch(resourceType, query, params, options) {
   return state;
 }
-export function updateData(resourceType, query, data, params, options) {
-  return state;
-}
-export function updateMetadata(resourceType, query, data, params, options) {
-  return state;
-}
-export function deleteData(resourceType, query, params, options) {
-  return state;
-}
-export function deleteMetadata(resourceType, query, params, options) {
+
+export function upsert(resourceType, uniqueAttribute, data, params, options) {
   return state;
 }
 
