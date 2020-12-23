@@ -311,8 +311,6 @@ export function discover(operation, resourceType) {
  * @param {Object} params - The optional query parameters for this endpoint. E.g `{filter: 'singular:like:attribute'}`
  * @param {string} params.filter - The optional filter parameter, specifiying the filter expression. E.g. `singular:eq:attribute`
  * @param {string} responseType - The optional response type. Defaults to `json`
- * @param {Object} options - The optional flags to control behavior of function. E.g `{supportApiVersion: true}`
- * @param {boolean} options.supportApiVersion - The optional flag, only set to `true` if endpoint supports use of api versions in url. Defaults to `false`
  * @param {Function} callback - The optional function that will be called to handle data returned by this function. Defaults to `state.data`
  * @example
  // 1. Get all api resources
@@ -321,7 +319,7 @@ export function discover(operation, resourceType) {
  // 2. Get an attribute resource in json
   getResources({filter: 'singular:eq:attribute'})
 
- // 3. Get organisation unit resource in XML format
+ // 3. Get organisation unit resource in XML format, with a callback
   getResources({ filter: 'singular:eq:organisationUnit' }, 'xml', state => {
     console.log('Response', state.data);
     return state;
@@ -332,7 +330,7 @@ export function discover(operation, resourceType) {
 
  // 4. Get all api resources in csv format
   getResources('','pdf')  
-  
+
  */
 export function getResources(params, responseType, callback) {
   return state => {
@@ -392,12 +390,36 @@ export function getResources(params, responseType, callback) {
 }
 
 /**
- *
+ * Get the schema of a given resource type, in any data format supported by DHIS2
+ * @typedef {Object<string, any>} VersionParam
+ * @property {Boolean} supportApiVersion
+ * @property {number} apiVersion
  * @param {string} resourceType
- * @param {*} params
- * @param {*} responseType
- * @param {*} options
- * @param {*} callback
+ * @param {Object} params
+ * @param {string} responseType - Defaults to `json`
+ * @param {VersionParam} options
+ * @param {Function} callback
+ * @returns
+ * @example
+ *
+ // 1. Get all schemas on the api, in json
+  getSchema();
+
+ // 2. Get Schema for Attribute resource in json
+  getSchema('attribute');
+
+ // 3. Get Schema for trackedEntityType in XML format
+  getSchema('trackedEntityType', '', 'xml');
+
+ // 4. Get all api schemas in csv format
+  getSchema('', '', 'csv');
+
+ // 4. Get Schema for trackedEntityType using a given api version(overriding apiVersion supplied in state.configuration), in json
+  getSchema('trackedEntityType', '', '', {supportApiVersion: true, apiVersion: 33});
+
+ // 5. Get Schema for organisationUnit in xml, with a callback
+  getSchema('organisationUnit', '', 'xml', '', (state)=>{console.log('state.data',state.data);return state;});
+ 
  */
 export function getSchema(
   resourceType,
@@ -407,24 +429,27 @@ export function getSchema(
   callback
 ) {
   return state => {
-    const { username, password, hostUrl, apiVersion } = state.configuration;
+    const { username, password, hostUrl } = state.configuration;
 
     const queryParams = expandReferences(params)(state);
 
-    const useApiVersion = options?.supportApiVersion;
+    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
+
+    const supportApiVersion =
+      options?.supportApiVersion ?? state.configuration.supportApiVersion;
 
     const headers = {
       Accept: CONTENT_TYPES[responseType] ?? 'application/json',
     };
 
     const url = buildUrl(
-      `/schemas/${resourceType}`,
+      `/schemas/${resourceType ?? ''}`,
       hostUrl,
       apiVersion,
-      useApiVersion
+      supportApiVersion
     );
 
-    logApiVersion(state.configuration, options);
+    logApiVersion(apiVersion, supportApiVersion);
 
     logWaitingForServer(url, queryParams);
 
@@ -451,34 +476,64 @@ export function getSchema(
 }
 
 /**
- *
- * @param {*} resourceType
- * @param {*} params
- * @param {*} options
+ * A generic helper method for getting data of any kind from DHIS2. This can be used to get `DataValueSets`,`events`,`trackedEntityInstances`,`etc.`
+ * @param {string} resourceType
+ * @param {Obejct} params
+ * @param {string} responseType
+ * @param {Object} options
+ * @param {Function} callback
  * @example
- * getData(
- * 'trackedEntityInstances',
- * {
- *  fields: '*',
-    ou: 'DiszpKrYNg8',
-    entityType: 'nEenWmSyUEp',
-    // filter: 'id:eq:FQ2o8UBlcrS',
-    skipPaging: true,
-    async: true,
-    // filter: 'id:eq:PWxgadk4sCG',
-  },
+  // 1. Example Getting Tracked Entity Instances: Get a list of trackedEntityInstances of type `Person`, in json, for a given `orgUnit`, leaving out `system info` from the `result body`
+    getData(
+    'trackedEntityInstances',
+    {
+      fields: '*',
+      ou: 'DiszpKrYNg8',
+      entityType: 'nEenWmSyUEp',
+      skipPaging: true,
+    },
+    {
+      includeSystem: false,
+    }
+    );
+
+  // 2. Example Getting Events: Get a list of  events with a certain program and organisation unit,sorting by due date ascending.
+
+  getData('events',
   {
-    includeSystem: false,
+    orgUnit: 'DiszpKrYNg8',
+    program: 'eBAyeGv0exc',
+    order: 'dueDate'
   }
-);
+  );
+
+  // 3. Example Getting DataValueSets: Get a list of `data values` for multiple  `dataSets`, with `startDate` and `endDate`, and multiple `orgUnits`
+
+  getData('dataValueSets', {
+    dataSet: 'pBOMPrpg1QX',
+    dataSet: 'BfMAe6Itzgt',
+    startDate: '2013-01-01',
+    endDate: '2020-01-31',
+    orgUnit: 'YuQRtpLP10I',
+    orgUnit: 'vWbkYPRmKyS',
+    children: true,
+  });
+
+  // 4. Example Getting Metadata: Get a list of `org units` 
+
+  getData('organisationUnits');
+
  */
 export function getData(resourceType, params, responseType, options, callback) {
   return state => {
-    const { username, password, hostUrl, apiVersion } = state.configuration;
+    const { username, password, hostUrl } = state.configuration;
 
     const queryParams = expandReferences(params)(state);
 
-    const useApiVersion = options?.supportApiVersion;
+    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
+
+    const supportApiVersion =
+      options?.supportApiVersion ?? state.configuration.supportApiVersion;
 
     const headers = {
       Accept: CONTENT_TYPES[responseType] ?? 'application/json',
@@ -488,10 +543,10 @@ export function getData(resourceType, params, responseType, options, callback) {
       `/${resourceType}`,
       hostUrl,
       apiVersion,
-      useApiVersion
+      supportApiVersion
     );
 
-    logApiVersion(state.configuration, options);
+    logApiVersion(apiVersion, supportApiVersion);
 
     logWaitingForServer(url, queryParams);
 
