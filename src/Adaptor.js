@@ -573,21 +573,29 @@ export function getData(resourceType, params, responseType, options, callback) {
 }
 
 /**
- * Get metadata
- * @param {*} resources 
- * @param {*} params 
- * @param {*} options 
- * @param {*} callback 
+ * A generic helper function to get metadata records from a given DHIS2 instance
+ * @param {Object} resources - E.g. `{organisationUnits: true, attributes: true}`
+ * @param {Object} params 
+ * @param {Object} options 
+ * @param {Function} callback 
  * @example
- *
+  // 1. Get a list of organisation units and attributes, in a single request
   getMetadata(
     {attributes: true, organisationUnits: true},
     {
       fields: '*',
-      // filter: 'id:eq:PWxgadk4sCG',
     },
     {
       includeSystem: false,
+    }
+  );
+
+  // 2. Get a list of `dataSets`
+  getMetadata(
+    { dataSets: true },
+    {
+      assumeTrue: false,
+      fields: '*',
     }
   );
  */
@@ -599,19 +607,22 @@ export function getMetadata(
   callback
 ) {
   return state => {
-    const { username, password, hostUrl, apiVersion } = state.configuration;
+    const { username, password, hostUrl } = state.configuration;
 
     const queryParams = expandReferences({ ...resources, ...params })(state);
 
-    const useApiVersion = options?.supportApiVersion;
+    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
+
+    const supportApiVersion =
+      options?.supportApiVersion ?? state.configuration.supportApiVersion;
 
     const headers = {
       Accept: CONTENT_TYPES[responseType] ?? 'application/json',
     };
 
-    const url = buildUrl('/metadata', hostUrl, apiVersion, useApiVersion);
+    const url = buildUrl('/metadata', hostUrl, apiVersion, supportApiVersion);
 
-    logApiVersion(state.configuration, options);
+    logApiVersion(apiVersion, supportApiVersion);
 
     logWaitingForServer(url, queryParams);
 
