@@ -21,18 +21,6 @@ export function composeSuccessMessage(
 }
 
 /**
- * Compose next state based on the result of a given operation
- * @param {Object} result - Success result of an http call
- */
-export function composeNextState(state, result) {
-  return {
-    ...state,
-    data: result?.data,
-    references: [...state?.references, result?.data],
-  };
-}
-
-/**
  * Warn user when there is too much data expected to be returned on a given resource type
  * @param {string} endpointUrl - endpoint url for a resourceType
  *
@@ -79,7 +67,7 @@ export function buildUrl(path, hostUrl, apiVersion, supportApiVersion) {
 
   const pathSuffix =
     useApiVersion === true
-      ? `${apiVersion ?? 'api_version_missing'}${path}`
+      ? `/${apiVersion ?? '/api_version_missing'}${path}`
       : `${path}`;
 
   const url = hostUrl + '/api' + pathSuffix;

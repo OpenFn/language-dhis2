@@ -1,18 +1,18 @@
 /** @module Adaptor */
 import axios from 'axios';
-import { execute as commonExecute, expandReferences } from 'language-common';
+import {
+  execute as commonExecute,
+  expandReferences,
+  composeNextState,
+} from 'language-common';
 import { indexOf } from 'lodash';
 
 import {
   Log,
-  composeSuccessMessage,
-  composeNextState,
   warnExpectLargeResult,
   logWaitingForServer,
   buildUrl,
   logApiVersion,
-  handleResponse,
-  prettyJson,
   CONTENT_TYPES,
   applyFilter,
   parseFilter,
@@ -67,7 +67,7 @@ function configMigrationHelper(state) {
 
 /**
  * Axios response interceptor
- * Intercepts every response, checks if the content type received is same as we send, the reject.
+ * Intercepts every response, checks if the content type received is same as we send.
  * We reject if response type differs from request's accept type because DHIS2 server sends us
  * html pages when a wrong url is sent other than the one with /api
  * We also parse response.data because sometimes we receive text data
@@ -307,19 +307,36 @@ export function discover(operation, resourceType) {
 }
 
 /**
- * Get DHIS2 api resources
+ * Get a list of DHIS2 api resources
  * @param {Object} params - The optional query parameters for this endpoint. E.g `{filter: 'singular:like:attribute'}`
  * @param {string} params.filter - The optional filter parameter, specifiying the filter expression. E.g. `singular:eq:attribute`
  * @param {string} responseType - The optional response type. Defaults to `json`
  * @param {Object} options - The optional flags to control behavior of function. E.g `{supportApiVersion: true}`
  * @param {boolean} options.supportApiVersion - The optional flag, only set to `true` if endpoint supports use of api versions in url. Defaults to `false`
  * @param {Function} callback - The optional function that will be called to handle data returned by this function. Defaults to `state.data`
- */
-export function getResources(params, responseType, options, callback) {
-  return state => {
-    const { username, password, hostUrl, apiVersion } = state.configuration;
+ * @example
+ // 1. Get all api resources
+  getResources()
 
-    const supportApiVersion = options?.supportApiVersion;
+ // 2. Get an attribute resource in json
+  getResources({filter: 'singular:eq:attribute'})
+
+ // 3. Get organisation unit resource in XML format
+  getResources({ filter: 'singular:eq:organisationUnit' }, 'xml', state => {
+    console.log('Response', state.data);
+    return state;
+  });
+
+ // 4. Get all api resources in csv format
+  getResources('','csv') 
+
+ // 4. Get all api resources in csv format
+  getResources('','pdf')  
+  
+ */
+export function getResources(params, responseType, callback) {
+  return state => {
+    const { username, password, hostUrl } = state.configuration;
 
     const queryParams = expandReferences(params)(state);
 
@@ -331,25 +348,27 @@ export function getResources(params, responseType, options, callback) {
 
     const path = '/resources';
 
-    const url = buildUrl(path, hostUrl, apiVersion, supportApiVersion);
+    const url = buildUrl(path, hostUrl, null, false);
 
     const transformResponse = function (data, headers) {
       if (filter) {
         if (
-          headers['content-type']?.split(';')[0] ??
-          null === CONTENT_TYPES.json
+          (headers['content-type']?.split(';')[0] ?? null) ===
+          CONTENT_TYPES.json
         ) {
           let tempData = JSON.parse(data);
           return {
             ...tempData,
             resources: applyFilter(tempData.resources, ...parseFilter(filter)),
           };
+        } else {
+          Log.warn(
+            'Filters on this resource are only supported for json content types. Skipping filtering ...'
+          );
         }
       }
       return data;
     };
-
-    logApiVersion(state.configuration, options);
 
     logWaitingForServer(url, queryParams);
 
@@ -365,26 +384,13 @@ export function getResources(params, responseType, options, callback) {
         transformResponse,
       })
       .then(result => {
-        Log.info(
-          composeSuccessMessage(
-            'getResources',
-            null,
-            queryParams,
-            options,
-            callback
-          )
-        );
-        const nextState = {
-          ...state,
-          data: result?.data,
-          references: [...state?.references, result?.data],
-        };
-        if (callback) return callback(nextState);
+        if (callback) return callback(composeNextState(state, result.data));
 
-        return nextState;
+        return composeNextState(state, result.data);
       });
   };
 }
+
 /**
  *
  * @param {string} resourceType
@@ -437,23 +443,9 @@ export function getSchema(
         headers,
       })
       .then(result => {
-        Log.info(
-          composeSuccessMessage(
-            'getSchema',
-            resourceType,
-            queryParams,
-            options,
-            callback
-          )
-        );
-        const nextState = {
-          ...state,
-          data: result?.data,
-          references: [...state?.references, result?.data],
-        };
-        if (callback) return callback(nextState);
+        if (callback) return callback(composeNextState(state, result.data));
 
-        return nextState;
+        return composeNextState(state, result.data);
       });
   };
 }
@@ -518,23 +510,9 @@ export function getData(resourceType, params, responseType, options, callback) {
         headers,
       })
       .then(result => {
-        Log.info(
-          composeSuccessMessage(
-            'getData',
-            resourceType,
-            queryParams,
-            options,
-            callback
-          )
-        );
-        const nextState = {
-          ...state,
-          data: result?.data,
-          references: [...state?.references, result?.data],
-        };
-        if (callback) return callback(nextState);
+        if (callback) return callback(composeNextState(state, result.data));
 
-        return nextState;
+        return composeNextState(state, result.data);
       });
   };
 }
@@ -546,16 +524,17 @@ export function getData(resourceType, params, responseType, options, callback) {
  * @param {*} options 
  * @param {*} callback 
  * @example
- * getMetadata(
-  {attributes: true, organisationUnits: true},
-  {
-    fields: '*',
-    // filter: 'id:eq:PWxgadk4sCG',
-  },
-  {
-    includeSystem: false,
-  }
-);
+ *
+  getMetadata(
+    {attributes: true, organisationUnits: true},
+    {
+      fields: '*',
+      // filter: 'id:eq:PWxgadk4sCG',
+    },
+    {
+      includeSystem: false,
+    }
+  );
  */
 export function getMetadata(
   resources,
@@ -596,23 +575,9 @@ export function getMetadata(
         headers,
       })
       .then(result => {
-        Log.info(
-          composeSuccessMessage(
-            'getMetadata',
-            resources,
-            queryParams,
-            options,
-            callback
-          )
-        );
-        const nextState = {
-          ...state,
-          data: result?.data,
-          references: [...state?.references, result?.data],
-        };
-        if (callback) return callback(nextState);
+        if (callback) return callback(composeNextState(state, result.data));
 
-        return nextState;
+        return composeNextState(state, result.data);
       });
   };
 }
@@ -653,23 +618,9 @@ export function post(resourceType, data, params, options, callback) {
         data: payload,
       })
       .then(result => {
-        Log.info(
-          composeSuccessMessage(
-            'postData',
-            resourceType,
-            queryParams,
-            options,
-            callback
-          )
-        );
-        const nextState = {
-          ...state,
-          data: result?.data,
-          references: [...state?.references, result?.data],
-        };
-        if (callback) return callback(nextState);
+        if (callback) return callback(composeNextState(state, result.data));
 
-        return nextState;
+        return composeNextState(state, result.data);
       });
   };
 }
