@@ -55,6 +55,9 @@ export function logApiVersion(apiVersion, supportApiVersion) {
   else Log.warn(`Using \x1b[33m latest \x1b[0m version of DHIS2 api.`);
 }
 
+export function logOperation(operation) {
+  Log.info(`Executing ${COLORS.FgGreen}${operation}\x1b[0m ...`);
+}
 /**
  * Build url for a given operation
  */

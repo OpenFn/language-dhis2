@@ -17,6 +17,7 @@ import {
   CONTENT_TYPES,
   applyFilter,
   parseFilter,
+  logOperation,
 } from './Utils';
 //#endregion
 
@@ -379,6 +380,7 @@ export function getResources(params, responseType, callback) {
       }
       return data;
     };
+    logOperation('getResources');
 
     logWaitingForServer(url, queryParams);
 
@@ -460,6 +462,8 @@ export function getSchema(
       apiVersion,
       supportApiVersion
     );
+
+    logOperation('getSchema');
 
     logApiVersion(apiVersion, supportApiVersion);
 
@@ -558,6 +562,8 @@ export function getData(resourceType, params, responseType, options, callback) {
       supportApiVersion
     );
 
+    logOperation('getData');
+
     logApiVersion(apiVersion, supportApiVersion);
 
     logWaitingForServer(url, queryParams);
@@ -634,6 +640,8 @@ export function getMetadata(
 
     const url = buildUrl('/metadata', hostUrl, apiVersion, supportApiVersion);
 
+    logOperation('getMetadata');
+
     logApiVersion(apiVersion, supportApiVersion);
 
     logWaitingForServer(url, queryParams);
@@ -689,6 +697,8 @@ export function create(resourceType, data, params, options, callback) {
       apiVersion,
       supportApiVersion
     );
+
+    logOperation('create');
 
     logApiVersion(apiVersion, supportApiVersion);
 
@@ -757,6 +767,8 @@ export function update(resourceType, path, data, params, options, callback) {
       supportApiVersion
     );
 
+    logOperation('update');
+
     logApiVersion(apiVersion, supportApiVersion);
 
     logWaitingForServer(url, queryParams);
@@ -815,6 +827,8 @@ export function patch(resourceType, path, data, params, options, callback) {
       supportApiVersion
     );
 
+    logOperation('patch');
+
     logApiVersion(apiVersion, supportApiVersion);
 
     logWaitingForServer(url, queryParams);
@@ -872,6 +886,8 @@ export function del(resourceType, path, data, params, options, callback) {
       supportApiVersion
     );
 
+    logOperation('del');
+
     logApiVersion(apiVersion, supportApiVersion);
 
     logWaitingForServer(url, queryParams);
@@ -902,14 +918,35 @@ export function del(resourceType, path, data, params, options, callback) {
  * UPDATE that existing row instead.
  *
  * @todo Tweak/refine to mimic implementation based on the following inspiration: https://sqlite.org/lang_upsert.html and https://wiki.postgresql.org/wiki/UPSERT
+ * @todo Test implementation for upserting metadata
+ * @todo Test implementation for upserting data values
+ * @todo Implement the updateCondition
+ * 
  * @param {!string} resourceType - The type of a resource to `insert` or `update`. E.g. `trackedEntityInstances`
- * @param {!{property: string, value: any}} uniqueAttribute - An object containing a `property` and `value` which will be used to uniquely identify the record
- * @param {{sourceValue: any, operator: ['eq','!eq','gt','lt'], destinationPropertyPath: string}} [updateCondition=true] - Useful for `idempotency`. Optional expression used to determine when to apply the UPDATE when a record exists(e.g. `payLoad.registrationDate>person.registrationDate`). By default, we apply the UPDATE.
+ * @param {!{attributeId: string, attributeValue: any}} uniqueAttribute - An object containing a `attributeId` and `attributeValue` which will be used to uniquely identify the record
+ * @param {{sourceValue: any, operator: ['eq','!eq','gt','gte','lt','lte'], destinationValuePath: string}} [updateCondition=true] - Useful for `idempotency`. Optional expression used to determine when to apply the UPDATE when a record exists(e.g. `payLoad.registrationDate>person.registrationDate`). By default, we apply the UPDATE.
  * @param {Object<any,any>} data - The update data containing new values
  * @param {Object} [params] - Optional `import` parameters for `Update/create`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
  * @param {{replace: boolean}} [options={replace: false}] - Optional `flags` for the behavior of the `upsert(Update)` operation. Options are `replace` or `merge`. Defaults to `{repalce: false}` which implies `merge`
  * @param {requestCallback} [callback] - Optional callback to handle the response
  * @returns {state} state
+ * @example <caption>Example usage of upsert</caption>
+    upsert(
+      'trackedEntityInstances',
+      {
+        attributeId: 'aX5hD4qUpRW',
+        attributeValue: state =>
+          state.data.attributes.find(obj => obj.attribute === 'aX5hD4qUpRW').value,
+      },
+      {
+        sourceValue: 'some value',
+        operator: 'gt',
+        destinationValuePath: '{object}.{propertyName}',
+      },
+      state.data,
+      '',
+      { replace: false }
+    );
  */
 export function upsert(
   resourceType,
@@ -923,9 +960,11 @@ export function upsert(
   return state => {
     const { username, password, hostUrl } = state.configuration;
 
-    const { property, value } = expandReferences(uniqueAttribute)(state);
+    const { attributeId, attributeValue } = expandReferences(uniqueAttribute)(
+      state
+    );
 
-    const { sourceValue, operator, destinationPropertyPath } = expandReferences(
+    const { sourceValue, operator, destinationValuePath } = expandReferences(
       updateCondition
     )(state);
 
@@ -945,28 +984,28 @@ export function upsert(
       supportApiVersion
     );
 
+    logOperation('upsert');
+
     logApiVersion(apiVersion, supportApiVersion);
 
     logWaitingForServer(url, queryParams);
 
     warnExpectLargeResult(resourceType, url);
 
-    return axios
-      .request({
-        method: 'POST',
-        url,
-        auth: {
-          username,
-          password,
-        },
-        params: queryParams,
-        data: payload,
-      })
-      .then(result => {
-        if (callback) return callback(composeNextState(state, result.data));
+    // Step 1: Check if the Resource Type Object Exists
+    // Step 2: Check if attribute is assigned to the Type Object
+    // Step 3: Check if attribute is unique on the Type Object
+    // Step 4: Check if instance exists
+    // Step 5: If instance exists
+    //    Step 5.1 Instance exists
+    //        Step 5.1.1 Check if to apply update based on updateCondition
+    //          Step 5.1.1.1 If to apply
+    //            Step 5.1.1.1 Check if to replace or merge
+    //              Step 5.1.1.1.1 Replace or merge
+    //    Step 5.2 If instance does not exist
+    //        Step 5.2.1 POST new instance
 
-        return composeNextState(state, result.data);
-      });
+    return state;
   };
 }
 //#endregion
