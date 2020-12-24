@@ -1,4 +1,5 @@
 /** @module Adaptor */
+//#region IMPORTS
 import axios from 'axios';
 import {
   execute as commonExecute,
@@ -17,7 +18,9 @@ import {
   applyFilter,
   parseFilter,
 } from './Utils';
+//#endregion
 
+//#region CONFIGS
 /**
  * Execute a sequence of operations.
  * Wraps `language-common/execute`, and prepends initial state for DHIS2.
@@ -65,13 +68,6 @@ function configMigrationHelper(state) {
   return state;
 }
 
-/**
- * Axios response interceptor
- * Intercepts every response, checks if the content type received is same as we send.
- * We reject if response type differs from request's accept type because DHIS2 server sends us
- * html pages when a wrong url is sent other than the one with /api
- * We also parse response.data because sometimes we receive text data
- */
 axios.interceptors.response.use(
   function (response) {
     const contentType = response.headers['content-type']?.split(';')[0];
@@ -119,9 +115,12 @@ axios.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+//#endregion
 
+//#region COMMONLY USED HELPER OPERATIONS
 /**
- * Create or update one or many new Tracked Entity Instances
+ * Upsert(Create or update) one or many new Tracked Entity Instances
+ * This is useful for idempotency and duplicate management
  * @public
  * @example
  * upsertTEI('w75KJ2mc4zz', state.data, { replace: true })
@@ -131,7 +130,6 @@ axios.interceptors.response.use(
  * @param {object} options - Optional options for update method. Defaults to {replace: true}
  * @returns {Operation}
  */
-/*
 export function upsertTEI(uniqueAttributeId, data, options) {
   return state => {
     const { password, username, hostUrl } = state.configuration;
@@ -292,8 +290,9 @@ export function upsertTEI(uniqueAttributeId, data, options) {
     });
   };
 }
-*/
+//#endregion
 
+//#region GENERIC HELPER OPERATIONS
 /**
  * TODO
  *
@@ -930,7 +929,9 @@ export function upsert(resourceType, uniqueAttribute, data, params, options) {
       });
   };
 }
+//#endregion
 
+//#region EXPORTS
 exports.axios = axios;
 
 export {
@@ -944,3 +945,4 @@ export {
   lastReferenceValue,
   alterState,
 } from 'language-common';
+//#endregion
