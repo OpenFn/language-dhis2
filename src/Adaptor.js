@@ -108,6 +108,7 @@ axios.interceptors.response.use(
   },
   function (error) {
     Log.error(`${error?.message}`);
+    console.log(error.response?.data?.response);
     // {
     //   status: error?.response?.status,
     //   message: error?.message,
@@ -703,20 +704,219 @@ export function create(resourceType, data, params, options, callback) {
   };
 }
 
-export function update(resourceType, query, data, params, options) {
-  return state;
+/**
+ *  A generic helper function to update an resource object of any type. It requires to send all required fields or the full body
+ * @param {string} resourceType
+ * @param {String} path
+ * @param {Object} data
+ * @param {Object} params
+ * @param {Object} options
+ * @param {Function} callback
+ * @example
+  // 1. Update data element
+  update('dataElements', 'FTRrcoaog83', {
+  displayName: 'New display name',
+  aggregationType: 'SUM',
+  domainType: 'AGGREGATE',
+  valueType: 'NUMBER',
+  name: 'Accute Flaccid Paralysis (Deaths < 5 yrs)',
+  shortName: 'Accute Flaccid Paral (Deaths < 5 yrs)',
+});
+
+ */
+export function update(resourceType, path, data, params, options, callback) {
+  return state => {
+    const { username, password, hostUrl } = state.configuration;
+
+    // const objectPath = expandReferences(path)(state);
+
+    const queryParams = expandReferences(params)(state);
+
+    const payload = expandReferences(data)(state);
+
+    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
+
+    const supportApiVersion =
+      options?.supportApiVersion ?? state.configuration.supportApiVersion;
+
+    const url = buildUrl(
+      '/' + resourceType + '/' + path,
+      hostUrl,
+      apiVersion,
+      supportApiVersion
+    );
+
+    logApiVersion(apiVersion, supportApiVersion);
+
+    logWaitingForServer(url, queryParams);
+
+    warnExpectLargeResult(resourceType, url);
+
+    return axios
+      .request({
+        method: 'PUT',
+        url,
+        auth: {
+          username,
+          password,
+        },
+        params: queryParams,
+        data: payload,
+      })
+      .then(result => {
+        if (callback) return callback(composeNextState(state, result.data));
+
+        return composeNextState(state, result.data);
+      });
+  };
 }
 
-export function del(resourceType, query, params, options) {
-  return state;
+/**
+ * A generic helper function to send partial updates on one or more object properties. You are not required to send the full body of object properties
+ * This is useful for cases where you don't want or need to update all properties on a object.
+ * @param {string} resourceType
+ * @param {Object} query
+ * @param {Object} params
+ * @param {Object} options
+ * @example
+  // 1. Update data element's property
+  patch('dataElements', 'FTRrcoaog83', {displayName: 'Some new display name'});
+ */
+export function patch(resourceType, path, data, params, options, callback) {
+  return state => {
+    const { username, password, hostUrl } = state.configuration;
+
+    // const objectPath = expandReferences(path)(state);
+
+    const queryParams = expandReferences(params)(state);
+
+    const payload = expandReferences(data)(state);
+
+    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
+
+    const supportApiVersion =
+      options?.supportApiVersion ?? state.configuration.supportApiVersion;
+
+    const url = buildUrl(
+      '/' + resourceType + '/' + path,
+      hostUrl,
+      apiVersion,
+      supportApiVersion
+    );
+
+    logApiVersion(apiVersion, supportApiVersion);
+
+    logWaitingForServer(url, queryParams);
+
+    warnExpectLargeResult(resourceType, url);
+
+    return axios
+      .request({
+        method: 'PATCH',
+        url,
+        auth: {
+          username,
+          password,
+        },
+        params: queryParams,
+        data: payload,
+      })
+      .then(result => {
+        if (callback) return callback(composeNextState(state, result.data));
+
+        return composeNextState(state, result.data);
+      });
+  };
 }
 
-export function patch(resourceType, query, params, options) {
-  return state;
+export function del(resourceType, path, data, params, options, callback) {
+  return state => {
+    const { username, password, hostUrl } = state.configuration;
+
+    const queryParams = expandReferences(params)(state);
+
+    const payload = expandReferences(data)(state);
+
+    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
+
+    const supportApiVersion =
+      options?.supportApiVersion ?? state.configuration.supportApiVersion;
+
+    const url = buildUrl(
+      '/' + resourceType + '/' + path,
+      hostUrl,
+      apiVersion,
+      supportApiVersion
+    );
+
+    logApiVersion(apiVersion, supportApiVersion);
+
+    logWaitingForServer(url, queryParams);
+
+    warnExpectLargeResult(resourceType, url);
+
+    return axios
+      .request({
+        method: 'DELETE',
+        url,
+        auth: {
+          username,
+          password,
+        },
+        params: queryParams,
+        data: payload,
+      })
+      .then(result => {
+        if (callback) return callback(composeNextState(state, result.data));
+
+        return composeNextState(state, result.data);
+      });
+  };
 }
 
 export function upsert(resourceType, uniqueAttribute, data, params, options) {
-  return state;
+  return state => {
+    const { username, password, hostUrl } = state.configuration;
+
+    const queryParams = expandReferences(params)(state);
+
+    const payload = expandReferences(data)(state);
+
+    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
+
+    const supportApiVersion =
+      options?.supportApiVersion ?? state.configuration.supportApiVersion;
+
+    const url = buildUrl(
+      '/' + resourceType,
+      hostUrl,
+      apiVersion,
+      supportApiVersion
+    );
+
+    logApiVersion(apiVersion, supportApiVersion);
+
+    logWaitingForServer(url, queryParams);
+
+    warnExpectLargeResult(resourceType, url);
+
+    return axios
+      .request({
+        method: 'POST',
+        url,
+        auth: {
+          username,
+          password,
+        },
+        params: queryParams,
+        data: payload,
+      })
+      .then(result => {
+        if (callback) return callback(composeNextState(state, result.data));
+
+        return composeNextState(state, result.data);
+      });
+  };
 }
 
 exports.axios = axios;
