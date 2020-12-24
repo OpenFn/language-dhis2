@@ -648,25 +648,37 @@ export function getMetadata(
   };
 }
 
-export function post(resourceType, data, params, options, callback) {
+/**
+ * A generic helper method to create a record of any kind in DHIS2
+ * @param {string} resourceType
+ * @param {Object} data
+ * @param {Object} params
+ * @param {Object} options
+ * @param {Function} callback
+ * @example
+  // 1. 
+ */
+export function create(resourceType, data, params, options, callback) {
   return state => {
-    const { username, password, hostUrl, apiVersion } = state.configuration;
+    const { username, password, hostUrl } = state.configuration;
 
     const queryParams = expandReferences(params)(state);
 
-    // const payload = expandReferences(data);
-    const payload = data;
+    const payload = expandReferences(data)(state);
 
-    const useApiVersion = options?.supportApiVersion;
+    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
+
+    const supportApiVersion =
+      options?.supportApiVersion ?? state.configuration.supportApiVersion;
 
     const url = buildUrl(
       '/' + resourceType,
       hostUrl,
       apiVersion,
-      useApiVersion
+      supportApiVersion
     );
 
-    logApiVersion(state.configuration, options);
+    logApiVersion(apiVersion, supportApiVersion);
 
     logWaitingForServer(url, queryParams);
 
@@ -674,7 +686,7 @@ export function post(resourceType, data, params, options, callback) {
 
     return axios
       .request({
-        method: 'post',
+        method: 'POST',
         url,
         auth: {
           username,
