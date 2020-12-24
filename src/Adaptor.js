@@ -829,6 +829,18 @@ export function patch(resourceType, path, data, params, options, callback) {
   };
 }
 
+/**
+ *  A generic helper function to delete an object
+ * @param {string} resourceType
+ * @param {string} path - Can be an `id` of an `object` or `path` to the `nested object` followed by `id` of the `property` of a `nested object`
+ * @param {Object} data
+ * @param {Object} params
+ * @param {Object} options
+ * @param {Function} callback
+ * @example
+  // 1. Delete data element
+  del('dataElements', 'FTRrcoaog83');
+ */
 export function del(resourceType, path, data, params, options, callback) {
   return state => {
     const { username, password, hostUrl } = state.configuration;
