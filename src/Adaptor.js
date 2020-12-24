@@ -115,6 +115,18 @@ axios.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+/**
+ * This is the type of result returned by OpenFn operations
+ * @typedef {{configuration: object, references: object[], data: object}} state
+ */
+
+/**
+ * This callback type is called `requestCallback` and is the type returned by callbacks supplied to OpenFn operations
+ * @callback requestCallback
+ * @param {state} state
+ * @returns {state}
+ */
+
 //#endregion
 
 //#region COMMONLY USED HELPER OPERATIONS
@@ -885,9 +897,37 @@ export function del(resourceType, path, data, params, options, callback) {
   };
 }
 
-export function upsert(resourceType, uniqueAttribute, data, params, options) {
+/**
+ * A generic helper function used to atomically either insert a row, or on the basis of the row already existing,
+ * UPDATE that existing row instead.
+ *
+ * @todo Tweak/refine to mimic implementation based on the following inspiration: https://sqlite.org/lang_upsert.html and https://wiki.postgresql.org/wiki/UPSERT
+ * @param {!string} resourceType - The type of a resource to `insert` or `update`. E.g. `trackedEntityInstances`
+ * @param {!{property: string, value: any}} uniqueAttribute - An object containing a `property` and `value` which will be used to uniquely identify the record
+ * @param {{sourceValue: any, operator: ['eq','!eq','gt','lt'], destinationPropertyPath: string}} [updateCondition=true] - Useful for `idempotency`. Optional expression used to determine when to apply the UPDATE when a record exists(e.g. `payLoad.registrationDate>person.registrationDate`). By default, we apply the UPDATE.
+ * @param {Object<any,any>} data - The update data containing new values
+ * @param {Object} [params] - Optional `import` parameters for `Update/create`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {{replace: boolean}} [options={replace: false}] - Optional `flags` for the behavior of the `upsert(Update)` operation. Options are `replace` or `merge`. Defaults to `{repalce: false}` which implies `merge`
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {state} state
+ */
+export function upsert(
+  resourceType,
+  uniqueAttribute,
+  updateCondition,
+  data,
+  params,
+  options,
+  callback
+) {
   return state => {
     const { username, password, hostUrl } = state.configuration;
+
+    const { property, value } = expandReferences(uniqueAttribute)(state);
+
+    const { sourceValue, operator, destinationPropertyPath } = expandReferences(
+      updateCondition
+    )(state);
 
     const queryParams = expandReferences(params)(state);
 
