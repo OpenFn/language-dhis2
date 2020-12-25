@@ -946,7 +946,7 @@ export function del(resourceType, path, data, params, options, callback) {
         destinationValuePath: '{object}.{propertyName}',
       },
       state.data,
-      '',
+      [{ ou: 'CMqUILyVnBL' }],
       { replace: false }
     );
  */
