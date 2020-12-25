@@ -6,7 +6,7 @@ import {
   expandReferences,
   composeNextState,
 } from 'language-common';
-import { indexOf } from 'lodash';
+import { indexOf, result } from 'lodash';
 
 import {
   Log,
@@ -18,6 +18,7 @@ import {
   applyFilter,
   parseFilter,
   logOperation,
+  COLORS,
 } from './Utils';
 //#endregion
 
@@ -926,7 +927,7 @@ export function del(resourceType, path, data, params, options, callback) {
  * @param {!{attributeId: string, attributeValue: any}} uniqueAttribute - An object containing a `attributeId` and `attributeValue` which will be used to uniquely identify the record
  * @param {{sourceValue: any, operator: ['eq','!eq','gt','gte','lt','lte'], destinationValuePath: string}} [updateCondition=true] - Useful for `idempotency`. Optional expression used to determine when to apply the UPDATE when a record exists(e.g. `payLoad.registrationDate>person.registrationDate`). By default, we apply the UPDATE.
  * @param {Object<any,any>} data - The update data containing new values
- * @param {Object} [params] - Optional `import` parameters for `Update/create`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {array} [params] - Optional `import` parameters for `Update/create`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
  * @param {{replace: boolean}} [options={replace: false}] - Optional `flags` for the behavior of the `upsert(Update)` operation. Options are `replace` or `merge`. Defaults to `{repalce: false}` which implies `merge`
  * @param {requestCallback} [callback] - Optional callback to handle the response
  * @returns {state} state
@@ -960,6 +961,8 @@ export function upsert(
   return state => {
     const { username, password, hostUrl } = state.configuration;
 
+    const responseType = 'json';
+
     const { attributeId, attributeValue } = expandReferences(uniqueAttribute)(
       state
     );
@@ -968,9 +971,15 @@ export function upsert(
       updateCondition
     )(state);
 
-    const queryParams = expandReferences(params)(state);
+    let queryParams = new URLSearchParams(
+      params?.map(item => Object.entries(item)?.flat())
+    );
 
-    const payload = expandReferences(data)(state);
+    const op = resourceType === 'trackedEntityInstances' ? 'EQ' : 'eq';
+
+    queryParams.append('filter', `${attributeId}:${op}:${attributeValue}`);
+
+    const body = expandReferences(data)(state);
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
@@ -984,6 +993,10 @@ export function upsert(
       supportApiVersion
     );
 
+    const headers = {
+      Accept: CONTENT_TYPES[responseType] ?? 'application/json',
+    };
+
     logOperation('upsert');
 
     logApiVersion(apiVersion, supportApiVersion);
@@ -992,20 +1005,63 @@ export function upsert(
 
     warnExpectLargeResult(resourceType, url);
 
-    // Step 1: Check if the Resource Type Object Exists
-    // Step 2: Check if attribute is assigned to the Type Object
-    // Step 3: Check if attribute is unique on the Type Object
-    // Step 4: Check if instance exists
-    // Step 5: If instance exists
-    //    Step 5.1 Instance exists
-    //        Step 5.1.1 Check if to apply update based on updateCondition
-    //          Step 5.1.1.1 If to apply
-    //            Step 5.1.1.1 Check if to replace or merge
-    //              Step 5.1.1.1.1 Replace or merge
-    //    Step 5.2 If instance does not exist
-    //        Step 5.2.1 POST new instance
+    const getResouceName = () => {
+      return axios
+        .get(hostUrl + '/api/resources', {
+          auth: { username, password },
+          transformResponse: [
+            function (data, headers) {
+              let filter = `plural:eq:${resourceType}`;
+              if (filter) {
+                if (
+                  (headers['content-type']?.split(';')[0] ?? null) ===
+                  CONTENT_TYPES.json
+                ) {
+                  let tempData = JSON.parse(data);
+                  return {
+                    ...tempData,
+                    resources: applyFilter(
+                      tempData.resources,
+                      ...parseFilter(filter)
+                    ),
+                  };
+                } else {
+                  Log.warn(
+                    'Filters on this resource are only supported for json content types. Skipping filtering ...'
+                  );
+                }
+              }
+              return data;
+            },
+          ],
+        })
+        .then(result => result.data.resources[0].singular);
+    };
 
-    return state;
+    const findRecordsWithValueOnAttribute = () => {
+      console.log(queryParams);
+      return axios.request({
+        method: 'GET',
+        url,
+        auth: {
+          username,
+          password,
+        },
+        params: queryParams,
+        headers,
+      });
+    };
+
+    Log.info(
+      `Checking if a record exists that matches this filter: ${COLORS.FgGreen}attribute{ id: ${attributeId}, value: ${attributeValue} }\x1b[0m ...`
+    );
+    return Promise.all([
+      getResouceName(),
+      findRecordsWithValueOnAttribute(),
+    ]).then(values => {
+      console.log(values[0]);
+      return [values[0], values[1].data];
+    });
   };
 }
 //#endregion

@@ -38,7 +38,7 @@ export function warnExpectLargeResult(paramOrResourceType, endpointUrl) {
  */
 export function logWaitingForServer(url, params) {
   Log.info(`url ${COLORS.FgGreen}${url}\x1b[0m`);
-  Log.info(`params ${prettyJson(params)}`);
+  Log.info(`params ${COLORS.FgGreen}${params}\x1b[0m`);
   Log.info(`Waiting for server response on ${url} ...`);
 }
 
@@ -186,7 +186,7 @@ export function prettyJson(data) {
     Escape sequences dealing only with colors and styles are also known as ANSI escape code(https://en.wikipedia.org/wiki/ANSI_escape_code#Colors) 
     and are standardized, so therefore they (should) work on any platform
   */
-const COLORS = {
+export const COLORS = {
   Reset: '\x1b[0m',
   Bright: '\x1b[1m',
   Dim: '\x1b[2m',
