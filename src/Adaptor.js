@@ -19,6 +19,7 @@ import {
   parseFilter,
   logOperation,
   COLORS,
+  prettyJson,
 } from './Utils';
 //#endregion
 
@@ -961,6 +962,8 @@ export function upsert(
   return state => {
     const { username, password, hostUrl } = state.configuration;
 
+    const { replace } = options;
+
     const responseType = 'json';
 
     const { attributeId, attributeValue } = expandReferences(uniqueAttribute)(
@@ -1058,9 +1061,94 @@ export function upsert(
     return Promise.all([
       getResouceName(),
       findRecordsWithValueOnAttribute(),
-    ]).then(values => {
-      console.log(values[0]);
-      return [values[0], values[1].data];
+    ]).then(([resourceName, recordsWithValue]) => {
+      const recordsWithValueCount = recordsWithValue.data[resourceType].length;
+      if (recordsWithValueCount > 1) {
+        throw new Error(
+          `Cannot upsert on Non-unique attribute. The operation found more than one records with the same value of ${attributeValue} for ${attributeId}`
+        );
+      } else if (recordsWithValueCount === 1) {
+        // TODO
+        // Log.info(
+        //   `Unique record found, proceeding to checking if attribute is NULLABLE ...`
+        // );
+        // if (recordsWithNulls.data[resourceType].length > 0) {
+        //   throw new Error(
+        //     `Cannot upsert on Nullable attribute. The operation found records with a NULL value on ${attributeId}.`
+        //   );
+        // }
+        Log.info(
+          `Attribute has unique values. Proceeding to replace or merge ...`
+        );
+
+        const row1 = recordsWithValue.data[resourceType][0];
+        const useCustomPATCH = ['trackedEntityInstances'].includes(resourceType)
+          ? true
+          : false;
+        const method = replace
+          ? 'PUT'
+          : useCustomPATCH === true
+          ? 'PUT'
+          : 'PATCH';
+
+        const id = row1['id'] ?? row1[resourceName];
+
+        const updateUrl = `${url}/${id}`;
+
+        const payload = useCustomPATCH
+          ? {
+              ...row1,
+              ...body,
+            }
+          : body;
+
+        return axios
+          .request({
+            method,
+            url: updateUrl,
+            auth: {
+              username,
+              password,
+            },
+            data: payload,
+            params: queryParams,
+            headers,
+          })
+          .then(result => {
+            Log.info(
+              `Upsert succeeded. Updated ${resourceName}: ${updateUrl}.\nSummary:\n${prettyJson(
+                result.data
+              )}`
+            );
+            if (callback) return callback(composeNextState(state, result.data));
+            return composeNextState(state, result.data);
+          });
+      } else if (recordsWithValueCount === 0) {
+        Log.info(`Existing record not found, proceeding to CREATE(POST) ...`);
+        queryParams.delete('filter');
+        queryParams.append('importStrategy', 'CREATE');
+        return axios
+          .request({
+            method: 'POST',
+            url,
+            auth: {
+              username,
+              password,
+            },
+            data: body,
+            params: queryParams,
+            headers,
+          })
+          .then(result => {
+            Log.info(
+              `Upsert succeeded. Created ${resourceName}: ${
+                result.data.response.importSummaries[0].href
+              }\nSummary:\n${prettyJson(result.data)}`
+            );
+            if (callback) return callback(composeNextState(state, result.data));
+            return composeNextState(state, result.data);
+          });
+      }
     });
   };
 }
