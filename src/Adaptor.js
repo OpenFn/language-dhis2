@@ -20,6 +20,7 @@ import {
   logOperation,
   COLORS,
   prettyJson,
+  ESCAPE,
 } from './Utils';
 //#endregion
 
@@ -142,166 +143,104 @@ axios.interceptors.response.use(
  * @constructor
  * @param {string} uniqueAttributeId - Tracked Entity Instance unique identifier used during matching
  * @param {object} data - Payload data for new/updated tracked entity instance(s)
- * @param {object} options - Optional options for update method. Defaults to {replace: true}
+ * @param {object} options - Optional options for update method. Defaults to {replace: false, requireUniqueAttributeConfig: true}
  * @returns {Operation}
  */
-export function upsertTEI(uniqueAttributeId, data, options) {
+export function upsertTEI(uniqueAttributeId, data, options, callback) {
   return state => {
     const { password, username, hostUrl } = state.configuration;
-    const { replace } = options;
 
     const body = expandReferences(data)(state);
-    const url = resolveUrl(hostUrl + '/', `api/trackedEntityInstances`);
-    const uniqueAttributeUrl = `${hostUrl}/api/trackedEntityAttributes/${uniqueAttributeId}`;
-    const trackedEntityType = state.data.trackedEntityType;
-    const trackedEntityTypeUrl = `${hostUrl}/api/trackedEntityTypes/${trackedEntityType}?fields=*`;
 
-    const uniqueAttributeValue = state.data.attributes.find(
-      obj => obj.attribute === uniqueAttributeId
-    ).value;
+    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
-    const query = {
-      ou: state.data.orgUnit,
-      ouMode: 'ACCESSIBLE',
-      filter: `${uniqueAttributeId}:EQ:${uniqueAttributeValue}`,
-      skipPaging: true,
+    const supportApiVersion =
+      options?.supportApiVersion ?? state.configuration.supportApiVersion;
+    const requireUniqueAttributeConfig =
+      options?.requireUniqueAttributeConfig ?? true;
+    const headers = {
+      Accept: 'application/json',
     };
 
-    console.log(
-      `Checking if Tracked Entity Type ${trackedEntityType} exists...`
+    const uniqueAttributeValue = state.data.attributes?.find(
+      obj => obj?.attribute === uniqueAttributeId
+    )?.value;
+
+    const trackedEntityType = state.data.trackedEntityType;
+
+    const uniqueAttributeUrl = buildUrl(
+      `/trackedEntityAttributes/${uniqueAttributeId}`,
+      hostUrl,
+      apiVersion,
+      supportApiVersion
     );
 
-    return get({
-      username,
-      password,
-      query: null,
-      url: trackedEntityTypeUrl,
-    }).then(result => {
-      let tet = JSON.parse(result.text);
+    const trackedEntityTypeUrl = buildUrl(
+      `/trackedEntityTypes/${trackedEntityType}?fields=*`,
+      hostUrl,
+      apiVersion,
+      supportApiVersion
+    );
 
-      console.log(
-        `Tracked Entity Type ${trackedEntityType}(${tet.name}) found.`
-      );
+    const params = [
+      {
+        ou: state.data.orgUnit,
+      },
+      { skipPaging: true },
+    ];
 
-      console.log(
-        `Checking if attribute ${uniqueAttributeId} is assigned to ${tet.name} Entity Type... `
-      );
-      const attribute = tet.trackedEntityTypeAttributes.find(
-        obj => obj.trackedEntityAttribute.id === uniqueAttributeId
-      );
-      if (attribute) {
-        console.log(
-          `Attribute ${attribute.name}(${uniqueAttributeId}) is assigned to ${tet.name}.`
-        );
-
-        console.log(
-          `Checking if attribute ${attribute.name}(${uniqueAttributeId}) is unique...`
-        );
-
-        return get({
-          username,
-          password,
-          query: null,
-          url: uniqueAttributeUrl,
-        }).then(result => {
-          const foundAttribute = JSON.parse(result.text);
-
-          if (foundAttribute.unique) {
-            console.log(
-              `Tracked Entity Attribute ${attribute.name}(${uniqueAttributeId}) is unique. Proceeding to checking if Tracked Entity Instance exists...`
-            );
-            return get({
-              username,
-              password,
-              query,
-              url,
-            }).then(result => {
-              console.log(`query ${JSON.stringify(query, null, 2)}`);
-
-              let tei_body = JSON.parse(result.text);
-
-              if (tei_body.trackedEntityInstances.length <= 0) {
-                console.log(
-                  `Tracked Entity Instance  with filter ${query.filter} not found, proceeding to create...`
-                );
-
-                return post({
-                  username,
-                  password,
-                  body,
-                  url,
-                  query: null,
-                }).then(result => {
-                  console.log(
-                    `POST succeeded. ${
-                      result.header.location
-                    }\nSummary:\n${JSON.stringify(
-                      JSON.parse(result.text),
-                      null,
-                      2
-                    )}`
-                  );
-
-                  return {
-                    ...state,
-                    references: [result, ...state.references],
-                  };
-                });
-              } else {
-                const row1 = tei_body.trackedEntityInstances[0];
-
-                const payload = replace
-                  ? body
-                  : {
-                      ...row1,
-                      ...body,
-                      attributes: [...row1.attributes, ...body.attributes],
-                    };
-
-                const updateUrl = `${url}/${row1.trackedEntityInstance}`;
-
-                console.log(
-                  `Tracked Entity Instance  with filter ${query.filter} found(${
-                    row1.trackedEntityInstance
-                  }), proceeding to ${
-                    replace ? 'replace' : 'merge data with'
-                  } the existing TEI...`
-                );
-
-                return put({
-                  username,
-                  password,
-                  body: payload,
-                  url: updateUrl,
-                  query: null,
-                }).then(result => {
-                  console.log(`Upsert succeeded. Updated TEI: ${updateUrl}`);
-                  console.log(
-                    `Summary:\n${JSON.stringify(
-                      JSON.parse(result.text),
-                      null,
-                      2
-                    )}`
-                  );
-
-                  return {
-                    ...state,
-                    references: [result, ...state.references],
-                  };
-                });
-              }
-            });
-          } else {
-            throw new Error(
-              `Attribute ${attribute.name}(${uniqueAttributeId}) is not unique. Ensure, in DHIS2, this tracked entity attribute is marked as unique.`
-            );
-          }
+    const findTrackedEntityType = () => {
+      return axios
+        .get(trackedEntityTypeUrl, { auth: { username, password } })
+        .then(result => {
+          const attribute = result.data?.trackedEntityTypeAttributes?.find(
+            obj => obj?.trackedEntityAttribute?.id === uniqueAttributeId
+          );
+          return {
+            ...result.data,
+            upsertAttributeAssigned: attribute ? true : false,
+          };
         });
-      } else {
-        throw new Error(
-          `Tracked Entity Attribute ${uniqueAttributeId} is not assigned to ${tet.name} Entity Type. Ensure, in DHIS2, this tracked entity attribute is assigned to ${tet.name} and that it is marked as unique.`
+    };
+
+    const isAttributeUnique = () => {
+      return axios
+        .get(uniqueAttributeUrl, { auth: { username, password } })
+        .then(result => {
+          const foundAttribute = result.data;
+          return { unique: foundAttribute.unique, name: foundAttribute.name };
+        });
+    };
+    return Promise.all([
+      findTrackedEntityType(),
+      requireUniqueAttributeConfig === true
+        ? isAttributeUnique()
+        : Promise.resolve({ unique: true }),
+    ]).then(([entityType, attribute]) => {
+      if (!entityType.upsertAttributeAssigned) {
+        Log.error('');
+        throw new RangeError(
+          `Tracked Entity Attribute ${uniqueAttributeId} is not assigned to ${entityType.name} Entity Type. Ensure, in DHIS2, this tracked entity attribute is assigned to ${entityType.name} and that it is marked as unique.`
         );
       }
+      if (!attribute.unique) {
+        Log.error('');
+        throw new RangeError(
+          `Attribute ${
+            attribute.name ?? ''
+          }(${uniqueAttributeId}) is not unique. Ensure, in DHIS2, this tracked entity attribute is marked as unique.`
+        );
+      }
+      return upsert(
+        'trackedEntityInstances',
+        {
+          attributeId: uniqueAttributeId,
+          attributeValue: uniqueAttributeValue,
+        },
+        '',
+        body,
+        params
+      )(state);
     });
   };
 }
@@ -964,7 +903,7 @@ export function upsert(
   return state => {
     const { username, password, hostUrl } = state.configuration;
 
-    const { replace } = options;
+    const replace = options?.replace ?? false;
 
     const responseType = 'json';
 
@@ -1080,7 +1019,11 @@ export function upsert(
         //   );
         // }
         Log.info(
-          `Attribute has unique values. Proceeding to replace or merge ...`
+          `${
+            COLORS.FgGreen
+          }Attribute has unique values${ESCAPE}. Proceeding to ${
+            COLORS.FgGreen
+          }${replace ? 'replace' : 'merge'}${ESCAPE} ...`
         );
 
         const row1 = recordsWithValue.data[resourceType][0];
@@ -1118,15 +1061,17 @@ export function upsert(
           })
           .then(result => {
             Log.info(
-              `Upsert succeeded. Updated ${resourceName}: ${updateUrl}.\nSummary:\n${prettyJson(
-                result.data
-              )}`
+              `Upsert succeeded. Updated ${resourceName}: ${
+                COLORS.FgGreen
+              }${updateUrl}${ESCAPE}.\nSummary:\n${prettyJson(result.data)}`
             );
             if (callback) return callback(composeNextState(state, result.data));
             return composeNextState(state, result.data);
           });
       } else if (recordsWithValueCount === 0) {
-        Log.info(`Existing record not found, proceeding to CREATE(POST) ...`);
+        Log.info(
+          `Existing record not found, proceeding to ${COLORS.FgGreen}CREATE(POST)${ESCAPE} ...`
+        );
         queryParams.delete('filter');
         queryParams.append('importStrategy', 'CREATE');
         return axios
@@ -1143,9 +1088,9 @@ export function upsert(
           })
           .then(result => {
             Log.info(
-              `Upsert succeeded. Created ${resourceName}: ${
+              `Upsert succeeded. Created ${resourceName}: ${COLORS.FgGreen}${
                 result.data.response.importSummaries[0].href
-              }\nSummary:\n${prettyJson(result.data)}`
+              }${ESCAPE}\nSummary:\n${prettyJson(result.data)}`
             );
             if (callback) return callback(composeNextState(state, result.data));
             return composeNextState(state, result.data);
