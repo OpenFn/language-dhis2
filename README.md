@@ -38,7 +38,7 @@ fetchAnalytics({
     outputIdScheme: 'UID',
   },
 });
-```
+````
 
 ## Tracked Entity API
 

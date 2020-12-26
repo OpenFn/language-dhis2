@@ -177,15 +177,30 @@ export function prettyJson(data) {
 }
 
 /**
- * Colors
+ * An ANSI escape sequence  constant character that will be intercepted by the terminal and used to escape sequences dealing only with colors and styles.
+ * @private
+ * @constant
+ * @default
+ * @example <caption>Example using `ESCAPE` in console logs</caption>
+ * ```javascript
+ * console.warn(`${COLORS.FgYellow}Warning!${ESCAPE} This may be dangerous!`)
+ * ```
  */
-/*
-  * For example, \x1b[31m is an escape sequence that will be intercepted by the terminal 
-    and instructs it to switch to the red color. 
-    In fact, \x1b is the code for the non-printable control character escape. 
-    Escape sequences dealing only with colors and styles are also known as ANSI escape code(https://en.wikipedia.org/wiki/ANSI_escape_code#Colors) 
-    and are standardized, so therefore they (should) work on any platform
-  */
+export const ESCAPE = '\x1b[0m';
+
+/**
+ * A constant for colors used in console messages to highlight or emphasize text
+ * These are also known as {@link https://en.wikipedia.org/wiki/ANSI_escape_code#Colors ANSI escape code}.
+ * These color codes are standardized ANSI escape codes, and so therefore they(should) work on any platform
+ * @private
+ * @enum {string}
+ * @readonly
+ * @default
+ * @example <caption>Example using `COLORS` in console logs</caption>
+ * ```javascript
+ * console.warn(`${COLORS.FgYellow}Warning!${ESCAPE} This is a warning!`)
+ * ```
+ */
 export const COLORS = {
   Reset: '\x1b[0m',
   Bright: '\x1b[1m',
@@ -215,25 +230,51 @@ export const COLORS = {
 };
 
 /**
- * Custom logger with timestamps and colors
- *
+ * Custom static logger class with timestamps and colors
+ * @private
+ * @class
+ * @method info - `Public static` member method used to print a `information` messages to the console.
+ * @method warn - `Public static` member method used to print `warning` messages to the console.
+ * @method error - `Public static` member method used to print `error` messages to the console.
+ * @method printMessage - `Private static` member method used internally to `render` a message to the console.
+ * @example <caption>Example using `Log` to print the message `Executing the Job...` with an `openfn` TAG pre-fixed, the word `INFO` in `green`, and a timestamp</caption>
+ * ```javascript
+ * Log.info('Executing the Job...');
+ * ```
  */
 export class Log {
+  /**
+   * Enum for `Switch` options
+   * @private
+   * @static
+   * @enum {string}
+   * @readonly
+   */
   static #OPTIONS = {
     INFO: 'INFO',
     WARN: 'WARN',
     ERROR: 'ERROR',
   };
-
+  /**
+   * `Static` main tag, pre-fixed to a console logged message
+   * @private
+   * @static
+   * @constant
+   * @readonly
+   */
   static #MAIN_TAG = 'openfn';
-
+  /**
+   * `Private static` helper method used to print the message to the console, applying all the colors and tags.
+   * @private
+   * @static
+   */
   static #printMessage(prefix, message) {
     switch (prefix) {
       case Log.#OPTIONS.WARN:
         console.warn(
           `${Log.#MAIN_TAG} ${
             COLORS.FgYellow
-          }%s\x1b[0m ${new Date()}\n ${message}`,
+          }%s${ESCAPE} ${new Date()}\n ${message}`,
           Log.#OPTIONS.WARN
         );
         break;
@@ -241,7 +282,7 @@ export class Log {
         console.error(
           `${Log.#MAIN_TAG} ${
             COLORS.FgRed
-          }%s\x1b[0m ${new Date()}\n ${message}`,
+          }%s${ESCAPE} ${new Date()}\n ${message}`,
           Log.#OPTIONS.ERROR
         );
         break;
@@ -249,18 +290,47 @@ export class Log {
         console.info(
           `${Log.#MAIN_TAG} ${
             COLORS.FgGreen
-          }%s\x1b[0m ${new Date()}\n ${message}`,
+          }%s${ESCAPE} ${new Date()}\n ${message}`,
           Log.#OPTIONS.INFO
         );
     }
   }
-
+  /**
+   * `Public static` helper method used to print `information` messages to the console, applying all the colors and tags.
+   * @public
+   * @static
+   * @returns {string}
+   * @example <caption>Example printing `information message` to the console with tag `openfn` prefixed, the word `INFO` in `green`, and a `timestamp`</caption>
+   * ```javascript
+   * Log.info('Upsert operation succeeded.')
+   * ```
+   */
   static info(message) {
     return Log.#printMessage(Log.#OPTIONS.INFO, message);
   }
+  /**
+   * `Public static` helper method used to print `warning` messages to the console, applying all the colors and tags.
+   * @public
+   * @static
+   * @returns {string}
+   * @example <caption>Example printing `warning message` to the console with tag `openfn` prefixed, the word `WARN` in `yellow`, and a `timestamp`</caption>
+   * ```javascript
+   * Log.warn('Upsert operation succeeded.')
+   * ```
+   */
   static warn(message) {
     return Log.#printMessage(Log.#OPTIONS.WARN, message);
   }
+  /**
+   * `Public static` helper method used to print `error` messages to the console, applying all the colors and tags.
+   * @public
+   * @static
+   * @returns {string}
+   * @example <caption>Example printing `error message` to the console with tag `openfn` prefixed, the word `ERROR` in `red`, and a `timestamp`</caption>
+   * ```javascript
+   * Log.error('Upsert operation succeeded.')
+   * ```
+   */
   static error(message) {
     return Log.#printMessage(Log.#OPTIONS.ERROR, message);
   }
