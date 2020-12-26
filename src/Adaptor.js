@@ -131,6 +131,13 @@ axios.interceptors.response.use(
  * @returns {state}
  */
 
+/**
+ * Configuration obect for the `upsert`'s `options` parameter
+ * @public
+ * @readonly
+ * @typedef {{ replace: boolean, apiVersion: number, supportApiVersion: boolean,requireUniqueAttributeConfig: boolean}} upsertOptionsConfig
+ */
+
 //#endregion
 
 //#region COMMONLY USED HELPER OPERATIONS
@@ -138,15 +145,25 @@ axios.interceptors.response.use(
  * Upsert(Create or update) one or many new Tracked Entity Instances
  * This is useful for idempotency and duplicate management
  * @public
- * @example
- * upsertTEI('w75KJ2mc4zz', state.data, { replace: true })
  * @constructor
  * @param {string} uniqueAttributeId - Tracked Entity Instance unique identifier used during matching
- * @param {object} data - Payload data for new/updated tracked entity instance(s)
- * @param {object} options - Optional options for update method. Defaults to {replace: false, requireUniqueAttributeConfig: true}
- * @returns {Operation}
+ * @param {object<any,any>} data - Payload data for new/updated tracked entity instance(s)
+ * @param {upsertOptionsConfig} [options={replace: false, apiVersion: null, supportApiVersion: false,requireUniqueAttributeConfig: true}] - Optional options for update method.`
+ * @param {{sourceValue: any, operator: ['eq','!eq','gt','gte','lt','lte'], destinationValuePath: string}} [updateCondition=true:EQ:true] - Useful for `idempotency`. Optional expression used to determine when to apply the UPDATE when a record exists(e.g. `payLoad.registrationDate>person.registrationDate`). By default, we apply the UPDATE if it passes `unique attribute checks`.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @throws {RangeError}
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of upsertTEI</caption>
+ * upsertTEI('aX5hD4qUpRW', state.data);
+ * @todo Implement updateCondition
  */
-export function upsertTEI(uniqueAttributeId, data, options, callback) {
+export function upsertTEI(
+  uniqueAttributeId,
+  data,
+  options,
+  updateCodntion,
+  callback
+) {
   return state => {
     const { password, username, hostUrl } = state.configuration;
 
@@ -237,9 +254,11 @@ export function upsertTEI(uniqueAttributeId, data, options, callback) {
           attributeId: uniqueAttributeId,
           attributeValue: uniqueAttributeValue,
         },
-        '',
+        updateCodntion,
         body,
-        params
+        params,
+        options,
+        callback
       )(state);
     });
   };
@@ -248,9 +267,8 @@ export function upsertTEI(uniqueAttributeId, data, options, callback) {
 
 //#region GENERIC HELPER OPERATIONS
 /**
- * TODO
- *
  * Discover available parameters and allowed operators for a given resource's endpoint
+ * @todo Implementation
  * @example
  * discover('getData, /api/trackedEntityInstances')
  * @param {*} operation
@@ -857,17 +875,12 @@ export function del(resourceType, path, data, params, options, callback) {
 /**
  * A generic helper function used to atomically either insert a row, or on the basis of the row already existing,
  * UPDATE that existing row instead.
- * @todo Tweak/refine to mimic implementation based on the following inspiration: https://sqlite.org/lang_upsert.html and https://wiki.postgresql.org/wiki/UPSERT
- * @todo Test implementation for upserting metadata
- * @todo Test implementation for upserting data values
- * @todo Implement the updateCondition
- *
  * @param {!string} resourceType - The type of a resource to `insert` or `update`. E.g. `trackedEntityInstances`
  * @param {!{attributeId: string, attributeValue: any}} uniqueAttribute - An object containing a `attributeId` and `attributeValue` which will be used to uniquely identify the record
- * @param {{sourceValue: any, operator: ['eq','!eq','gt','gte','lt','lte'], destinationValuePath: string}} [updateCondition=true] - Useful for `idempotency`. Optional expression used to determine when to apply the UPDATE when a record exists(e.g. `payLoad.registrationDate>person.registrationDate`). By default, we apply the UPDATE.
+ * @param {{sourceValue: any, operator: ['eq','!eq','gt','gte','lt','lte'], destinationValuePath: string}} [updateCondition=true:EQ:true] - Useful for `idempotency`. Optional expression used to determine when to apply the UPDATE when a record exists(e.g. `payLoad.registrationDate>person.registrationDate`). By default, we apply the UPDATE if it passes `unique attribute checks`.
  * @param {Object<any,any>} data - The update data containing new values
  * @param {array} [params] - Optional `import` parameters for `Update/create`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
- * @param {{replace: boolean}} [options={replace: false}] - Optional `flags` for the behavior of the `upsert(Update)` operation. Options are `{replace:true}` or `{replace:false}`. Defaults to `{repalce: false}` which implies `merge` existing properties with new ones(if any)
+ * @param {upsertOptionsConfig} [options={replace: false, apiVersion: null, supportApiVersion: false,requireUniqueAttributeConfig: true}] - Optional options for update method {@link upsertOptionsConfig}.`
  * @param {requestCallback} [callback] - Optional callback to handle the response
  * @returns {Promise<state>} state
  * @throws {RangeError}
@@ -890,6 +903,10 @@ export function del(resourceType, path, data, params, options, callback) {
  *    { replace: false }
  *   );
  * ```
+ * @todo Tweak/refine to mimic implementation based on the following inspiration: {@link https://sqlite.org/lang_upsert.html sqlite upsert} and {@link https://wiki.postgresql.org/wiki/UPSERT postgresql upsert}
+ * @todo Test implementation for upserting metadata
+ * @todo Test implementation for upserting data values
+ * @todo Implement the updateCondition
  */
 export function upsert(
   resourceType,
@@ -1061,7 +1078,9 @@ export function upsert(
           })
           .then(result => {
             Log.info(
-              `Upsert succeeded. Updated ${resourceName}: ${
+              `${
+                COLORS.FgGreen
+              }Upsert succeeded${ESCAPE}. Updated ${resourceName}: ${
                 COLORS.FgGreen
               }${updateUrl}${ESCAPE}.\nSummary:\n${prettyJson(result.data)}`
             );
@@ -1070,7 +1089,7 @@ export function upsert(
           });
       } else if (recordsWithValueCount === 0) {
         Log.info(
-          `Existing record not found, proceeding to ${COLORS.FgGreen}CREATE(POST)${ESCAPE} ...`
+          `${COLORS.FgGreen}Existing record not found${ESCAPE}, proceeding to ${COLORS.FgGreen}CREATE(POST)${ESCAPE} ...`
         );
         queryParams.delete('filter');
         queryParams.append('importStrategy', 'CREATE');
@@ -1088,7 +1107,11 @@ export function upsert(
           })
           .then(result => {
             Log.info(
-              `Upsert succeeded. Created ${resourceName}: ${COLORS.FgGreen}${
+              `${
+                COLORS.FgGreen
+              }Upsert succeeded${ESCAPE}. Created ${resourceName}: ${
+                COLORS.FgGreen
+              }${
                 result.data.response.importSummaries[0].href
               }${ESCAPE}\nSummary:\n${prettyJson(result.data)}`
             );
