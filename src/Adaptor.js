@@ -142,7 +142,7 @@ axios.interceptors.response.use(
 
 //#region COMMONLY USED HELPER OPERATIONS
 /**
- * Upsert(Create or update) one or many new Tracked Entity Instances
+ * Upsert(Create or update) one or many Tracked Entity Instances
  * This is useful for idempotency and duplicate management
  * @public
  * @constructor
@@ -261,6 +261,27 @@ export function upsertTEI(
         callback
       )(state);
     });
+  };
+}
+
+/**
+ * Create a DHIS2 Tracked Entity Instance
+ * @param {object<any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `create`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `createTEI` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `createTEI`</caption>
+ */
+export function createTEI(data, params, options, callback) {
+  return state => {
+    return create(
+      'trackedEntityInstances',
+      data,
+      params,
+      options,
+      callback
+    )(state);
   };
 }
 //#endregion
@@ -641,7 +662,9 @@ export function create(resourceType, data, params, options, callback) {
   return state => {
     const { username, password, hostUrl } = state.configuration;
 
-    const queryParams = expandReferences(params)(state);
+    let queryParams = new URLSearchParams(
+      params?.map(item => Object.entries(item)?.flat())
+    );
 
     const payload = expandReferences(data)(state);
 
@@ -657,7 +680,7 @@ export function create(resourceType, data, params, options, callback) {
       supportApiVersion
     );
 
-    logOperation('create');
+    logOperation(`CREATE ${resourceType}`);
 
     logApiVersion(apiVersion, supportApiVersion);
 
@@ -677,8 +700,16 @@ export function create(resourceType, data, params, options, callback) {
         data: payload,
       })
       .then(result => {
+        Log.info(
+          `${
+            COLORS.FgGreen
+          }CREATE succeeded${ESCAPE}. Created ${resourceType}: ${
+            COLORS.FgGreen
+          }${
+            result.data.response.importSummaries[0].href
+          }${ESCAPE}.\nSummary:\n${prettyJson(result.data)}`
+        );
         if (callback) return callback(composeNextState(state, result.data));
-
         return composeNextState(state, result.data);
       });
   };
