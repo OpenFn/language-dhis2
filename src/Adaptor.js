@@ -21,6 +21,7 @@ import {
   COLORS,
   prettyJson,
   ESCAPE,
+  composeSuccessMessage,
 } from './Utils';
 //#endregion
 
@@ -309,6 +310,28 @@ export function updateTEI(path, data, params, options, callback) {
     )(state);
   };
 }
+
+/**
+ * Get DHIS2 Tracked Entity Instance(s)
+ * @param {array} params - `import` parameters for `getTEIs`. E.g. `{ou:}`
+ * @param {string} [responseType] - Optional
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `getTEIs` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `getTEIs`</caption>
+ * getTEIs('PVqUD2hvU4E', state.data);
+ */
+export function getTEIs(params, responseType, options, callback) {
+  return state => {
+    return getData(
+      'trackedEntityInstances',
+      params,
+      responseType,
+      options,
+      callback
+    )(state);
+  };
+}
 //#endregion
 
 //#region GENERIC HELPER OPERATIONS
@@ -401,8 +424,8 @@ export function getResources(params, responseType, callback) {
         transformResponse,
       })
       .then(result => {
+        composeSuccessMessage('getResources');
         if (callback) return callback(composeNextState(state, result.data));
-
         return composeNextState(state, result.data);
       });
   };
@@ -549,7 +572,9 @@ export function getData(resourceType, params, responseType, options, callback) {
   return state => {
     const { username, password, hostUrl } = state.configuration;
 
-    const queryParams = expandReferences(params)(state);
+    let queryParams = new URLSearchParams(
+      params?.map(item => Object.entries(item)?.flat())
+    );
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
@@ -588,8 +613,8 @@ export function getData(resourceType, params, responseType, options, callback) {
         headers,
       })
       .then(result => {
+        Log.info(composeSuccessMessage('GET ' + resourceType));
         if (callback) return callback(composeNextState(state, result.data));
-
         return composeNextState(state, result.data);
       });
   };

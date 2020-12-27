@@ -6,18 +6,8 @@ import { expandReferences } from 'language-common';
  * Compose success message
  */
 
-export function composeSuccessMessage(
-  operation,
-  responseType,
-  params,
-  options,
-  callback
-) {
-  return `${operation}('${responseType ?? ''}', ${JSON.stringify(
-    params ?? null
-  )}, ${JSON.stringify(options ?? '')}, ${
-    isEmpty(callback ?? '-unused-') ? '(state)=>{}' : callback
-  }) succeeded. The body of this result will be available in state.data or in your callback.`;
+export function composeSuccessMessage(operation) {
+  return `${COLORS.FgGreen}${operation}${ESCAPE} succeeded. The body of this result will be available in ${COLORS.FgGreen}state.data${ESCAPE} or in your ${COLORS.FgGreen}callback${ESCAPE}.`;
 }
 
 /**
