@@ -272,11 +272,36 @@ export function upsertTEI(
  * @param {requestCallback} [callback] - Optional callback to handle the response
  * @returns {Promise<state>} state
  * @example <caption>- Example `expression.js` of `createTEI`</caption>
+ * createTEI(state.data);
  */
 export function createTEI(data, params, options, callback) {
   return state => {
     return create(
       'trackedEntityInstances',
+      data,
+      params,
+      options,
+      callback
+    )(state);
+  };
+}
+
+/**
+ * Update a DHIS2 Tracked Entity Instance
+ * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
+ * @param {object<any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `create`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `updateTEI` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `updateTEI`</caption>
+ * update('PVqUD2hvU4E', state.data);
+ */
+export function updateTEI(path, data, params, options, callback) {
+  return state => {
+    return update(
+      'trackedEntityInstances',
+      path,
       data,
       params,
       options,
@@ -706,7 +731,9 @@ export function create(resourceType, data, params, options, callback) {
           }CREATE succeeded${ESCAPE}. Created ${resourceType}: ${
             COLORS.FgGreen
           }${
-            result.data.response.importSummaries[0].href
+            result.data.response.importSummaries
+              ? result.data.response.importSummaries[0].href
+              : result.data.response?.reference
           }${ESCAPE}.\nSummary:\n${prettyJson(result.data)}`
         );
         if (callback) return callback(composeNextState(state, result.data));
@@ -739,9 +766,9 @@ export function update(resourceType, path, data, params, options, callback) {
   return state => {
     const { username, password, hostUrl } = state.configuration;
 
-    // const objectPath = expandReferences(path)(state);
-
-    const queryParams = expandReferences(params)(state);
+    let queryParams = new URLSearchParams(
+      params?.map(item => Object.entries(item)?.flat())
+    );
 
     const payload = expandReferences(data)(state);
 
@@ -757,7 +784,7 @@ export function update(resourceType, path, data, params, options, callback) {
       supportApiVersion
     );
 
-    logOperation('update');
+    logOperation(`UPDATE ${resourceType}`);
 
     logApiVersion(apiVersion, supportApiVersion);
 
@@ -777,8 +804,18 @@ export function update(resourceType, path, data, params, options, callback) {
         data: payload,
       })
       .then(result => {
+        Log.info(
+          `${
+            COLORS.FgGreen
+          }UPDATE succeeded${ESCAPE}. Updated ${resourceType}: ${
+            COLORS.FgGreen
+          }${
+            result.data.response.importSummaries
+              ? result.data.response.importSummaries[0].href
+              : result.data.response?.reference
+          }${ESCAPE}.\nSummary:\n${prettyJson(result.data)}`
+        );
         if (callback) return callback(composeNextState(state, result.data));
-
         return composeNextState(state, result.data);
       });
   };
@@ -1143,8 +1180,10 @@ export function upsert(
               }Upsert succeeded${ESCAPE}. Created ${resourceName}: ${
                 COLORS.FgGreen
               }${
-                result.data.response.importSummaries[0].href
-              }${ESCAPE}\nSummary:\n${prettyJson(result.data)}`
+                result.data.response.importSummaries
+                  ? result.data.response.importSummaries[0].href
+                  : result.data.response?.reference
+              }${ESCAPE}.\nSummary:\n${prettyJson(result.data)}`
             );
             if (callback) return callback(composeNextState(state, result.data));
             return composeNextState(state, result.data);
