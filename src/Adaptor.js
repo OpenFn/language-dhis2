@@ -754,9 +754,40 @@ export function getDataValues(params, responseType, options, callback) {
  * generateDhis2UID([{limit: 3}]);
  */
 export function generateDhis2UID(params, responseType, options, callback) {
-  return getData('system/id', params, responseType, options, callback);
+  return state =>
+    getData('system/id', params, responseType, options, callback)(state);
 }
 
+/**
+ * Access analytical, aggregated data in DHIS2 you can work with the analytics resource
+ * - The analytics resource is powerful as it lets you query and retrieve data aggregated along all available data dimensions.
+ * - For instance, you can ask the analytics resource to provide the aggregated data values for a set of data elements, periods and organisation units.
+ * - Also, you can retrieve the aggregated data for a combination of any number of dimensions based on data elements and organisation unit group sets.
+ * @param {string} resourceType - The resource you want analytics for.
+ * @param {array} [params] - Analytics query params. Run `discover('getAnalytics',${resourceType})` to get the params available
+ * @param {string} [responseType] - Defaults to `json`
+ * @param {options} [options] - Options
+ * @param {requestCallback} [callback] - Callback to handle response
+ * @example <caption>Example generating `one UID` from the DHIS2 server</caption>
+ * getAnalytics('events');
+ * @todo examples
+ */
+export function getAnalytics(
+  resourceType,
+  params,
+  responseType,
+  options,
+  callback
+) {
+  return state =>
+    getData(
+      `analytics/${resourceType}`,
+      params,
+      responseType,
+      options,
+      callback
+    )(state);
+}
 /**
  * Discover available parameters and allowed operators for a given resource's endpoint
  * @todo Implementation
