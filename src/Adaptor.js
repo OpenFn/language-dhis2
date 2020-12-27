@@ -331,6 +331,26 @@ export function createPrograms(data, params, options, callback) {
 }
 
 /**
+ * Create a DHIS2 Enrollment
+ * - Enrolling a tracked entity instance into a program
+ * - For enrolling `persons` into a `program`, you will need to first get the `identifier of the person` from the `trackedEntityInstances resource` via the `getTEIs` operation.
+ * - Then, you will need to get the `program identifier` from the `programs` resource via the `getPrograms` operation.
+ * @param {object<any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `createEnrollment`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `createEnrollment` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `createEnrollment` of a `person` into a `program` can look like this:</caption>
+ * createEnrollment(state.data);
+ * @see {enrollmentSampleState}
+ */
+export function createEnrollment(data, params, options, callback) {
+  return state => {
+    return create('enrollments', data, params, options, callback)(state);
+  };
+}
+
+/**
  * Update a DHIS2 Tracked Entity Instance
  * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
  * @param {object<any,any>} data - The update data containing new values
