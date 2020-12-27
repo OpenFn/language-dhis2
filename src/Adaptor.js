@@ -162,7 +162,7 @@ export function upsertTEI(
   uniqueAttributeId,
   data,
   options,
-  updateCodntion,
+  updateCondition,
   callback
 ) {
   return state => {
@@ -255,7 +255,7 @@ export function upsertTEI(
           attributeId: uniqueAttributeId,
           attributeValue: uniqueAttributeValue,
         },
-        updateCodntion,
+        updateCondition,
         body,
         params,
         options,
