@@ -288,6 +288,29 @@ export function createTEI(data, params, options, callback) {
 }
 
 /**
+ * Create a DHIS2 Events
+ * - You will need a `program` which can be looked up using the `getPrograms` operation, an `orgUnit` which can be looked up using the `getMetadata` operation and passing `{organisationUnits: true}` as `resources` param, and a list of `valid data element identifiers` which can be looked up using the `getMetadata` passing `{dataElements: true}` as `resources` param.
+ * - For events with registration, a `tracked entity instance identifier is required`
+ * - For sending `events` to `programs with multiple stages`, you will need to also include the `programStage` identifier, the identifiers for `programStages` can be found in the `programStages` resource via a call to `getMetadata` operation.
+ * @param {object<any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `createEvents`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `createEvents` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `createEvents` for a `single event` can look like this:</caption>
+ * createEvents(state.data);
+ * @see {singleEventSampleState}
+ * @example <caption>- Example `expression.js` of `createEvents` for sending `multiple events` at the same time</caption>
+ * createEvents(state.data);
+ * @see {multipleEventsSampleState}
+ */
+export function createEvents(data, params, options, callback) {
+  return state => {
+    return create('events', data, params, options, callback)(state);
+  };
+}
+
+/**
  * Update a DHIS2 Tracked Entity Instance
  * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
  * @param {object<any,any>} data - The update data containing new values
