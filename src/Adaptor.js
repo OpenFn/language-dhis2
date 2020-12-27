@@ -407,6 +407,21 @@ export function getEvents(params, responseType, options, callback) {
     return getData('events', params, responseType, options, callback)(state);
   };
 }
+/**
+ * Get DHIS2 Programs, single events with no registration(annonymous events) or single event with registration and multiple events with registration(tracker events)
+ * @param {array} params - `import` parameters for `getEvents`.
+ * @param {string} [responseType] - Optional response type. Defaults to `json`
+ * @param {eventOptions} [options] - Optional `flags` for the behavior of the `getEvents` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Query for `all programss` with a certain `organisation unit`</caption>
+ * getPrograms([{ orgUnit: 'DiszpKrYNg8' }, { fields: '*' }]);
+ */
+export function getPrograms(params, responseType, options, callback) {
+  return state => {
+    return getData('programs', params, responseType, options, callback)(state);
+  };
+}
 //#endregion
 
 //#region GENERIC HELPER OPERATIONS
