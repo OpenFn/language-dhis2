@@ -483,6 +483,34 @@ export function getEnrollments(params, responseType, options, callback) {
     )(state);
   };
 }
+
+/**
+ * Get DHIS2 Relationships(links) between two entities in tracker. These entities can be tracked entity instances, enrollments and events.
+ * - All the tracker operations, `getTEIs`, `getEnrollments` and `getEvents` also list their relationships if requested in the `field` filter.
+ * - To list all relationships, this requires you to provide the UID of the trackedEntityInstance, Enrollment or event that you want to list all the relationships for.
+ * @param {array} params - `import` parameters for `getRelationships`.
+ * @param {string} [responseType] - Optional response type. Defaults to `json`
+ * @param {eventOptions} [options] - Optional `flags` for the behavior of the `getRelationships` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- A query for `all relationships` associated with a `specific tracked entity instance` can look like this:</caption>
+ * getRelationships([{ tei: 'F8yKM85NbxW' }, { fields: '*' }]);
+ * @example <caption>- A query for `all relationships` associated with a `enrollment` can look like this:</caption>
+ * getRelationships([{ enrollment: 'LXmiAMnJLrS' }, { fields: '*' }]);
+ * @example <caption>- A query for `all relationships` associated with a `event` can look like this:</caption>
+ * getRelationships([{ event: 'TgJUhG6P6TJ' }, { fields: '*' }]);
+ */
+export function getRelationships(params, responseType, options, callback) {
+  return state => {
+    return getData(
+      'relationships',
+      params,
+      responseType,
+      options,
+      callback
+    )(state);
+  };
+}
 //#endregion
 
 //#region GENERIC HELPER OPERATIONS
