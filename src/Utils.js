@@ -135,30 +135,6 @@ export function handleResponse(result, state, callback) {
 }
 
 /**
- * TODO
- *
- * Create a DHIS2 UID-Useful for client generated Ids compatible with DHIS2
- */
-export function generateUID() {
-  return;
-}
-
-/**
- * TODO
- *
- * Validate if valid DHIS2 UID
- * @example
- * isValidUID('MmwcGkxy876')
- * // true
- * isValidUID(12345)
- * // false
- *
- */
-export function isValidUID(target) {
-  return true | false;
-}
-
-/**
  * Print easy-readable JSON objects, uses JSON.stringify.
  *
  */

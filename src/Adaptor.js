@@ -740,6 +740,23 @@ export function getDataValues(params, responseType, options, callback) {
 //#endregion
 
 //#region GENERIC HELPER OPERATIONS
+
+/**
+ * Generate valid, random DHIS2 identifiers *
+ * - Useful for client generated Ids compatible with DHIS2
+ * @param {array} [params] - The limit query parameter is optional and indicates how many identifiers you want to be returned with the response. The default is to return one identifier.
+ * @param {string} [responseType] - Defaults to `json`
+ * @param {options} [options] - Options
+ * @param {requestCallback} [callback] - Callback to handle response
+ * @example <caption>Example generating `one UID` from the DHIS2 server</caption>
+ * generateDhis2UID();
+ * @example <caption>Example generating `three UIDs` from the DHIS2 server</caption>
+ * generateDhis2UID([{limit: 3}]);
+ */
+export function generateDhis2UID(params, responseType, options, callback) {
+  return getData('system/id', params, responseType, options, callback);
+}
+
 /**
  * Discover available parameters and allowed operators for a given resource's endpoint
  * @todo Implementation
