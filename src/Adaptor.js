@@ -351,6 +351,31 @@ export function createEnrollment(data, params, options, callback) {
 }
 
 /**
+ * Create DHIS2 Data Values
+ * - This is used to send aggregated data to DHIS2
+ * - A data value set represents a set of data values which have a relationship, usually from being captured off the same data entry form.
+ * - To send a set of related data values sharing the same period and organisation unit, we need to identify the period, the data set, the org unit (facility) and the data elements for which to report.
+ * - You can also use this operation to send large bulks of data values which don't necessarily are logically related.
+ * - To send data values that are not linked to a `dataSet`, you do not need to specify the dataSet and completeDate attributes. Instead, you will specify the period and orgUnit attributes on the individual data value elements instead of on the outer data value set element. This will enable us to send data values for various periods and organisation units
+ * @param {object<any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `createDataValues`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `createDataVaues` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `createDataValues`  for sending a set of related data values sharing the same period and organisation unit</caption>
+ * createDataValues(state.data);
+ * @see {relatedDataValuesSampleState}
+ * @example <caption>- Example `expression.js` of `createDataValues`  for sending large bulks of data values which don't necessarily are logically related</caption>
+ * createDataValues(state.data);
+ * @see {bulkDataValuesSampleState}
+ */
+export function createDataValues(data, params, options, callback) {
+  return state => {
+    return create('enrollments', data, params, options, callback)(state);
+  };
+}
+
+/**
  * Update a DHIS2 Tracked Entity Instance
  * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
  * @param {object<any,any>} data - The update data containing new values
