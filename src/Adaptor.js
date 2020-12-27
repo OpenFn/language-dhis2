@@ -757,6 +757,37 @@ export function generateDhis2UID(params, responseType, options, callback) {
   return state =>
     getData('system/id', params, responseType, options, callback)(state);
 }
+/**
+ * Discover available parameters and allowed operators for a given resource's endpoint
+ * @todo Implementation
+ * @example
+ * discover('getData, /api/trackedEntityInstances')
+ * @param {*} operation
+ * @param {*} resourceType
+ */
+export function discover(operation, resourceType) {
+  return state => {
+    return axios
+      .get(
+        'https://dhis2.github.io/dhis2-api-specification/spec/metadata_openapi.json'
+      )
+      .then(result => {
+        // console.log(
+        //   prettyJson(
+        //     result.data.paths['/analyticsTableHooks']['get']['parameters']
+        //   )
+        // );
+        console.table(result.data.components.parameters, [
+          'in',
+          'description',
+          'schema',
+          'required',
+        ]);
+        // console.log(prettyJson(result.data.components.schema));
+        return { ...state, data: result.data };
+      });
+  };
+}
 
 /**
  * Access analytical, aggregated data in DHIS2 you can work with the analytics resource
@@ -787,17 +818,6 @@ export function getAnalytics(
       options,
       callback
     )(state);
-}
-/**
- * Discover available parameters and allowed operators for a given resource's endpoint
- * @todo Implementation
- * @example
- * discover('getData, /api/trackedEntityInstances')
- * @param {*} operation
- * @param {*} resourceType
- */
-export function discover(operation, resourceType) {
-  return state;
 }
 
 /**
