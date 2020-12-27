@@ -400,6 +400,110 @@ export function updateTEI(path, data, params, options, callback) {
 }
 
 /**
+ * Update a DHIS2 Events
+ * - To update an existing event, the format of the payload is the same as that of `creating an event` via `createEvents` operations
+ * - But  you should supply the `identifier` of the object you are updating
+ * - The payload has to contain `all`, even `non-modified`, `attributes`.
+ * - Attributes that were present before and are not present in the current payload any more will be removed by DHIS2.
+ * - If you do not want this behavior, please use `upsert` operation to upsert your events.
+ * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
+ * @param {object<any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `updateEvents`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `updateEvents` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `updateEvents`</caption>
+ * updateEvents('PVqUD2hvU4E', state.data);
+ * @todo Support `merge` via custom `partial updates` mechanism since `PATCH` is not `natively` supported on this endpoint
+ */
+export function updateEvents(path, data, params, options, callback) {
+  return state => {
+    return update('events', path, data, params, options, callback)(state);
+  };
+}
+
+/**
+ * Update a DHIS2 Programs
+ * - To update an existing program, the format of the payload is the same as that of `creating an event` via `createEvents` operations
+ * - But  you should supply the `identifier` of the object you are updating
+ * - The payload has to contain `all`, even `non-modified`, `attributes`.
+ * - Attributes that were present before and are not present in the current payload any more will be removed by DHIS2.
+ * - If you do not want this behavior, please use `upsert` operation to upsert your events.
+ * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
+ * @param {object<any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `updatePrograms` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `updatePrograms`</caption>
+ * updatePrograms('PVqUD2hvU4E', state.data);
+ * @todo Support `merge` via custom `partial updates` mechanism since `PATCH` is not `natively` supported on this endpoint
+ */
+export function updatePrograms(path, data, params, options, callback) {
+  return state => {
+    return update('programs', path, data, params, options, callback)(state);
+  };
+}
+/**
+ * Update a DHIS2 Enrollemts
+ * - To update an existing enrollment, the format of the payload is the same as that of `creating an event` via `createEvents` operations
+ * - But  you should supply the `identifier` of the object you are updating
+ * - The payload has to contain `all`, even `non-modified`, `attributes`.
+ * - Attributes that were present before and are not present in the current payload any more will be removed by DHIS2.
+ * - If you do not want this behavior, please use `upsert` operation to upsert your events.
+ * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
+ * @param {object<any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `updatePrograms` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `updateEnromments`</caption>
+ * updatePrograms('PVqUD2hvU4E', state.data);
+ * @todo Support `merge` via custom `partial updates` mechanism since `PATCH` is not `natively` supported on this endpoint
+ */
+export function updateEnrollments(path, data, params, options, callback) {
+  return state => {
+    return update('enrollments', path, data, params, options, callback)(state);
+  };
+}
+
+/**
+ * Cancel a DHIS2 Enrollment
+ * - To cancel an existing enrollment, you should supply the `enrollment identifier`(`enrollemt-id`)
+ * @param {string} enrollmentId - The `enrollment-id` of the enrollment you wish to cancel
+ * @param {array} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `updatePrograms` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `cancelEnrollment`</caption>
+ * cancelEnrollments('PVqUD2hvU4E');
+ */
+export function cancelEnrollment(enrollmentId, params, options, callback) {
+  return state => {
+    const path = `${enrollmentId}/cancelled`;
+    return update('enrollments', path, null, params, options, callback)(state);
+  };
+}
+
+/**
+ * Complete a DHIS2 Enrollment
+ * - To complete an existing enrollment, you should supply the `enrollment identifier`(`enrollemt-id`)
+ * @param {string} enrollmentId - The `enrollment-id` of the enrollment you wish to cancel
+ * @param {array} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `updatePrograms` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `completeEnrollment`</caption>
+ * completeEnrollment('PVqUD2hvU4E');
+ */
+export function completeEnrollment(enrollmentId, params, options, callback) {
+  return state => {
+    const path = `${enrollmentId}/completed`;
+    return update('enrollments', path, null, params, options, callback)(state);
+  };
+}
+
+/**
  * Get DHIS2 Tracked Entity Instance(s)
  * @param {array} params - `import` parameters for `getTEIs`. E.g. `{ou:}`
  * @param {string} [responseType] - Optional response type. Defaults to `json`
