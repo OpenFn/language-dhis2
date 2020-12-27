@@ -311,6 +311,26 @@ export function createEvents(data, params, options, callback) {
 }
 
 /**
+ * Create a DHIS2 Programs
+ * @param {object<any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `createPrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `createPrograms` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `createPrograms` for a `single program` can look like this:</caption>
+ * createPrograms(state.data);
+ * @see {singleProgramSampleState}
+ * @example <caption>- Example `expression.js` of `createPrograms` for sending `multiple programs` at the same time</caption>
+ * createPrograms(state.data);
+ * @see {multipleProgramsSampleState}
+ */
+export function createPrograms(data, params, options, callback) {
+  return state => {
+    return create('programs', data, params, options, callback)(state);
+  };
+}
+
+/**
  * Update a DHIS2 Tracked Entity Instance
  * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
  * @param {object<any,any>} data - The update data containing new values
