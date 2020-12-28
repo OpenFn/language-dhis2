@@ -1,4 +1,4 @@
-import { eq, filter, some, isEmpty } from 'lodash';
+import { eq, filter, some, isEmpty, indexOf, lastIndexOf, trim } from 'lodash';
 import axios from 'axios';
 import { expandReferences } from 'language-common';
 
@@ -140,6 +140,35 @@ export function handleResponse(result, state, callback) {
  */
 export function prettyJson(data) {
   return JSON.stringify(data, null, 2);
+}
+
+export function getIndicesOf(string, regex) {
+  var match,
+    indexes = {};
+
+  regex = new RegExp(regex);
+
+  while ((match = regex.exec(string))) {
+    let schemaRef;
+    if (!indexes[match[0]]) {
+      indexes[match[0]] = {};
+    }
+    let hrefString = string.slice(
+      match.index,
+      indexOf(string, '}', match.index) - 1
+    );
+    console.log('hrefstring: ', hrefString);
+    let lastIndex = lastIndexOf(hrefString, '/') + 1;
+    console.log('last index:', lastIndex);
+    schemaRef = trim(hrefString.slice(lastIndex));
+    console.log('SchemaRef: ', schemaRef);
+    // let item = {};
+    // item[match.index] = schemaRef;
+    // indexes[match[0]].push(match.index);
+    indexes[match[0]][match.index] = schemaRef;
+  }
+
+  return indexes;
 }
 
 /**

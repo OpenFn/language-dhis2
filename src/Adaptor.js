@@ -6,7 +6,7 @@ import {
   expandReferences,
   composeNextState,
 } from 'language-common';
-import { indexOf } from 'lodash';
+import { indexOf, forEach, keyBy } from 'lodash';
 import { prop } from 'lodash/fp';
 
 import {
@@ -23,6 +23,7 @@ import {
   prettyJson,
   ESCAPE,
   composeSuccessMessage,
+  getIndicesOf,
 } from './Utils';
 //#endregion
 
@@ -766,63 +767,61 @@ export function generateDhis2UID(params, responseType, options, callback) {
  * @param {*} operation
  * @param {*} resourceType
  */
-export function discover(operation, resourceType) {
+export function discover(operation, path) {
   return state => {
     return axios
       .get(
         'https://dhis2.github.io/dhis2-api-specification/spec/metadata_openapi.json',
         {
           transformResponse: [
-            (data, headers) => {
+            data => {
               let tempData = JSON.parse(data);
-              console.log('Path', tempData.paths);
-              let filteredData = tempData.paths[resourceType][operation];
-              console.log(`filtered paths ${filteredData}`);
+              let filteredData = tempData.paths[path][operation];
               return {
-                ...tempData,
-                components: {
-                  ...tempData.components,
-                  parameters: Object.entries(
-                    tempData.components.parameters
-                  ).reduce((acc, currentvalue) => {
-                    let index;
-                    if (
-                      indexOf(currentvalue[1].description, ',') === -1 &&
-                      indexOf(currentvalue[1].description, '.') > -1
-                    )
-                      index = indexOf(currentvalue[1].description, '.');
-                    else if (
-                      indexOf(currentvalue[1].description, ',') > -1 &&
-                      indexOf(currentvalue[1].description, '.') > -1
-                    ) {
-                      index =
-                        indexOf(currentvalue[1].description, '.') <
-                        indexOf(currentvalue[1].description, ',')
-                          ? indexOf(currentvalue[1].description, '.')
-                          : indexOf(currentvalue[1].description, ',');
-                    } else {
-                      index = currentvalue[1].description.length;
-                    }
-                    currentvalue[1].description = currentvalue[1].description.substring(
-                      0,
-                      index
-                    );
-                    if (currentvalue[1].schema['$ref']) {
+                ...filteredData,
+                parameters: filteredData.parameters.reduce(
+                  (acc, currentValue) => {
+                    let index = currentValue['$ref'].lastIndexOf('/') + 1;
+                    let paramRef = currentValue['$ref'].slice(index);
+                    let param = tempData.components.parameters[paramRef];
+
+                    if (param.schema['$ref']) {
                       let schemaRefIndex =
-                        currentvalue[1].schema['$ref'].lastIndexOf('/') + 1;
-                      let schemaRef = currentvalue[1].schema['$ref'].slice(
+                        param.schema['$ref'].lastIndexOf('/') + 1;
+                      let schemaRef = param.schema['$ref'].slice(
                         schemaRefIndex
                       );
-                      currentvalue[1].schema =
-                        tempData.components.schemas[schemaRef];
+                      param.schema = tempData.components.schemas[schemaRef];
                     }
-                    currentvalue[1].schema = JSON.stringify(
-                      currentvalue[1].schema
-                    );
-                    acc[currentvalue[0]] = currentvalue[1];
+
+                    param.schema = JSON.stringify(param.schema);
+
+                    let descIndex;
+                    if (
+                      indexOf(param.description, ',') === -1 &&
+                      indexOf(param.description, '.') > -1
+                    )
+                      descIndex = indexOf(param.description, '.');
+                    else if (
+                      indexOf(param.description, ',') > -1 &&
+                      indexOf(param.description, '.') > -1
+                    ) {
+                      descIndex =
+                        indexOf(param.description, '.') <
+                        indexOf(param.description, ',')
+                          ? indexOf(param.description, '.')
+                          : indexOf(param.description, ',');
+                    } else {
+                      descIndex = param.description.length;
+                    }
+
+                    param.description = param.description.slice(0, descIndex);
+
+                    acc[paramRef] = param;
                     return acc;
-                  }, {}),
-                },
+                  },
+                  {}
+                ),
               };
             },
           ],
@@ -830,14 +829,23 @@ export function discover(operation, resourceType) {
       )
       .then(result => {
         Log.info(
-          `\t===========================================================================\n\tQuery Parameters for ${COLORS.FgGreen}${operation}${ESCAPE} on ${COLORS.FgGreen}${resourceType}${ESCAPE}\n\t===========================================================================`
+          `\t=======================================================================================\n\tQuery Parameters for ${
+            COLORS.FgGreen
+          }${operation}${ESCAPE} on ${COLORS.FgGreen}${path}${ESCAPE} [${
+            result.data.description ?? '<description_missing>'
+          }]\n\t=======================================================================================`
         );
-        console.table(result.data.components.parameters, [
+        console.table(result.data.parameters, [
           'in',
           'required',
           'description',
         ]);
-        console.table(result.data.components.parameters, ['schema']);
+        console.table(result.data.parameters, ['schema']);
+        console.log(
+          `=========================================Responses===============================\n${prettyJson(
+            result.data.responses
+          )}\n=======================================================================================`
+        );
         return { ...state, data: result.data };
       });
   };
