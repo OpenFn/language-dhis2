@@ -6,7 +6,8 @@ import {
   expandReferences,
   composeNextState,
 } from 'language-common';
-import { indexOf, result } from 'lodash';
+import { indexOf } from 'lodash';
+import { prop } from 'lodash/fp';
 
 import {
   Log,
@@ -769,21 +770,74 @@ export function discover(operation, resourceType) {
   return state => {
     return axios
       .get(
-        'https://dhis2.github.io/dhis2-api-specification/spec/metadata_openapi.json'
+        'https://dhis2.github.io/dhis2-api-specification/spec/metadata_openapi.json',
+        {
+          transformResponse: [
+            (data, headers) => {
+              let tempData = JSON.parse(data);
+              console.log('Path', tempData.paths);
+              let filteredData = tempData.paths[resourceType][operation];
+              console.log(`filtered paths ${filteredData}`);
+              return {
+                ...tempData,
+                components: {
+                  ...tempData.components,
+                  parameters: Object.entries(
+                    tempData.components.parameters
+                  ).reduce((acc, currentvalue) => {
+                    let index;
+                    if (
+                      indexOf(currentvalue[1].description, ',') === -1 &&
+                      indexOf(currentvalue[1].description, '.') > -1
+                    )
+                      index = indexOf(currentvalue[1].description, '.');
+                    else if (
+                      indexOf(currentvalue[1].description, ',') > -1 &&
+                      indexOf(currentvalue[1].description, '.') > -1
+                    ) {
+                      index =
+                        indexOf(currentvalue[1].description, '.') <
+                        indexOf(currentvalue[1].description, ',')
+                          ? indexOf(currentvalue[1].description, '.')
+                          : indexOf(currentvalue[1].description, ',');
+                    } else {
+                      index = currentvalue[1].description.length;
+                    }
+                    currentvalue[1].description = currentvalue[1].description.substring(
+                      0,
+                      index
+                    );
+                    if (currentvalue[1].schema['$ref']) {
+                      let schemaRefIndex =
+                        currentvalue[1].schema['$ref'].lastIndexOf('/') + 1;
+                      let schemaRef = currentvalue[1].schema['$ref'].slice(
+                        schemaRefIndex
+                      );
+                      currentvalue[1].schema =
+                        tempData.components.schemas[schemaRef];
+                    }
+                    currentvalue[1].schema = JSON.stringify(
+                      currentvalue[1].schema
+                    );
+                    acc[currentvalue[0]] = currentvalue[1];
+                    return acc;
+                  }, {}),
+                },
+              };
+            },
+          ],
+        }
       )
       .then(result => {
-        // console.log(
-        //   prettyJson(
-        //     result.data.paths['/analyticsTableHooks']['get']['parameters']
-        //   )
-        // );
+        Log.info(
+          `\t===========================================================================\n\tQuery Parameters for ${COLORS.FgGreen}${operation}${ESCAPE} on ${COLORS.FgGreen}${resourceType}${ESCAPE}\n\t===========================================================================`
+        );
         console.table(result.data.components.parameters, [
           'in',
-          'description',
-          'schema',
           'required',
+          'description',
         ]);
-        // console.log(prettyJson(result.data.components.schema));
+        console.table(result.data.components.parameters, ['schema']);
         return { ...state, data: result.data };
       });
   };
