@@ -7,7 +7,6 @@ import {
   composeNextState,
 } from 'language-common';
 import { indexOf, forEach, keyBy } from 'lodash';
-import { prop } from 'lodash/fp';
 
 import {
   Log,
@@ -23,40 +22,14 @@ import {
   prettyJson,
   ESCAPE,
   composeSuccessMessage,
-  getIndicesOf,
 } from './Utils';
 //#endregion
 
-//#region CONFIGS
-/**
- * Execute a sequence of operations.
- * Wraps `language-common/execute`, and prepends initial state for DHIS2.
- * @example
- * execute(
- *   create('foo'),
- *   delete('bar')
- * )(state)
- * @constructor
- * @param {Operations} operations - Operations to be performed.
- * @returns {Operation}
- */
-export function execute(...operations) {
-  const initialState = {
-    references: [],
-    data: null,
-  };
-
-  return state => {
-    return commonExecute(
-      configMigrationHelper,
-      ...operations
-    )({ ...initialState, ...state });
-  };
-}
+//#region CONFIG HELPERS, INTERCEPTORS and TYPE DEFINITIONS
 
 /**
- * Migrates "apiUrl" to "hostUrl" if "hostUrl" is blank.
- * For OpenFn.org users with the old-style configuration.
+ * Migrates `apiUrl` to `hostUrl` if `hostUrl` is `blank`.
+ * For `OpenFn.org` users with the `old-style configuration`.
  * @example
  * configMigrationHelper(state)
  * @constructor
@@ -75,6 +48,7 @@ function configMigrationHelper(state) {
   return state;
 }
 
+/* `Axios` Interceptors */
 axios.interceptors.response.use(
   function (response) {
     const contentType = response.headers['content-type']?.split(';')[0];
@@ -112,49 +86,76 @@ axios.interceptors.response.use(
   function (error) {
     Log.error(`${error?.message}`);
     console.log(error.response?.data?.response);
-    // {
-    //   status: error?.response?.status,
-    //   message: error?.message,
-    //   url: error?.response?.config?.url,
-    //   responseData: error?.response?.data,
-    //   isAxiosError: error?.isAxiosError,
-    // }
     return Promise.reject(error);
   }
 );
+
 /**
- * This is the type of result returned by OpenFn operations
+ * Type definition for the `result returned` by `OpenFn operations`
+ * @public
  * @typedef {{configuration: object, references: object[], data: object}} state
  */
 
 /**
- * This callback type is called `requestCallback` and is the type returned by callbacks supplied to OpenFn operations
+ * Type definition for the `callback` supplied to `OpenFn operations`
+ * @public
  * @callback requestCallback
  * @param {state} state
  * @returns {state}
  */
 
 /**
- * Configuration obect for the `upsert`'s `options` parameter
+ * Type definition for `options` `parameter` object used in `DHIS2 adaptor's operations`.
  * @public
- * @readonly
- * @typedef {{ replace: boolean, apiVersion: number, supportApiVersion: boolean,requireUniqueAttributeConfig: boolean}} upsertOptionsConfig
+ * @typedef {{ replace: boolean, apiVersion: number, supportApiVersion: boolean,requireUniqueAttributeConfig: boolean}} options
+ *
  */
 
 //#endregion
 
 //#region COMMONLY USED HELPER OPERATIONS
+
 /**
- * Upsert(Create or update) one or many Tracked Entity Instances
+ * Get DHIS2 Tracked Entity Instance(s)
+ * @param {array} params - `import` parameters for `getTEIs`. E.g. `{ou:}`
+ * @param {string} [responseType] - Optional response type. Defaults to `json`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `getTEIs` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `getTEIs` `expression.js` for fetching a `single` `Tracked Entity Instance`</caption>
+ * getTEIs([
+ * {
+ *   fields: '*',
+ * },
+ * { ou: 'CMqUILyVnBL' },
+ * { trackedEntityInstance: 'HNTA9qD6EEG' },
+ * { skipPaging: true },
+ * ]);
+ */
+export function getTEIs(params, responseType, options, callback) {
+  return state => {
+    return getData(
+      'trackedEntityInstances',
+      params,
+      responseType,
+      options,
+      callback
+    )(state);
+  };
+}
+
+/**
+ * Upsert(Create or update) one or many Tracked Entity Instances. Update if the record exists otherwise insert a new record.
  * This is useful for idempotency and duplicate management
  * @public
  * @constructor
  * @param {string} uniqueAttributeId - Tracked Entity Instance unique identifier used during matching
- * @param {object<any,any>} data - Payload data for new/updated tracked entity instance(s)
- * @param {upsertOptionsConfig} [options={replace: false, apiVersion: null, supportApiVersion: false,requireUniqueAttributeConfig: true}] - Optional options for update method.`
- * @param {{sourceValue: any, operator: ['eq','!eq','gt','gte','lt','lte'], destinationValuePath: string}} [updateCondition=true:EQ:true] - Useful for `idempotency`. Optional expression used to determine when to apply the UPDATE when a record exists(e.g. `payLoad.registrationDate>person.registrationDate`). By default, we apply the UPDATE if it passes `unique attribute checks`.
- * @param {requestCallback} [callback] - Optional callback to handle the response
- * @throws {RangeError}
+ * @param {Object<symbol,any>} data - Payload data for new/updated tracked entity instance(s)
+ * @param {options} [options={replace: false, apiVersion: null, supportApiVersion: false,requireUniqueAttributeConfig: true}] - Optional `options` for `upserTEI` operation.
+ * @param {{filter: string}} [updateCondition={filter: 'true:EQ:true'}] - Useful for `idempotency`. Optional expression used to determine when to apply the UPDATE when a record exists(e.g. `lqI9ZZ0Bbnt:GT:state.data.registrationDate`). By default, we apply the UPDATE if it passes `unique attribute checks`.
+ * @param {Object<symbol,any>[]} params - Optional `params array`. See import parameters {@link discover} or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#tracked-entity-instance-management DHIS2 docs}.
+ * @param {requestCallback} [callback] - Optional `callback` to handle the response.
+ * @throws {RangeError} - Throws `RangeError` when `uniqueAttributeId` is `invalid` or `not unique`.
  * @returns {Promise<state>} state
  * @example <caption>- Example `expression.js` of upsertTEI</caption>
  * upsertTEI('aX5hD4qUpRW', state.data);
@@ -165,6 +166,7 @@ export function upsertTEI(
   data,
   options,
   updateCondition,
+  params,
   callback
 ) {
   return state => {
@@ -178,9 +180,17 @@ export function upsertTEI(
       options?.supportApiVersion ?? state.configuration.supportApiVersion;
     const requireUniqueAttributeConfig =
       options?.requireUniqueAttributeConfig ?? true;
-    const headers = {
-      Accept: 'application/json',
+
+    params = params ?? [];
+    const ou = params?.find(obj => obj.hasOwnProperty('ou')) ?? {
+      ou: state.data.orgUnit,
     };
+
+    console.log('ou is', ou);
+
+    params?.push(ou);
+
+    console.log('Params are', params);
 
     const uniqueAttributeValue = state.data.attributes?.find(
       obj => obj?.attribute === uniqueAttributeId
@@ -201,13 +211,6 @@ export function upsertTEI(
       apiVersion,
       supportApiVersion
     );
-
-    const params = [
-      {
-        ou: state.data.orgUnit,
-      },
-      { skipPaging: true },
-    ];
 
     const findTrackedEntityType = () => {
       return axios
@@ -290,94 +293,6 @@ export function createTEI(data, params, options, callback) {
 }
 
 /**
- * Create a DHIS2 Events
- * - You will need a `program` which can be looked up using the `getPrograms` operation, an `orgUnit` which can be looked up using the `getMetadata` operation and passing `{organisationUnits: true}` as `resources` param, and a list of `valid data element identifiers` which can be looked up using the `getMetadata` passing `{dataElements: true}` as `resources` param.
- * - For events with registration, a `tracked entity instance identifier is required`
- * - For sending `events` to `programs with multiple stages`, you will need to also include the `programStage` identifier, the identifiers for `programStages` can be found in the `programStages` resource via a call to `getMetadata` operation.
- * @param {object<any,any>} data - The update data containing new values
- * @param {array} [params] - Optional `import` parameters for `createEvents`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
- * @param {createOptions} [options] - Optional `flags` for the behavior of the `createEvents` operation.
- * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` of `createEvents` for a `single event` can look like this:</caption>
- * createEvents(state.data);
- * @see {singleEventSampleState}
- * @example <caption>- Example `expression.js` of `createEvents` for sending `multiple events` at the same time</caption>
- * createEvents(state.data);
- * @see {multipleEventsSampleState}
- */
-export function createEvents(data, params, options, callback) {
-  return state => {
-    return create('events', data, params, options, callback)(state);
-  };
-}
-
-/**
- * Create a DHIS2 Programs
- * @param {object<any,any>} data - The update data containing new values
- * @param {array} [params] - Optional `import` parameters for `createPrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
- * @param {createOptions} [options] - Optional `flags` for the behavior of the `createPrograms` operation.
- * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` of `createPrograms` for a `single program` can look like this:</caption>
- * createPrograms(state.data);
- * @see {singleProgramSampleState}
- * @example <caption>- Example `expression.js` of `createPrograms` for sending `multiple programs` at the same time</caption>
- * createPrograms(state.data);
- * @see {multipleProgramsSampleState}
- */
-export function createPrograms(data, params, options, callback) {
-  return state => {
-    return create('programs', data, params, options, callback)(state);
-  };
-}
-
-/**
- * Create a DHIS2 Enrollment
- * - Enrolling a tracked entity instance into a program
- * - For enrolling `persons` into a `program`, you will need to first get the `identifier of the person` from the `trackedEntityInstances resource` via the `getTEIs` operation.
- * - Then, you will need to get the `program identifier` from the `programs` resource via the `getPrograms` operation.
- * @param {object<any,any>} data - The update data containing new values
- * @param {array} [params] - Optional `import` parameters for `createEnrollment`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
- * @param {createOptions} [options] - Optional `flags` for the behavior of the `createEnrollment` operation.
- * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` of `createEnrollment` of a `person` into a `program` can look like this:</caption>
- * createEnrollment(state.data);
- * @see {enrollmentSampleState}
- */
-export function createEnrollment(data, params, options, callback) {
-  return state => {
-    return create('enrollments', data, params, options, callback)(state);
-  };
-}
-
-/**
- * Create DHIS2 Data Values
- * - This is used to send aggregated data to DHIS2
- * - A data value set represents a set of data values which have a relationship, usually from being captured off the same data entry form.
- * - To send a set of related data values sharing the same period and organisation unit, we need to identify the period, the data set, the org unit (facility) and the data elements for which to report.
- * - You can also use this operation to send large bulks of data values which don't necessarily are logically related.
- * - To send data values that are not linked to a `dataSet`, you do not need to specify the dataSet and completeDate attributes. Instead, you will specify the period and orgUnit attributes on the individual data value elements instead of on the outer data value set element. This will enable us to send data values for various periods and organisation units
- * @param {object<any,any>} data - The update data containing new values
- * @param {array} [params] - Optional `import` parameters for `createDataValues`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
- * @param {createOptions} [options] - Optional `flags` for the behavior of the `createDataVaues` operation.
- * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` of `createDataValues`  for sending a set of related data values sharing the same period and organisation unit</caption>
- * createDataValues(state.data);
- * @see {relatedDataValuesSampleState}
- * @example <caption>- Example `expression.js` of `createDataValues`  for sending large bulks of data values which don't necessarily are logically related</caption>
- * createDataValues(state.data);
- * @see {bulkDataValuesSampleState}
- */
-export function createDataValues(data, params, options, callback) {
-  return state => {
-    return create('enrollments', data, params, options, callback)(state);
-  };
-}
-
-/**
  * Update a DHIS2 Tracked Entity Instance
  * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
  * @param {object<any,any>} data - The update data containing new values
@@ -395,139 +310,6 @@ export function updateTEI(path, data, params, options, callback) {
       path,
       data,
       params,
-      options,
-      callback
-    )(state);
-  };
-}
-
-/**
- * Update a DHIS2 Events
- * - To update an existing event, the format of the payload is the same as that of `creating an event` via `createEvents` operations
- * - But  you should supply the `identifier` of the object you are updating
- * - The payload has to contain `all`, even `non-modified`, `attributes`.
- * - Attributes that were present before and are not present in the current payload any more will be removed by DHIS2.
- * - If you do not want this behavior, please use `upsert` operation to upsert your events.
- * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
- * @param {object<any,any>} data - The update data containing new values
- * @param {array} [params] - Optional `import` parameters for `updateEvents`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
- * @param {createOptions} [options] - Optional `flags` for the behavior of the `updateEvents` operation.
- * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` of `updateEvents`</caption>
- * updateEvents('PVqUD2hvU4E', state.data);
- * @todo Support `merge` via custom `partial updates` mechanism since `PATCH` is not `natively` supported on this endpoint
- */
-export function updateEvents(path, data, params, options, callback) {
-  return state => {
-    return update('events', path, data, params, options, callback)(state);
-  };
-}
-
-/**
- * Update a DHIS2 Programs
- * - To update an existing program, the format of the payload is the same as that of `creating an event` via `createEvents` operations
- * - But  you should supply the `identifier` of the object you are updating
- * - The payload has to contain `all`, even `non-modified`, `attributes`.
- * - Attributes that were present before and are not present in the current payload any more will be removed by DHIS2.
- * - If you do not want this behavior, please use `upsert` operation to upsert your events.
- * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
- * @param {object<any,any>} data - The update data containing new values
- * @param {array} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
- * @param {createOptions} [options] - Optional `flags` for the behavior of the `updatePrograms` operation.
- * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` of `updatePrograms`</caption>
- * updatePrograms('PVqUD2hvU4E', state.data);
- * @todo Support `merge` via custom `partial updates` mechanism since `PATCH` is not `natively` supported on this endpoint
- */
-export function updatePrograms(path, data, params, options, callback) {
-  return state => {
-    return update('programs', path, data, params, options, callback)(state);
-  };
-}
-/**
- * Update a DHIS2 Enrollemts
- * - To update an existing enrollment, the format of the payload is the same as that of `creating an event` via `createEvents` operations
- * - But  you should supply the `identifier` of the object you are updating
- * - The payload has to contain `all`, even `non-modified`, `attributes`.
- * - Attributes that were present before and are not present in the current payload any more will be removed by DHIS2.
- * - If you do not want this behavior, please use `upsert` operation to upsert your events.
- * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
- * @param {object<any,any>} data - The update data containing new values
- * @param {array} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
- * @param {createOptions} [options] - Optional `flags` for the behavior of the `updatePrograms` operation.
- * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` of `updateEnromments`</caption>
- * updatePrograms('PVqUD2hvU4E', state.data);
- * @todo Support `merge` via custom `partial updates` mechanism since `PATCH` is not `natively` supported on this endpoint
- */
-export function updateEnrollments(path, data, params, options, callback) {
-  return state => {
-    return update('enrollments', path, data, params, options, callback)(state);
-  };
-}
-
-/**
- * Cancel a DHIS2 Enrollment
- * - To cancel an existing enrollment, you should supply the `enrollment identifier`(`enrollemt-id`)
- * @param {string} enrollmentId - The `enrollment-id` of the enrollment you wish to cancel
- * @param {array} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
- * @param {createOptions} [options] - Optional `flags` for the behavior of the `updatePrograms` operation.
- * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` of `cancelEnrollment`</caption>
- * cancelEnrollments('PVqUD2hvU4E');
- */
-export function cancelEnrollment(enrollmentId, params, options, callback) {
-  return state => {
-    const path = `${enrollmentId}/cancelled`;
-    return update('enrollments', path, null, params, options, callback)(state);
-  };
-}
-
-/**
- * Complete a DHIS2 Enrollment
- * - To complete an existing enrollment, you should supply the `enrollment identifier`(`enrollemt-id`)
- * @param {string} enrollmentId - The `enrollment-id` of the enrollment you wish to cancel
- * @param {array} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
- * @param {createOptions} [options] - Optional `flags` for the behavior of the `updatePrograms` operation.
- * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` of `completeEnrollment`</caption>
- * completeEnrollment('PVqUD2hvU4E');
- */
-export function completeEnrollment(enrollmentId, params, options, callback) {
-  return state => {
-    const path = `${enrollmentId}/completed`;
-    return update('enrollments', path, null, params, options, callback)(state);
-  };
-}
-
-/**
- * Get DHIS2 Tracked Entity Instance(s)
- * @param {array} params - `import` parameters for `getTEIs`. E.g. `{ou:}`
- * @param {string} [responseType] - Optional response type. Defaults to `json`
- * @param {createOptions} [options] - Optional `flags` for the behavior of the `getTEIs` operation.
- * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `getTEIs` `expression.js` for fetching a `single` `Tracked Entity Instance`</caption>
- * getTEIs([
- * {
- *   fields: '*',
- * },
- * { ou: 'CMqUILyVnBL' },
- * { trackedEntityInstance: 'HNTA9qD6EEG' },
- * { skipPaging: true },
- * ]);
- */
-export function getTEIs(params, responseType, options, callback) {
-  return state => {
-    return getData(
-      'trackedEntityInstances',
-      params,
-      responseType,
       options,
       callback
     )(state);
@@ -603,6 +385,52 @@ export function getEvents(params, responseType, options, callback) {
 }
 
 /**
+ * Create a DHIS2 Events
+ * - You will need a `program` which can be looked up using the `getPrograms` operation, an `orgUnit` which can be looked up using the `getMetadata` operation and passing `{organisationUnits: true}` as `resources` param, and a list of `valid data element identifiers` which can be looked up using the `getMetadata` passing `{dataElements: true}` as `resources` param.
+ * - For events with registration, a `tracked entity instance identifier is required`
+ * - For sending `events` to `programs with multiple stages`, you will need to also include the `programStage` identifier, the identifiers for `programStages` can be found in the `programStages` resource via a call to `getMetadata` operation.
+ * @param {object<any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `createEvents`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `createEvents` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `createEvents` for a `single event` can look like this:</caption>
+ * createEvents(state.data);
+ * @see {singleEventSampleState}
+ * @example <caption>- Example `expression.js` of `createEvents` for sending `multiple events` at the same time</caption>
+ * createEvents(state.data);
+ * @see {multipleEventsSampleState}
+ */
+export function createEvents(data, params, options, callback) {
+  return state => {
+    return create('events', data, params, options, callback)(state);
+  };
+}
+
+/**
+ * Update a DHIS2 Events
+ * - To update an existing event, the format of the payload is the same as that of `creating an event` via `createEvents` operations
+ * - But  you should supply the `identifier` of the object you are updating
+ * - The payload has to contain `all`, even `non-modified`, `attributes`.
+ * - Attributes that were present before and are not present in the current payload any more will be removed by DHIS2.
+ * - If you do not want this behavior, please use `upsert` operation to upsert your events.
+ * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
+ * @param {object<any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `updateEvents`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `updateEvents` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `updateEvents`</caption>
+ * updateEvents('PVqUD2hvU4E', state.data);
+ * @todo Support `merge` via custom `partial updates` mechanism since `PATCH` is not `natively` supported on this endpoint
+ */
+export function updateEvents(path, data, params, options, callback) {
+  return state => {
+    return update('events', path, data, params, options, callback)(state);
+  };
+}
+
+/**
  * Get DHIS2 Programs
  * @param {array} params - `import` parameters for `getPrograms`.
  * @param {string} [responseType] - Optional response type. Defaults to `json`
@@ -615,6 +443,49 @@ export function getEvents(params, responseType, options, callback) {
 export function getPrograms(params, responseType, options, callback) {
   return state => {
     return getData('programs', params, responseType, options, callback)(state);
+  };
+}
+
+/**
+ * Create a DHIS2 Programs
+ * @param {object<any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `createPrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `createPrograms` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `createPrograms` for a `single program` can look like this:</caption>
+ * createPrograms(state.data);
+ * @see {singleProgramSampleState}
+ * @example <caption>- Example `expression.js` of `createPrograms` for sending `multiple programs` at the same time</caption>
+ * createPrograms(state.data);
+ * @see {multipleProgramsSampleState}
+ */
+export function createPrograms(data, params, options, callback) {
+  return state => {
+    return create('programs', data, params, options, callback)(state);
+  };
+}
+
+/**
+ * Update a DHIS2 Programs
+ * - To update an existing program, the format of the payload is the same as that of `creating an event` via `createEvents` operations
+ * - But  you should supply the `identifier` of the object you are updating
+ * - The payload has to contain `all`, even `non-modified`, `attributes`.
+ * - Attributes that were present before and are not present in the current payload any more will be removed by DHIS2.
+ * - If you do not want this behavior, please use `upsert` operation to upsert your events.
+ * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
+ * @param {object<any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `updatePrograms` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `updatePrograms`</caption>
+ * updatePrograms('PVqUD2hvU4E', state.data);
+ * @todo Support `merge` via custom `partial updates` mechanism since `PATCH` is not `natively` supported on this endpoint
+ */
+export function updatePrograms(path, data, params, options, callback) {
+  return state => {
+    return update('programs', path, data, params, options, callback)(state);
   };
 }
 
@@ -679,6 +550,85 @@ export function getEnrollments(params, responseType, options, callback) {
 }
 
 /**
+ * Create a DHIS2 Enrollment
+ * - Enrolling a tracked entity instance into a program
+ * - For enrolling `persons` into a `program`, you will need to first get the `identifier of the person` from the `trackedEntityInstances resource` via the `getTEIs` operation.
+ * - Then, you will need to get the `program identifier` from the `programs` resource via the `getPrograms` operation.
+ * @param {object<any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `createEnrollment`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `createEnrollment` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `createEnrollment` of a `person` into a `program` can look like this:</caption>
+ * createEnrollment(state.data);
+ * @see {enrollmentSampleState}
+ */
+export function createEnrollment(data, params, options, callback) {
+  return state => {
+    return create('enrollments', data, params, options, callback)(state);
+  };
+}
+
+/**
+ * Update a DHIS2 Enrollemts
+ * - To update an existing enrollment, the format of the payload is the same as that of `creating an event` via `createEvents` operations
+ * - But  you should supply the `identifier` of the object you are updating
+ * - The payload has to contain `all`, even `non-modified`, `attributes`.
+ * - Attributes that were present before and are not present in the current payload any more will be removed by DHIS2.
+ * - If you do not want this behavior, please use `upsert` operation to upsert your events.
+ * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
+ * @param {object<any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `updatePrograms` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `updateEnromments`</caption>
+ * updatePrograms('PVqUD2hvU4E', state.data);
+ * @todo Support `merge` via custom `partial updates` mechanism since `PATCH` is not `natively` supported on this endpoint
+ */
+export function updateEnrollments(path, data, params, options, callback) {
+  return state => {
+    return update('enrollments', path, data, params, options, callback)(state);
+  };
+}
+
+/**
+ * Cancel a DHIS2 Enrollment
+ * - To cancel an existing enrollment, you should supply the `enrollment identifier`(`enrollemt-id`)
+ * @param {string} enrollmentId - The `enrollment-id` of the enrollment you wish to cancel
+ * @param {array} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `updatePrograms` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `cancelEnrollment`</caption>
+ * cancelEnrollments('PVqUD2hvU4E');
+ */
+export function cancelEnrollment(enrollmentId, params, options, callback) {
+  return state => {
+    const path = `${enrollmentId}/cancelled`;
+    return update('enrollments', path, null, params, options, callback)(state);
+  };
+}
+
+/**
+ * Complete a DHIS2 Enrollment
+ * - To complete an existing enrollment, you should supply the `enrollment identifier`(`enrollemt-id`)
+ * @param {string} enrollmentId - The `enrollment-id` of the enrollment you wish to cancel
+ * @param {array} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `updatePrograms` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `completeEnrollment`</caption>
+ * completeEnrollment('PVqUD2hvU4E');
+ */
+export function completeEnrollment(enrollmentId, params, options, callback) {
+  return state => {
+    const path = `${enrollmentId}/completed`;
+    return update('enrollments', path, null, params, options, callback)(state);
+  };
+}
+
+/**
  * Get DHIS2 Relationships(links) between two entities in tracker. These entities can be tracked entity instances, enrollments and events.
  * - All the tracker operations, `getTEIs`, `getEnrollments` and `getEvents` also list their relationships if requested in the `field` filter.
  * - To list all relationships, this requires you to provide the UID of the trackedEntityInstance, Enrollment or event that you want to list all the relationships for.
@@ -739,9 +689,60 @@ export function getDataValues(params, responseType, options, callback) {
     )(state);
   };
 }
+
+/**
+ * Create DHIS2 Data Values
+ * - This is used to send aggregated data to DHIS2
+ * - A data value set represents a set of data values which have a relationship, usually from being captured off the same data entry form.
+ * - To send a set of related data values sharing the same period and organisation unit, we need to identify the period, the data set, the org unit (facility) and the data elements for which to report.
+ * - You can also use this operation to send large bulks of data values which don't necessarily are logically related.
+ * - To send data values that are not linked to a `dataSet`, you do not need to specify the dataSet and completeDate attributes. Instead, you will specify the period and orgUnit attributes on the individual data value elements instead of on the outer data value set element. This will enable us to send data values for various periods and organisation units
+ * @param {object<any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `createDataValues`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `createDataVaues` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `createDataValues`  for sending a set of related data values sharing the same period and organisation unit</caption>
+ * createDataValues(state.data);
+ * @see {relatedDataValuesSampleState}
+ * @example <caption>- Example `expression.js` of `createDataValues`  for sending large bulks of data values which don't necessarily are logically related</caption>
+ * createDataValues(state.data);
+ * @see {bulkDataValuesSampleState}
+ */
+export function createDataValues(data, params, options, callback) {
+  return state => {
+    return create('enrollments', data, params, options, callback)(state);
+  };
+}
 //#endregion
 
 //#region GENERIC HELPER OPERATIONS
+
+/**
+ * Execute a sequence of operations.
+ * Wraps `language-common/execute`, and prepends initial state for DHIS2.
+ * @example
+ * execute(
+ *   create('foo'),
+ *   delete('bar')
+ * )(state)
+ * @constructor
+ * @param {Operations} operations - Operations to be performed.
+ * @returns {Operation}
+ */
+export function execute(...operations) {
+  const initialState = {
+    references: [],
+    data: null,
+  };
+
+  return state => {
+    return commonExecute(
+      configMigrationHelper,
+      ...operations
+    )({ ...initialState, ...state });
+  };
+}
 
 /**
  * Generate valid, random DHIS2 identifiers *
@@ -764,8 +765,9 @@ export function generateDhis2UID(params, responseType, options, callback) {
  * @todo Implementation
  * @example
  * discover('getData, /api/trackedEntityInstances')
+ * @constructor
  * @param {*} operation
- * @param {*} resourceType
+ * @param {*} path
  */
 export function discover(operation, path) {
   return state => {
@@ -1243,7 +1245,14 @@ export function getMetadata(
  * @example
   // 1. 
  */
-export function create(resourceType, data, params, options, callback) {
+export function create(
+  resourceType,
+  data,
+  params,
+  options,
+  responseType,
+  callback
+) {
   return state => {
     const { username, password, hostUrl } = state.configuration;
 
@@ -1265,6 +1274,10 @@ export function create(resourceType, data, params, options, callback) {
       supportApiVersion
     );
 
+    const headers = {
+      Accept: CONTENT_TYPES[responseType] ?? 'application/json',
+    };
+
     logOperation(`CREATE ${resourceType}`);
 
     logApiVersion(apiVersion, supportApiVersion);
@@ -1283,6 +1296,7 @@ export function create(resourceType, data, params, options, callback) {
         },
         params: queryParams,
         data: payload,
+        headers,
       })
       .then(result => {
         Log.info(
@@ -1322,7 +1336,15 @@ export function create(resourceType, data, params, options, callback) {
 });
 
  */
-export function update(resourceType, path, data, params, options, callback) {
+export function update(
+  resourceType,
+  path,
+  data,
+  params,
+  options,
+  responseType,
+  callback
+) {
   return state => {
     const { username, password, hostUrl } = state.configuration;
 
@@ -1344,6 +1366,10 @@ export function update(resourceType, path, data, params, options, callback) {
       supportApiVersion
     );
 
+    const headers = {
+      Accept: CONTENT_TYPES[responseType] ?? 'application/json',
+    };
+
     logOperation(`UPDATE ${resourceType}`);
 
     logApiVersion(apiVersion, supportApiVersion);
@@ -1362,6 +1388,7 @@ export function update(resourceType, path, data, params, options, callback) {
         },
         params: queryParams,
         data: payload,
+        headers,
       })
       .then(result => {
         Log.info(
@@ -1392,7 +1419,15 @@ export function update(resourceType, path, data, params, options, callback) {
   // 1. Update data element's property
   patch('dataElements', 'FTRrcoaog83', {displayName: 'Some new display name'});
  */
-export function patch(resourceType, path, data, params, options, callback) {
+export function patch(
+  resourceType,
+  path,
+  data,
+  params,
+  options,
+  responseType,
+  callback
+) {
   return state => {
     const { username, password, hostUrl } = state.configuration;
 
@@ -1414,6 +1449,10 @@ export function patch(resourceType, path, data, params, options, callback) {
       supportApiVersion
     );
 
+    const headers = {
+      Accept: CONTENT_TYPES[responseType] ?? 'application/json',
+    };
+
     logOperation('patch');
 
     logApiVersion(apiVersion, supportApiVersion);
@@ -1432,6 +1471,7 @@ export function patch(resourceType, path, data, params, options, callback) {
         },
         params: queryParams,
         data: payload,
+        headers,
       })
       .then(result => {
         if (callback) return callback(composeNextState(state, result.data));
@@ -1453,7 +1493,15 @@ export function patch(resourceType, path, data, params, options, callback) {
   // 1. Delete data element
   del('dataElements', 'FTRrcoaog83');
  */
-export function del(resourceType, path, data, params, options, callback) {
+export function del(
+  resourceType,
+  path,
+  data,
+  params,
+  options,
+  responseType,
+  callback
+) {
   return state => {
     const { username, password, hostUrl } = state.configuration;
 
@@ -1462,6 +1510,10 @@ export function del(resourceType, path, data, params, options, callback) {
     const payload = expandReferences(data)(state);
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
+
+    const headers = {
+      Accept: CONTENT_TYPES[responseType] ?? 'application/json',
+    };
 
     const supportApiVersion =
       options?.supportApiVersion ?? state.configuration.supportApiVersion;
@@ -1491,6 +1543,7 @@ export function del(resourceType, path, data, params, options, callback) {
         },
         params: queryParams,
         data: payload,
+        headers,
       })
       .then(result => {
         if (callback) return callback(composeNextState(state, result.data));
@@ -1543,14 +1596,13 @@ export function upsert(
   data,
   params,
   options,
+  responseType,
   callback
 ) {
   return state => {
     const { username, password, hostUrl } = state.configuration;
 
     const replace = options?.replace ?? false;
-
-    const responseType = 'json';
 
     const { attributeId, attributeValue } = expandReferences(uniqueAttribute)(
       state
@@ -1650,6 +1702,7 @@ export function upsert(
     ]).then(([resourceName, recordsWithValue]) => {
       const recordsWithValueCount = recordsWithValue.data[resourceType].length;
       if (recordsWithValueCount > 1) {
+        Log.error('');
         throw new RangeError(
           `Cannot upsert on Non-unique attribute. The operation found more than one records with the same value of ${attributeValue} for ${attributeId}`
         );
