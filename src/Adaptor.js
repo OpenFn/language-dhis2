@@ -117,7 +117,7 @@ axios.interceptors.response.use(
 
 /**
  * Get DHIS2 Tracked Entity Instance(s)
- * @param {array} params - `import` parameters for `getTEIs`. E.g. `{ou:}`
+ * @param {array} params - `import` parameters for `getTEIs`. E.g. `[{fields: '*'},{ ou: 'DiszpKrYNg8' },{ skipPaging: true },])`
  * @param {string} [responseType] - Optional response type. Defaults to `json`
  * @param {createOptions} [options] - Optional `flags` for the behavior of the `getTEIs` operation.
  * @param {requestCallback} [callback] - Optional callback to handle the response
