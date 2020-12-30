@@ -1109,9 +1109,14 @@ export function getData(resourceType, params, responseType, options, callback) {
   return state => {
     const { username, password, hostUrl } = state.configuration;
 
-    let queryParams = new URLSearchParams(
-      params?.map(item => Object.entries(item)?.flat())
-    );
+    // NOTE: 'filters' is the only special parameter we control for DHIS2, all
+    // others can be passed directly, but as dhis2 expects multiple filters and
+    // they cannot occupy the same key for an object, users may opt to pass an
+    // array of 'filters' which we handle below.
+    const { filters } = params;
+    delete params.filters;
+    let queryParams = new URLSearchParams(params);
+    filter.map(f => queryParams.append('filter', f));
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
