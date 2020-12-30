@@ -1747,6 +1747,7 @@ export function upsert(
           ? {
               ...row1,
               ...body,
+              attributes: [...row1.attributes, ...body.attributes],
             }
           : body;
 
