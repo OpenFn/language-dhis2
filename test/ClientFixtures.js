@@ -41,6 +41,15 @@ const fixtures = {
   },
 };
 
+// export const state = {
+//   configuration: {
+//     username: 'admin',
+//     password: 'district',
+//     hostUrl: 'https://play.dhis2.org/2.35.0',
+//     apiVersion: 35,
+//   },
+// };
+
 export { fixtures };
 
 export default [

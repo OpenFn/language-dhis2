@@ -1,148 +1,40 @@
 import { expect } from 'chai';
+import { getData } from '../src/Adaptor';
+import { state } from './ClientFixtures';
 
-import Adaptor from '../src';
-const { execute, event, dataElement, fetchData, fetchEvents } = Adaptor;
-
-import request from 'superagent';
-import superagentMock from 'superagent-mock';
-import ClientFixtures, { fixtures } from './ClientFixtures';
-
-describe('execute', () => {
-  it('executes each operation in sequence', (done) => {
-    let state = {
-      configuration: {
-        hostUrl: 'https://play.dhis2.org/demo',
-      },
-    };
-    let operations = [
-      (state) => {
-        return { counter: 1 };
-      },
-      (state) => {
-        return { counter: 2 };
-      },
-      (state) => {
-        return { counter: 3 };
-      },
-    ];
-
-    execute(...operations)(state)
-      .then((finalState) => {
-        expect(finalState).to.eql({ counter: 3 });
-      })
-      .then(done)
-      .catch(done);
-  });
-
-  it('assigns references, data to the initialState', () => {
-    let state = {};
-
-    let finalState = execute()(state);
-
-    execute()(state).then((finalState) => {
-      expect(finalState).to.eql({
-        references: [],
-        data: null,
+describe('DHIS2 API', () => {
+  /**
+   * Test getData
+   */
+  describe('Get data using getData operation', function () {
+    this.timeout(0);
+    console.log('Logs...');
+    it("should return one trackedEntityInstance with trackedInstanceInstance Id 'dNpxRu1mWG5' for a given orgUnit(CMqUILyVnBL)", done => {
+      console.log('Logs...');
+      let state = {
+        configuration: {
+          username: 'admin',
+          password: 'district',
+          hostUrl: 'https://play.dhis2.org/2.35.0',
+          apiVersion: 35,
+        },
+      };
+      return getData('trackedEntityInstances', [
+        { fields: '*' },
+        { ou: 'DiszpKrYNg8' },
+        { entityType: 'nEenWmSyUEp' },
+        { trackedEntityInstance: 'dNpxRu1mWG5' },
+      ])(state).then(state => {
+        console.log('state', state);
+        expect(state.data.trackedEntityInstances.length).to.eq(1);
+        expect(
+          state.data.trackedEntityInstances[0].trackedInstanceInstance
+        ).to.eq('dNpxRu1mWG5');
+        done();
       });
     });
   });
-});
-
-describe('event', () => {
-  let mockRequest;
-
-  before(() => {
-    mockRequest = superagentMock(request, ClientFixtures);
-  });
-
-  it('posts to API and returns state', () => {
-    let state = {
-      configuration: {
-        username: 'hello',
-        password: 'there',
-        hostUrl: 'https://play.dhis2.org/demo',
-      },
-    };
-
-    return execute(event(fixtures.event.requestBody))(state).then((state) => {
-      let lastReference = state.references[0];
-
-      // Check that the eventData made it's way to the request as a string.
-      expect(lastReference.params).to.eql(
-        JSON.stringify(fixtures.event.requestBody)
-      );
-    });
-  });
-
-  after(() => {
-    mockRequest.unset();
-  });
-});
-
-describe('dataElement', function () {
-  it('creates a dataElement from key, value, comment args', function () {
-    let element = dataElement('key', 'foo');
-    expect(element).to.eql({
-      dataElement: 'key',
-      value: 'foo',
-      comment: undefined,
-    });
-
-    let commentedElement = dataElement('key', 'foo', 'bar');
-    expect(commentedElement).to.eql({
-      dataElement: 'key',
-      value: 'foo',
-      comment: 'bar',
-    });
-  });
-});
-
-describe('fetchData', function () {
-  it('fetches data set values', function () {
-    let state = {
-      configuration: {
-        username: 'admin',
-        password: 'district',
-        hostUrl: 'https://play.dhis2.org/demo',
-      },
-    };
-
-    let params = {
-      fields: {
-        dataSet: 'pBOMPrpg1QX',
-        orgUnit: 'DiszpKrYNg8',
-        period: '201401',
-      },
-    };
-
-    return execute(fetchData(params))(state).then((state) => {
-      let lastReference = state.references[0];
-      expect(lastReference.statusCode).to.eql(200);
-    });
-  }).timeout(10000);
-});
-
-describe('fetchEvents', function () {
-  it('fetches events', function () {
-    let state = {
-      configuration: {
-        username: 'admin',
-        password: 'district',
-        hostUrl: 'https://play.dhis2.org/demo',
-      },
-    };
-
-    let params = {
-      fields: {
-        orgUnit: 'DiszpKrYNg8',
-        program: 'eBAyeGv0exc',
-        endDate: '2016-01-01',
-      },
-    };
-
-    return execute(fetchEvents(params))(state).then((state) => {
-      let lastReference = state.references[0];
-      expect(lastReference.statusCode).to.eql(200);
-    });
-  }).timeout(10000);
+  /** Test create */
+  /** Test update */
+  /** Test upsert */
 });
