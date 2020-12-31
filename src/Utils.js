@@ -42,7 +42,7 @@ export function logApiVersion(apiVersion) {
       : '\x1b[33m Attempting to use apiVersion without providing it in state.configuration or in options parameter\x1b[0m. You may encounter errors.\x1b[33m api_version_missing\x1b[0m.';
 
   if (apiVersion) console.warn(message);
-  else console.warn(`Using \x1b[33m latest \x1b[0m version of DHIS2 api.`);
+  else console.warn(`Using\x1b[33m latest\x1b[0m version of DHIS2 api.`);
 }
 
 export function logOperation(operation) {
