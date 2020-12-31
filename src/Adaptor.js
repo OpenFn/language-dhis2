@@ -132,8 +132,9 @@ axios.interceptors.response.use(
  * { skipPaging: true },
  * ]);
  */
-export function getTEIs(params, responseType, options, callback) {
+export function getTEIs(params, options, callback) {
   return state => {
+    let responseType = options?.responseType ?? 'json';
     return getData(
       'trackedEntityInstances',
       params,
@@ -1088,7 +1089,7 @@ export function getSchema(
   getData('organisationUnits');
 
  */
-export function getData(resourceType, params, responseType, options, callback) {
+export function getData(resourceType, params, options, callback) {
   return state => {
     const { username, password, hostUrl } = state.configuration;
 
@@ -1101,25 +1102,19 @@ export function getData(resourceType, params, responseType, options, callback) {
     let queryParams = new URLSearchParams(params);
     filter.map(f => queryParams.append('filter', f));
 
-    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
+    let responseType = options?.responseType ?? 'json';
 
-    const supportApiVersion =
-      options?.supportApiVersion ?? state.configuration.supportApiVersion;
+    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
     const headers = {
       Accept: CONTENT_TYPES[responseType] ?? 'application/json',
     };
 
-    const url = buildUrl(
-      `/${resourceType}`,
-      hostUrl,
-      apiVersion,
-      supportApiVersion
-    );
+    const url = buildUrl(`/${resourceType}`, hostUrl, apiVersion);
 
     logOperation('getData');
 
-    logApiVersion(apiVersion, supportApiVersion);
+    logApiVersion(apiVersion);
 
     logWaitingForServer(url, queryParams);
 
