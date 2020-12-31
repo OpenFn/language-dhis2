@@ -1043,7 +1043,7 @@ export function getSchema(
 /**
  * A generic helper method for getting data of any kind from DHIS2. This can be used to get `DataValueSets`,`events`,`trackedEntityInstances`,`etc.`
  * @param {string} resourceType
- * @param {Obejct} params
+ * @param {Object} params
  * @param {string} responseType
  * @param {Object} options
  * @param {Function} callback
@@ -1100,7 +1100,7 @@ export function getData(resourceType, params, options, callback) {
     const { filters } = params;
     delete params.filters;
     let queryParams = new URLSearchParams(params);
-    filter.map(f => queryParams.append('filter', f));
+    filters?.map(f => queryParams.append('filter', f));
 
     let responseType = options?.responseType ?? 'json';
 
