@@ -141,19 +141,19 @@ describe('upsert', () => {
       upsert(
         'trackedEntityInstances',
         {
-          attributeId: 'aX5hD4qUpRW',
+          attributeId: 'lZGmxYbs97q',
           attributeValue: state =>
-            state.data.attributes.find(obj => obj.attribute === 'aX5hD4qUpRW')
+            state.data.attributes.find(obj => obj.attribute === 'lZGmxYbs97q')
               .value,
         },
         state.data,
-        { ou: 'CMqUILyVnBL' }
+        { ou: 'DiszpKrYNg8' }
       )
     )(state).then(state => {
-      console.log(JSON.stringify(state.data, null, 2));
+      // console.log(JSON.stringify(state.data, null, 2));
       // expect(state.data.response.reference).to.eq('YGyelJBMeKy');
-      // expect(state.data.response.importCount.updated).to.eq(1);
-      // expect(state.data.response.importCount.imported).to.eq(0);
+      expect(state.data.response.importCount.updated).to.eq(1);
+      expect(state.data.response.importCount.imported).to.eq(0);
     });
   }).timeout(10 * 1000);
 
