@@ -51,52 +51,65 @@ describe('execute', () => {
   });
 });
 
-// describe('The get() function', () => {
-//   before(() => {
-//     nock('https://play.dhis2.org/2.35.0')
-//       .persist()
-//       // .get(
-//       //   '/api/34/trackedEntityInstances?fields=*&ou=DiszpKrYNg8&entityType=nEenWmSyUEp&trackedEntityInstance=dNpxRu1mWG5"'
-//       // )
-//       .reply(200, {
-//         httpStatus: 'OK',
-//         message: 'the response',
-//       });
-//   });
+describe('buildUrl for getData', () => {
+  before(() => {
+    nock('https://play.dhis2.org/2.35.0/')
+      .get(uri => uri.includes('api/34'))
+      .reply(200, {
+        trackedEntityInstances: ['from v34'],
+      });
 
-//   it('should respect api version when passed through configuration', function () {
-//     let state = {
-//       configuration: {
-//         username: 'admin',
-//         password: 'district',
-//         hostUrl: 'https://play.dhis2.org/2.35.0',
-//         apiVersion: 34,
-//       },
-//     };
+    nock('https://play.dhis2.org/2.35.0/')
+      .get(uri => uri.includes('api/999'))
+      .reply(200, {
+        trackedEntityInstances: ['from v999'],
+      });
+  });
 
-//     return execute(
-//       getData('trackedEntityInstances', {
-//         fields: '*',
-//         ou: 'DiszpKrYNg8',
-//         entityType: 'nEenWmSyUEp',
-//         trackedEntityInstance: 'dNpxRu1mWG5',
-//       })
-//     )(state).then(state => {
-//       console.log(state);
-//     });
-//   }).timeout(10 * 1000);
-
-//   it('should also respect the api version when passed through the options argument', function () {});
-// });
-
-describe('getData', function () {
-  it("should return one trackedEntityInstance with trackedInstanceInstance Id 'dNpxRu1mWG5' for a given orgUnit(CMqUILyVnBL)", function () {
+  it('should respect api version when passed through configuration', () => {
     let state = {
       configuration: {
         username: 'admin',
         password: 'district',
         hostUrl: 'https://play.dhis2.org/2.35.0',
         apiVersion: 34,
+      },
+    };
+
+    return execute(getData('trackedEntityInstances', {}))(state).then(state => {
+      expect(state.data.trackedEntityInstances[0]).to.eq('from v34');
+    });
+  }).timeout(10 * 1000);
+
+  it('should respect the api version when passed through the options argument', () => {
+    let state = {
+      configuration: {
+        username: 'admin',
+        password: 'district',
+        hostUrl: 'https://play.dhis2.org/2.35.0',
+      },
+    };
+
+    return execute(getData('trackedEntityInstances', {}, { apiVersion: 999 }))(
+      state
+    ).then(state => {
+      expect(state.data.trackedEntityInstances[0]).to.eq('from v999');
+    });
+  }).timeout(10 * 1000);
+});
+
+describe('getData', () => {
+  before(() => {
+    nock.cleanAll();
+    nock.enableNetConnect();
+  });
+
+  it("should return one trackedEntityInstance with trackedInstanceInstance Id 'dNpxRu1mWG5' for a given orgUnit(CMqUILyVnBL)", () => {
+    let state = {
+      configuration: {
+        username: 'admin',
+        password: 'district',
+        hostUrl: 'https://play.dhis2.org/2.35.0',
       },
     };
 
