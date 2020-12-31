@@ -41,14 +41,129 @@ const fixtures = {
   },
 };
 
-// export const state = {
-//   configuration: {
-//     username: 'admin',
-//     password: 'district',
-//     hostUrl: 'https://play.dhis2.org/2.35.0',
-//     apiVersion: 35,
-//   },
-// };
+export const upsertState = {
+  configuration: {
+    username: 'admin',
+    password: 'district',
+    hostUrl: 'https://play.dhis2.org/2.35.0',
+  },
+  data: {
+    orgUnit: 'CMqUILyVnBL',
+    trackedEntityType: 'hRqJrTjGWtg',
+    enrollments: [
+      {
+        orgUnit: 'CMqUILyVnBL',
+        program: 'wZLN40noez1',
+        enrollmentDate: '2020-12-31',
+        incidentDate: '2020-12-31',
+        events: [
+          {
+            program: 'wZLN40noez1',
+            programStage: 'jIjk9MfFbzb',
+            orgUnit: 'CMqUILyVnBL',
+            status: 'COMPLETED',
+            eventDate: '2020-12-31',
+            dataValues: [
+              {
+                dataElement: 'jKD9gqa68Hr',
+                value: 'No',
+              },
+              {
+                dataElement: 'pXmbLUbZIes',
+                value: 'Negative',
+              },
+              {
+                dataElement: 'SDvESW82Ecj',
+                value: 'true',
+              },
+            ],
+          },
+          {
+            program: 'wZLN40noez1',
+            programStage: 'YalzZDUzMyF',
+            orgUnit: 'CMqUILyVnBL',
+            status: 'COMPLETED',
+            eventDate: '2020-12-31',
+            dataValues: [
+              {
+                dataElement: 'prYZ7QJT0u5',
+                value: 'true',
+              },
+              {
+                dataElement: 'I4I5tQFJBBP',
+                value: 'Stable status',
+              },
+            ],
+            notes: [],
+            relationships: [],
+          },
+          {
+            program: 'wZLN40noez1',
+            programStage: 'YalzZDUzMyF',
+            orgUnit: 'CMqUILyVnBL',
+            status: 'COMPLETED',
+            eventDate: '2020-12-31',
+            dataValues: [
+              {
+                dataElement: 'I4I5tQFJBBP',
+                value: 'Deteriorating status',
+              },
+              {
+                dataElement: 'Nj5z8CuyhPj',
+                value: 'true',
+              },
+            ],
+          },
+          {
+            program: 'wZLN40noez1',
+            programStage: 'YalzZDUzMyF',
+            orgUnit: 'CMqUILyVnBL',
+            status: 'COMPLETED',
+            eventDate: '2020-12-31',
+            dataValues: [
+              {
+                dataElement: 'qaB6ugd28O5',
+                value: 'true',
+              },
+              {
+                dataElement: 'xBKQS8pkiaN',
+                value: 'true',
+              },
+              {
+                dataElement: 'I4I5tQFJBBP',
+                value: 'Stable status',
+              },
+            ],
+            notes: [],
+            relationships: [],
+          },
+        ],
+      },
+    ],
+    attributes: [
+      {
+        attribute: 'RxNsHWsucU6',
+        value: '04-12-1984',
+      },
+      {
+        attribute: 'ZL4K1hwBdTF',
+        value: 'Chaiwa',
+      },
+      {
+        attribute: 'aX5hD4qUpRW',
+        value: '11535322',
+      },
+      {
+        attribute: 'lkk7ve7dr6b',
+        value: 'Mary',
+      },
+      {
+        attribute: 'nMsjzduOW4Z',
+        value: 'Female',
+      },
+    ],
+  },
+};
 
 export { fixtures };
 

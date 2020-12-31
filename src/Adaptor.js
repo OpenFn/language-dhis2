@@ -171,13 +171,9 @@ export function upsertTEI(uniqueAttributeId, data, options, callback) {
     const requireUniqueAttributeConfig =
       options?.requireUniqueAttributeConfig ?? true;
 
-    let params = [];
-
-    const ou = {
+    const params = {
       ou: state.data.orgUnit,
     };
-
-    params?.push(ou);
 
     const uniqueAttributeValue = state.data.attributes?.find(
       obj => obj?.attribute === uniqueAttributeId
@@ -1574,10 +1570,12 @@ export function upsert(
     const { attributeId, attributeValue } = expandReferences(uniqueAttribute)(
       state
     );
+    params = expandReferences(params)(state);
 
-    let queryParams = new URLSearchParams(
-      params?.map(item => Object.entries(item)?.flat())
-    );
+    const { filters } = params;
+    delete params.filters;
+    let queryParams = new URLSearchParams(params);
+    filters?.map(f => queryParams.append('filter', f));
 
     const op = resourceType === 'trackedEntityInstances' ? 'EQ' : 'eq';
 

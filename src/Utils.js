@@ -27,9 +27,9 @@ export function warnExpectLargeResult(paramOrResourceType, endpointUrl) {
  *
  */
 export function logWaitingForServer(url, params) {
-  Log.info(`url ${COLORS.FgGreen}${url}\x1b[0m`);
-  Log.info(`params ${COLORS.FgGreen}${params}\x1b[0m`);
-  Log.info(`Waiting for server response on ${url} ...`);
+  console.info(`url ${COLORS.FgGreen}${url}\x1b[0m`);
+  console.info(`params ${COLORS.FgGreen}${params}\x1b[0m`);
+  console.info(`Waiting for server response on ${url} ...`);
 }
 
 /**
@@ -41,12 +41,12 @@ export function logApiVersion(apiVersion) {
       ? `Using DHIS2 api version \x1b[33m${apiVersion}\x1b[0m`
       : '\x1b[33m Attempting to use apiVersion without providing it in state.configuration or in options parameter\x1b[0m. You may encounter errors.\x1b[33m api_version_missing\x1b[0m.';
 
-  if (apiVersion) Log.warn(message);
-  else Log.warn(`Using \x1b[33m latest \x1b[0m version of DHIS2 api.`);
+  if (apiVersion) console.warn(message);
+  else console.warn(`Using \x1b[33m latest \x1b[0m version of DHIS2 api.`);
 }
 
 export function logOperation(operation) {
-  Log.info(`Executing ${COLORS.FgGreen}${operation}\x1b[0m ...`);
+  console.info(`Executing ${COLORS.FgGreen}${operation}\x1b[0m ...`);
 }
 /**
  * Build url for a given operation

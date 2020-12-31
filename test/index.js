@@ -1,7 +1,8 @@
 import { expect } from 'chai';
-import { execute, getData } from '../lib/Adaptor';
+import { execute, getData, upsert } from '../lib/Adaptor';
 import nock from 'nock';
-import { state } from './ClientFixtures';
+import { upsertState } from './ClientFixtures';
+import { random } from 'lodash';
 
 describe('execute', () => {
   it('executes each operation in sequence', done => {
@@ -124,6 +125,54 @@ describe('getData', () => {
       const instances = state.data.trackedEntityInstances;
       expect(instances.length).to.eq(1);
       expect(instances[0].trackedEntityInstance).to.eq('dNpxRu1mWG5');
+    });
+  }).timeout(10 * 1000);
+});
+
+describe('upsert', () => {
+  before(() => {
+    nock.cleanAll();
+    nock.enableNetConnect();
+  });
+
+  it('should update an existing TEI when a matching TEI is found by attribute ID', () => {
+    let state = upsertState;
+    return execute(
+      upsert(
+        'trackedEntityInstances',
+        {
+          attributeId: 'aX5hD4qUpRW',
+          attributeValue: state =>
+            state.data.attributes.find(obj => obj.attribute === 'aX5hD4qUpRW')
+              .value,
+        },
+        state.data,
+        { ou: 'CMqUILyVnBL' }
+      )
+    )(state).then(state => {
+      console.log(JSON.stringify(state.data, null, 2));
+      // expect(state.data.response.reference).to.eq('YGyelJBMeKy');
+      // expect(state.data.response.importCount.updated).to.eq(1);
+      // expect(state.data.response.importCount.imported).to.eq(0);
+    });
+  }).timeout(10 * 1000);
+
+  it('should create a new TEI when a matching TEI is not found by attribute ID', () => {
+    let state = upsertState;
+    return execute(
+      upsert(
+        'trackedEntityInstances',
+        {
+          attributeId: 'aX5hD4qUpRW',
+          attributeValue: Date.now(),
+        },
+        state.data,
+        { ou: 'CMqUILyVnBL' }
+      )
+    )(state).then(state => {
+      console.log(JSON.stringify(state.data, null, 2));
+      // expect(state.data.response.importCount.updated).to.eq(0);
+      // expect(state.data.response.importCount.imported).to.eq(1);
     });
   }).timeout(10 * 1000);
 });
