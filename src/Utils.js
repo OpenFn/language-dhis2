@@ -35,13 +35,13 @@ export function logWaitingForServer(url, params) {
 /**
  * Log api version
  */
-export function logApiVersion(apiVersion, supportApiVersion) {
+export function logApiVersion(apiVersion) {
   const message =
-    supportApiVersion === true && apiVersion
+    apiVersion && apiVersion
       ? `Using DHIS2 api version \x1b[33m ${apiVersion}\x1b[0m`
-      : '\x1b[33m Attempting to use apiVersion without providing it in state.configuration or in options parameter\x1b[0m. You may encounter errors.\x1b[33m api_version_missing\x1b[0m. If `supportApiVersion = true` in the `options` parameter, then you need to provide `apiVersion` as part of the `options` parameter or set `apiVersion` in state.configuration.';
+      : '\x1b[33m Attempting to use apiVersion without providing it in state.configuration or in options parameter\x1b[0m. You may encounter errors.\x1b[33m api_version_missing\x1b[0m.';
 
-  if (supportApiVersion === true) Log.warn(message);
+  if (apiVersion) Log.warn(message);
   else Log.warn(`Using \x1b[33m latest \x1b[0m version of DHIS2 api.`);
 }
 
@@ -51,8 +51,8 @@ export function logOperation(operation) {
 /**
  * Build url for a given operation
  */
-export function buildUrl(path, hostUrl, apiVersion, supportApiVersion) {
-  const useApiVersion = supportApiVersion ?? false;
+export function buildUrl(path, hostUrl, apiVersion) {
+  const useApiVersion = apiVersion ?? false;
 
   const pathSuffix =
     useApiVersion === true

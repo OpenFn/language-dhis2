@@ -151,9 +151,7 @@ export function getTEIs(params, responseType, options, callback) {
  * @constructor
  * @param {string} uniqueAttributeId - Tracked Entity Instance unique identifier used during matching
  * @param {Object<symbol,any>} data - Payload data for new/updated tracked entity instance(s)
- * @param {options} [options={replace: false, apiVersion: null, supportApiVersion: false,requireUniqueAttributeConfig: true}] - Optional `options` for `upserTEI` operation.
- * @param {{filter: string}} [updateCondition={filter: 'true:EQ:true'}] - Useful for `idempotency`. Optional expression used to determine when to apply the UPDATE when a record exists(e.g. `lqI9ZZ0Bbnt:GT:state.data.registrationDate`). By default, we apply the UPDATE if it passes `unique attribute checks`.
- * @param {Object<symbol,any>[]} params - Optional `params array`. See import parameters {@link discover} or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#tracked-entity-instance-management DHIS2 docs}.
+ * @param {options} [options={replace: false, apiVersion: null,requireUniqueAttributeConfig: true}] - Optional `options` for `upserTEI` operation.
  * @param {requestCallback} [callback] - Optional `callback` to handle the response.
  * @throws {RangeError} - Throws `RangeError` when `uniqueAttributeId` is `invalid` or `not unique`.
  * @returns {Promise<state>} state
@@ -161,14 +159,7 @@ export function getTEIs(params, responseType, options, callback) {
  * upsertTEI('aX5hD4qUpRW', state.data);
  * @todo Implement updateCondition
  */
-export function upsertTEI(
-  uniqueAttributeId,
-  data,
-  options,
-  updateCondition,
-  params,
-  callback
-) {
+export function upsertTEI(uniqueAttributeId, data, options, callback) {
   return state => {
     const { password, username, hostUrl } = state.configuration;
 
@@ -176,21 +167,16 @@ export function upsertTEI(
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
-    const supportApiVersion =
-      options?.supportApiVersion ?? state.configuration.supportApiVersion;
     const requireUniqueAttributeConfig =
       options?.requireUniqueAttributeConfig ?? true;
 
-    params = params ?? [];
-    const ou = params?.find(obj => obj.hasOwnProperty('ou')) ?? {
+    let params = [];
+
+    const ou = {
       ou: state.data.orgUnit,
     };
 
-    console.log('ou is', ou);
-
     params?.push(ou);
-
-    console.log('Params are', params);
 
     const uniqueAttributeValue = state.data.attributes?.find(
       obj => obj?.attribute === uniqueAttributeId
@@ -201,15 +187,13 @@ export function upsertTEI(
     const uniqueAttributeUrl = buildUrl(
       `/trackedEntityAttributes/${uniqueAttributeId}`,
       hostUrl,
-      apiVersion,
-      supportApiVersion
+      apiVersion
     );
 
     const trackedEntityTypeUrl = buildUrl(
       `/trackedEntityTypes/${trackedEntityType}?fields=*`,
       hostUrl,
-      apiVersion,
-      supportApiVersion
+      apiVersion
     );
 
     const findTrackedEntityType = () => {
@@ -260,7 +244,6 @@ export function upsertTEI(
           attributeId: uniqueAttributeId,
           attributeValue: uniqueAttributeValue,
         },
-        updateCondition,
         body,
         params,
         options,
@@ -1561,33 +1544,17 @@ export function del(
 /**
  * A generic helper function used to atomically either insert a row, or on the basis of the row already existing,
  * UPDATE that existing row instead.
- * @param {!string} resourceType - The type of a resource to `insert` or `update`. E.g. `trackedEntityInstances`
- * @param {!{attributeId: string, attributeValue: any}} uniqueAttribute - An object containing a `attributeId` and `attributeValue` which will be used to uniquely identify the record
- * @param {{sourceValue: any, operator: ['eq','!eq','gt','gte','lt','lte'], destinationValuePath: string}} [updateCondition=true:EQ:true] - Useful for `idempotency`. Optional expression used to determine when to apply the UPDATE when a record exists(e.g. `payLoad.registrationDate>person.registrationDate`). By default, we apply the UPDATE if it passes `unique attribute checks`.
+ * @param {string} resourceType - The type of a resource to `insert` or `update`. E.g. `trackedEntityInstances`
+ * @param {string} uniqueAttribute - An object containing a `attributeId` and `attributeValue` which will be used to uniquely identify the record
  * @param {Object<any,any>} data - The update data containing new values
- * @param {array} [params] - Optional `import` parameters for `Update/create`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
- * @param {upsertOptionsConfig} [options={replace: false, apiVersion: null, supportApiVersion: false,requireUniqueAttributeConfig: true}] - Optional options for update method {@link upsertOptionsConfig}.`
+ * @param {array} [params] - Optional `import` parameters e.g. `ou`
+ * @param {options} [options={replace: false, apiVersion: null, responseType: 'json'}] - Optional options for update method {@link options}.`
  * @param {requestCallback} [callback] - Optional callback to handle the response
  * @returns {Promise<state>} state
  * @throws {RangeError}
  * @example <caption>- Example `expression.js` of upsert</caption>
  * ```javascript
- *   upsert(
- *    'trackedEntityInstances',
- *    {
- *      attributeId: 'aX5hD4qUpRW',
- *      attributeValue: state =>
- *        state.data.attributes.find(obj => obj.attribute === 'aX5hD4qUpRW').value,
- *    },
- *    {
- *      sourceValue: 'some value',
- *      operator: 'gt',
- *      destinationValuePath: '{object}.{propertyName}',
- *    },
- *    state.data,
- *    [{ ou: 'CMqUILyVnBL' }],
- *    { replace: false }
- *   );
+ 
  * ```
  * @todo Tweak/refine to mimic implementation based on the following inspiration: {@link https://sqlite.org/lang_upsert.html sqlite upsert} and {@link https://wiki.postgresql.org/wiki/UPSERT postgresql upsert}
  * @todo Test implementation for upserting metadata
@@ -1597,11 +1564,9 @@ export function del(
 export function upsert(
   resourceType,
   uniqueAttribute,
-  updateCondition,
   data,
   params,
   options,
-  responseType,
   callback
 ) {
   return state => {
@@ -1609,13 +1574,11 @@ export function upsert(
 
     const replace = options?.replace ?? false;
 
+    const responseType = options?.responseType ?? 'json';
+
     const { attributeId, attributeValue } = expandReferences(uniqueAttribute)(
       state
     );
-
-    const { sourceValue, operator, destinationValuePath } = expandReferences(
-      updateCondition
-    )(state);
 
     let queryParams = new URLSearchParams(
       params?.map(item => Object.entries(item)?.flat())
@@ -1629,15 +1592,7 @@ export function upsert(
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
-    const supportApiVersion =
-      options?.supportApiVersion ?? state.configuration.supportApiVersion;
-
-    const url = buildUrl(
-      '/' + resourceType,
-      hostUrl,
-      apiVersion,
-      supportApiVersion
-    );
+    const url = buildUrl('/' + resourceType, hostUrl, apiVersion);
 
     const headers = {
       Accept: CONTENT_TYPES[responseType] ?? 'application/json',
@@ -1645,7 +1600,7 @@ export function upsert(
 
     logOperation('upsert');
 
-    logApiVersion(apiVersion, supportApiVersion);
+    logApiVersion(apiVersion);
 
     logWaitingForServer(url, queryParams);
 

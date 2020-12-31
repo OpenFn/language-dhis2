@@ -28,7 +28,11 @@
 
 <header>
     
+<<<<<<< HEAD
         <h2><span class="attribs"><span class="type-signature"></span></span>upsertTEI<span class="signature">(uniqueAttributeId, data, options)</span><span class="type-signature"> &rarr; {Operation}</span></h2>
+=======
+        <h2><span class="attribs"><span class="type-signature"></span></span>upsertTEI<span class="signature">(uniqueAttributeId, data, options<span class="signature-attributes">opt</span>, updateCondition<span class="signature-attributes">opt</span>, params, callback<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;<a href="global.html#state">state</a>>}</span></h2>
+>>>>>>> 747a859... ready to test upsert and upsertTEI
         
     
 </header>
@@ -41,7 +45,11 @@
     
 
     
+<<<<<<< HEAD
     <h4 class="name" id="upsertTEI"><span class="type-signature"></span>new upsertTEI<span class="signature">(uniqueAttributeId, data, options)</span><span class="type-signature"> &rarr; {Operation}</span></h4>
+=======
+    <h4 class="name" id="upsertTEI"><span class="type-signature"></span>new upsertTEI<span class="signature">(uniqueAttributeId, data, options<span class="signature-attributes">opt</span>, updateCondition<span class="signature-attributes">opt</span>, params, callback<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;<a href="global.html#state">state</a>>}</span></h4>
+>>>>>>> 747a859... ready to test upsert and upsertTEI
     
 
     
@@ -49,7 +57,12 @@
 
 
 <div class="description">
+<<<<<<< HEAD
     Create or update one or many new Tracked Entity Instances
+=======
+    Upsert(Create or update) one or many Tracked Entity Instances. Update if the record exists otherwise insert a new record.
+This is useful for idempotency and duplicate management
+>>>>>>> 747a859... ready to test upsert and upsertTEI
 </div>
 
 
@@ -73,8 +86,17 @@
         <th>Type</th>
 
         
+<<<<<<< HEAD
 
         
+=======
+        <th>Attributes</th>
+        
+
+        
+        <th>Default</th>
+        
+>>>>>>> 747a859... ready to test upsert and upsertTEI
 
         <th class="last">Description</th>
     </tr>
@@ -98,7 +120,23 @@
             </td>
 
             
+<<<<<<< HEAD
 
+=======
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+>>>>>>> 747a859... ready to test upsert and upsertTEI
             
 
             <td class="description last">Tracked Entity Instance unique identifier used during matching</td>
@@ -114,14 +152,34 @@
             <td class="type">
             
                 
+<<<<<<< HEAD
 <span class="param-type">object</span>
+=======
+<span class="param-type">Object.&lt;symbol, any></span>
+>>>>>>> 747a859... ready to test upsert and upsertTEI
 
 
             
             </td>
 
             
+<<<<<<< HEAD
 
+=======
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+>>>>>>> 747a859... ready to test upsert and upsertTEI
             
 
             <td class="description last">Payload data for new/updated tracked entity instance(s)</td>
@@ -137,17 +195,150 @@
             <td class="type">
             
                 
+<<<<<<< HEAD
 <span class="param-type">object</span>
+=======
+<span class="param-type"><a href="global.html#options">options</a></span>
 
 
             
             </td>
 
             
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    {replace: false, apiVersion: null, supportApiVersion: false,requireUniqueAttributeConfig: true}
+                
+                </td>
+            
+
+            <td class="description last">Optional `options` for `upserTEI` operation.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>updateCondition</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+>>>>>>> 747a859... ready to test upsert and upsertTEI
+
+
+            
+            </td>
+
+            
+<<<<<<< HEAD
 
             
 
             <td class="description last">Optional options for update method. Defaults to {replace: true}</td>
+=======
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                    {filter: 'true:EQ:true'}
+                
+                </td>
+            
+
+            <td class="description last">Useful for `idempotency`. Optional expression used to determine when to apply the UPDATE when a record exists(e.g. `lqI9ZZ0Bbnt:GT:state.data.registrationDate`). By default, we apply the UPDATE if it passes `unique attribute checks`.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>params</code></td>
+            
+
+            <td class="type">
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#requestCallback">requestCallback</a></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+                <td class="default">
+                
+                </td>
+            
+
+            <td class="description last">Optional `callback` to handle the response.</td>
+>>>>>>> 747a859... ready to test upsert and upsertTEI
         </tr>
 
     
@@ -188,7 +379,11 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
+<<<<<<< HEAD
         <a href="Adaptor.js.html">Adaptor.js</a>, <a href="Adaptor.js.html#line462">line 462</a>
+=======
+        <a href="Adaptor.js.html">Adaptor.js</a>, <a href="Adaptor.js.html#line262">line 262</a>
+>>>>>>> 747a859... ready to test upsert and upsertTEI
     </li></ul></dd>
     
 
@@ -197,6 +392,16 @@
     
 
     
+<<<<<<< HEAD
+=======
+    <dt class="tag-todo">To Do:</dt>
+    <dd class="tag-todo">
+        <ul>
+            <li>Implement updateCondition</li>
+        </ul>
+    </dd>
+    
+>>>>>>> 747a859... ready to test upsert and upsertTEI
 </dl>
 
 
@@ -211,11 +416,50 @@
 
 
 
+<<<<<<< HEAD
+=======
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        - Throws `RangeError` when `uniqueAttributeId` is `invalid` or `not unique`.
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">RangeError</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+>>>>>>> 747a859... ready to test upsert and upsertTEI
 
 
 <h5>Returns:</h5>
 
         
+<<<<<<< HEAD
+=======
+<div class="param-desc">
+    state
+</div>
+
+>>>>>>> 747a859... ready to test upsert and upsertTEI
 
 
 <dl>
@@ -224,7 +468,11 @@
     </dt>
     <dd>
         
+<<<<<<< HEAD
 <span class="param-type">Operation</span>
+=======
+<span class="param-type">Promise.&lt;<a href="global.html#state">state</a>></span>
+>>>>>>> 747a859... ready to test upsert and upsertTEI
 
 
     </dd>
@@ -237,7 +485,13 @@
 
     <h5>Example</h5>
     
+<<<<<<< HEAD
     <pre class="prettyprint"><code>upsertTEI('w75KJ2mc4zz', state.data, { replace: true })</code></pre>
+=======
+        <p class="code-caption">- Example `expression.js` of upsertTEI</p>
+    
+    <pre class="prettyprint"><code>upsertTEI('aX5hD4qUpRW', state.data);</code></pre>
+>>>>>>> 747a859... ready to test upsert and upsertTEI
 
 
 
@@ -273,13 +527,21 @@
 </div>
 
 <nav>
+<<<<<<< HEAD
     <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="configMigrationHelper.html">configMigrationHelper</a></li><li><a href="createTEI.html">createTEI</a></li><li><a href="dataElement.html">dataElement</a></li><li><a href="dataValueSet.html">dataValueSet</a></li><li><a href="enroll.html">enroll</a></li><li><a href="event.html">event</a></li><li><a href="execute.html">execute</a></li><li><a href="fetchAnalytics.html">fetchAnalytics</a></li><li><a href="fetchData.html">fetchData</a></li><li><a href="fetchEvents.html">fetchEvents</a></li><li><a href="updateTEI.html">updateTEI</a></li><li><a href="upsertTEI.html">upsertTEI</a></li></ul>
+=======
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="configMigrationHelper.html">configMigrationHelper</a></li><li><a href="discover.html">discover</a></li><li><a href="execute.html">execute</a></li><li><a href="upsertTEI.html">upsertTEI</a></li></ul><h3>Global</h3><ul><li><a href="global.html#buildUrl">buildUrl</a></li><li><a href="global.html#cancelEnrollment">cancelEnrollment</a></li><li><a href="global.html#completeEnrollment">completeEnrollment</a></li><li><a href="global.html#composeSuccessMessage">composeSuccessMessage</a></li><li><a href="global.html#create">create</a></li><li><a href="global.html#createDataValues">createDataValues</a></li><li><a href="global.html#createEnrollment">createEnrollment</a></li><li><a href="global.html#createEvents">createEvents</a></li><li><a href="global.html#createPrograms">createPrograms</a></li><li><a href="global.html#createTEI">createTEI</a></li><li><a href="global.html#del">del</a></li><li><a href="global.html#FIELD_FILTERS_PRESETS">FIELD_FILTERS_PRESETS</a></li><li><a href="global.html#FIELD_TRANSFORMERS">FIELD_TRANSFORMERS</a></li><li><a href="global.html#generateDhis2UID">generateDhis2UID</a></li><li><a href="global.html#getAnalytics">getAnalytics</a></li><li><a href="global.html#getData">getData</a></li><li><a href="global.html#getDataValues">getDataValues</a></li><li><a href="global.html#getEnrollments">getEnrollments</a></li><li><a href="global.html#getEvents">getEvents</a></li><li><a href="global.html#getMetadata">getMetadata</a></li><li><a href="global.html#getPrograms">getPrograms</a></li><li><a href="global.html#getRelationships">getRelationships</a></li><li><a href="global.html#getResources">getResources</a></li><li><a href="global.html#getTEIs">getTEIs</a></li><li><a href="global.html#handleResponse">handleResponse</a></li><li><a href="global.html#logApiVersion">logApiVersion</a></li><li><a href="global.html#logWaitingForServer">logWaitingForServer</a></li><li><a href="global.html#patch">patch</a></li><li><a href="global.html#prettyJson">prettyJson</a></li><li><a href="global.html#requestHttpHead">requestHttpHead</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#updateEnrollments">updateEnrollments</a></li><li><a href="global.html#updateEvents">updateEvents</a></li><li><a href="global.html#updatePrograms">updatePrograms</a></li><li><a href="global.html#updateTEI">updateTEI</a></li><li><a href="global.html#upsert">upsert</a></li><li><a href="global.html#value">value</a></li><li><a href="global.html#warnExpectLargeResult">warnExpectLargeResult</a></li></ul>
+>>>>>>> 747a859... ready to test upsert and upsertTEI
 </nav>
 
 <br class="clear">
 
 <footer>
+<<<<<<< HEAD
     Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Mon Dec 14 2020 11:22:43 GMT-0500 (Eastern Standard Time)
+=======
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Dec 30 2020 15:45:02 GMT+0200 (Central Africa Time)
+>>>>>>> 747a859... ready to test upsert and upsertTEI
 </footer>
 
 <script> prettyPrint(); </script>
