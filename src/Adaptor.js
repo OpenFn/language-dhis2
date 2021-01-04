@@ -85,6 +85,12 @@ axios.interceptors.response.use(
   },
   function (error) {
     Log.error(`${error?.message}`);
+    try {
+      console.log(JSON.stringify(error.response?.data?.response, null, 2));
+    } catch (err) {
+      /* Keep quiet! Just log the above error again */
+      console.log(error.response?.data?.response);
+    }
     console.log(error.response?.data?.response);
     return Promise.reject(error);
   }
@@ -1727,7 +1733,7 @@ export function upsert(
           `${COLORS.FgGreen}Existing record not found${ESCAPE}, proceeding to ${COLORS.FgGreen}CREATE(POST)${ESCAPE} ...`
         );
         queryParams.delete('filter');
-        queryParams.append('importStrategy', 'CREATE');
+        queryParams.delete('ou');
         return axios
           .request({
             method: 'POST',

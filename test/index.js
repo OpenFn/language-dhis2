@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { execute, getData, upsert } from '../lib/Adaptor';
 import nock from 'nock';
-import { upsertState } from './ClientFixtures';
+import { upsertNewState, upsertExistingState } from './ClientFixtures';
 import { random } from 'lodash';
 
 describe('execute', () => {
@@ -136,7 +136,7 @@ describe('upsert', () => {
   });
 
   it('should update an existing TEI when a matching TEI is found by attribute ID', () => {
-    let state = upsertState;
+    let state = upsertExistingState;
     return execute(
       upsert(
         'trackedEntityInstances',
@@ -147,36 +147,53 @@ describe('upsert', () => {
               .value,
         },
         state.data,
-        { ou: 'DiszpKrYNg8' }
+        { ou: 'TSyzvBiovKh' }
       )
     )(state).then(state => {
-      // console.log(JSON.stringify(state.data, null, 2));
-      // expect(state.data.response.reference).to.eq('YGyelJBMeKy');
-      expect(state.data.response.importCount.updated).to.eq(1);
       expect(state.data.response.importCount.imported).to.eq(0);
+      expect(state.data.response.importCount.updated).to.eq(1);
+      expect(state.data.response.importCount.deleted).to.eq(0);
+      expect(state.data.response.importCount.ignored).to.eq(0);
     });
   }).timeout(10 * 1000);
 
   it('should create a new TEI when a matching TEI is not found by attribute ID', () => {
-    let state = upsertState;
+    let state = upsertNewState;
     return execute(
       upsert(
         'trackedEntityInstances',
         {
-          attributeId: 'aX5hD4qUpRW',
-          attributeValue: Date.now(),
+          attributeId: 'lZGmxYbs97q',
+          attributeValue: state =>
+            state.data.attributes.find(obj => obj.attribute === 'lZGmxYbs97q')
+              .value,
         },
         state.data,
-        { ou: 'CMqUILyVnBL' }
+        { ou: 'TSyzvBiovKh' }
       )
     )(state).then(state => {
-      console.log(JSON.stringify(state.data, null, 2));
-      // expect(state.data.response.importCount.updated).to.eq(0);
-      // expect(state.data.response.importCount.imported).to.eq(1);
+      expect(state.data.response.imported).to.eq(1);
+      expect(state.data.response.updated).to.eq(0);
+      expect(state.data.response.deleted).to.eq(0);
+      expect(state.data.response.ignored).to.eq(0);
     });
   }).timeout(10 * 1000);
+  // it('should throw a TypeError when duolicates are detected on upsert attribute ID', () => {
+  //   let state = upsertState;
+  //   return execute(
+  //     upsert(
+  //       'trackedEntityInstances',
+  //       {
+  //         attributeId: 'aX5hD4qUpRW',
+  //         attributeValue: Date.now(),
+  //       },
+  //       state.data,
+  //       { ou: 'CMqUILyVnBL' }
+  //     )
+  //   )(state).then(state => {
+  //     console.log(JSON.stringify(state.data, null, 2));
+  //     // expect(state.data.response.importCount.updated).to.eq(0);
+  //     // expect(state.data.response.importCount.imported).to.eq(1);
+  //   });
+  // }).timeout(10 * 1000);
 });
-
-/** Test create */
-/** Test update */
-/** Test upsert */
