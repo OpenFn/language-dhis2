@@ -175,23 +175,23 @@ export function upsertTEI(uniqueAttributeId, data, options, callback) {
     }
 
     const { password, username, hostUrl } = state.configuration;
-
+    // console.log('Data before expansion', data);
     const body = expandReferences(data)(state);
-
+    // console.log('Body after expansion', body);
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
     const requireUniqueAttributeConfig =
       options?.requireUniqueAttributeConfig ?? true;
 
     const params = {
-      ou: state.data.orgUnit,
+      ou: body.orgUnit,
     };
 
-    const uniqueAttributeValue = state.data.attributes?.find(
+    const uniqueAttributeValue = body.attributes?.find(
       obj => obj?.attribute === uniqueAttributeId
     )?.value;
 
-    const trackedEntityType = state.data.trackedEntityType;
+    const trackedEntityType = body.trackedEntityType;
 
     const uniqueAttributeUrl = buildUrl(
       `/trackedEntityAttributes/${uniqueAttributeId}`,
@@ -1300,7 +1300,8 @@ export function create(resourceType, data, options, params, callback) {
 }
 
 /**
- *  A generic helper function to update an resource object of any type. It requires to send all required fields or the full body
+ *  A generic helper function to update a resource object of any type. 
+ * - It requires to send `all required fields` or the `full body`
  * @param {string} resourceType
  * @param {String} path
  * @param {Object} data
@@ -1742,8 +1743,11 @@ export function upsert(
         Log.info(
           `${COLORS.FgGreen}Existing record not found${ESCAPE}, proceeding to ${COLORS.FgGreen}CREATE(POST)${ESCAPE} ...`
         );
+
+        // We must delete the filter and ou params so the POST request is not interpreted as a GET request by the server
         queryParams.delete('filter');
         queryParams.delete('ou');
+
         return axios
           .request({
             method: 'POST',

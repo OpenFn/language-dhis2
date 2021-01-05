@@ -1,4 +1,5 @@
 import { expect } from 'chai';
+import { dataValue } from 'language-common';
 import { execute, getData, upsert, upsertTEI, create } from '../lib/Adaptor';
 import nock from 'nock';
 import {
@@ -142,6 +143,7 @@ describe('upsert', () => {
 
   it('should update an existing TEI when a matching TEI is found by attribute ID', () => {
     let state = upsertExistingState;
+
     return execute(
       upsert(
         'trackedEntityInstances',
@@ -164,6 +166,7 @@ describe('upsert', () => {
 
   it('should create a new TEI when a matching TEI is not found by attribute ID', () => {
     let state = upsertNewState;
+
     return execute(
       upsert(
         'trackedEntityInstances',
@@ -193,6 +196,7 @@ describe('upsertTEI', () => {
 
   it('upsertTEI should update an existing TEI when a matching TEI is found by attribute ID', () => {
     let state = upsertExistingTEIState;
+
     return execute(upsertTEI('lZGmxYbs97q', state.data))(state).then(state => {
       expect(state.data.response.importCount.imported).to.eq(0);
       expect(state.data.response.importCount.updated).to.eq(1);
@@ -203,11 +207,60 @@ describe('upsertTEI', () => {
 
   it('upsertTEI should create a new TEI when a matching TEI is not found by attribute ID', () => {
     let state = upsertNewTEIState;
+
     return execute(upsertTEI('lZGmxYbs97q', state.data))(state).then(state => {
       expect(state.data.response.imported).to.eq(1);
       expect(state.data.response.updated).to.eq(0);
       expect(state.data.response.deleted).to.eq(0);
       expect(state.data.response.ignored).to.eq(0);
+    });
+  }).timeout(10 * 1000);
+
+  it('should allow the user to build a TEI object from a generic state', () => {
+    let state = {
+      ...upsertNewTEIState,
+      data: {
+        form: {
+          name: 'Taylor',
+          uniqueId: '1135353',
+          organization: 'TSyzvBiovKh',
+          programsJoined: ['fDd25txQckK'],
+        },
+      },
+    };
+
+    return execute(
+      upsertTEI('lZGmxYbs97q', {
+        orgUnit: dataValue('form.organization'),
+        trackedEntityType: 'nEenWmSyUEp',
+        attributes: [
+          {
+            attribute: 'w75KJ2mc4zz',
+            value: state.data.form.name,
+          },
+          {
+            attribute: 'lZGmxYbs97q',
+            value: state.data.form.uniqueId,
+          },
+        ],
+        enrollments: state =>
+          state.data.form.programsJoined.map(item => ({
+            orgUnit: state.data.form.organization,
+            program: item,
+            programState: 'lST1OZ5BDJ2',
+            enrollmentDate: '2021-01-05',
+            incidentDate: '2021-01-05',
+          })),
+      })
+    )(state).then(state => {
+      expect(state.data.response.status).to.eq('SUCCESS');
+      expect(state.data.httpStatusCode).to.eq(200);
+      expect(
+        state.data.response.deleted ?? state.data.response.importCount.deleted
+      ).to.eq(0);
+      expect(
+        state.data.response.ignored ?? state.data.response.importCount.ignored
+      ).to.eq(0);
     });
   }).timeout(10 * 1000);
 });
