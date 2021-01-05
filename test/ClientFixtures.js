@@ -41,8 +41,14 @@ const fixtures = {
   },
 };
 
-let valUpsert = Math.floor(Math.random() * 7000000);
-let valUpsertTEI = Math.floor(Math.random() * 7000000);
+function rand(n) {
+  if (n === 0) return '';
+  let r = Math.floor(Math.random() * Math.floor(n));
+  return '' + r + rand(n - 1);
+}
+
+let valUpsert = rand(7);
+let valUpsertTEI = rand(7);
 
 export const upsertNewState = {
   configuration: {
@@ -180,6 +186,41 @@ export const upsertExistingTEIState = {
         programState: 'lST1OZ5BDJ2',
         enrollmentDate: '2021-01-04',
         incidentDate: '2021-01-04',
+      },
+    ],
+  },
+};
+
+export const createState = {
+  configuration: {
+    username: 'admin',
+    password: 'district',
+    hostUrl: 'https://play.dhis2.org/2.35.1',
+    apiVersion: 35,
+  },
+  data: {
+    program: 'eBAyeGv0exc',
+    orgUnit: 'DiszpKrYNg8',
+    eventDate: '2021-01-05',
+    status: 'COMPLETED',
+    completedDate: '2021-01-05',
+    storedBy: 'admin',
+    coordinate: {
+      latitude: 59.8,
+      longitude: 10.9,
+    },
+    dataValues: [
+      {
+        dataElement: 'qrur9Dvnyt5',
+        value: '33',
+      },
+      {
+        dataElement: 'oZg33kd9taw',
+        value: 'Male',
+      },
+      {
+        dataElement: 'msodh3rEMJa',
+        value: '2014-05-18',
       },
     ],
   },

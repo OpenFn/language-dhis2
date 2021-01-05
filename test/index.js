@@ -1,14 +1,13 @@
 import { expect } from 'chai';
-import { execute, getData, upsert } from '../lib/Adaptor';
+import { execute, getData, upsert, upsertTEI, create } from '../lib/Adaptor';
 import nock from 'nock';
 import {
   upsertNewState,
   upsertExistingState,
   upsertExistingTEIState,
   upsertNewTEIState,
+  createState,
 } from './ClientFixtures';
-import { random } from 'lodash';
-import { upsertTEI } from '../src/Adaptor';
 
 describe('execute', () => {
   it('executes each operation in sequence', done => {
@@ -205,6 +204,22 @@ describe('upsertTEI', () => {
   it('upsertTEI should create a new TEI when a matching TEI is not found by attribute ID', () => {
     let state = upsertNewTEIState;
     return execute(upsertTEI('lZGmxYbs97q', state.data))(state).then(state => {
+      expect(state.data.response.imported).to.eq(1);
+      expect(state.data.response.updated).to.eq(0);
+      expect(state.data.response.deleted).to.eq(0);
+      expect(state.data.response.ignored).to.eq(0);
+    });
+  }).timeout(10 * 1000);
+});
+
+describe('create', () => {
+  before(() => {
+    nock.cleanAll();
+    nock.enableNetConnect();
+  });
+  it('should create a new single event and link to a given program', () => {
+    let state = createState;
+    return execute(create('events', state.data))(state).then(state => {
       expect(state.data.response.imported).to.eq(1);
       expect(state.data.response.updated).to.eq(0);
       expect(state.data.response.deleted).to.eq(0);

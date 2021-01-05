@@ -1228,50 +1228,42 @@ export function getMetadata(
 
 /**
  * A generic helper method to create a record of any kind in DHIS2
- * @param {string} resourceType
- * @param {Object} data
- * @param {Object} params
- * @param {Object} options
- * @param {Function} callback
- * @example
-  // 1. 
+ * @param {string} resourceType - Type of resource to create. E.g. `trackedEntityInstances`
+ * @param {Object<symbol,any>} data - Data that will be used to create a given instance of resource
+ * @param {Object} [options] - Optional `options` to control the behavior of the `create` operation.` Defaults to `{operationName: 'create', apiVersion: null, responseType: 'json'}`
+ * @param {Object} [params] - Optional `import parameters` for a given a resource. E.g. `{dryRun: true, importStrategy: CREATE}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 API documentation} or {@link discover}. Defauls to `DHIS2 default params` for a given resource type.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `create`</caption>
+ * create('events', state.data);
  */
-export function create(
-  resourceType,
-  data,
-  params,
-  options,
-  responseType,
-  callback
-) {
+export function create(resourceType, data, options, params, callback) {
   return state => {
+    const operationName = options?.operationName ?? 'create';
+
     const { username, password, hostUrl } = state.configuration;
 
-    let queryParams = new URLSearchParams(
-      params?.map(item => Object.entries(item)?.flat())
-    );
+    const responseType = options?.responseType ?? 'json';
+
+    params = expandReferences(params)(state);
+
+    const { filters } = params;
+    delete params.filters;
+    let queryParams = new URLSearchParams(params);
 
     const payload = expandReferences(data)(state);
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
-    const supportApiVersion =
-      options?.supportApiVersion ?? state.configuration.supportApiVersion;
-
-    const url = buildUrl(
-      '/' + resourceType,
-      hostUrl,
-      apiVersion,
-      supportApiVersion
-    );
+    const url = buildUrl('/' + resourceType, hostUrl, apiVersion);
 
     const headers = {
       Accept: CONTENT_TYPES[responseType] ?? 'application/json',
     };
 
-    logOperation(`CREATE ${resourceType}`);
+    logOperation(operationName);
 
-    logApiVersion(apiVersion, supportApiVersion);
+    logApiVersion(apiVersion);
 
     logWaitingForServer(url, queryParams);
 
@@ -1293,7 +1285,7 @@ export function create(
         Log.info(
           `${
             COLORS.FgGreen
-          }CREATE succeeded${ESCAPE}. Created ${resourceType}: ${
+          }${operationName} succeeded${ESCAPE}. Created ${resourceType}: ${
             COLORS.FgGreen
           }${
             result.data.response.importSummaries
