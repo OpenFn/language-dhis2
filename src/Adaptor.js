@@ -158,16 +158,22 @@ export function getTEIs(params, options, callback) {
  * @constructor
  * @param {string} uniqueAttributeId - Tracked Entity Instance unique identifier used during matching
  * @param {Object<symbol,any>} data - Payload data for new/updated tracked entity instance(s)
- * @param {options} [options={replace: false, apiVersion: null,requireUniqueAttributeConfig: true}] - Optional `options` for `upserTEI` operation.
+ * @param {options} [options] - Optional `options` for `upserTEI` operation. Defaults to `{responseType: 'json',replace: false, apiVersion: null,requireUniqueAttributeConfig: true}`
  * @param {requestCallback} [callback] - Optional `callback` to handle the response.
  * @throws {RangeError} - Throws `RangeError` when `uniqueAttributeId` is `invalid` or `not unique`.
  * @returns {Promise<state>} state
  * @example <caption>- Example `expression.js` of upsertTEI</caption>
- * upsertTEI('aX5hD4qUpRW', state.data);
+ * upsertTEI('lZGmxYbs97q', state.data);
  * @todo Implement updateCondition
+ * @todo Upsert many TEIs in a single call
  */
 export function upsertTEI(uniqueAttributeId, data, options, callback) {
   return state => {
+    if (options) options[operationName] = 'upsertTEI';
+    else {
+      options = { operationName: 'upsertTEI' };
+    }
+
     const { password, username, hostUrl } = state.configuration;
 
     const body = expandReferences(data)(state);
@@ -1542,16 +1548,26 @@ export function del(
  * A generic helper function used to atomically either insert a row, or on the basis of the row already existing,
  * UPDATE that existing row instead.
  * @param {string} resourceType - The type of a resource to `insert` or `update`. E.g. `trackedEntityInstances`
- * @param {string} uniqueAttribute - An object containing a `attributeId` and `attributeValue` which will be used to uniquely identify the record
+ * @param {{attributeId: string,attributeValue:string|number}} uniqueAttribute - An object containing a `attributeId` and `attributeValue` which will be used to uniquely identify the record
  * @param {Object<any,any>} data - The update data containing new values
- * @param {array} [params] - Optional `import` parameters e.g. `ou`
+ * @param {array} [params] - Optional `import` parameters e.g. `{ou: 'lZGmxYbs97q', filters: [w75KJ2mc4zz:EQ:Jane]}`
  * @param {options} [options={replace: false, apiVersion: null, responseType: 'json'}] - Optional options for update method {@link options}.`
  * @param {requestCallback} [callback] - Optional callback to handle the response
  * @returns {Promise<state>} state
  * @throws {RangeError}
  * @example <caption>- Example `expression.js` of upsert</caption>
  * ```javascript
- 
+ * upsert(
+ *      'trackedEntityInstances',
+ *       {
+ *         attributeId: 'lZGmxYbs97q',
+ *         attributeValue: state =>
+ *           state.data.attributes.find(obj => obj.attribute === 'lZGmxYbs97q')
+ *             .value,
+ *       },
+ *       state.data,
+ *       { ou: 'TSyzvBiovKh' }
+ *     )
  * ```
  * @todo Tweak/refine to mimic implementation based on the following inspiration: {@link https://sqlite.org/lang_upsert.html sqlite upsert} and {@link https://wiki.postgresql.org/wiki/UPSERT postgresql upsert}
  * @todo Test implementation for upserting metadata
@@ -1567,6 +1583,8 @@ export function upsert(
   callback
 ) {
   return state => {
+    const operationName = options?.operationName ?? 'upsert';
+
     const { username, password, hostUrl } = state.configuration;
 
     const replace = options?.replace ?? false;
@@ -1597,7 +1615,7 @@ export function upsert(
       Accept: CONTENT_TYPES[responseType] ?? 'application/json',
     };
 
-    logOperation('upsert');
+    logOperation(operationName);
 
     logApiVersion(apiVersion);
 
@@ -1721,7 +1739,7 @@ export function upsert(
             Log.info(
               `${
                 COLORS.FgGreen
-              }Upsert succeeded${ESCAPE}. Updated ${resourceName}: ${
+              }${operationName} succeeded${ESCAPE}. Updated ${resourceName}: ${
                 COLORS.FgGreen
               }${updateUrl}${ESCAPE}.\nSummary:\n${prettyJson(result.data)}`
             );
@@ -1750,7 +1768,7 @@ export function upsert(
             Log.info(
               `${
                 COLORS.FgGreen
-              }Upsert succeeded${ESCAPE}. Created ${resourceName}: ${
+              }${operationName} succeeded${ESCAPE}. Created ${resourceName}: ${
                 COLORS.FgGreen
               }${
                 result.data.response.importSummaries

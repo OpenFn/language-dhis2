@@ -1,8 +1,14 @@
 import { expect } from 'chai';
 import { execute, getData, upsert } from '../lib/Adaptor';
 import nock from 'nock';
-import { upsertNewState, upsertExistingState } from './ClientFixtures';
+import {
+  upsertNewState,
+  upsertExistingState,
+  upsertExistingTEIState,
+  upsertNewTEIState,
+} from './ClientFixtures';
 import { random } from 'lodash';
+import { upsertTEI } from '../src/Adaptor';
 
 describe('execute', () => {
   it('executes each operation in sequence', done => {
@@ -178,22 +184,31 @@ describe('upsert', () => {
       expect(state.data.response.ignored).to.eq(0);
     });
   }).timeout(10 * 1000);
-  // it('should throw a TypeError when duolicates are detected on upsert attribute ID', () => {
-  //   let state = upsertState;
-  //   return execute(
-  //     upsert(
-  //       'trackedEntityInstances',
-  //       {
-  //         attributeId: 'aX5hD4qUpRW',
-  //         attributeValue: Date.now(),
-  //       },
-  //       state.data,
-  //       { ou: 'CMqUILyVnBL' }
-  //     )
-  //   )(state).then(state => {
-  //     console.log(JSON.stringify(state.data, null, 2));
-  //     // expect(state.data.response.importCount.updated).to.eq(0);
-  //     // expect(state.data.response.importCount.imported).to.eq(1);
-  //   });
-  // }).timeout(10 * 1000);
+});
+
+describe('upsertTEI', () => {
+  before(() => {
+    nock.cleanAll();
+    nock.enableNetConnect();
+  });
+
+  it('upsertTEI should update an existing TEI when a matching TEI is found by attribute ID', () => {
+    let state = upsertExistingTEIState;
+    return execute(upsertTEI('lZGmxYbs97q', state.data))(state).then(state => {
+      expect(state.data.response.importCount.imported).to.eq(0);
+      expect(state.data.response.importCount.updated).to.eq(1);
+      expect(state.data.response.importCount.deleted).to.eq(0);
+      expect(state.data.response.importCount.ignored).to.eq(0);
+    });
+  }).timeout(10 * 1000);
+
+  it('upsertTEI should create a new TEI when a matching TEI is not found by attribute ID', () => {
+    let state = upsertNewTEIState;
+    return execute(upsertTEI('lZGmxYbs97q', state.data))(state).then(state => {
+      expect(state.data.response.imported).to.eq(1);
+      expect(state.data.response.updated).to.eq(0);
+      expect(state.data.response.deleted).to.eq(0);
+      expect(state.data.response.ignored).to.eq(0);
+    });
+  }).timeout(10 * 1000);
 });

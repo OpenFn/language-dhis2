@@ -41,7 +41,8 @@ const fixtures = {
   },
 };
 
-let val = Date.now().toString().slice(-7);
+let valUpsert = Math.floor(Math.random() * 7000000);
+let valUpsertTEI = Math.floor(Math.random() * 7000000);
 
 export const upsertNewState = {
   configuration: {
@@ -56,7 +57,7 @@ export const upsertNewState = {
     attributes: [
       {
         attribute: 'lZGmxYbs97q',
-        value: val,
+        value: valUpsert,
       },
       {
         attribute: 'w75KJ2mc4zz',
@@ -79,6 +80,76 @@ export const upsertNewState = {
   },
 };
 export const upsertExistingState = {
+  configuration: {
+    username: 'admin',
+    password: 'district',
+    hostUrl: 'https://play.dhis2.org/2.35.1',
+    apiVersion: 35,
+  },
+  data: {
+    orgUnit: 'TSyzvBiovKh',
+    trackedEntityType: 'nEenWmSyUEp',
+    attributes: [
+      {
+        attribute: 'lZGmxYbs97q',
+        value: '4088389',
+      },
+      {
+        attribute: 'w75KJ2mc4zz',
+        value: 'Gigiwe',
+      },
+      {
+        attribute: 'zDhUuAYrxNC',
+        value: 'Mwanza',
+      },
+    ],
+    enrollments: [
+      {
+        orgUnit: 'TSyzvBiovKh',
+        program: 'fDd25txQckK',
+        programState: 'lST1OZ5BDJ2',
+        enrollmentDate: '2021-01-04',
+        incidentDate: '2021-01-04',
+      },
+    ],
+  },
+};
+export const upsertNewTEIState = {
+  configuration: {
+    username: 'admin',
+    password: 'district',
+    hostUrl: 'https://play.dhis2.org/2.35.1',
+    apiVersion: 35,
+  },
+  data: {
+    orgUnit: 'TSyzvBiovKh',
+    trackedEntityType: 'nEenWmSyUEp',
+    attributes: [
+      {
+        attribute: 'lZGmxYbs97q',
+        value: valUpsertTEI,
+      },
+      {
+        attribute: 'w75KJ2mc4zz',
+        value: 'Gigiwe',
+      },
+      {
+        attribute: 'zDhUuAYrxNC',
+        value: 'Mwanza',
+      },
+    ],
+    enrollments: [
+      {
+        orgUnit: 'TSyzvBiovKh',
+        program: 'fDd25txQckK',
+        programState: 'lST1OZ5BDJ2',
+        enrollmentDate: '2021-01-04',
+        incidentDate: '2021-01-04',
+      },
+    ],
+  },
+};
+export const upsertExistingTEIState = {
   configuration: {
     username: 'admin',
     password: 'district',
