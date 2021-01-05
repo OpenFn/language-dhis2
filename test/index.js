@@ -238,7 +238,7 @@ describe('upsertTEI', () => {
 
     return execute(
       upsertTEI('lZGmxYbs97q', {
-        orgUnit: dataValue('form.organization'),
+        orgUnit: state.data.form.organization,
         trackedEntityType: 'nEenWmSyUEp',
         attributes: [
           {
@@ -271,7 +271,7 @@ describe('upsertTEI', () => {
     });
   }).timeout(10 * 1000);
 
-  it('should allow the user to use `attribute` helper function to create `attribute/value pairs` for the `attributes` property of the TEI', () => {
+  it('should allow the user to use `attribute` and `dataValue` helper functions', () => {
     let state = {
       ...upsertNewTEIState,
       data: {
@@ -291,6 +291,48 @@ describe('upsertTEI', () => {
         attributes: [
           attribute('w75KJ2mc4zz', dataValue('form.name')),
           attribute('lZGmxYbs97q', dataValue('form.uniqueId')),
+        ],
+        enrollments: state =>
+          state.data.form.programsJoined.map(item => ({
+            orgUnit: dataValue('form.organization'),
+            program: item,
+            programState: 'lST1OZ5BDJ2',
+            enrollmentDate: '2021-01-05',
+            incidentDate: '2021-01-05',
+          })),
+      })
+    )(state).then(state => {
+      expect(state.data.response.status).to.eq('SUCCESS');
+      expect(state.data.httpStatusCode).to.eq(200);
+      expect(
+        state.data.response.deleted ?? state.data.response.importCount.deleted
+      ).to.eq(0);
+      expect(
+        state.data.response.ignored ?? state.data.response.importCount.ignored
+      ).to.eq(0);
+    });
+  }).timeout(10 * 1000);
+
+  it('should allow the user to use `arrow function` to access data', () => {
+    let state = {
+      ...upsertNewTEIState,
+      data: {
+        form: {
+          name: 'Taylor',
+          uniqueId: '1135354',
+          organization: 'TSyzvBiovKh',
+          programsJoined: ['fDd25txQckK'],
+        },
+      },
+    };
+
+    return execute(
+      upsertTEI('lZGmxYbs97q', {
+        orgUnit: state => state.data.form.organization,
+        trackedEntityType: 'nEenWmSyUEp',
+        attributes: [
+          attribute('w75KJ2mc4zz', state => state.data.form.name),
+          attribute('lZGmxYbs97q', state => state.data.form.uniqueId),
         ],
         enrollments: state =>
           state.data.form.programsJoined.map(item => ({
