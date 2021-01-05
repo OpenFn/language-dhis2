@@ -289,8 +289,8 @@ describe('upsertTEI', () => {
         orgUnit: dataValue('form.organization'),
         trackedEntityType: 'nEenWmSyUEp',
         attributes: [
-          attribute('w75KJ2mc4zz', state.data.form.name),
-          attribute('lZGmxYbs97q', state.data.form.uniqueId),
+          attribute('w75KJ2mc4zz', dataValue('form.name')),
+          attribute('lZGmxYbs97q', dataValue('form.uniqueId')),
         ],
         enrollments: state =>
           state.data.form.programsJoined.map(item => ({
