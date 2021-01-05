@@ -175,9 +175,9 @@ export function upsertTEI(uniqueAttributeId, data, options, callback) {
     }
 
     const { password, username, hostUrl } = state.configuration;
-    // console.log('Data before expansion', data);
+
     const body = expandReferences(data)(state);
-    // console.log('Body after expansion', body);
+
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
     const requireUniqueAttributeConfig =
@@ -1782,6 +1782,8 @@ export function upsert(
 //#endregion
 
 //#region EXPORTS
+export { attribute } from './Utils';
+
 exports.axios = axios;
 
 export {

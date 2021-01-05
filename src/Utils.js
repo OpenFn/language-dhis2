@@ -59,6 +59,18 @@ export function buildUrl(path, hostUrl, apiVersion) {
 }
 
 /**
+ * Helper function that returns an attribute of the format `{attribute: 'lZGmxYbs97q',value: 'Banda'}`, given an `Id` and the `value`
+ * @param {string} attributeId
+ * @param {string|boolean|number} attributeValue
+ */
+export function attribute(attributeId, attributeValue) {
+  return {
+    attribute: expandReferences(attributeId),
+    value: expandReferences(attributeValue),
+  };
+}
+
+/**
  * Send a HEAD request to read Content-Length header to check the file size before we can send
  * the actual request
  * This will give us a sense of how big the result would be and warn the user, accordingly

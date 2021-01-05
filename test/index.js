@@ -1,6 +1,13 @@
 import { expect } from 'chai';
 import { dataValue } from 'language-common';
-import { execute, getData, upsert, upsertTEI, create } from '../lib/Adaptor';
+import {
+  execute,
+  getData,
+  upsert,
+  upsertTEI,
+  create,
+  attribute,
+} from '../lib/Adaptor';
 import nock from 'nock';
 import {
   upsertNewState,
@@ -263,6 +270,48 @@ describe('upsertTEI', () => {
       ).to.eq(0);
     });
   }).timeout(10 * 1000);
+
+  it('should allow the user to use `attribute` helper function to create `attribute/value pairs` for the `attributes` property of the TEI', () => {
+    let state = {
+      ...upsertNewTEIState,
+      data: {
+        form: {
+          name: 'Taylor',
+          uniqueId: '1135354',
+          organization: 'TSyzvBiovKh',
+          programsJoined: ['fDd25txQckK'],
+        },
+      },
+    };
+
+    return execute(
+      upsertTEI('lZGmxYbs97q', {
+        orgUnit: dataValue('form.organization'),
+        trackedEntityType: 'nEenWmSyUEp',
+        attributes: [
+          attribute('w75KJ2mc4zz', state.data.form.name),
+          attribute('lZGmxYbs97q', state.data.form.uniqueId),
+        ],
+        enrollments: state =>
+          state.data.form.programsJoined.map(item => ({
+            orgUnit: state.data.form.organization,
+            program: item,
+            programState: 'lST1OZ5BDJ2',
+            enrollmentDate: '2021-01-05',
+            incidentDate: '2021-01-05',
+          })),
+      })
+    )(state).then(state => {
+      expect(state.data.response.status).to.eq('SUCCESS');
+      expect(state.data.httpStatusCode).to.eq(200);
+      expect(
+        state.data.response.deleted ?? state.data.response.importCount.deleted
+      ).to.eq(0);
+      expect(
+        state.data.response.ignored ?? state.data.response.importCount.ignored
+      ).to.eq(0);
+    });
+  }).timeout(10 * 1000);
 });
 
 describe('create', () => {
@@ -270,7 +319,7 @@ describe('create', () => {
     nock.cleanAll();
     nock.enableNetConnect();
   });
-  it('should create a new single event and link to a given program', () => {
+  it('should create a new single event and link it to a given program', () => {
     let state = createState;
     return execute(create('events', state.data))(state).then(state => {
       expect(state.data.response.imported).to.eq(1);
