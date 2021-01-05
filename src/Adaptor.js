@@ -1,12 +1,8 @@
 /** @module Adaptor */
 //#region IMPORTS
 import axios from 'axios';
-import {
-  execute as commonExecute,
-  expandReferences,
-  composeNextState,
-} from 'language-common';
-import { indexOf, forEach, keyBy } from 'lodash';
+import { execute as commonExecute, composeNextState } from 'language-common';
+import { indexOf } from 'lodash';
 
 import {
   Log,
@@ -22,6 +18,7 @@ import {
   prettyJson,
   ESCAPE,
   composeSuccessMessage,
+  recursivelyExpandReferences,
 } from './Utils';
 //#endregion
 
@@ -176,7 +173,7 @@ export function upsertTEI(uniqueAttributeId, data, options, callback) {
 
     const { password, username, hostUrl } = state.configuration;
 
-    const body = expandReferences(data)(state);
+    const body = recursivelyExpandReferences(data)(state);
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
@@ -906,7 +903,7 @@ export function getResources(params, responseType, callback) {
   return state => {
     const { username, password, hostUrl } = state.configuration;
 
-    const queryParams = expandReferences(params)(state);
+    const queryParams = recursivelyExpandReferences(params)(state);
 
     const filter = params?.filter;
 
@@ -1002,7 +999,7 @@ export function getSchema(
   return state => {
     const { username, password, hostUrl } = state.configuration;
 
-    const queryParams = expandReferences(params)(state);
+    const queryParams = recursivelyExpandReferences(params)(state);
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
@@ -1185,7 +1182,10 @@ export function getMetadata(
   return state => {
     const { username, password, hostUrl } = state.configuration;
 
-    const queryParams = expandReferences({ ...resources, ...params })(state);
+    const queryParams = recursivelyExpandReferences({
+      ...resources,
+      ...params,
+    })(state);
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
@@ -1245,13 +1245,13 @@ export function create(resourceType, data, options, params, callback) {
 
     const responseType = options?.responseType ?? 'json';
 
-    params = expandReferences(params)(state);
+    params = recursivelyExpandReferences(params)(state);
 
     const { filters } = params;
     delete params.filters;
     let queryParams = new URLSearchParams(params);
 
-    const payload = expandReferences(data)(state);
+    const body = recursivelyExpandReferences(data)(state);
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
@@ -1278,7 +1278,7 @@ export function create(resourceType, data, options, params, callback) {
           password,
         },
         params: queryParams,
-        data: payload,
+        data: body,
         headers,
       })
       .then(result => {
@@ -1336,7 +1336,7 @@ export function update(
       params?.map(item => Object.entries(item)?.flat())
     );
 
-    const payload = expandReferences(data)(state);
+    const payload = recursivelyExpandReferences(data)(state);
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
@@ -1417,9 +1417,9 @@ export function patch(
 
     // const objectPath = expandReferences(path)(state);
 
-    const queryParams = expandReferences(params)(state);
+    const queryParams = recursivelyExpandReferences(params)(state);
 
-    const payload = expandReferences(data)(state);
+    const payload = recursivelyExpandReferences(data)(state);
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
@@ -1489,9 +1489,9 @@ export function del(
   return state => {
     const { username, password, hostUrl } = state.configuration;
 
-    const queryParams = expandReferences(params)(state);
+    const queryParams = recursivelyExpandReferences(params)(state);
 
-    const payload = expandReferences(data)(state);
+    const payload = recursivelyExpandReferences(data)(state);
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
@@ -1584,10 +1584,10 @@ export function upsert(
 
     const responseType = options?.responseType ?? 'json';
 
-    const { attributeId, attributeValue } = expandReferences(uniqueAttribute)(
-      state
-    );
-    params = expandReferences(params)(state);
+    const { attributeId, attributeValue } = recursivelyExpandReferences(
+      uniqueAttribute
+    )(state);
+    params = recursivelyExpandReferences(params)(state);
 
     const { filters } = params;
     delete params.filters;
@@ -1598,7 +1598,7 @@ export function upsert(
 
     queryParams.append('filter', `${attributeId}:${op}:${attributeValue}`);
 
-    const body = expandReferences(data)(state);
+    const body = recursivelyExpandReferences(data)(state);
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 

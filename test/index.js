@@ -201,7 +201,7 @@ describe('upsertTEI', () => {
     nock.enableNetConnect();
   });
 
-  it('upsertTEI should update an existing TEI when a matching TEI is found by attribute ID', () => {
+  it('should update an existing TEI when a matching TEI is found by attribute ID', () => {
     let state = upsertExistingTEIState;
 
     return execute(upsertTEI('lZGmxYbs97q', state.data))(state).then(state => {
@@ -212,7 +212,7 @@ describe('upsertTEI', () => {
     });
   }).timeout(10 * 1000);
 
-  it('upsertTEI should create a new TEI when a matching TEI is not found by attribute ID', () => {
+  it('should create a new TEI when a matching TEI is not found by attribute ID', () => {
     let state = upsertNewTEIState;
 
     return execute(upsertTEI('lZGmxYbs97q', state.data))(state).then(state => {
@@ -361,6 +361,7 @@ describe('create', () => {
     nock.cleanAll();
     nock.enableNetConnect();
   });
+
   it('should create a new single event and link it to a given program', () => {
     let state = createState;
     return execute(create('events', state.data))(state).then(state => {

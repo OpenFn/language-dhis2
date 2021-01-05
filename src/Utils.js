@@ -1,6 +1,28 @@
 import { eq, filter, some, isEmpty, indexOf, lastIndexOf, trim } from 'lodash';
+import { mapValues } from 'lodash/fp';
 import axios from 'axios';
-import { expandReferences } from 'language-common';
+
+/**
+ * Recursively expand object, each time resolving function calls and returning the resolved values
+ * @param {oject} obj - Object to expand
+ */
+export function recursivelyExpandReferences(obj) {
+  return state => {
+    return mapValues(function (value) {
+      if (typeof value == 'object') {
+        if (Array.isArray(value)) {
+          return value.map(item => {
+            return recursivelyExpandReferences(item)(state);
+          });
+        } else {
+          return recursivelyExpandReferences(value)(state);
+        }
+      } else {
+        return typeof value == 'function' ? value(state) : value;
+      }
+    })(obj);
+  };
+}
 
 /**
  * Compose success message
@@ -65,8 +87,8 @@ export function buildUrl(path, hostUrl, apiVersion) {
  */
 export function attribute(attributeId, attributeValue) {
   return {
-    attribute: expandReferences(attributeId),
-    value: expandReferences(attributeValue),
+    attribute: attributeId,
+    value: attributeValue,
   };
 }
 
