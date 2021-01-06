@@ -185,14 +185,8 @@ export function getIndicesOf(string, regex) {
       match.index,
       indexOf(string, '}', match.index) - 1
     );
-    console.log('hrefstring: ', hrefString);
     let lastIndex = lastIndexOf(hrefString, '/') + 1;
-    console.log('last index:', lastIndex);
     schemaRef = trim(hrefString.slice(lastIndex));
-    console.log('SchemaRef: ', schemaRef);
-    // let item = {};
-    // item[match.index] = schemaRef;
-    // indexes[match[0]].push(match.index);
     indexes[match[0]][match.index] = schemaRef;
   }
 

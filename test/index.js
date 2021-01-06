@@ -7,6 +7,7 @@ import {
   upsertTEI,
   create,
   attribute,
+  update,
 } from '../lib/Adaptor';
 import nock from 'nock';
 import {
@@ -15,6 +16,7 @@ import {
   upsertExistingTEIState,
   upsertNewTEIState,
   createState,
+  updateState,
 } from './ClientFixtures';
 
 describe('execute', () => {
@@ -369,6 +371,23 @@ describe('create', () => {
       expect(state.data.response.updated).to.eq(0);
       expect(state.data.response.deleted).to.eq(0);
       expect(state.data.response.ignored).to.eq(0);
+    });
+  }).timeout(10 * 1000);
+});
+
+describe('update', () => {
+  before(() => {
+    nock.cleanAll();
+    nock.enableNetConnect();
+  });
+
+  it('should update a data element', () => {
+    let state = updateState;
+    return execute(update('dataElements', 'FTRrcoaog83', state.data))(
+      state
+    ).then(state => {
+      expect(state.data.httpStatusCode).to.eq(200);
+      expect(state.data.response.uid).to.eq('FTRrcoaog83');
     });
   }).timeout(10 * 1000);
 });

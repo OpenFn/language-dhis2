@@ -1300,63 +1300,53 @@ export function create(resourceType, data, options, params, callback) {
 }
 
 /**
- *  A generic helper function to update a resource object of any type. 
+ *  A generic helper function to update a resource object of any type.
  * - It requires to send `all required fields` or the `full body`
- * @param {string} resourceType
- * @param {String} path
- * @param {Object} data
- * @param {Object} params
- * @param {Object} options
- * @param {Function} callback
- * @example
-  // 1. Update data element
-  update('dataElements', 'FTRrcoaog83', {
-  displayName: 'New display name',
-  aggregationType: 'SUM',
-  domainType: 'AGGREGATE',
-  valueType: 'NUMBER',
-  name: 'Accute Flaccid Paralysis (Deaths < 5 yrs)',
-  shortName: 'Accute Flaccid Paral (Deaths < 5 yrs)',
-});
-
+ * @param {string} resourceType - The type of resource to be updated. E.g. `dataElements`, `organisationUnits`, etc.
+ * @param {string} path - The `id` or `path` to the `object` to be updated. E.g. `FTRrcoaog83` or `FTRrcoaog83/{collection-name}/{object-id}`
+ * @param {object} data - Data to update. It requires to send `all required fields` or the `full body`. If you want `partial updates`, use `patch` operation.
+ * @param {object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
+ * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional options for update method. Defaults to `{operationName: 'update', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
+ * @param {requestCallback} [callback]  - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>Example `updating` a `data element`</caption>
+ * update('dataElements', 'FTRrcoaog83',
+ * {
+ *   displayName: 'New display name',
+ *   aggregationType: 'SUM',
+ *   domainType: 'AGGREGATE',
+ *   valueType: 'NUMBER',
+ *   name: 'Accute Flaccid Paralysis (Deaths < 5 yrs)',
+ *   shortName: 'Accute Flaccid Paral (Deaths < 5 yrs)',
+ * });
+ *
  */
-export function update(
-  resourceType,
-  path,
-  data,
-  params,
-  options,
-  responseType,
-  callback
-) {
+export function update(resourceType, path, data, params, options, callback) {
   return state => {
+    const operationName = options?.operationName ?? 'update';
+
     const { username, password, hostUrl } = state.configuration;
 
-    let queryParams = new URLSearchParams(
-      params?.map(item => Object.entries(item)?.flat())
-    );
+    const responseType = options?.responseType ?? 'json';
 
-    const payload = recursivelyExpandReferences(data)(state);
+    const filters = params?.filters;
+    delete params?.filters;
+    let queryParams = new URLSearchParams(params);
+    filters?.map(f => queryParams.append('filter', f));
+
+    const body = recursivelyExpandReferences(data)(state);
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
-    const supportApiVersion =
-      options?.supportApiVersion ?? state.configuration.supportApiVersion;
-
-    const url = buildUrl(
-      '/' + resourceType + '/' + path,
-      hostUrl,
-      apiVersion,
-      supportApiVersion
-    );
+    const url = buildUrl('/' + resourceType + '/' + path, hostUrl, apiVersion);
 
     const headers = {
       Accept: CONTENT_TYPES[responseType] ?? 'application/json',
     };
 
-    logOperation(`UPDATE ${resourceType}`);
+    logOperation(operationName);
 
-    logApiVersion(apiVersion, supportApiVersion);
+    logApiVersion(apiVersion);
 
     logWaitingForServer(url, queryParams);
 
@@ -1371,20 +1361,16 @@ export function update(
           password,
         },
         params: queryParams,
-        data: payload,
+        data: body,
         headers,
       })
       .then(result => {
         Log.info(
           `${
             COLORS.FgGreen
-          }UPDATE succeeded${ESCAPE}. Updated ${resourceType}: ${
-            COLORS.FgGreen
-          }${
-            result.data.response.importSummaries
-              ? result.data.response.importSummaries[0].href
-              : result.data.response?.reference
-          }${ESCAPE}.\nSummary:\n${prettyJson(result.data)}`
+          }${operationName} succeeded${ESCAPE}. Updated ${resourceType}.\nSummary:\n${prettyJson(
+            result.data
+          )}`
         );
         if (callback) return callback(composeNextState(state, result.data));
         return composeNextState(state, result.data);

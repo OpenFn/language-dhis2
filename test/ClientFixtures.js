@@ -226,6 +226,24 @@ export const createState = {
   },
 };
 
+export const updateState = {
+  configuration: {
+    username: 'admin',
+    password: 'district',
+    hostUrl: 'https://play.dhis2.org/2.35.1',
+    apiVersion: 35,
+  },
+  data: {
+    id: 'FTRrcoaog83',
+    displayName: 'New display name',
+    aggregationType: 'SUM',
+    domainType: 'AGGREGATE',
+    valueType: 'NUMBER',
+    name: 'Accute Flaccid Paralysis (Deaths < 5 yrs)',
+    shortName: 'Accute Flaccid Paral (Deaths < 5 yrs)',
+  },
+};
+
 export { fixtures };
 
 export default [
