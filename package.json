@@ -14,7 +14,7 @@
     "lib/"
   ],
   "dependencies": {
-    "axios": "^0.21.0",
+    "axios": "^0.21.1",
     "language-common": "github:openfn/language-common#v0.2.0",
     "lodash": "^4.17.19",
     "superagent": "^4.1.0"
