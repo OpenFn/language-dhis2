@@ -1379,15 +1379,21 @@ export function update(resourceType, path, data, params, options, callback) {
 }
 
 /**
- * A generic helper function to send partial updates on one or more object properties. You are not required to send the full body of object properties
- * This is useful for cases where you don't want or need to update all properties on a object.
- * @param {string} resourceType
- * @param {Object} query
- * @param {Object} params
- * @param {Object} options
- * @example
-  // 1. Update data element's property
-  patch('dataElements', 'FTRrcoaog83', {displayName: 'Some new display name'});
+ * A generic helper function to send partial updates on one or more object properties.
+ * - You are not required to send the full body of object properties.
+ * - This is useful for cases where you don't want or need to update all properties on a object.
+ * @param {string} resourceType - The type of resource to be updated. E.g. `dataElements`, `organisationUnits`, etc.
+ * @param {string} path - The `id` or `path` to the `object` to be updated. E.g. `FTRrcoaog83` or `FTRrcoaog83/{collection-name}/{object-id}`
+ * @param {object} data - Data to update. Include only the fields you want to update. E.g. `{name: "New Name"}`
+ * @param {object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
+ * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional options for update method. Defaults to `{operationName: 'patch', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
+ * @param {requestCallback} [callback]
+ * @returns {Promise<state>} state
+ * @example <caption>Example `patching` a `data element`</caption>
+ * patch('dataElements', 'FTRrcoaog83',
+ * {
+ *   name: 'New Name',
+ * });
  */
 export function patch(resourceType, path, data, params, options, callback) {
   return state => {
