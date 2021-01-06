@@ -1134,53 +1134,21 @@ export function getSchema(resourceType, params, options, callback) {
 }
 
 /**
- * A generic helper method for getting data of any kind from DHIS2. This can be used to get `DataValueSets`,`events`,`trackedEntityInstances`,`etc.`
- * @param {string} resourceType
- * @param {Object} params
- * @param {string} responseType
- * @param {Object} options
- * @param {Function} callback
- * @example
-  // 1. Example Getting Tracked Entity Instances: Get a list of trackedEntityInstances of type `Person`, in json, for a given `orgUnit`, leaving out `system info` from the `result body`
-    getData(
-    'trackedEntityInstances',
-    {
-      fields: '*',
-      ou: 'DiszpKrYNg8',
-      entityType: 'nEenWmSyUEp',
-      skipPaging: true,
-    },
-    {
-      includeSystem: false,
-    }
-    );
-
-  // 2. Example Getting Events: Get a list of  events with a certain program and organisation unit,sorting by due date ascending.
-
-  getData('events',
-  {
-    orgUnit: 'DiszpKrYNg8',
-    program: 'eBAyeGv0exc',
-    order: 'dueDate'
-  }
-  );
-
-  // 3. Example Getting DataValueSets: Get a list of `data values` for multiple  `dataSets`, with `startDate` and `endDate`, and multiple `orgUnits`
-
-  getData('dataValueSets', {
-    dataSet: 'pBOMPrpg1QX',
-    dataSet: 'BfMAe6Itzgt',
-    startDate: '2013-01-01',
-    endDate: '2020-01-31',
-    orgUnit: 'YuQRtpLP10I',
-    orgUnit: 'vWbkYPRmKyS',
-    children: true,
-  });
-
-  // 4. Example Getting Metadata: Get a list of `org units` 
-
-  getData('organisationUnits');
-
+ * A generic helper method for getting data of any kind from DHIS2.
+ * - This can be used to get `DataValueSets`,`events`,`trackedEntityInstances`,`etc.`
+ * @param {string} resourceType - The type of resource to get(use its `plural` name). E.g. `dataElements`, `trackedEntityInstances`,`organisationUnits`, etc.
+ * @param {object} [params] - Optional `query parameters` e.g. `{ou: 'DiszpKrYNg8'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 docs} for more details on which params to use for a given type of resource.
+ * @param {{apiVersion: number,operationName: string,resourceType: string}}[options] - `Optional` options for `getData` operation. Defaults to `{operationName: 'getData', apiVersion: state.configuration.apiVersion, responseType: 'json'}`.
+ * @param {requestCallback} [callback]  - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>Example getting one `trackedEntityInstance` with `Id` 'dNpxRu1mWG5' for a given `orgUnit(DiszpKrYNg8)`</caption>
+ *  getData('trackedEntityInstances', {
+ *    fields: '*',
+ *    ou: 'DiszpKrYNg8',
+ *    entityType: 'nEenWmSyUEp',
+ *    trackedEntityInstance: 'dNpxRu1mWG5',
+ *  })
+ *
  */
 export function getData(resourceType, params, options, callback) {
   return state => {

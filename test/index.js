@@ -26,7 +26,6 @@ import {
   delState,
   getState,
 } from './ClientFixtures';
-import { result } from 'lodash';
 
 describe('execute', () => {
   it('executes each operation in sequence', done => {
@@ -129,7 +128,7 @@ describe('getData', () => {
     nock.enableNetConnect();
   });
 
-  it("should return one trackedEntityInstance with trackedInstanceInstance Id 'dNpxRu1mWG5' for a given orgUnit(CMqUILyVnBL)", () => {
+  it("should return one trackedEntityInstance with trackedInstanceInstance Id 'dNpxRu1mWG5' for a given orgUnit(DiszpKrYNg8)", () => {
     let state = {
       configuration: {
         username: 'admin',
@@ -517,20 +516,19 @@ describe('getSchema', () => {
 });
 
 describe('getResources', () => {
+  let state = getState;
   before(() => {
     nock.cleanAll();
     nock.enableNetConnect();
   });
 
   it('should get a list of all DHIS2 resources', () => {
-    let state = getState;
     return execute(getResources())(state).then(result => {
       expect(result.data.resources.length).to.be.gte(1);
     });
   }).timeout(20 * 1000);
 
   it('should get a resource named `attribute`, in `json` format', () => {
-    let state = getState;
     return execute(getResources({ filter: 'singular:eq:attribute' }))(
       state
     ).then(result => {
@@ -540,7 +538,6 @@ describe('getResources', () => {
   }).timeout(10 * 1000);
 
   it('should get a resource named `attribute`, in `xml` format, returning all the fields', () => {
-    let state = getState;
     return execute(
       getResources('dataElement', {
         filter: 'singular:eq:attribute',
