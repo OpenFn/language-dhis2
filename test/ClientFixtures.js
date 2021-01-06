@@ -244,6 +244,18 @@ export const updateState = {
   },
 };
 
+export const patchState = {
+  configuration: {
+    username: 'admin',
+    password: 'district',
+    hostUrl: 'https://play.dhis2.org/2.35.1',
+    apiVersion: 35,
+  },
+  data: {
+    displayName: 'Chaiwa',
+  },
+};
+
 export { fixtures };
 
 export default [

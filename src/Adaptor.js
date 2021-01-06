@@ -1389,43 +1389,37 @@ export function update(resourceType, path, data, params, options, callback) {
   // 1. Update data element's property
   patch('dataElements', 'FTRrcoaog83', {displayName: 'Some new display name'});
  */
-export function patch(
-  resourceType,
-  path,
-  data,
-  params,
-  options,
-  responseType,
-  callback
-) {
+export function patch(resourceType, path, data, params, options, callback) {
   return state => {
+    const operationName = options?.operationName ?? 'patch';
+
     const { username, password, hostUrl } = state.configuration;
 
-    // const objectPath = expandReferences(path)(state);
+    const responseType = options?.responseType ?? 'json';
 
-    const queryParams = recursivelyExpandReferences(params)(state);
+    let queryParams = recursivelyExpandReferences(params)(state);
 
-    const payload = recursivelyExpandReferences(data)(state);
+    const filters = queryParams?.filters;
+
+    delete queryParams?.filters;
+
+    queryParams = new URLSearchParams(queryParams);
+
+    filters?.map(f => queryParams.append('filter', f));
+
+    const body = recursivelyExpandReferences(data)(state);
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
-    const supportApiVersion =
-      options?.supportApiVersion ?? state.configuration.supportApiVersion;
-
-    const url = buildUrl(
-      '/' + resourceType + '/' + path,
-      hostUrl,
-      apiVersion,
-      supportApiVersion
-    );
+    const url = buildUrl('/' + resourceType + '/' + path, hostUrl, apiVersion);
 
     const headers = {
       Accept: CONTENT_TYPES[responseType] ?? 'application/json',
     };
 
-    logOperation('patch');
+    logOperation(operationName);
 
-    logApiVersion(apiVersion, supportApiVersion);
+    logApiVersion(apiVersion);
 
     logWaitingForServer(url, queryParams);
 
@@ -1440,12 +1434,18 @@ export function patch(
           password,
         },
         params: queryParams,
-        data: payload,
+        data: body,
         headers,
       })
       .then(result => {
+        Log.info(
+          `${
+            COLORS.FgGreen
+          }${operationName} succeeded${ESCAPE}. Updated ${resourceType}.\nSummary:\n${prettyJson(
+            result.data
+          )}`
+        );
         if (callback) return callback(composeNextState(state, result.data));
-
         return composeNextState(state, result.data);
       });
   };

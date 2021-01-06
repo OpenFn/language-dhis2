@@ -8,6 +8,7 @@ import {
   create,
   attribute,
   update,
+  patch,
 } from '../lib/Adaptor';
 import nock from 'nock';
 import {
@@ -17,6 +18,7 @@ import {
   upsertNewTEIState,
   createState,
   updateState,
+  patchState,
 } from './ClientFixtures';
 
 describe('execute', () => {
@@ -388,6 +390,23 @@ describe('update', () => {
     ).then(state => {
       expect(state.data.httpStatusCode).to.eq(200);
       expect(state.data.response.uid).to.eq('FTRrcoaog83');
+    });
+  }).timeout(10 * 1000);
+});
+
+describe('patch', () => {
+  before(() => {
+    nock.cleanAll();
+    nock.enableNetConnect();
+  });
+
+  it('should do a partial update(patch) of a data element', () => {
+    let state = patchState;
+    return execute(patch('dataElements', 'FTRrcoaog83', state.data))(
+      state
+    ).then(state => {
+      // @todo further assertions as we learn more about PATCH
+      // expect(state.data.response.uid).to.eq('FTRrcoaog83');
     });
   }).timeout(10 * 1000);
 });
