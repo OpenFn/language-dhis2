@@ -8,27 +8,25 @@ import axios from 'axios';
  */
 export function recursivelyExpandReferences(obj) {
   return state => {
-    if (typeof obj !== 'object') return obj;
-    return mapValues(function (value) {
-      if (typeof value == 'object') {
-        if (Array.isArray(value)) {
-          return value.map(item => {
-            return recursivelyExpandReferences(item)(state);
-          });
-        } else {
-          return recursivelyExpandReferences(value)(state);
-        }
+    if (typeof obj !== 'object')
+      return typeof obj == 'function' ? obj(state) : obj;
+    let res = mapValues(function (value) {
+      if (Array.isArray(value)) {
+        return value.map(item => {
+          return recursivelyExpandReferences(item)(state);
+        });
       } else {
-        return typeof value == 'function' ? value(state) : value;
+        return recursivelyExpandReferences(value)(state);
       }
     })(obj);
+    if (Array.isArray(obj)) res = Object.values(res);
+    return res;
   };
 }
 
 /**
  * Compose success message
  */
-
 export function composeSuccessMessage(operation) {
   return `${COLORS.FgGreen}${operation}${ESCAPE} succeeded. The body of this result will be available in ${COLORS.FgGreen}state.data${ESCAPE} or in your ${COLORS.FgGreen}callback${ESCAPE}.`;
 }

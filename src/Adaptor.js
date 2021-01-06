@@ -19,6 +19,7 @@ import {
   ESCAPE,
   composeSuccessMessage,
   recursivelyExpandReferences,
+  expandRefs,
 } from './Utils';
 //#endregion
 
@@ -1264,30 +1265,17 @@ export function getData(resourceType, params, options, callback) {
 
 /**
  * A generic helper function to get metadata records from a given DHIS2 instance
- * @param {Object} resources - E.g. `{organisationUnits: true, attributes: true}`
- * @param {Object} params 
- * @param {Object} options 
- * @param {Function} callback 
- * @example
-  // 1. Get a list of organisation units and attributes, in a single request
-  getMetadata(
-    {attributes: true, organisationUnits: true},
-    {
-      fields: '*',
-    },
-    {
-      includeSystem: false,
-    }
-  );
-
-  // 2. Get a list of `dataSets`
-  getMetadata(
-    { dataSets: true },
-    {
-      assumeTrue: false,
-      fields: '*',
-    }
-  );
+ * @param {Array<string>} resources - Required. List of metadata resources to fetch. E.g. `['organisationUnits', 'attributes']` or like `'dataSets'` if you only want a single type of resource. See `getResources` to see the types of resources available.
+ * @param {Object} [params] - Optional `query parameters` e.g. `{filters: ['name:like:ANC'],fields:'*'}`. See `discover` or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#metadata-export-examples DHIS2 API docs}
+ * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional `options` for `getMetadata` operation. Defaults to `{operationName: 'getMetadata', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
+ * @param {requestCallback} [callback] - Optional `callback` to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>Example getting a list of `ALL` `organisation units`</caption>
+ * getMetadata('organisationUnits')
+ * @example <caption>Example getting a list of `data elements` and `indicators` where `name` includes the word **ANC**</caption>
+ * getMetadata(['dataElements', 'indicators'], {
+ *      filters: ['name:like:ANC'],
+ *  })
  */
 export function getMetadata(resources, params, options, callback) {
   return state => {
@@ -1303,10 +1291,29 @@ export function getMetadata(resources, params, options, callback) {
 
     const responseType = options?.responseType ?? 'json';
 
-    const queryParams = {
+    if (typeof resources === 'string') {
+      let res = {};
+      res[resources] = true;
+      resources = res;
+    } else {
+      resources = resources.reduce((acc, currentValue) => {
+        acc[currentValue] = true;
+        return acc;
+      }, {});
+    }
+
+    let queryParams = {
       ...resources,
       ...params,
-    }(state);
+    };
+
+    const filters = queryParams?.filters;
+
+    delete queryParams?.filters;
+
+    queryParams = new URLSearchParams(queryParams);
+
+    filters?.map(f => queryParams.append('filter', f));
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
@@ -1337,6 +1344,9 @@ export function getMetadata(resources, params, options, callback) {
         headers,
       })
       .then(result => {
+        Log.info(
+          `${COLORS.FgGreen}${operationName} succeeded${ESCAPE}. The result of this operation will be in ${operationName}state.data${ESCAPE} or in your ${operationName}callback${ESCAPE}.`
+        );
         if (callback) return callback(composeNextState(state, result.data));
         return composeNextState(state, result.data);
       });

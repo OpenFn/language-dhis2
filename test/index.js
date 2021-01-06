@@ -10,6 +10,7 @@ import {
   update,
   patch,
   del,
+  getMetadata,
 } from '../lib/Adaptor';
 import nock from 'nock';
 import {
@@ -21,8 +22,8 @@ import {
   updateState,
   patchState,
   delState,
+  getState,
 } from './ClientFixtures';
-import { result } from 'lodash';
 
 describe('execute', () => {
   it('executes each operation in sequence', done => {
@@ -450,6 +451,32 @@ describe('delete', () => {
       expect(state.data.response.importCount.updated).to.eq(0);
       expect(state.data.response.importCount.ignored).to.eq(0);
       expect(state.data.response.importCount.deleted).to.eq(1);
+    });
+  }).timeout(10 * 1000);
+});
+
+describe('getMetadata', () => {
+  before(() => {
+    nock.cleanAll();
+    nock.enableNetConnect();
+  });
+
+  it('should get a list of orgUnits', () => {
+    let state = getState;
+    return execute(getMetadata('organisationUnits'))(state).then(result => {
+      expect(result.data.organisationUnits.length).to.be.gte(1);
+    });
+  }).timeout(20 * 1000);
+
+  it('should get data elements and indicators where name includes "ANC"', () => {
+    let state = getState;
+    return execute(
+      getMetadata(['dataElements', 'indicators'], {
+        filters: ['name:like:ANC'],
+      })
+    )(state).then(result => {
+      expect(result.data.dataElements.length).to.be.gte(1);
+      expect(result.data.indicators.length).to.be.gte(1);
     });
   }).timeout(10 * 1000);
 });

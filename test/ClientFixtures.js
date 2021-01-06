@@ -292,6 +292,15 @@ export const delState = {
   },
 };
 
+export const getState = {
+  configuration: {
+    username: 'admin',
+    password: 'district',
+    hostUrl: 'https://play.dhis2.org/2.35.1',
+    apiVersion: 35,
+  },
+};
+
 export { fixtures };
 
 export default [
