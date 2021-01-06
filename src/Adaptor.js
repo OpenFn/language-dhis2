@@ -137,14 +137,14 @@ axios.interceptors.response.use(
  */
 export function getTEIs(params, options, callback) {
   return state => {
-    let responseType = options?.responseType ?? 'json';
-    return getData(
-      'trackedEntityInstances',
-      params,
-      responseType,
-      options,
-      callback
-    )(state);
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options[operationName] = 'getTEIs';
+    else {
+      options = { operationName: 'getTEIs' };
+    }
+
+    return getData('trackedEntityInstances', params, options, callback)(state);
   };
 }
 
@@ -166,14 +166,18 @@ export function getTEIs(params, options, callback) {
  */
 export function upsertTEI(uniqueAttributeId, data, options, callback) {
   return state => {
+    uniqueAttributeId = recursivelyExpandReferences(uniqueAttributeId)(state);
+
+    const body = recursivelyExpandReferences(data)(state);
+
+    options = recursivelyExpandReferences(options)(state);
+
     if (options) options[operationName] = 'upsertTEI';
     else {
       options = { operationName: 'upsertTEI' };
     }
 
     const { password, username, hostUrl } = state.configuration;
-
-    const body = recursivelyExpandReferences(data)(state);
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
@@ -271,6 +275,12 @@ export function upsertTEI(uniqueAttributeId, data, options, callback) {
  */
 export function createTEI(data, params, options, callback) {
   return state => {
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options[operationName] = 'createTEI';
+    else {
+      options = { operationName: 'createTEI' };
+    }
     return create(
       'trackedEntityInstances',
       data,
@@ -294,6 +304,12 @@ export function createTEI(data, params, options, callback) {
  */
 export function updateTEI(path, data, params, options, callback) {
   return state => {
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options[operationName] = 'createTEI';
+    else {
+      options = { operationName: 'createTEI' };
+    }
     return update(
       'trackedEntityInstances',
       path,
@@ -367,8 +383,14 @@ export function updateTEI(path, data, params, options, callback) {
  * { programStageIdScheme: 'Code' },
  * ]);
  */
-export function getEvents(params, responseType, options, callback) {
+export function getEvents(params, options, callback) {
   return state => {
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options[operationName] = 'getEvents';
+    else {
+      options = { operationName: 'getEvents' };
+    }
     return getData('events', params, responseType, options, callback)(state);
   };
 }
@@ -392,6 +414,12 @@ export function getEvents(params, responseType, options, callback) {
  */
 export function createEvents(data, params, options, callback) {
   return state => {
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options[operationName] = 'createEvents';
+    else {
+      options = { operationName: 'createEvents' };
+    }
     return create('events', data, params, options, callback)(state);
   };
 }
@@ -415,6 +443,12 @@ export function createEvents(data, params, options, callback) {
  */
 export function updateEvents(path, data, params, options, callback) {
   return state => {
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options[operationName] = 'updateEvents';
+    else {
+      options = { operationName: 'updateEvents' };
+    }
     return update('events', path, data, params, options, callback)(state);
   };
 }
@@ -429,9 +463,15 @@ export function updateEvents(path, data, params, options, callback) {
  * @example <caption>- Query for `all programs` with a certain `organisation unit`</caption>
  * getPrograms([{ orgUnit: 'DiszpKrYNg8' }, { fields: '*' }]);
  */
-export function getPrograms(params, responseType, options, callback) {
+export function getPrograms(params, options, callback) {
   return state => {
-    return getData('programs', params, responseType, options, callback)(state);
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options[operationName] = 'getPrograms';
+    else {
+      options = { operationName: 'getPrograms' };
+    }
+    return getData('programs', params, options, callback)(state);
   };
 }
 
@@ -451,7 +491,13 @@ export function getPrograms(params, responseType, options, callback) {
  */
 export function createPrograms(data, params, options, callback) {
   return state => {
-    return create('programs', data, params, options, callback)(state);
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options[operationName] = 'createPrograms';
+    else {
+      options = { operationName: 'createPrograms' };
+    }
+    return create('programs', data, options, params, callback)(state);
   };
 }
 
@@ -474,6 +520,12 @@ export function createPrograms(data, params, options, callback) {
  */
 export function updatePrograms(path, data, params, options, callback) {
   return state => {
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options[operationName] = 'updatePrograms';
+    else {
+      options = { operationName: 'updatePrograms' };
+    }
     return update('programs', path, data, params, options, callback)(state);
   };
 }
@@ -528,13 +580,13 @@ export function updatePrograms(path, data, params, options, callback) {
  */
 export function getEnrollments(params, responseType, options, callback) {
   return state => {
-    return getData(
-      'enrollments',
-      params,
-      responseType,
-      options,
-      callback
-    )(state);
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options[operationName] = 'getEnrollments';
+    else {
+      options = { operationName: 'getEnrollments' };
+    }
+    return getData('enrollments', params, options, callback)(state);
   };
 }
 
@@ -552,9 +604,15 @@ export function getEnrollments(params, responseType, options, callback) {
  * createEnrollment(state.data);
  * @see {enrollmentSampleState}
  */
-export function createEnrollment(data, params, options, callback) {
+export function enrollTEI(data, params, options, callback) {
   return state => {
-    return create('enrollments', data, params, options, callback)(state);
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options[operationName] = 'enrollTEI';
+    else {
+      options = { operationName: 'enrollTEI' };
+    }
+    return create('enrollments', data, options, params, callback)(state);
   };
 }
 
@@ -577,6 +635,12 @@ export function createEnrollment(data, params, options, callback) {
  */
 export function updateEnrollments(path, data, params, options, callback) {
   return state => {
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options[operationName] = 'updateEnrollments';
+    else {
+      options = { operationName: 'updateEnrollments' };
+    }
     return update('enrollments', path, data, params, options, callback)(state);
   };
 }
@@ -594,7 +658,17 @@ export function updateEnrollments(path, data, params, options, callback) {
  */
 export function cancelEnrollment(enrollmentId, params, options, callback) {
   return state => {
+    enrollmentId = recursivelyExpandReferences(enrollmentId)(state);
+
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options[operationName] = 'cancelEnrollment';
+    else {
+      options = { operationName: 'cancelEnrollment' };
+    }
+
     const path = `${enrollmentId}/cancelled`;
+
     return update('enrollments', path, null, params, options, callback)(state);
   };
 }
@@ -612,7 +686,17 @@ export function cancelEnrollment(enrollmentId, params, options, callback) {
  */
 export function completeEnrollment(enrollmentId, params, options, callback) {
   return state => {
+    enrollmentId = recursivelyExpandReferences(enrollmentId)(state);
+
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options[operationName] = 'completeEnrollment';
+    else {
+      options = { operationName: 'completeEnrollment' };
+    }
+
     const path = `${enrollmentId}/completed`;
+
     return update('enrollments', path, null, params, options, callback)(state);
   };
 }
@@ -633,15 +717,16 @@ export function completeEnrollment(enrollmentId, params, options, callback) {
  * @example <caption>- A query for `all relationships` associated with a `event` can look like this:</caption>
  * getRelationships([{ event: 'TgJUhG6P6TJ' }, { fields: '*' }]);
  */
-export function getRelationships(params, responseType, options, callback) {
+export function getRelationships(params, options, callback) {
   return state => {
-    return getData(
-      'relationships',
-      params,
-      responseType,
-      options,
-      callback
-    )(state);
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options[operationName] = 'getRelationships';
+    else {
+      options = { operationName: 'getRelationships' };
+    }
+
+    return getData('relationships', params, options, callback)(state);
   };
 }
 
@@ -667,15 +752,15 @@ export function getRelationships(params, responseType, options, callback) {
  * { dataSet: 'pBOMPrpg1QX' },
  * ]);
  */
-export function getDataValues(params, responseType, options, callback) {
+export function getDataValues(params, options, callback) {
   return state => {
-    return getData(
-      'dataValueSets',
-      params,
-      responseType,
-      options,
-      callback
-    )(state);
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options[operationName] = 'getDataValues';
+    else {
+      options = { operationName: 'getDataValues' };
+    }
+    return getData('dataValueSets', params, options, callback)(state);
   };
 }
 
@@ -700,6 +785,12 @@ export function getDataValues(params, responseType, options, callback) {
  */
 export function createDataValues(data, params, options, callback) {
   return state => {
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options[operationName] = 'createDataValues';
+    else {
+      options = { operationName: 'createDataValues' };
+    }
     return create('enrollments', data, params, options, callback)(state);
   };
 }
@@ -745,9 +836,16 @@ export function execute(...operations) {
  * @example <caption>Example generating `three UIDs` from the DHIS2 server</caption>
  * generateDhis2UID([{limit: 3}]);
  */
-export function generateDhis2UID(params, responseType, options, callback) {
-  return state =>
-    getData('system/id', params, responseType, options, callback)(state);
+export function generateDhis2UID(params, options, callback) {
+  return state => {
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options[operationName] = 'generateDhis2UID';
+    else {
+      options = { operationName: 'generateDhis2UID' };
+    }
+    return getData('system/id', params, options, callback)(state);
+  };
 }
 /**
  * Discover available parameters and allowed operators for a given resource's endpoint
@@ -856,21 +954,23 @@ export function discover(operation, path) {
  * getAnalytics('events');
  * @todo examples
  */
-export function getAnalytics(
-  resourceType,
-  params,
-  responseType,
-  options,
-  callback
-) {
-  return state =>
-    getData(
+export function getAnalytics(resourceType, params, options, callback) {
+  return state => {
+    resourceType = recursivelyExpandReferences(resourceType)(state);
+
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options[operationName] = 'getAnalytics';
+    else {
+      options = { operationName: 'getAnalytics' };
+    }
+    return getData(
       `analytics/${resourceType}`,
       params,
-      responseType,
       options,
       callback
     )(state);
+  };
 }
 
 /**
@@ -899,13 +999,21 @@ export function getAnalytics(
   getResources('','pdf')  
 
  */
-export function getResources(params, responseType, callback) {
+export function getResources(params, options, callback) {
   return state => {
+    params = recursivelyExpandReferences(params)(state);
+
+    options = recursivelyExpandReferences(options)(state);
+
+    const operationName = 'getResources';
+
     const { username, password, hostUrl } = state.configuration;
 
-    const queryParams = recursivelyExpandReferences(params)(state);
+    const responseType = options?.responseType ?? 'json';
 
     const filter = params?.filter;
+
+    const queryParams = params;
 
     const headers = {
       Accept: CONTENT_TYPES[responseType] ?? 'application/json',
@@ -934,7 +1042,8 @@ export function getResources(params, responseType, callback) {
       }
       return data;
     };
-    logOperation('getResources');
+
+    logOperation(operationName);
 
     logWaitingForServer(url, queryParams);
 
@@ -989,37 +1098,39 @@ export function getResources(params, responseType, callback) {
   getSchema('organisationUnit', '', 'xml', '', (state)=>{console.log('state.data',state.data);return state;});
  
  */
-export function getSchema(
-  resourceType,
-  params,
-  responseType,
-  options,
-  callback
-) {
+export function getSchema(resourceType, params, options, callback) {
   return state => {
+    resourceType = recursivelyExpandReferences(resourceType)(state);
+
+    params = recursivelyExpandReferences(params)(state);
+
+    options = recursivelyExpandReferences(options)(state);
+
+    const operationName = 'getSchema';
+
     const { username, password, hostUrl } = state.configuration;
 
-    const queryParams = recursivelyExpandReferences(params)(state);
+    const responseType = options?.responseType ?? 'json';
+
+    const filters = params?.filters;
+
+    delete params?.filters;
+
+    let queryParams = new URLSearchParams(params);
+
+    filters?.map(f => queryParams.append('filter', f));
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
-
-    const supportApiVersion =
-      options?.supportApiVersion ?? state.configuration.supportApiVersion;
 
     const headers = {
       Accept: CONTENT_TYPES[responseType] ?? 'application/json',
     };
 
-    const url = buildUrl(
-      `/schemas/${resourceType ?? ''}`,
-      hostUrl,
-      apiVersion,
-      supportApiVersion
-    );
+    const url = buildUrl(`/schemas/${resourceType ?? ''}`, hostUrl, apiVersion);
 
-    logOperation('getSchema');
+    logOperation(operationName);
 
-    logApiVersion(apiVersion, supportApiVersion);
+    logApiVersion(apiVersion);
 
     logWaitingForServer(url, queryParams);
 
@@ -1039,7 +1150,6 @@ export function getSchema(
       })
       .then(result => {
         if (callback) return callback(composeNextState(state, result.data));
-
         return composeNextState(state, result.data);
       });
   };
@@ -1096,18 +1206,25 @@ export function getSchema(
  */
 export function getData(resourceType, params, options, callback) {
   return state => {
+    resourceType = recursivelyExpandReferences(resourceType)(state);
+
+    params = recursivelyExpandReferences(params)(state);
+
+    options = recursivelyExpandReferences(options)(state);
+
+    const operationName = options?.operationName ?? 'getData';
+
     const { username, password, hostUrl } = state.configuration;
 
-    // NOTE: 'filters' is the only special parameter we control for DHIS2, all
-    // others can be passed directly, but as dhis2 expects multiple filters and
-    // they cannot occupy the same key for an object, users may opt to pass an
-    // array of 'filters' which we handle below.
-    const { filters } = params;
-    delete params.filters;
-    let queryParams = new URLSearchParams(params);
-    filters?.map(f => queryParams.append('filter', f));
+    const responseType = options?.responseType ?? 'json';
 
-    let responseType = options?.responseType ?? 'json';
+    const filters = params?.filters;
+
+    delete params?.filters;
+
+    let queryParams = new URLSearchParams(params);
+
+    filters?.map(f => queryParams.append('filter', f));
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
@@ -1117,7 +1234,7 @@ export function getData(resourceType, params, options, callback) {
 
     const url = buildUrl(`/${resourceType}`, hostUrl, apiVersion);
 
-    logOperation('getData');
+    logOperation(operationName);
 
     logApiVersion(apiVersion);
 
@@ -1172,35 +1289,36 @@ export function getData(resourceType, params, options, callback) {
     }
   );
  */
-export function getMetadata(
-  resources,
-  params,
-  responseType,
-  options,
-  callback
-) {
+export function getMetadata(resources, params, options, callback) {
   return state => {
+    resources = recursivelyExpandReferences(resources)(state);
+
+    params = recursivelyExpandReferences(params)(state);
+
+    options = recursivelyExpandReferences(options)(state);
+
+    const operationName = 'getMetadata';
+
     const { username, password, hostUrl } = state.configuration;
 
-    const queryParams = recursivelyExpandReferences({
+    const responseType = options?.responseType ?? 'json';
+
+    const queryParams = {
       ...resources,
       ...params,
-    })(state);
+    }(state);
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
-
-    const supportApiVersion =
-      options?.supportApiVersion ?? state.configuration.supportApiVersion;
 
     const headers = {
       Accept: CONTENT_TYPES[responseType] ?? 'application/json',
     };
 
-    const url = buildUrl('/metadata', hostUrl, apiVersion, supportApiVersion);
+    const url = buildUrl('/metadata', hostUrl, apiVersion);
 
-    logOperation('getMetadata');
+    logOperation(operationName);
 
-    logApiVersion(apiVersion, supportApiVersion);
+    logApiVersion(apiVersion);
 
     logWaitingForServer(url, queryParams);
 
@@ -1220,7 +1338,6 @@ export function getMetadata(
       })
       .then(result => {
         if (callback) return callback(composeNextState(state, result.data));
-
         return composeNextState(state, result.data);
       });
   };
@@ -1239,19 +1356,25 @@ export function getMetadata(
  */
 export function create(resourceType, data, options, params, callback) {
   return state => {
+    resourceType = recursivelyExpandReferences(resourceType)(state);
+
+    const body = recursivelyExpandReferences(data)(state);
+
+    options = recursivelyExpandReferences(options)(state);
+
+    params = recursivelyExpandReferences(params)(state);
+
     const operationName = options?.operationName ?? 'create';
 
     const { username, password, hostUrl } = state.configuration;
 
     const responseType = options?.responseType ?? 'json';
 
-    params = recursivelyExpandReferences(params)(state);
+    const filters = params?.filters;
 
-    const { filters } = params;
-    delete params.filters;
+    delete params?.filters;
+
     let queryParams = new URLSearchParams(params);
-
-    const body = recursivelyExpandReferences(data)(state);
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
@@ -1323,18 +1446,29 @@ export function create(resourceType, data, options, params, callback) {
  */
 export function update(resourceType, path, data, params, options, callback) {
   return state => {
-    const operationName = options?.operationName ?? 'update';
+    resourceType = recursivelyExpandReferences(resourceType)(state);
+
+    path = recursivelyExpandReferences(path)(state);
+
+    const body = recursivelyExpandReferences(data)(state);
+
+    params = recursivelyExpandReferences(params)(state);
+
+    options = recursivelyExpandReferences(options)(state);
 
     const { username, password, hostUrl } = state.configuration;
+
+    const operationName = options?.operationName ?? 'update';
 
     const responseType = options?.responseType ?? 'json';
 
     const filters = params?.filters;
-    delete params?.filters;
-    let queryParams = new URLSearchParams(params);
-    filters?.map(f => queryParams.append('filter', f));
 
-    const body = recursivelyExpandReferences(data)(state);
+    delete params?.filters;
+
+    let queryParams = new URLSearchParams(params);
+
+    filters?.map(f => queryParams.append('filter', f));
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
@@ -1397,13 +1531,23 @@ export function update(resourceType, path, data, params, options, callback) {
  */
 export function patch(resourceType, path, data, params, options, callback) {
   return state => {
+    resourceType = recursivelyExpandReferences(resourceType)(state);
+
+    path = recursivelyExpandReferences(path)(state);
+
+    const body = recursivelyExpandReferences(data)(state);
+
+    params = recursivelyExpandReferences(params)(state);
+
+    options = recursivelyExpandReferences(options)(state);
+
     const operationName = options?.operationName ?? 'patch';
 
     const { username, password, hostUrl } = state.configuration;
 
     const responseType = options?.responseType ?? 'json';
 
-    let queryParams = recursivelyExpandReferences(params)(state);
+    let queryParams = params;
 
     const filters = queryParams?.filters;
 
@@ -1412,8 +1556,6 @@ export function patch(resourceType, path, data, params, options, callback) {
     queryParams = new URLSearchParams(queryParams);
 
     filters?.map(f => queryParams.append('filter', f));
-
-    const body = recursivelyExpandReferences(data)(state);
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
@@ -1463,20 +1605,31 @@ export function patch(resourceType, path, data, params, options, callback) {
  * @param {string} path - Can be an `id` of an `object` or `path` to the `nested object` to `delete`.
  * @param {object} [data] - Optional. This is useful when you want to remove multiple objects from a collection in one request. You can send `data` as, for example, `{"identifiableObjects": [{"id": "IDA"}, {"id": "IDB"}, {"id": "IDC"}]}`. See more {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#deleting-objects on DHIS2 API docs}
  * @param {object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
- * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional options for update method. Defaults to `{operationName: 'delete', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
+ * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional `options` for `del` operation. Defaults to `{operationName: 'delete', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
  * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
  * @example <caption>Example`deleting` a `tracked entity instance`</caption>
  * del('trackedEntityInstances', 'LcRd6Nyaq7T');
  */
 export function del(resourceType, path, data, params, options, callback) {
   return state => {
+    resourceType = recursivelyExpandReferences(resourceType)(state);
+
+    path = recursivelyExpandReferences(path)(state);
+
+    const body = recursivelyExpandReferences(data)(state);
+
+    params = recursivelyExpandReferences(params)(state);
+
+    options = recursivelyExpandReferences(options)(state);
+
     const operationName = options?.operationName ?? 'delete';
 
     const { username, password, hostUrl } = state.configuration;
 
     const responseType = options?.responseType ?? 'json';
 
-    let queryParams = recursivelyExpandReferences(params)(state);
+    let queryParams = params;
 
     const filters = queryParams?.filters;
 
@@ -1485,8 +1638,6 @@ export function del(resourceType, path, data, params, options, callback) {
     queryParams = new URLSearchParams(queryParams);
 
     filters?.map(f => queryParams.append('filter', f));
-
-    const body = recursivelyExpandReferences(data)(state);
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
@@ -1569,6 +1720,16 @@ export function upsert(
   callback
 ) {
   return state => {
+    resourceType = recursivelyExpandReferences(resourceType)(state);
+
+    uniqueAttribute = recursivelyExpandReferences(uniqueAttribute)(state);
+
+    const body = recursivelyExpandReferences(data)(state);
+
+    params = recursivelyExpandReferences(params)(state);
+
+    options = recursivelyExpandReferences(options)(state);
+
     const operationName = options?.operationName ?? 'upsert';
 
     const { username, password, hostUrl } = state.configuration;
@@ -1577,21 +1738,19 @@ export function upsert(
 
     const responseType = options?.responseType ?? 'json';
 
-    const { attributeId, attributeValue } = recursivelyExpandReferences(
-      uniqueAttribute
-    )(state);
-    params = recursivelyExpandReferences(params)(state);
+    const { attributeId, attributeValue } = uniqueAttribute;
 
-    const { filters } = params;
+    const filters = params?.filters;
+
     delete params.filters;
+
     let queryParams = new URLSearchParams(params);
+
     filters?.map(f => queryParams.append('filter', f));
 
     const op = resourceType === 'trackedEntityInstances' ? 'EQ' : 'eq';
 
     queryParams.append('filter', `${attributeId}:${op}:${attributeValue}`);
-
-    const body = recursivelyExpandReferences(data)(state);
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 

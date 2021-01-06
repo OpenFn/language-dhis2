@@ -8,6 +8,7 @@ import axios from 'axios';
  */
 export function recursivelyExpandReferences(obj) {
   return state => {
+    if (typeof obj !== 'object') return obj;
     return mapValues(function (value) {
       if (typeof value == 'object') {
         if (Array.isArray(value)) {

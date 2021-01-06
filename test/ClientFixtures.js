@@ -236,11 +236,10 @@ export const updateState = {
   },
   data: {
     id: 'FTRrcoaog83',
-    displayName: 'New display name',
     aggregationType: 'SUM',
     domainType: 'AGGREGATE',
     valueType: 'NUMBER',
-    name: 'Accute Flaccid Paralysis (Deaths < 5 yrs)',
+    name: 'Some New Name',
     shortName: 'Accute Flaccid Paral (Deaths < 5 yrs)',
   },
 };

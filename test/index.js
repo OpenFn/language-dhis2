@@ -22,6 +22,7 @@ import {
   patchState,
   delState,
 } from './ClientFixtures';
+import { result } from 'lodash';
 
 describe('execute', () => {
   it('executes each operation in sequence', done => {
@@ -380,19 +381,28 @@ describe('create', () => {
 });
 
 describe('update', () => {
+  let state = updateState;
+  state.data.name += Date.now();
   before(() => {
     nock.cleanAll();
     nock.enableNetConnect();
   });
 
-  it('should update a data element', () => {
-    let state = updateState;
-    return execute(update('dataElements', 'FTRrcoaog83', state.data))(
+  it('should update the name of a data element', () => {
+    return execute(update('dataElements', state.data.id, state.data))(
       state
-    ).then(state => {
-      expect(state.data.httpStatusCode).to.eq(200);
-      expect(state.data.response.uid).to.eq('FTRrcoaog83');
+    ).then(result => {
+      expect(result.data.httpStatusCode).to.eq(200);
+      expect(result.data.response.uid).to.eq(state.data.id);
     });
+  }).timeout(10 * 1000);
+
+  it('should verify that the name of the data element was updated', () => {
+    return execute(getData(`dataElements/${state.data.id}`))(state).then(
+      result => {
+        expect(result.data.name).to.eq(state.data.name);
+      }
+    );
   }).timeout(10 * 1000);
 });
 
