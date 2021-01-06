@@ -11,6 +11,7 @@ import {
   patch,
   del,
   getMetadata,
+  getSchema,
 } from '../lib/Adaptor';
 import nock from 'nock';
 import {
@@ -24,6 +25,7 @@ import {
   delState,
   getState,
 } from './ClientFixtures';
+import { result } from 'lodash';
 
 describe('execute', () => {
   it('executes each operation in sequence', done => {
@@ -426,31 +428,30 @@ describe('patch', () => {
 
 describe('delete', () => {
   let id = '';
+  let state = delState;
   before(() => {
     nock.cleanAll();
     nock.enableNetConnect();
   });
 
   it('should create a new tracked entity instance', () => {
-    let state = delState;
     return execute(create('trackedEntityInstances', state.data))(state).then(
-      state => {
-        id = state.data.response.importSummaries[0].reference;
-        expect(state.data.response.imported).to.eq(1);
-        expect(state.data.response.updated).to.eq(0);
-        expect(state.data.response.deleted).to.eq(0);
-        expect(state.data.response.ignored).to.eq(0);
+      result => {
+        id = result.data.response.importSummaries[0].reference;
+        expect(result.data.response.imported).to.eq(1);
+        expect(result.data.response.updated).to.eq(0);
+        expect(result.data.response.deleted).to.eq(0);
+        expect(result.data.response.ignored).to.eq(0);
       }
     );
   }).timeout(10 * 1000);
 
   it('should delete the newly created tracked entity instance', () => {
-    let state = delState;
-    return execute(del('trackedEntityInstances', id))(state).then(state => {
-      expect(state.data.response.importCount.imported).to.eq(0);
-      expect(state.data.response.importCount.updated).to.eq(0);
-      expect(state.data.response.importCount.ignored).to.eq(0);
-      expect(state.data.response.importCount.deleted).to.eq(1);
+    return execute(del('trackedEntityInstances', id))(state).then(result => {
+      expect(result.data.response.importCount.imported).to.eq(0);
+      expect(result.data.response.importCount.updated).to.eq(0);
+      expect(result.data.response.importCount.ignored).to.eq(0);
+      expect(result.data.response.importCount.deleted).to.eq(1);
     });
   }).timeout(10 * 1000);
 });
@@ -477,6 +478,39 @@ describe('getMetadata', () => {
     )(state).then(result => {
       expect(result.data.dataElements.length).to.be.gte(1);
       expect(result.data.indicators.length).to.be.gte(1);
+    });
+  }).timeout(10 * 1000);
+});
+
+describe('getSchema', () => {
+  before(() => {
+    nock.cleanAll();
+    nock.enableNetConnect();
+  });
+
+  it('should get the schema for dataElement', () => {
+    let state = getState;
+    return execute(getSchema('dataElement'))(state).then(result => {
+      expect(result.data.name).to.eq('dataElement');
+    });
+  }).timeout(20 * 1000);
+
+  it('should get the schema for dataElement, only returning the `properties` field', () => {
+    let state = getState;
+    return execute(getSchema('dataElement', { fields: 'properties' }))(
+      state
+    ).then(result => {
+      expect(result.data).to.have.a.key('properties');
+      expect(Object.keys(result.data).length).to.eq(1);
+    });
+  }).timeout(10 * 1000);
+
+  it('should get the schema for dataElement in XML, returning all the fields', () => {
+    let state = getState;
+    return execute(
+      getSchema('dataElement', { fields: '*' }, { responseType: 'xml' })
+    )(state).then(result => {
+      expect(result.data.slice(2, 5)).to.eq('xml');
     });
   }).timeout(10 * 1000);
 });

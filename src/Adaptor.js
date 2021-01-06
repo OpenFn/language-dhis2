@@ -19,7 +19,6 @@ import {
   ESCAPE,
   composeSuccessMessage,
   recursivelyExpandReferences,
-  expandRefs,
 } from './Utils';
 //#endregion
 
@@ -1060,7 +1059,9 @@ export function getResources(params, options, callback) {
         transformResponse,
       })
       .then(result => {
-        composeSuccessMessage('getResources');
+        Log.info(
+          `${COLORS.FgGreen}${operationName} succeeded${ESCAPE}. The result of this operation will be in ${operationName}state.data${ESCAPE} or in your ${operationName}callback${ESCAPE}.`
+        );
         if (callback) return callback(composeNextState(state, result.data));
         return composeNextState(state, result.data);
       });
@@ -1069,35 +1070,17 @@ export function getResources(params, options, callback) {
 
 /**
  * Get the schema of a given resource type, in any data format supported by DHIS2
- * @typedef {Object<string, any>} VersionParam
- * @property {Boolean} supportApiVersion
- * @property {number} apiVersion
- * @param {string} resourceType
- * @param {Object} params
- * @param {string} responseType - Defaults to `json`
- * @param {VersionParam} options
- * @param {Function} callback
- * @returns
- * @example
- *
- // 1. Get all schemas on the api, in json
-  getSchema();
-
- // 2. Get Schema for Attribute resource in json
-  getSchema('attribute');
-
- // 3. Get Schema for trackedEntityType in XML format
-  getSchema('trackedEntityType', '', 'xml');
-
- // 4. Get all api schemas in csv format
-  getSchema('', '', 'csv');
-
- // 4. Get Schema for trackedEntityType using a given api version(overriding apiVersion supplied in state.configuration), in json
-  getSchema('trackedEntityType', '', '', {supportApiVersion: true, apiVersion: 33});
-
- // 5. Get Schema for organisationUnit in xml, with a callback
-  getSchema('organisationUnit', '', 'xml', '', (state)=>{console.log('state.data',state.data);return state;});
- 
+ * @param {string} resourceType - The type of resource to be updated(`singular` version of the `resource name`). E.g. `dataElement`, `organisationUnit`, etc. Run `getResources` to see available resources and their corresponding `singular` names.
+ * @param {Object} params - Optional `query parameters` for the `getSchema` operation. e.g. `{ fields: 'properties' ,skipPaging: true}`. Run`discover` or See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#metadata-export-examples DHIS2 API Docs}
+ * @param {{apiVersion: number,resourceType: string}} [options] - Optional options for `getSchema` method. Defaults to `{apiVersion: state.configuration.apiVersion, responseType: 'json'}`
+ * @param {Function} [callback] - Optional `callback` to handle the response
+ * @returns Promise<state> state
+ * @example <caption>Example getting the `schema` for `dataElement`</caption>
+ * getSchema('dataElement');
+ * @example <caption>Example getting the `schema` for `dataElement`, only returning the `properties` field</caption>
+ * getSchema('dataElement', { fields: 'properties' });
+ * @example <caption>Example getting the `schema` for `dataElement` in XML</caption>
+ * getSchema('dataElement', '{ fields: '*' }, { responseType: 'xml' });
  */
 export function getSchema(resourceType, params, options, callback) {
   return state => {
@@ -1150,6 +1133,9 @@ export function getSchema(resourceType, params, options, callback) {
         headers,
       })
       .then(result => {
+        Log.info(
+          `${COLORS.FgGreen}${operationName} succeeded${ESCAPE}. The result of this operation will be in ${operationName}state.data${ESCAPE} or in your ${operationName}callback${ESCAPE}.`
+        );
         if (callback) return callback(composeNextState(state, result.data));
         return composeNextState(state, result.data);
       });
@@ -1256,7 +1242,9 @@ export function getData(resourceType, params, options, callback) {
         headers,
       })
       .then(result => {
-        Log.info(composeSuccessMessage('GET ' + resourceType));
+        Log.info(
+          `${COLORS.FgGreen}${operationName} succeeded${ESCAPE}. The result of this operation will be in ${operationName}state.data${ESCAPE} or in your ${operationName}callback${ESCAPE}.`
+        );
         if (callback) return callback(composeNextState(state, result.data));
         return composeNextState(state, result.data);
       });
