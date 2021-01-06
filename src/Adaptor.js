@@ -975,29 +975,20 @@ export function getAnalytics(resourceType, params, options, callback) {
 
 /**
  * Get a list of DHIS2 api resources
- * @param {Object} params - The optional query parameters for this endpoint. E.g `{filter: 'singular:like:attribute'}`
- * @param {string} params.filter - The optional filter parameter, specifiying the filter expression. E.g. `singular:eq:attribute`
- * @param {string} responseType - The optional response type. Defaults to `json`
- * @param {Function} callback - The optional function that will be called to handle data returned by this function. Defaults to `state.data`
- * @example
- // 1. Get all api resources
-  getResources()
-
- // 2. Get an attribute resource in json
-  getResources({filter: 'singular:eq:attribute'})
-
- // 3. Get organisation unit resource in XML format, with a callback
-  getResources({ filter: 'singular:eq:organisationUnit' }, 'xml', state => {
-    console.log('Response', state.data);
-    return state;
-  });
-
- // 4. Get all api resources in csv format
-  getResources('','csv') 
-
- // 4. Get all api resources in csv format
-  getResources('','pdf')  
-
+ * @param {object} params - The optional query parameters for this endpoint. E.g `{filter: 'singular:like:attribute'}`.
+ * @param {{filter: string, fields: string, resourceType: string}} [options] - The `optional` options, specifiying the filter expression. E.g. `singular:eq:attribute`.
+ * @param {requestCallback} [callback] - The `optional callback function that will be called to handle data returned by this function.
+ * @returns Promise<state> state
+ * @example <caption>Example getting a list of `all DHIS2 resources`</caption>
+ * getResources();
+ * @example <caption>Example getting a resource named `attribute`, in `json` format</caption>
+ * getResources({ filter: 'singular:eq:attribute' });
+ * @example <caption>Example getting a resource named `attribute`, in `xml` format, returning all the fields</caption>
+ *  getResources('dataElement', {
+ *      filter: 'singular:eq:attribute',
+ *      fields: '*',
+ *      responseType: 'xml',
+ *   })
  */
 export function getResources(params, options, callback) {
   return state => {

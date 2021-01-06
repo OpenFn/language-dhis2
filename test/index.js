@@ -12,6 +12,7 @@ import {
   del,
   getMetadata,
   getSchema,
+  getResources,
 } from '../lib/Adaptor';
 import nock from 'nock';
 import {
@@ -511,6 +512,43 @@ describe('getSchema', () => {
       getSchema('dataElement', { fields: '*' }, { responseType: 'xml' })
     )(state).then(result => {
       expect(result.data.slice(2, 5)).to.eq('xml');
+    });
+  }).timeout(10 * 1000);
+});
+
+describe('getResources', () => {
+  before(() => {
+    nock.cleanAll();
+    nock.enableNetConnect();
+  });
+
+  it('should get a list of all DHIS2 resources', () => {
+    let state = getState;
+    return execute(getResources())(state).then(result => {
+      expect(result.data.resources.length).to.be.gte(1);
+    });
+  }).timeout(20 * 1000);
+
+  it('should get a resource named `attribute`, in `json` format', () => {
+    let state = getState;
+    return execute(getResources({ filter: 'singular:eq:attribute' }))(
+      state
+    ).then(result => {
+      expect(result.data.resources.length).to.be.eq(1);
+      expect(result.data.resources[0].singular).to.be.eq('attribute');
+    });
+  }).timeout(10 * 1000);
+
+  it('should get a resource named `attribute`, in `xml` format, returning all the fields', () => {
+    let state = getState;
+    return execute(
+      getResources('dataElement', {
+        filter: 'singular:eq:attribute',
+        fields: '*',
+        responseType: 'xml',
+      })
+    )(state).then(result => {
+      expect(result.data.slice(2, 5)).to.be.eq('xml');
     });
   }).timeout(10 * 1000);
 });

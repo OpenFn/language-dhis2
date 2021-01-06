@@ -5,12 +5,13 @@ import axios from 'axios';
 /**
  * Recursively expand object, each time resolving function calls and returning the resolved values
  * @param {oject} obj - Object to expand
+ * @returns {object|number|string|boolean|array} expandedObject
  */
 export function recursivelyExpandReferences(obj) {
   return state => {
     if (typeof obj !== 'object')
       return typeof obj == 'function' ? obj(state) : obj;
-    let res = mapValues(function (value) {
+    let result = mapValues(function (value) {
       if (Array.isArray(value)) {
         return value.map(item => {
           return recursivelyExpandReferences(item)(state);
@@ -19,8 +20,8 @@ export function recursivelyExpandReferences(obj) {
         return recursivelyExpandReferences(value)(state);
       }
     })(obj);
-    if (Array.isArray(obj)) res = Object.values(res);
-    return res;
+    if (Array.isArray(obj)) result = Object.values(result);
+    return result;
   };
 }
 
