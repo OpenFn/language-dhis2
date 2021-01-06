@@ -9,6 +9,7 @@ import {
   attribute,
   update,
   patch,
+  del,
 } from '../lib/Adaptor';
 import nock from 'nock';
 import {
@@ -19,6 +20,7 @@ import {
   createState,
   updateState,
   patchState,
+  delState,
 } from './ClientFixtures';
 
 describe('execute', () => {
@@ -407,6 +409,37 @@ describe('patch', () => {
     ).then(state => {
       // @todo further assertions as we learn more about PATCH
       // expect(state.data.response.uid).to.eq('FTRrcoaog83');
+    });
+  }).timeout(10 * 1000);
+});
+
+describe('delete', () => {
+  let id = '';
+  before(() => {
+    nock.cleanAll();
+    nock.enableNetConnect();
+  });
+
+  it('should create a new tracked entity instance', () => {
+    let state = delState;
+    return execute(create('trackedEntityInstances', state.data))(state).then(
+      state => {
+        id = state.data.response.importSummaries[0].reference;
+        expect(state.data.response.imported).to.eq(1);
+        expect(state.data.response.updated).to.eq(0);
+        expect(state.data.response.deleted).to.eq(0);
+        expect(state.data.response.ignored).to.eq(0);
+      }
+    );
+  }).timeout(10 * 1000);
+
+  it('should delete the newly created tracked entity instance', () => {
+    let state = delState;
+    return execute(del('trackedEntityInstances', id))(state).then(state => {
+      expect(state.data.response.importCount.imported).to.eq(0);
+      expect(state.data.response.importCount.updated).to.eq(0);
+      expect(state.data.response.importCount.ignored).to.eq(0);
+      expect(state.data.response.importCount.deleted).to.eq(1);
     });
   }).timeout(10 * 1000);
 });

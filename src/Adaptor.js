@@ -1387,7 +1387,7 @@ export function update(resourceType, path, data, params, options, callback) {
  * @param {object} data - Data to update. Include only the fields you want to update. E.g. `{name: "New Name"}`
  * @param {object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
  * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional options for update method. Defaults to `{operationName: 'patch', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
- * @param {requestCallback} [callback]
+ * @param {requestCallback} [callback] - Optional callback to handle the response
  * @returns {Promise<state>} state
  * @example <caption>Example `patching` a `data element`</caption>
  * patch('dataElements', 'FTRrcoaog83',
@@ -1459,31 +1459,34 @@ export function patch(resourceType, path, data, params, options, callback) {
 
 /**
  *  A generic helper function to delete an object
- * @param {string} resourceType
- * @param {string} path - Can be an `id` of an `object` or `path` to the `nested object` followed by `id` of the `property` of a `nested object`
- * @param {Object} data
- * @param {Object} params
- * @param {Object} options
- * @param {Function} callback
- * @example
-  // 1. Delete data element
-  del('dataElements', 'FTRrcoaog83');
+ * @param {string} resourceType - The type of resource to be deleted. E.g. `trackedEntityInstances`, `organisationUnits`, etc.
+ * @param {string} path - Can be an `id` of an `object` or `path` to the `nested object` to `delete`.
+ * @param {object} [data] - Optional. This is useful when you want to remove multiple objects from a collection in one request. You can send `data` as, for example, `{"identifiableObjects": [{"id": "IDA"}, {"id": "IDB"}, {"id": "IDC"}]}`. See more {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#deleting-objects on DHIS2 API docs}
+ * @param {object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
+ * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional options for update method. Defaults to `{operationName: 'delete', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @example <caption>Example`deleting` a `tracked entity instance`</caption>
+ * del('trackedEntityInstances', 'LcRd6Nyaq7T');
  */
-export function del(
-  resourceType,
-  path,
-  data,
-  params,
-  options,
-  responseType,
-  callback
-) {
+export function del(resourceType, path, data, params, options, callback) {
   return state => {
+    const operationName = options?.operationName ?? 'delete';
+
     const { username, password, hostUrl } = state.configuration;
 
-    const queryParams = recursivelyExpandReferences(params)(state);
+    const responseType = options?.responseType ?? 'json';
 
-    const payload = recursivelyExpandReferences(data)(state);
+    let queryParams = recursivelyExpandReferences(params)(state);
+
+    const filters = queryParams?.filters;
+
+    delete queryParams?.filters;
+
+    queryParams = new URLSearchParams(queryParams);
+
+    filters?.map(f => queryParams.append('filter', f));
+
+    const body = recursivelyExpandReferences(data)(state);
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
@@ -1491,19 +1494,11 @@ export function del(
       Accept: CONTENT_TYPES[responseType] ?? 'application/json',
     };
 
-    const supportApiVersion =
-      options?.supportApiVersion ?? state.configuration.supportApiVersion;
+    const url = buildUrl('/' + resourceType + '/' + path, hostUrl, apiVersion);
 
-    const url = buildUrl(
-      '/' + resourceType + '/' + path,
-      hostUrl,
-      apiVersion,
-      supportApiVersion
-    );
+    logOperation(operationName);
 
-    logOperation('del');
-
-    logApiVersion(apiVersion, supportApiVersion);
+    logApiVersion(apiVersion);
 
     logWaitingForServer(url, queryParams);
 
@@ -1518,12 +1513,18 @@ export function del(
           password,
         },
         params: queryParams,
-        data: payload,
+        data: body,
         headers,
       })
       .then(result => {
+        Log.info(
+          `${
+            COLORS.FgGreen
+          }${operationName} succeeded${ESCAPE}. DELETED ${resourceType}.\nSummary:\n${prettyJson(
+            result.data
+          )}`
+        );
         if (callback) return callback(composeNextState(state, result.data));
-
         return composeNextState(state, result.data);
       });
   };
