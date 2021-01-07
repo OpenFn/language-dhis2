@@ -139,7 +139,7 @@ export function getTEIs(params, options, callback) {
   return state => {
     options = recursivelyExpandReferences(options)(state);
 
-    if (options) options[operationName] = 'getTEIs';
+    if (options) options.operationName = 'getTEIs';
     else {
       options = { operationName: 'getTEIs' };
     }
@@ -172,7 +172,7 @@ export function upsertTEI(uniqueAttributeId, data, options, callback) {
 
     options = recursivelyExpandReferences(options)(state);
 
-    if (options) options[operationName] = 'upsertTEI';
+    if (options) options.operationName = 'upsertTEI';
     else {
       options = { operationName: 'upsertTEI' };
     }
@@ -277,10 +277,11 @@ export function createTEI(data, params, options, callback) {
   return state => {
     options = recursivelyExpandReferences(options)(state);
 
-    if (options) options[operationName] = 'createTEI';
+    if (options) options.operationName = 'createTEI';
     else {
       options = { operationName: 'createTEI' };
     }
+
     return create(
       'trackedEntityInstances',
       data,
@@ -305,10 +306,9 @@ export function createTEI(data, params, options, callback) {
 export function updateTEI(path, data, params, options, callback) {
   return state => {
     options = recursivelyExpandReferences(options)(state);
-
-    if (options) options[operationName] = 'createTEI';
+    if (options) options.operationName = 'updateTEI';
     else {
-      options = { operationName: 'createTEI' };
+      options = { operationName: 'updateTEI' };
     }
     return update(
       'trackedEntityInstances',
@@ -387,7 +387,7 @@ export function getEvents(params, options, callback) {
   return state => {
     options = recursivelyExpandReferences(options)(state);
 
-    if (options) options[operationName] = 'getEvents';
+    if (options) options.operationName = 'getEvents';
     else {
       options = { operationName: 'getEvents' };
     }
@@ -416,7 +416,7 @@ export function createEvents(data, params, options, callback) {
   return state => {
     options = recursivelyExpandReferences(options)(state);
 
-    if (options) options[operationName] = 'createEvents';
+    if (options) options.operationName = 'createEvents';
     else {
       options = { operationName: 'createEvents' };
     }
@@ -445,7 +445,7 @@ export function updateEvents(path, data, params, options, callback) {
   return state => {
     options = recursivelyExpandReferences(options)(state);
 
-    if (options) options[operationName] = 'updateEvents';
+    if (options) options.operationName = 'updateEvents';
     else {
       options = { operationName: 'updateEvents' };
     }
@@ -467,7 +467,7 @@ export function getPrograms(params, options, callback) {
   return state => {
     options = recursivelyExpandReferences(options)(state);
 
-    if (options) options[operationName] = 'getPrograms';
+    if (options) options.operationName = 'getPrograms';
     else {
       options = { operationName: 'getPrograms' };
     }
@@ -493,7 +493,7 @@ export function createPrograms(data, params, options, callback) {
   return state => {
     options = recursivelyExpandReferences(options)(state);
 
-    if (options) options[operationName] = 'createPrograms';
+    if (options) options.operationName = 'createPrograms';
     else {
       options = { operationName: 'createPrograms' };
     }
@@ -521,8 +521,7 @@ export function createPrograms(data, params, options, callback) {
 export function updatePrograms(path, data, params, options, callback) {
   return state => {
     options = recursivelyExpandReferences(options)(state);
-
-    if (options) options[operationName] = 'updatePrograms';
+    if (options) options.operationName = 'updatePrograms';
     else {
       options = { operationName: 'updatePrograms' };
     }
@@ -582,7 +581,7 @@ export function getEnrollments(params, responseType, options, callback) {
   return state => {
     options = recursivelyExpandReferences(options)(state);
 
-    if (options) options[operationName] = 'getEnrollments';
+    if (options) options.operationName = 'getEnrollments';
     else {
       options = { operationName: 'getEnrollments' };
     }
@@ -607,8 +606,7 @@ export function getEnrollments(params, responseType, options, callback) {
 export function enrollTEI(data, params, options, callback) {
   return state => {
     options = recursivelyExpandReferences(options)(state);
-
-    if (options) options[operationName] = 'enrollTEI';
+    if (options) options.operationName = 'enrollTEI';
     else {
       options = { operationName: 'enrollTEI' };
     }
@@ -637,7 +635,7 @@ export function updateEnrollments(path, data, params, options, callback) {
   return state => {
     options = recursivelyExpandReferences(options)(state);
 
-    if (options) options[operationName] = 'updateEnrollments';
+    if (options) options.operationName = 'updateEnrollments';
     else {
       options = { operationName: 'updateEnrollments' };
     }
@@ -662,7 +660,7 @@ export function cancelEnrollment(enrollmentId, params, options, callback) {
 
     options = recursivelyExpandReferences(options)(state);
 
-    if (options) options[operationName] = 'cancelEnrollment';
+    if (options) options.operationName = 'cancelEnrollment';
     else {
       options = { operationName: 'cancelEnrollment' };
     }
@@ -690,7 +688,7 @@ export function completeEnrollment(enrollmentId, params, options, callback) {
 
     options = recursivelyExpandReferences(options)(state);
 
-    if (options) options[operationName] = 'completeEnrollment';
+    if (options) options.operationName = 'completeEnrollment';
     else {
       options = { operationName: 'completeEnrollment' };
     }
@@ -721,7 +719,7 @@ export function getRelationships(params, options, callback) {
   return state => {
     options = recursivelyExpandReferences(options)(state);
 
-    if (options) options[operationName] = 'getRelationships';
+    if (options) options.operationName = 'getRelationships';
     else {
       options = { operationName: 'getRelationships' };
     }
@@ -756,10 +754,11 @@ export function getDataValues(params, options, callback) {
   return state => {
     options = recursivelyExpandReferences(options)(state);
 
-    if (options) options[operationName] = 'getDataValues';
+    if (options) options.operationName = 'getDataValues';
     else {
       options = { operationName: 'getDataValues' };
     }
+
     return getData('dataValueSets', params, options, callback)(state);
   };
 }
@@ -787,11 +786,12 @@ export function createDataValues(data, params, options, callback) {
   return state => {
     options = recursivelyExpandReferences(options)(state);
 
-    if (options) options[operationName] = 'createDataValues';
+    if (options) options.operationName = 'createDataValues';
     else {
       options = { operationName: 'createDataValues' };
     }
-    return create('enrollments', data, params, options, callback)(state);
+
+    return create('dataValueSets', data, params, options, callback)(state);
   };
 }
 //#endregion
@@ -839,11 +839,11 @@ export function execute(...operations) {
 export function generateDhis2UID(params, options, callback) {
   return state => {
     options = recursivelyExpandReferences(options)(state);
-
-    if (options) options[operationName] = 'generateDhis2UID';
+    if (options) options.operationName = 'generateDhis2UID';
     else {
       options = { operationName: 'generateDhis2UID' };
     }
+
     return getData('system/id', params, options, callback)(state);
   };
 }
@@ -945,38 +945,47 @@ export function discover(operation, path) {
  * - The analytics resource is powerful as it lets you query and retrieve data aggregated along all available data dimensions.
  * - For instance, you can ask the analytics resource to provide the aggregated data values for a set of data elements, periods and organisation units.
  * - Also, you can retrieve the aggregated data for a combination of any number of dimensions based on data elements and organisation unit group sets.
- * @param {string} resourceType - The resource you want analytics for.
- * @param {array} [params] - Analytics query params. Run `discover('getAnalytics',${resourceType})` to get the params available
- * @param {string} [responseType] - Defaults to `json`
- * @param {options} [options] - Options
+ * @param {object} params - Analytics `query parameters`, e.g. `{dx: 'fbfJHSPpUQD;cYeuwXTCPkU',filters: ['pe:2014Q1;2014Q2','ou:O6uvpzGd5pu;lc3eMKXaEfw']}`. Run `discover` or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#analytics DHIS2 API docs} to get the params available.
+ * @param {{apiVersion: number,responseType: string}}[options] - `Optional` options for `getAnalytics` operation. Defaults to `{apiVersion: state.configuration.apiVersion, responseType: 'json'}`.
  * @param {requestCallback} [callback] - Callback to handle response
- * @example <caption>Example generating `one UID` from the DHIS2 server</caption>
- * getAnalytics('events');
- * @todo examples
+ * @returns {Promise<state>} state
+ * @example <caption>Example getting a list of data elements filtered by the periods and organisation units</caption>
+ *  getAnalytics({
+ *    dimensions: ['dx:fbfJHSPpUQD;cYeuwXTCPkU'],
+ *    filters: ['pe:2014Q1;2014Q2', 'ou:O6uvpzGd5pu;lc3eMKXaEfw'],
+ *  })
+ * @example <caption>Example getting only records where the data value is greater or equal to 6500 and less than 33000</caption>
+ * getAnalytics({
+ *   dimensions: [
+ *    'dx:fbfJHSPpUQD;cYeuwXTCPkU',
+ *    'pe:2014',
+ *    'ou:O6uvpzGd5pu;lc3eMKXaEfw',
+ *   ],
+ *   measureCriteria: 'GE:6500;LT:33000',
+ * })
+ * @example <caption>Example getting only records for a certain date range using startDate and endDate</caption>
+ * getAnalytics({
+ *   dimensions: ['dx:fbfJHSPpUQD;cYeuwXTCPkU', 'ou:ImspTQPwCqd'],
+ *     startDate: '2018-01-01',
+ *     endDate: '2018-06-01',
+ * })
  */
-export function getAnalytics(resourceType, params, options, callback) {
+export function getAnalytics(params, options, callback) {
   return state => {
-    resourceType = recursivelyExpandReferences(resourceType)(state);
-
     options = recursivelyExpandReferences(options)(state);
 
-    if (options) options[operationName] = 'getAnalytics';
+    if (options) options.operationName = 'getAnalytics';
     else {
       options = { operationName: 'getAnalytics' };
     }
-    return getData(
-      `analytics/${resourceType}`,
-      params,
-      options,
-      callback
-    )(state);
+    return getData(`analytics`, params, options, callback)(state);
   };
 }
 
 /**
  * Get a list of DHIS2 api resources
  * @param {object} params - The optional query parameters for this endpoint. E.g `{filter: 'singular:like:attribute'}`.
- * @param {{filter: string, fields: string, resourceType: string}} [options] - The `optional` options, specifiying the filter expression. E.g. `singular:eq:attribute`.
+ * @param {{filter: string, fields: string, responseType: string}} [options] - The `optional` options, specifiying the filter expression. E.g. `singular:eq:attribute`.
  * @param {requestCallback} [callback] - The `optional callback function that will be called to handle data returned by this function.
  * @returns Promise<state> state
  * @example <caption>Example getting a list of `all DHIS2 resources`</caption>
@@ -1138,7 +1147,7 @@ export function getSchema(resourceType, params, options, callback) {
  * - This can be used to get `DataValueSets`,`events`,`trackedEntityInstances`,`etc.`
  * @param {string} resourceType - The type of resource to get(use its `plural` name). E.g. `dataElements`, `trackedEntityInstances`,`organisationUnits`, etc.
  * @param {object} [params] - Optional `query parameters` e.g. `{ou: 'DiszpKrYNg8'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 docs} for more details on which params to use for a given type of resource.
- * @param {{apiVersion: number,operationName: string,resourceType: string}}[options] - `Optional` options for `getData` operation. Defaults to `{operationName: 'getData', apiVersion: state.configuration.apiVersion, responseType: 'json'}`.
+ * @param {{apiVersion: number,operationName: string,responseType: string}}[options] - `Optional` options for `getData` operation. Defaults to `{operationName: 'getData', apiVersion: state.configuration.apiVersion, responseType: 'json'}`.
  * @param {requestCallback} [callback]  - Optional callback to handle the response
  * @returns {Promise<state>} state
  * @example <caption>Example getting one `trackedEntityInstance` with `Id` 'dNpxRu1mWG5' for a given `orgUnit(DiszpKrYNg8)`</caption>
@@ -1166,11 +1175,15 @@ export function getData(resourceType, params, options, callback) {
 
     const filters = params?.filters;
 
+    const dimensions = params?.dimensions;
+
     delete params?.filters;
 
     let queryParams = new URLSearchParams(params);
 
     filters?.map(f => queryParams.append('filter', f));
+
+    dimensions?.map(d => queryParams.append('dimension', d));
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
@@ -1202,7 +1215,7 @@ export function getData(resourceType, params, options, callback) {
       })
       .then(result => {
         Log.info(
-          `${COLORS.FgGreen}${operationName} succeeded${ESCAPE}. The result of this operation will be in ${operationName}state.data${ESCAPE} or in your ${operationName}callback${ESCAPE}.`
+          `${COLORS.FgGreen}${operationName} succeeded${ESCAPE}. The result of this operation will be in ${operationName} ${COLORS.FgGreen}state.data${ESCAPE} or in your ${COLORS.FgGreen}callback${ESCAPE}.`
         );
         if (callback) return callback(composeNextState(state, result.data));
         return composeNextState(state, result.data);

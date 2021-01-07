@@ -3,14 +3,14 @@ import { mapValues } from 'lodash/fp';
 import axios from 'axios';
 
 /**
- * Recursively expand object, each time resolving function calls and returning the resolved values
- * @param {oject} obj - Object to expand
- * @returns {object|number|string|boolean|array} expandedObject
+ * Recursively expand object|number|string|boolean|array, each time resolving function calls and returning the resolved values
+ * @param {any} thing - Thing to expand
+ * @returns {object|number|string|boolean|array} expandedResult
  */
-export function recursivelyExpandReferences(obj) {
+export function recursivelyExpandReferences(thing) {
   return state => {
-    if (typeof obj !== 'object')
-      return typeof obj == 'function' ? obj(state) : obj;
+    if (typeof thing !== 'object')
+      return typeof thing == 'function' ? thing(state) : thing;
     let result = mapValues(function (value) {
       if (Array.isArray(value)) {
         return value.map(item => {
@@ -19,8 +19,8 @@ export function recursivelyExpandReferences(obj) {
       } else {
         return recursivelyExpandReferences(value)(state);
       }
-    })(obj);
-    if (Array.isArray(obj)) result = Object.values(result);
+    })(thing);
+    if (Array.isArray(thing)) result = Object.values(result);
     return result;
   };
 }

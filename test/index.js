@@ -13,6 +13,7 @@ import {
   getMetadata,
   getSchema,
   getResources,
+  getAnalytics,
 } from '../lib/Adaptor';
 import nock from 'nock';
 import {
@@ -153,14 +154,35 @@ describe('getData', () => {
 });
 
 describe('upsert', () => {
+  let state = upsertExistingState;
+  let newTEI = {};
   before(() => {
     nock.cleanAll();
     nock.enableNetConnect();
   });
 
-  it('should update an existing TEI when a matching TEI is found by attribute ID', () => {
-    let state = upsertExistingState;
+  // it('should create a new TEI', () => {
+  //   return execute(
+  //     upsert(
+  //       'trackedEntityInstances',
+  //       {
+  //         attributeId: 'lZGmxYbs97q',
+  //         attributeValue: state =>
+  //           state.data.attributes.find(obj => obj.attribute === 'lZGmxYbs97q')
+  //             .value,
+  //       },
+  //       state.data,
+  //       { ou: 'TSyzvBiovKh' }
+  //     )
+  //   )(state).then(state => {
+  //     expect(state.data.response.importCount.imported).to.eq(0);
+  //     expect(state.data.response.importCount.updated).to.eq(1);
+  //     expect(state.data.response.importCount.deleted).to.eq(0);
+  //     expect(state.data.response.importCount.ignored).to.eq(0);
+  //   });
+  // }).timeout(10 * 1000);
 
+  it('should update an existing TEI when a matching TEI is found by attribute ID', () => {
     return execute(
       upsert(
         'trackedEntityInstances',
@@ -546,6 +568,55 @@ describe('getResources', () => {
       })
     )(state).then(result => {
       expect(result.data.slice(2, 5)).to.be.eq('xml');
+    });
+  }).timeout(10 * 1000);
+});
+
+describe('getAnalytics', () => {
+  let state = getState;
+  before(() => {
+    nock.cleanAll();
+    nock.enableNetConnect();
+  });
+
+  it('should return a list of data elements filtered by the periods and organisation units', () => {
+    return execute(
+      getAnalytics({
+        dimensions: ['dx:fbfJHSPpUQD;cYeuwXTCPkU'],
+        filters: ['pe:2014Q1;2014Q2', 'ou:O6uvpzGd5pu;lc3eMKXaEfw'],
+      })
+    )(state).then(result => {
+      expect(result.data).to.be.not.null;
+      expect(result.data).to.haveOwnProperty('rows');
+    });
+  }).timeout(20 * 1000);
+
+  it('should return only records where the data value is greater or equal to 6500 and less than 33000', () => {
+    return execute(
+      getAnalytics({
+        dimensions: [
+          'dx:fbfJHSPpUQD;cYeuwXTCPkU',
+          'pe:2014',
+          'ou:O6uvpzGd5pu;lc3eMKXaEfw',
+        ],
+        measureCriteria: 'GE:6500;LT:33000',
+      })
+    )(state).then(result => {
+      expect(result.data).to.be.not.null;
+      expect(result.data).to.haveOwnProperty('rows');
+    });
+  }).timeout(10 * 1000);
+
+  it('should allow users to send a date range using startDate and endDate', () => {
+    return execute(
+      getAnalytics({
+        dimensions: ['dx:fbfJHSPpUQD;cYeuwXTCPkU', 'ou:ImspTQPwCqd'],
+        startDate: '2018-01-01',
+        endDate: '2018-06-01',
+      })
+    )(state).then(result => {
+      expect(result.data).to.be.not.null;
+      expect(result.data).to.haveOwnProperty('rows');
     });
   }).timeout(10 * 1000);
 });
