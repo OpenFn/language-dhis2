@@ -764,19 +764,68 @@ export function getDataValues(params, options, callback) {
  * - To send a set of related data values sharing the same period and organisation unit, we need to identify the period, the data set, the org unit (facility) and the data elements for which to report.
  * - You can also use this operation to send large bulks of data values which don't necessarily are logically related.
  * - To send data values that are not linked to a `dataSet`, you do not need to specify the dataSet and completeDate attributes. Instead, you will specify the period and orgUnit attributes on the individual data value elements instead of on the outer data value set element. This will enable us to send data values for various periods and organisation units
- * @param {object<any,any>} data - The update data containing new values
- * @param {array} [params] - Optional `import` parameters for `createDataValues`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
- * @param {createOptions} [options] - Optional `flags` for the behavior of the `createDataVaues` operation.
+ * @param {object} data - The `data values` to upload or create. See example shape.
+ * @param {object} [params] - Optional `import` parameters for `createDataValues`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`. Run `discover` or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#data-values DHIS2 Docs API} to learn about available data values import parameters.
+ * @param  {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `createDataVaues` operation.
  * @param {requestCallback} [callback] - Optional callback to handle the response
  * @returns {Promise<state>} state
  * @example <caption>- Example `expression.js` of `createDataValues`  for sending a set of related data values sharing the same period and organisation unit</caption>
  * createDataValues(state.data);
- * @see {relatedDataValuesSampleState}
+ * // Example shape for state.data
+ * data: {
+ *   dataSet: 'pBOMPrpg1QX',
+ *   completeDate: '2014-02-03',
+ *   period: '201401',
+ *   orgUnit: 'DiszpKrYNg8',
+ *   dataValues: [
+ *     {
+ *       dataElement: 'f7n9E0hX8qk',
+ *       value: '1',
+ *     },
+ *     {
+ *       dataElement: 'Ix2HsbDMLea',
+ *       value: '2',
+ *     },
+ *     {
+ *       dataElement: 'eY5ehpbEsB7',
+ *       value: '3',
+ *     },
+ *   ],
+ * }
  * @example <caption>- Example `expression.js` of `createDataValues`  for sending large bulks of data values which don't necessarily are logically related</caption>
  * createDataValues(state.data);
- * @see {bulkDataValuesSampleState}
+ * // Example shape for state.data
+ * {
+ *   dataValues: [
+ *  {
+ *       dataElement: 'f7n9E0hX8qk',
+ *       period: '201401',
+ *       orgUnit: 'DiszpKrYNg8',
+ *       value: '12',
+ *     },
+ *     {
+ *       dataElement: 'f7n9E0hX8qk',
+ *       period: '201401',
+ *       orgUnit: 'FNnj3jKGS7i',
+ *       value: '14',
+ *     },
+ *     {
+ *       dataElement: 'f7n9E0hX8qk',
+ *       period: '201402',
+ *       orgUnit: 'DiszpKrYNg8',
+ *       value: '16',
+ *     },
+ *     {
+ *       dataElement: 'f7n9E0hX8qk',
+ *       period: '201402',
+ *      orgUnit: 'Jkhdsf8sdf4',
+ *       value: '18',
+ *     },
+ *   ]
+ * }
+ *
  */
-export function createDataValues(data, params, options, callback) {
+export function createDataValues(data, options, params, callback) {
   return state => {
     options = recursivelyExpandReferences(options)(state);
 
@@ -784,8 +833,7 @@ export function createDataValues(data, params, options, callback) {
     else {
       options = { operationName: 'createDataValues' };
     }
-
-    return create('dataValueSets', data, params, options, callback)(state);
+    return create('dataValueSets', data, options, params, callback)(state);
   };
 }
 //#endregion
@@ -1351,6 +1399,7 @@ export function create(resourceType, data, options, params, callback) {
 
     const headers = {
       Accept: CONTENT_TYPES[responseType] ?? 'application/json',
+      'Content-Type': 'application/json',
     };
 
     logOperation(operationName);
@@ -1380,7 +1429,7 @@ export function create(resourceType, data, options, params, callback) {
           }${operationName} succeeded${ESCAPE}. Created ${resourceType}: ${
             COLORS.FgGreen
           }${
-            result.data.response.importSummaries
+            result.data.response?.importSummaries
               ? result.data.response.importSummaries[0].href
               : result.data.response?.reference
           }${ESCAPE}.\nSummary:\n${prettyJson(result.data)}`

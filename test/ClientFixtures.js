@@ -227,6 +227,72 @@ export const createState = {
   },
 };
 
+export const createBulkUnrelatedDataValues = {
+  configuration: {
+    username: 'admin',
+    password: 'district',
+    hostUrl: 'https://play.dhis2.org/2.35.1',
+    apiVersion: 35,
+  },
+  data: {
+    dataValues: [
+      {
+        dataElement: 'f7n9E0hX8qk',
+        period: '201401',
+        orgUnit: 'DiszpKrYNg8',
+        value: '12',
+      },
+      {
+        dataElement: 'f7n9E0hX8qk',
+        period: '201401',
+        orgUnit: 'FNnj3jKGS7i',
+        value: '14',
+      },
+      {
+        dataElement: 'f7n9E0hX8qk',
+        period: '201402',
+        orgUnit: 'DiszpKrYNg8',
+        value: '16',
+      },
+      {
+        dataElement: 'f7n9E0hX8qk',
+        period: '201402',
+        orgUnit: 'Jkhdsf8sdf4',
+        value: '18',
+      },
+    ],
+  },
+};
+
+export const createRelatedDataValues = {
+  configuration: {
+    username: 'admin',
+    password: 'district',
+    hostUrl: 'https://play.dhis2.org/2.35.1',
+    apiVersion: 35,
+  },
+  data: {
+    dataSet: 'pBOMPrpg1QX',
+    completeDate: '2014-02-03',
+    period: '201401',
+    orgUnit: 'DiszpKrYNg8',
+    dataValues: [
+      {
+        dataElement: 'f7n9E0hX8qk',
+        value: '1',
+      },
+      {
+        dataElement: 'Ix2HsbDMLea',
+        value: '2',
+      },
+      {
+        dataElement: 'eY5ehpbEsB7',
+        value: '3',
+      },
+    ],
+  },
+};
+
 export const updateState = {
   configuration: {
     username: 'admin',

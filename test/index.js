@@ -29,9 +29,12 @@ import {
   patchState,
   delState,
   getState,
+  createBulkUnrelatedDataValues,
+  createRelatedDataValues,
 } from './ClientFixtures';
 import { result } from 'lodash';
 import { prettyJson } from '../src/Utils';
+import { createDataValues } from '../src/Adaptor';
 
 describe('execute', () => {
   it('executes each operation in sequence', done => {
@@ -679,4 +682,32 @@ describe('getDataValues', () => {
       expect(result.data.dataValues.length).to.be.eq(2);
     });
   }).timeout(20 * 1000);
+});
+
+describe('createDataValues', () => {
+  it('should create large bulks of data values which are not logically related', () => {
+    let state = createBulkUnrelatedDataValues;
+    return execute(createDataValues(state.data))(state).then(result => {
+      expect(
+        (result.data.status === 'WARNING' &&
+          result.data.importCount.ignored > 0) ||
+          result.data.importCount.imported > 0 ||
+          result.data.importCount.updated > 0
+      );
+      expect(result.data.importCount.deleted).to.eq(0);
+    });
+  }).timeout(10 * 1000);
+
+  it('should create large bulks of data values which are not logically related', () => {
+    let state = createRelatedDataValues;
+    return execute(createDataValues(state.data))(state).then(result => {
+      expect(
+        (result.data.status === 'WARNING' &&
+          result.data.importCount.ignored > 0) ||
+          result.data.importCount.imported > 0 ||
+          result.data.importCount.updated > 0
+      );
+      expect(result.data.importCount.deleted).to.eq(0);
+    });
+  }).timeout(10 * 1000);
 });
