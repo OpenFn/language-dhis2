@@ -1,4 +1,4 @@
-import { eq, filter, some, isEmpty, indexOf, lastIndexOf, trim } from 'lodash';
+import { eq, filter, some, indexOf, lastIndexOf, trim } from 'lodash';
 import { mapValues } from 'lodash/fp';
 import axios from 'axios';
 
@@ -38,7 +38,7 @@ export function composeSuccessMessage(operation) {
  *
  */
 export function warnExpectLargeResult(paramOrResourceType, endpointUrl) {
-  if (isEmpty(paramOrResourceType))
+  if (!paramOrResourceType)
     Log.warn(
       `\x1b[33m Missing params or resourceType. This may take a while\x1b[0m. This endpoint(\x1b[33m${endpointUrl}\x1b[0m) may return a large collection of records, since 'params' or 'resourceType' is not specified. We recommend you specify 'params' or 'resourceType' or use 'filter' parameter to limit the content of the result.`
     );
@@ -50,7 +50,15 @@ export function warnExpectLargeResult(paramOrResourceType, endpointUrl) {
  */
 export function logWaitingForServer(url, params) {
   console.info(`url ${COLORS.FgGreen}${url}\x1b[0m`);
-  console.info(`params ${COLORS.FgGreen}${params}\x1b[0m`);
+
+  console.info(
+    `params ${COLORS.FgGreen}${
+      typeof params === 'object' && !(params instanceof URLSearchParams)
+        ? prettyJson(params)
+        : params
+    }\x1b[0m`
+  );
+
   console.info(`Waiting for server response on ${url} ...`);
 }
 

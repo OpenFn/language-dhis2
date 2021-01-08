@@ -732,23 +732,17 @@ export function getRelationships(params, options, callback) {
  * Get DHIS2 Data Values.
  * - This operation retrives data values from DHIS2 Web API by interacting with the `dataValueSets` resource
  * - Data values can be retrieved in XML, JSON and CSV format.
- * @param {array} params - `Query` parameters for `getDataValues`.
- * @param {string} [responseType] - Optional response type. Defaults to `json`
- * @param {dhis2Options} [options] - Optional `flags` for the behavior of the `getDataValues` operation.
- * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @param {array} params - `Query` parameters for `getDataValues`. E.g. `{dataset: 'pBOMPrpg1QX', limit: 3, period: 2021, orgUnit: 'DiszpKrYNg8'} Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#data-values DHIS2 API docs} for available `Data Value Set Query Parameters`.
+ * @param {{apiVersion: number,operationName: string,responseType: string}} [options] - Optional `options` for `getDataValues` operation. Defaults to `{operationName: 'getDataValues', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
+ * @param {requestCallback} [callback] - Optional `callback` to handle the response
  * @returns {Promise<state>} state
- * @example <caption>- A query for retrieving `data values` associated with a specific `orgUnit`, `dataSet`, and `period `, can look like this:</caption>
- *  getDataValues([
- * { orgUnit: 'DiszpKrYNg8' },
- * { period: '202010' },
- * { dataSet: 'pBOMPrpg1QX' },
- * ]);
- * @example <caption>- To retrieve `data values` which have been `created or updated` within the `last 10 days` you can make a request like this:</caption>
- * getDataValues([
- * { orgUnit: 'DiszpKrYNg8' },
- * { lastUpdatedDuration: '10d' },
- * { dataSet: 'pBOMPrpg1QX' },
- * ]);
+ * @example <caption>- Example getting **two** `data values` associated with a specific `orgUnit`, `dataSet`, and `period `</caption>
+ * getDataValues({
+ *   orgUnit: 'DiszpKrYNg8',
+ *   period: '202010',
+ *   dataSet: 'pBOMPrpg1QX',
+ *   limit: 2,
+ *  })
  */
 export function getDataValues(params, options, callback) {
   return state => {
@@ -1060,6 +1054,7 @@ export function getResources(params, options, callback) {
         auth: { username, password },
         responseType,
         headers,
+        params: queryParams,
         transformResponse,
       })
       .then(result => {
@@ -1229,8 +1224,8 @@ export function getData(resourceType, params, options, callback) {
 
 /**
  * A generic helper function to get metadata records from a given DHIS2 instance
- * @param {Array<string>} resources - Required. List of metadata resources to fetch. E.g. `['organisationUnits', 'attributes']` or like `'dataSets'` if you only want a single type of resource. See `getResources` to see the types of resources available.
- * @param {Object} [params] - Optional `query parameters` e.g. `{filters: ['name:like:ANC'],fields:'*'}`. See `discover` or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#metadata-export-examples DHIS2 API docs}
+ * @param {string[]} resources - Required. List of metadata resources to fetch. E.g. `['organisationUnits', 'attributes']` or like `'dataSets'` if you only want a single type of resource. See `getResources` to see the types of resources available.
+ * @param {object} [params] - Optional `query parameters` e.g. `{filters: ['name:like:ANC'],fields:'*'}`. See `discover` or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#metadata-export DHIS2 API docs}
  * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional `options` for `getMetadata` operation. Defaults to `{operationName: 'getMetadata', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
  * @param {requestCallback} [callback] - Optional `callback` to handle the response
  * @returns {Promise<state>} state
@@ -1293,7 +1288,7 @@ export function getMetadata(resources, params, options, callback) {
 
     logWaitingForServer(url, queryParams);
 
-    warnExpectLargeResult(resources, url);
+    warnExpectLargeResult(queryParams, url);
 
     return axios
       .request({
@@ -1309,7 +1304,7 @@ export function getMetadata(resources, params, options, callback) {
       })
       .then(result => {
         Log.info(
-          `${COLORS.FgGreen}${operationName} succeeded${ESCAPE}. The result of this operation will be in ${operationName}state.data${ESCAPE} or in your ${operationName}callback${ESCAPE}.`
+          `${COLORS.FgGreen}${operationName} succeeded${ESCAPE}. The result of this operation will be in ${COLORS.FgGreen}${operationName} state.data${ESCAPE} or in your ${COLORS.FgGreen}callback${ESCAPE}.`
         );
         if (callback) return callback(composeNextState(state, result.data));
         return composeNextState(state, result.data);

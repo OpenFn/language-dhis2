@@ -16,6 +16,7 @@ import {
   getAnalytics,
   discover,
   generateDhis2UID,
+  getDataValues,
 } from '../lib/Adaptor';
 import nock from 'nock';
 import {
@@ -30,6 +31,7 @@ import {
   getState,
 } from './ClientFixtures';
 import { result } from 'lodash';
+import { prettyJson } from '../src/Utils';
 
 describe('execute', () => {
   it('executes each operation in sequence', done => {
@@ -203,6 +205,7 @@ describe('upsert', () => {
       expect(state.data.response.importCount.imported).to.eq(0);
       expect(state.data.response.importCount.updated).to.eq(1);
       expect(state.data.response.importCount.deleted).to.eq(0);
+      expect(state.data.response.importCount.ignored).to.eq(0);
       expect(state.data.response.importCount.ignored).to.eq(0);
     });
   }).timeout(10 * 1000);
@@ -446,7 +449,6 @@ describe('patch', () => {
   it('should do a partial update(patch) of a data element', () => {
     return execute(patch('dataElements', state.id, state.data))(state).then(
       result => {
-        // console.log('Result', result);
         expect(result.data.status).to.eq(204);
       }
     );
@@ -642,7 +644,7 @@ describe('discover', () => {
         );
       }
     );
-  }).timeout(20 * 1000);
+  }).timeout(30 * 1000);
 });
 
 describe('generateDhis2UID', () => {
@@ -656,6 +658,25 @@ describe('generateDhis2UID', () => {
   it('should return three UIDs generated from DHIS2 server', () => {
     return execute(generateDhis2UID({ limit: 3 }))(state).then(result => {
       expect(result.data.codes.length).to.be.eq(3);
+    });
+  }).timeout(20 * 1000);
+});
+
+describe('getDataValues', () => {
+  let state = getState;
+  it('should return two `data values` associated with a specific `orgUnit`, `dataSet`, and `period `', () => {
+    return execute(
+      getDataValues({
+        orgUnit: 'DiszpKrYNg8',
+        period: '202010',
+        dataSet: 'pBOMPrpg1QX',
+        limit: 2,
+      })
+    )(state).then(result => {
+      expect(result.data.orgUnit).to.be.eq('DiszpKrYNg8');
+      expect(result.data.period).to.be.eq('202010');
+      expect(result.data.dataSet).to.be.eq('pBOMPrpg1QX');
+      expect(result.data.dataValues.length).to.be.eq(2);
     });
   }).timeout(20 * 1000);
 });
