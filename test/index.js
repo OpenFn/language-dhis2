@@ -750,7 +750,7 @@ describe('enrollTEI', () => {
     nock.enableNetConnect();
   });
 
-  it.only('should enroll TEI into a given program', () => {
+  it('should enroll TEI into a given program', () => {
     let state = enrollTEIState;
     return execute(enrollTEI(state.data))(state).then(result => {
       console.log('Result', result);
