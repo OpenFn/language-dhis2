@@ -192,6 +192,106 @@ export const upsertExistingTEIState = {
   },
 };
 
+let date = new Date();
+function paddZeroes(number) {
+  return number <= 9 ? `0${number}` : number;
+}
+date =
+  date.getFullYear() +
+  '-' +
+  paddZeroes(date.getMonth() + 1) +
+  '-' +
+  paddZeroes(date.getDate());
+export const createEventsState = {
+  configuration: {
+    username: 'admin',
+    password: 'district',
+    hostUrl: 'https://play.dhis2.org/2.35.1',
+    apiVersion: 35,
+  },
+  data: {
+    program: 'eBAyeGv0exc',
+    orgUnit: 'DiszpKrYNg8',
+    eventDate: date,
+    status: 'COMPLETED',
+    completedDate: date,
+    storedBy: 'admin',
+    coordinate: {
+      latitude: 59.8,
+      longitude: 10.9,
+    },
+    dataValues: [
+      {
+        dataElement: 'qrur9Dvnyt5',
+        value: '33',
+      },
+      {
+        dataElement: 'oZg33kd9taw',
+        value: 'Male',
+      },
+      {
+        dataElement: 'msodh3rEMJa',
+        value: date,
+      },
+    ],
+  },
+};
+
+export const sendDataForMultipleEventsState = {
+  configuration: {
+    username: 'admin',
+    password: 'district',
+    hostUrl: 'https://play.dhis2.org/2.35.1',
+    apiVersion: 35,
+  },
+  data: {
+    events: [
+      {
+        program: 'eBAyeGv0exc',
+        orgUnit: 'DiszpKrYNg8',
+        eventDate: date,
+        status: 'COMPLETED',
+        storedBy: 'admin',
+        coordinate: {
+          latitude: '59.8',
+          longitude: '10.9',
+        },
+        dataValues: [
+          {
+            dataElement: 'qrur9Dvnyt5',
+            value: '22',
+          },
+          {
+            dataElement: 'oZg33kd9taw',
+            value: 'Male',
+          },
+        ],
+      },
+      {
+        program: 'eBAyeGv0exc',
+        orgUnit: 'DiszpKrYNg8',
+        eventDate: date,
+        status: 'COMPLETED',
+        storedBy: 'admin',
+        coordinate: {
+          latitude: '59.8',
+          longitude: '10.9',
+        },
+        dataValues: [
+          {
+            dataElement: 'qrur9Dvnyt5',
+            value: '26',
+          },
+          {
+            dataElement: 'oZg33kd9taw',
+            value: 'Female',
+          },
+        ],
+      },
+    ],
+  },
+};
+
 export const createState = {
   configuration: {
     username: 'admin',

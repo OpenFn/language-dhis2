@@ -402,15 +402,42 @@ export function getEvents(params, options, callback) {
  * - For sending `events` to `programs with multiple stages`, you will need to also include the `programStage` identifier, the identifiers for `programStages` can be found in the `programStages` resource via a call to `getMetadata` operation.
  * @param {object<any,any>} data - The update data containing new values
  * @param {array} [params] - Optional `import` parameters for `createEvents`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
- * @param {createOptions} [options] - Optional `flags` for the behavior of the `createEvents` operation.
+ * @param { {apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `createEvents` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {requestCallback} [callback] - Optional callback to handle the response
  * @returns {Promise<state>} state
  * @example <caption>- Example `expression.js` of `createEvents` for a `single event` can look like this:</caption>
  * createEvents(state.data);
- * @see {singleEventSampleState}
+ * // Example shape for state.data
+ * data: {
+ *   program: 'eBAyeGv0exc',
+ *   orgUnit: 'DiszpKrYNg8',
+ *   eventDate: date,
+ *   status: 'COMPLETED',
+ *   completedDate: date,
+ *   storedBy: 'admin',
+ *   coordinate: {
+ *     latitude: 59.8,
+ *     longitude: 10.9,
+ *   },
+ *   dataValues: [
+ *     {
+ *       dataElement: 'qrur9Dvnyt5',
+ *       value: '33',
+ *     },
+ *     {
+ *       dataElement: 'oZg33kd9taw',
+ *       value: 'Male',
+ *     },
+ *     {
+ *       dataElement: 'msodh3rEMJa',
+ *       value: date,
+ *     },
+ *   ],
+ * },
  * @example <caption>- Example `expression.js` of `createEvents` for sending `multiple events` at the same time</caption>
  * createEvents(state.data);
- * @see {multipleEventsSampleState}
+ * // Example shape for state.data
+ *
  */
 export function createEvents(data, params, options, callback) {
   return state => {

@@ -17,6 +17,7 @@ import {
   discover,
   generateDhis2UID,
   getDataValues,
+  createEvents,
 } from '../lib/Adaptor';
 import nock from 'nock';
 import {
@@ -31,6 +32,8 @@ import {
   getState,
   createBulkUnrelatedDataValues,
   createRelatedDataValues,
+  createEventsState,
+  sendDataForMultipleEventsState,
 } from './ClientFixtures';
 import { result } from 'lodash';
 import { prettyJson } from '../src/Utils';
@@ -708,6 +711,33 @@ describe('createDataValues', () => {
           result.data.importCount.updated > 0
       );
       expect(result.data.importCount.deleted).to.eq(0);
+    });
+  }).timeout(10 * 1000);
+});
+
+describe('createEvents', () => {
+  before(() => {
+    nock.cleanAll();
+    nock.enableNetConnect();
+  });
+
+  it('should create a new single event and link it to a given program', () => {
+    let state = createEventsState;
+    return execute(createEvents(state.data))(state).then(result => {
+      expect(result.data.response.imported).to.eq(1);
+      expect(result.data.response.updated).to.eq(0);
+      expect(result.data.response.deleted).to.eq(0);
+      expect(result.data.response.ignored).to.eq(0);
+    });
+  }).timeout(10 * 1000);
+
+  it('should create two new events and link them to respective programs', () => {
+    let state = sendDataForMultipleEventsState;
+    return execute(createEvents(state.data))(state).then(result => {
+      expect(result.data.response.imported).to.eq(2);
+      expect(result.data.response.updated).to.eq(0);
+      expect(result.data.response.deleted).to.eq(0);
+      expect(result.data.response.ignored).to.eq(0);
     });
   }).timeout(10 * 1000);
 });
