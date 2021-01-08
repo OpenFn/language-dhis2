@@ -14,6 +14,7 @@ import {
   getSchema,
   getResources,
   getAnalytics,
+  discover,
 } from '../lib/Adaptor';
 import nock from 'nock';
 import {
@@ -619,4 +620,17 @@ describe('getAnalytics', () => {
       expect(result.data).to.haveOwnProperty('rows');
     });
   }).timeout(10 * 1000);
+});
+
+describe('discover', () => {
+  let state = getState;
+  it('should return a list of parameters allowed on a given endpoint for specific http method', () => {
+    return execute(discover('get', '/trackedEntityInstances'))(state).then(
+      result => {
+        expect(result.data.description).to.be.eq(
+          'list tracked entity instances (TEIs)'
+        );
+      }
+    );
+  }).timeout(20 * 1000);
 });

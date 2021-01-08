@@ -848,16 +848,18 @@ export function generateDhis2UID(params, options, callback) {
   };
 }
 /**
- * Discover available parameters and allowed operators for a given resource's endpoint
- * @todo Implementation
- * @example
- * discover('getData, /api/trackedEntityInstances')
- * @constructor
- * @param {*} operation
- * @param {*} path
+ * Discover available `DHIS2` `api` `endpoint` `query parameters` and allowed `operators` for a given resource's endpoint.
+ * @param {string} httpMethod - The HTTP to inspect parameter usage for a given endpoint, e.g., `get`, `post`,`put`,`patch`,`delete`
+ * @param {string} endpoint - The path for a given endpoint. E.g. `/trackedEntityInstances` or `/dataValueSets`
+ * @returns {Promise<state>} state
+ * @example <caption>Example getting a list of `parameters allowed` on a given `endpoint` for specific `http method`</caption>
+ * discover('post', '/trackedEntityInstances')
  */
-export function discover(operation, path) {
+export function discover(httpMethod, endpoint) {
   return state => {
+    Log.info(
+      `Discovering query/import parameters for ${COLORS.FgGreen}${httpMethod}${ESCAPE} on ${COLORS.FgGreen}${endpoint}${ESCAPE}`
+    );
     return axios
       .get(
         'https://dhis2.github.io/dhis2-api-specification/spec/metadata_openapi.json',
@@ -865,7 +867,7 @@ export function discover(operation, path) {
           transformResponse: [
             data => {
               let tempData = JSON.parse(data);
-              let filteredData = tempData.paths[path][operation];
+              let filteredData = tempData.paths[endpoint][httpMethod];
               return {
                 ...filteredData,
                 parameters: filteredData.parameters.reduce(
@@ -920,7 +922,7 @@ export function discover(operation, path) {
         Log.info(
           `\t=======================================================================================\n\tQuery Parameters for ${
             COLORS.FgGreen
-          }${operation}${ESCAPE} on ${COLORS.FgGreen}${path}${ESCAPE} [${
+          }${httpMethod}${ESCAPE} on ${COLORS.FgGreen}${endpoint}${ESCAPE} [${
             result.data.description ?? '<description_missing>'
           }]\n\t=======================================================================================`
         );
