@@ -15,6 +15,7 @@ import {
   getResources,
   getAnalytics,
   discover,
+  generateDhis2UID,
 } from '../lib/Adaptor';
 import nock from 'nock';
 import {
@@ -632,5 +633,20 @@ describe('discover', () => {
         );
       }
     );
+  }).timeout(20 * 1000);
+});
+
+describe('generateDhis2UID', () => {
+  let state = getState;
+  it('should return one UID generated from DHIS2 server', () => {
+    return execute(generateDhis2UID())(state).then(result => {
+      expect(result.data.codes.length).to.be.eq(1);
+    });
+  }).timeout(20 * 1000);
+
+  it('should return three UIDs generated from DHIS2 server', () => {
+    return execute(generateDhis2UID({ limit: 3 }))(state).then(result => {
+      expect(result.data.codes.length).to.be.eq(3);
+    });
   }).timeout(20 * 1000);
 });

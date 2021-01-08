@@ -825,26 +825,28 @@ export function execute(...operations) {
 }
 
 /**
- * Generate valid, random DHIS2 identifiers *
+ * Generate valid, random DHIS2 identifiers
  * - Useful for client generated Ids compatible with DHIS2
- * @param {array} [params] - The limit query parameter is optional and indicates how many identifiers you want to be returned with the response. The default is to return one identifier.
- * @param {string} [responseType] - Defaults to `json`
- * @param {options} [options] - Options
+ * @param {{apiVersion: number,limit: number,responseType: string}} [options] - Optional `options` for `getMetadata` operation. Defaults to `{apiVersion: state.configuration.apiVersion,limit: 1,responseType: 'json'}`
  * @param {requestCallback} [callback] - Callback to handle response
+ * @returns {Promise<state>} state
  * @example <caption>Example generating `one UID` from the DHIS2 server</caption>
  * generateDhis2UID();
  * @example <caption>Example generating `three UIDs` from the DHIS2 server</caption>
- * generateDhis2UID([{limit: 3}]);
+ * generateDhis2UID({limit: 3});
  */
-export function generateDhis2UID(params, options, callback) {
+export function generateDhis2UID(options, callback) {
   return state => {
     options = recursivelyExpandReferences(options)(state);
     if (options) options.operationName = 'generateDhis2UID';
     else {
       options = { operationName: 'generateDhis2UID' };
     }
+    const limit = { limit: options?.limit ?? 1 };
 
-    return getData('system/id', params, options, callback)(state);
+    delete options?.limit;
+
+    return getData('system/id', limit, options, callback)(state);
   };
 }
 /**
