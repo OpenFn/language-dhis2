@@ -18,6 +18,7 @@ import {
   generateDhis2UID,
   getDataValues,
   createEvents,
+  enrollTEI,
 } from '../lib/Adaptor';
 import nock from 'nock';
 import {
@@ -34,6 +35,7 @@ import {
   createRelatedDataValues,
   createEventsState,
   sendDataForMultipleEventsState,
+  enrollTEIState,
 } from './ClientFixtures';
 import { result } from 'lodash';
 import { prettyJson } from '../src/Utils';
@@ -738,6 +740,24 @@ describe('createEvents', () => {
       expect(result.data.response.updated).to.eq(0);
       expect(result.data.response.deleted).to.eq(0);
       expect(result.data.response.ignored).to.eq(0);
+    });
+  }).timeout(10 * 1000);
+});
+
+describe('enrollTEI', () => {
+  before(() => {
+    nock.cleanAll();
+    nock.enableNetConnect();
+  });
+
+  it.only('should enroll TEI into a given program', () => {
+    let state = enrollTEIState;
+    return execute(enrollTEI(state.data))(state).then(result => {
+      console.log('Result', result);
+      // expect(result.data.response.imported).to.eq(1);
+      // expect(result.data.response.updated).to.eq(0);
+      // expect(result.data.response.deleted).to.eq(0);
+      // expect(result.data.response.ignored).to.eq(0);
     });
   }).timeout(10 * 1000);
 });
