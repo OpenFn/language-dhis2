@@ -29,6 +29,7 @@ import {
   delState,
   getState,
 } from './ClientFixtures';
+import { result } from 'lodash';
 
 describe('execute', () => {
   it('executes each operation in sequence', done => {
@@ -157,34 +158,14 @@ describe('getData', () => {
 
 describe('upsert', () => {
   let state = upsertExistingState;
-  let newTEI = {};
+  state.attributeVal = state =>
+    state.data.attributes.find(obj => obj.attribute === 'lZGmxYbs97q').value;
   before(() => {
     nock.cleanAll();
     nock.enableNetConnect();
   });
 
-  // it('should create a new TEI', () => {
-  //   return execute(
-  //     upsert(
-  //       'trackedEntityInstances',
-  //       {
-  //         attributeId: 'lZGmxYbs97q',
-  //         attributeValue: state =>
-  //           state.data.attributes.find(obj => obj.attribute === 'lZGmxYbs97q')
-  //             .value,
-  //       },
-  //       state.data,
-  //       { ou: 'TSyzvBiovKh' }
-  //     )
-  //   )(state).then(state => {
-  //     expect(state.data.response.importCount.imported).to.eq(0);
-  //     expect(state.data.response.importCount.updated).to.eq(1);
-  //     expect(state.data.response.importCount.deleted).to.eq(0);
-  //     expect(state.data.response.importCount.ignored).to.eq(0);
-  //   });
-  // }).timeout(10 * 1000);
-
-  it('should update an existing TEI when a matching TEI is found by attribute ID', () => {
+  it('should create a new TEI', () => {
     return execute(
       upsert(
         'trackedEntityInstances',
@@ -193,6 +174,27 @@ describe('upsert', () => {
           attributeValue: state =>
             state.data.attributes.find(obj => obj.attribute === 'lZGmxYbs97q')
               .value,
+        },
+        state.data,
+        { ou: 'TSyzvBiovKh' }
+      )
+    )(state).then(result => {
+      expect(result.data.httpStatus).to.eq('OK');
+      expect(result.data.httpStatusCode).to.eq(200);
+      expect(result.data.response.imported).to.eq(1);
+      expect(result.data.response.updated).to.eq(0);
+      expect(result.data.response.deleted).to.eq(0);
+      expect(result.data.response.ignored).to.eq(0);
+    });
+  }).timeout(10 * 1000);
+
+  it('should update an existing TEI when a matching TEI is found by attribute ID', () => {
+    return execute(
+      upsert(
+        'trackedEntityInstances',
+        {
+          attributeId: 'lZGmxYbs97q',
+          attributeValue: state.attributeVal,
         },
         state.data,
         { ou: 'TSyzvBiovKh' }
@@ -434,18 +436,25 @@ describe('update', () => {
 });
 
 describe('patch', () => {
+  let state = patchState;
+  state.id = 'FTRrcoaog83';
   before(() => {
     nock.cleanAll();
     nock.enableNetConnect();
   });
 
   it('should do a partial update(patch) of a data element', () => {
-    let state = patchState;
-    return execute(patch('dataElements', 'FTRrcoaog83', state.data))(
-      state
-    ).then(state => {
-      // @todo further assertions as we learn more about PATCH
-      // expect(state.data.response.uid).to.eq('FTRrcoaog83');
+    return execute(patch('dataElements', state.id, state.data))(state).then(
+      result => {
+        // console.log('Result', result);
+        expect(result.data.status).to.eq(204);
+      }
+    );
+  }).timeout(10 * 1000);
+
+  it('should verify that the name of the data element was updated', () => {
+    return execute(getData(`dataElements/${state.id}`))(state).then(result => {
+      expect(result.data.name).to.eq(state.data.name);
     });
   }).timeout(10 * 1000);
 });

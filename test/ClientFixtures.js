@@ -99,7 +99,7 @@ export const upsertExistingState = {
     attributes: [
       {
         attribute: 'lZGmxYbs97q',
-        value: '4088389',
+        value: rand(7),
       },
       {
         attribute: 'w75KJ2mc4zz',
@@ -239,7 +239,7 @@ export const updateState = {
     aggregationType: 'SUM',
     domainType: 'AGGREGATE',
     valueType: 'NUMBER',
-    name: 'Some New Name',
+    name: 'Some New Name' + Date.now(),
     shortName: 'Accute Flaccid Paral (Deaths < 5 yrs)',
   },
 };
@@ -252,7 +252,7 @@ export const patchState = {
     apiVersion: 35,
   },
   data: {
-    displayName: 'Chaiwa',
+    name: 'Patched Name ' + Date.now(),
   },
 };
 

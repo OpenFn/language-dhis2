@@ -1494,7 +1494,7 @@ export function update(resourceType, path, data, params, options, callback) {
  * @param {string} path - The `id` or `path` to the `object` to be updated. E.g. `FTRrcoaog83` or `FTRrcoaog83/{collection-name}/{object-id}`
  * @param {object} data - Data to update. Include only the fields you want to update. E.g. `{name: "New Name"}`
  * @param {object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
- * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional options for update method. Defaults to `{operationName: 'patch', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
+ * @param {{apiVersion: number,operationName: string,responseType: string}} [options] - Optional options for update method. Defaults to `{operationName: 'patch', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
  * @param {requestCallback} [callback] - Optional callback to handle the response
  * @returns {Promise<state>} state
  * @example <caption>Example `patching` a `data element`</caption>
@@ -1560,15 +1560,19 @@ export function patch(resourceType, path, data, params, options, callback) {
         headers,
       })
       .then(result => {
+        let resultObject = {
+          status: result.status,
+          statusText: result.statusText,
+        };
         Log.info(
           `${
             COLORS.FgGreen
           }${operationName} succeeded${ESCAPE}. Updated ${resourceType}.\nSummary:\n${prettyJson(
-            result.data
+            resultObject
           )}`
         );
-        if (callback) return callback(composeNextState(state, result.data));
-        return composeNextState(state, result.data);
+        if (callback) return callback(composeNextState(state, resultObject));
+        return composeNextState(state, resultObject);
       });
   };
 }
