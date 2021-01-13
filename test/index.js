@@ -507,16 +507,19 @@ describe('getMetadata', () => {
 
   it('should get a list of orgUnits', () => {
     let state = getState;
-    return execute(getMetadata('organisationUnits'))(state).then(result => {
+    return execute(
+      getMetadata('organisationUnits', { fields: ['id', 'name'] })
+    )(state).then(result => {
       expect(result.data.organisationUnits.length).to.be.gte(1);
     });
-  }).timeout(20 * 1000);
+  }).timeout(30 * 1000);
 
   it('should get data elements and indicators where name includes "ANC"', () => {
     let state = getState;
     return execute(
       getMetadata(['dataElements', 'indicators'], {
         filters: ['name:like:ANC'],
+        fields: ['id', 'name'],
       })
     )(state).then(result => {
       expect(result.data.dataElements.length).to.be.gte(1);
@@ -745,19 +748,47 @@ describe('createEvents', () => {
 });
 
 describe('enrollTEI', () => {
+  let trackedEntityInstance = '';
+
+  let state = enrollTEIState;
+
   before(() => {
     nock.cleanAll();
     nock.enableNetConnect();
   });
 
+  it('should create a new tracked entity instance', () => {
+    return execute(create('trackedEntityInstances', state.data))(state).then(
+      result => {
+        trackedEntityInstance =
+          result.data.response.importSummaries[0].reference;
+        expect(result.data.response.imported).to.eq(1);
+        expect(result.data.response.updated).to.eq(0);
+        expect(result.data.response.deleted).to.eq(0);
+        expect(result.data.response.ignored).to.eq(0);
+      }
+    );
+  }).timeout(10 * 1000);
+
   it('should enroll TEI into a given program', () => {
-    let state = enrollTEIState;
+    let date = new Date();
+    state = {
+      ...state,
+      data: {
+        trackedEntityInstance: trackedEntityInstance,
+        orgUnit: 'ImspTQPwCqd',
+        program: 'WSGAb5XwJ3Y',
+        enrollmentDate: date,
+        incidentDate: date,
+      },
+    };
+
+    console.log('state', state);
     return execute(enrollTEI(state.data))(state).then(result => {
-      console.log('Result', result);
-      // expect(result.data.response.imported).to.eq(1);
-      // expect(result.data.response.updated).to.eq(0);
-      // expect(result.data.response.deleted).to.eq(0);
-      // expect(result.data.response.ignored).to.eq(0);
+      expect(result.data.response.imported).to.eq(1);
+      expect(result.data.response.updated).to.eq(0);
+      expect(result.data.response.deleted).to.eq(0);
+      expect(result.data.response.ignored).to.eq(0);
     });
   }).timeout(10 * 1000);
 });

@@ -24,7 +24,23 @@ export function recursivelyExpandReferences(thing) {
     return result;
   };
 }
-
+// Stuart
+// export function expandReferences(thing) {
+//   return state => {
+//     if (Array.isArray(thing)) {
+//       return thing.map(expandReferences(thing)(state));
+//     }
+//     if (typeof thing == 'object') {
+//       return Object.keys(thing).reduce((acc, key) => {
+//         return { ...acc, [key]: expandReferences(thing[key]) };
+//       }, {});
+//     }
+//     if (typeof thing == 'function') {
+//       return thing(state);
+//     }
+//     return thing;
+//   };
+// }
 /**
  * Compose success message
  */

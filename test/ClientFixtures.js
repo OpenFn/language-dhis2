@@ -55,7 +55,7 @@ export const upsertNewState = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/demo',
+    hostUrl: 'https://play.dhis2.org/2.35.1',
     apiVersion: 35,
   },
   data: {
@@ -90,7 +90,7 @@ export const upsertExistingState = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/demo',
+    hostUrl: 'https://play.dhis2.org/2.35.1',
     apiVersion: 35,
   },
   data: {
@@ -125,7 +125,7 @@ export const upsertNewTEIState = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/demo',
+    hostUrl: 'https://play.dhis2.org/2.35.1',
     apiVersion: 35,
   },
   data: {
@@ -160,7 +160,7 @@ export const upsertExistingTEIState = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/demo',
+    hostUrl: 'https://play.dhis2.org/2.35.1',
     apiVersion: 35,
   },
   data: {
@@ -206,7 +206,7 @@ export const createEventsState = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/demo',
+    hostUrl: 'https://play.dhis2.org/2.35.1',
     apiVersion: 35,
   },
   data: {
@@ -241,7 +241,7 @@ export const sendDataForMultipleEventsState = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/demo',
+    hostUrl: 'https://play.dhis2.org/2.35.1',
     apiVersion: 35,
   },
   data: {
@@ -296,7 +296,7 @@ export const createState = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/demo',
+    hostUrl: 'https://play.dhis2.org/2.35.1',
     apiVersion: 35,
   },
   data: {
@@ -331,7 +331,7 @@ export const createBulkUnrelatedDataValues = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/demo',
+    hostUrl: 'https://play.dhis2.org/2.35.1',
     apiVersion: 35,
   },
   data: {
@@ -368,7 +368,7 @@ export const createRelatedDataValues = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/demo',
+    hostUrl: 'https://play.dhis2.org/2.35.1',
     apiVersion: 35,
   },
   data: {
@@ -397,7 +397,7 @@ export const updateState = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/demo',
+    hostUrl: 'https://play.dhis2.org/2.35.1',
     apiVersion: 35,
   },
   data: {
@@ -414,7 +414,7 @@ export const patchState = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/demo',
+    hostUrl: 'https://play.dhis2.org/2.35.1',
     apiVersion: 35,
   },
   data: {
@@ -426,7 +426,7 @@ export const delState = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/demo',
+    hostUrl: 'https://play.dhis2.org/2.35.1',
     apiVersion: 35,
   },
   data: {
@@ -462,7 +462,7 @@ export const getState = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/demo',
+    hostUrl: 'https://play.dhis2.org/2.35.1',
     apiVersion: 35,
   },
 };
@@ -471,17 +471,29 @@ export const enrollTEIState = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/demo',
+    hostUrl: 'https://play.dhis2.org/2.35.1',
     apiVersion: 35,
   },
   data: {
-    trackedEntityInstance: 'ZRyCnJ1qUXS',
-    orgUnit: 'ImspTQPwCqd',
-    program: 'S8uo8AlvYMz',
-    enrollmentDate: date,
-    incidentDate: date,
+    orgUnit: 'TSyzvBiovKh',
+    trackedEntityType: 'nEenWmSyUEp',
+    attributes: [
+      {
+        attribute: 'lZGmxYbs97q',
+        value: rand(7),
+      },
+      {
+        attribute: 'w75KJ2mc4zz',
+        value: 'Gigiwe',
+      },
+      {
+        attribute: 'zDhUuAYrxNC',
+        value: 'Mwanza',
+      },
+    ],
   },
 };
+
 export { fixtures };
 
 export default [
