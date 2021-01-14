@@ -1,9 +1,28 @@
 /** @module Adaptor */
+//#region IMPORTS
 import axios from 'axios';
-import { execute as commonExecute, expandReferences } from 'language-common';
-import { get, post, put } from './Client';
-import { resolve as resolveUrl } from 'url';
-import { mapValues } from 'lodash/fp';
+import { execute as commonExecute, composeNextState } from 'language-common';
+import { indexOf } from 'lodash';
+
+import {
+  Log,
+  warnExpectLargeResult,
+  logWaitingForServer,
+  buildUrl,
+  logApiVersion,
+  CONTENT_TYPES,
+  applyFilter,
+  parseFilter,
+  logOperation,
+  COLORS,
+  prettyJson,
+  ESCAPE,
+  composeSuccessMessage,
+  recursivelyExpandReferences,
+} from './Utils';
+//#endregion
+
+//#region CONFIG HELPERS, INTERCEPTORS and TYPE DEFINITIONS
 
 /**
  * Execute a sequence of operations.
@@ -32,8 +51,8 @@ export function execute(...operations) {
 }
 
 /**
- * Migrates "apiUrl" to "hostUrl" if "hostUrl" is blank.
- * For OpenFn.org users with the old-style configuration.
+ * Migrates `apiUrl` to `hostUrl` if `hostUrl` is `blank`.
+ * For `OpenFn.org` users with the `old-style configuration`.
  * @example
  * configMigrationHelper(state)
  * @constructor
@@ -43,7 +62,7 @@ export function execute(...operations) {
 function configMigrationHelper(state) {
   const { hostUrl, apiUrl } = state.configuration;
   if (!hostUrl) {
-    console.log(
+    Log.warn(
       'DEPRECATION WARNING: Please migrate instance address from `apiUrl` to `hostUrl`.'
     );
     state.configuration.hostUrl = apiUrl;
@@ -52,569 +71,1978 @@ function configMigrationHelper(state) {
   return state;
 }
 
-/**
- * Fetch a dataValueSet
- * @public
- * @example
- * fetchData({
- *   fields: {
- *     dataSet: 'pBOMPrpg1QX',
- *     orgUnit: 'DiszpKrYNg8',
- *     period: '201401'
- *   },
- *   postUrl: "yourposturl"
- * });
- * @constructor
- * @param {object} params - data to query for events
- * @param {String} postUrl - (optional) URL to post the result
- * @returns {Operation}
- */
-export function fetchData(params, postUrl) {
-  return state => {
-    const data = expandReferences(params)(state);
-    const { username, password, hostUrl } = state.configuration;
-    const url = resolveUrl(hostUrl + '/', 'api/dataValueSets.json?');
-    const query = data.fields || expandDataValues(params)(state);
+/* `Axios` Interceptors */
+axios.interceptors.response.use(
+  function (response) {
+    const contentType = response.headers['content-type']?.split(';')[0];
 
-    console.log('Getting Data Value Sets:');
+    const acceptHeaders = response.config.headers['Accept']
+      .split(';')[0]
+      .split(',');
 
-    return get({ username, password, query, url })
-      .then(result => {
-        console.log('Get Result:', result.body);
-        return result;
-      })
-      .then(result => {
-        if (postUrl) {
-          const body = result.body;
-          const url = postUrl;
+    if (response.config.method === 'get') {
+      if (indexOf(acceptHeaders, contentType) === -1) {
+        const newError = {
+          status: 404,
+          message: 'Unexpected content,returned',
+          responseData: response.data,
+        };
 
-          return post({ username, password, body, url }).then(result => {
-            console.log('Post Result:', result.statusCode);
-            return {
-              ...state,
-              references: [result, ...state.references],
-            };
-          });
-        } else {
-          return {
-            ...state,
-            references: [result, ...state.references],
-          };
-        }
-      });
-  };
-}
+        Log.error(newError.message);
 
-/**
- * Fetch an event
- * @public
- * @example
- * fetchEvents({
- *   fields: {
- *     orgUnit: 'DiszpKrYNg8',
- *     period: '201401'
- *   }},
- *   postUrl: "yourposturl"
- * )
- * @constructor
- * @param {object} params - data to query for events
- * @param {String} postUrl - (optional) URL to post the result
- * @returns {Operation}
- */
-export function fetchEvents(params, postUrl) {
-  return state => {
-    const data = expandReferences(params)(state);
-    const { username, password, hostUrl } = state.configuration;
-    const url = resolveUrl(hostUrl + '/', 'api/events.json?');
-    const query = data.fields || expandDataValues(params)(state);
-
-    console.log('Getting Events Data:');
-
-    return get({ username, password, query, url })
-      .then(result => {
-        console.log('Get Result:', result.body);
-        return result;
-      })
-      .then(result => {
-        if (postUrl) {
-          const body = result.body;
-          const url = postUrl;
-
-          return post({ username, password, body, url }).then(result => {
-            console.log('Post Result:', result.statusCode);
-            return {
-              ...state,
-              references: [result, ...state.references],
-            };
-          });
-        } else {
-          return {
-            ...state,
-            references: [result, ...state.references],
-          };
-        }
-      });
-  };
-}
-
-/**
- * Create an event
- * @public
- * @example
- * event(eventData)
- * @constructor
- * @param {object} eventData - Payload data for the event
- * @returns {Operation}
- */
-export function event(eventData) {
-  return state => {
-    const body = expandReferences(eventData)(state);
-    const { username, password, hostUrl } = state.configuration;
-    const url = resolveUrl(hostUrl + '/', 'api/events');
-
-    console.log(`Posting event to org unit '${body.orgUnit}'.`);
-
-    return post({
-      username,
-      password,
-      body,
-      url,
-    }).then(result => {
-      console.log('Result:', JSON.stringify(result.body, null, 2));
-      return { ...state, references: [result, ...state.references] };
-    });
-  };
-}
-
-function expandDataValues(obj) {
-  return state => {
-    return mapValues(function (value) {
-      if (typeof value == 'object') {
-        return value.map(item => {
-          return expandDataValues(item)(state);
-        });
-      } else {
-        return typeof value == 'function' ? value(state) : value;
+        return Promise.reject(newError);
       }
-    })(obj);
-  };
-}
+    }
+
+    if (
+      typeof response?.data === 'string' &&
+      contentType === CONTENT_TYPES?.json
+    ) {
+      try {
+        response = { ...response, data: JSON.parse(response.data) };
+      } catch (error) {
+        /** Keep quiet */
+      }
+    }
+    return response;
+  },
+  function (error) {
+    Log.error(`${error?.message}`);
+    try {
+      console.log(JSON.stringify(error.response?.data?.response, null, 2));
+    } catch (err) {
+      /* Keep quiet! Just log the above error again */
+      console.log(error.response?.data?.response);
+    }
+    console.log(error.response?.data?.response);
+    return Promise.reject(error);
+  }
+);
 
 /**
- * Send data values using the dataValueSets resource
+ * Type definition for the `result returned` by `OpenFn operations`
  * @public
- * @example
- *  dataValueSet({
- *    dataSet: dataValue("set"),
- *    orgUnit: "DiszpKrYNg8",
- *    period: "201402",
- *    completeData: "2014-03-03",
- *    dataValues: [
- *      dataElement("f7n9E0hX8qk", dataValue("name")),
- *      dataElement("Ix2HsbDMLea", dataValue("age")),
- *      dataElement("eY5ehpbEsB7", 30)
- *    ]
- * });
- * @constructor
- * @param {object} data - Payload data for the data value set
- * @returns {Operation}
+ * @typedef {{configuration: object, references: object[], data: object}} state
  */
-export function dataValueSet(data) {
+
+/**
+ * Type definition for the `callback` supplied to `OpenFn operations`
+ * @public
+ * @callback requestCallback
+ * @param {state} state
+ * @returns {state}
+ */
+
+/**
+ * Type definition for `options` `parameter` object used in `DHIS2 adaptor's operations`.
+ * @public
+ * @typedef {{ replace: boolean, apiVersion: number, supportApiVersion: boolean,requireUniqueAttributeConfig: boolean}} options
+ *
+ */
+
+//#endregion
+
+//#region COMMONLY USED HELPER OPERATIONS
+
+/**
+ * Get DHIS2 Tracked Entity Instance(s)
+ * @public
+ * @function
+ * @param {array} params - `import` parameters for `getTEIs`. E.g. `[{fields: '*'},{ ou: 'DiszpKrYNg8' },{ skipPaging: true },])`
+ * @param {string} [responseType] - Optional response type. Defaults to `json`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `getTEIs` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `getTEIs` `expression.js` for fetching a `single` `Tracked Entity Instance`</caption>
+ * getTEIs([
+ * {
+ *   fields: '*',
+ * },
+ * { ou: 'CMqUILyVnBL' },
+ * { trackedEntityInstance: 'HNTA9qD6EEG' },
+ * { skipPaging: true },
+ * ]);
+ */
+export function getTEIs(params, options, callback) {
   return state => {
-    const body = expandDataValues(data)(state);
-    const { username, password, hostUrl } = state.configuration;
-    const url = resolveUrl(hostUrl + '/', 'api/dataValueSets');
+    options = recursivelyExpandReferences(options)(state);
 
-    console.log(
-      `Posting data value set ${body.dataSet} to org unit '${
-        body.orgUnit
-      }' with ${body.dataValues && body.dataValues.length} data values.`
-    );
+    if (options) options.operationName = 'getTEIs';
+    else {
+      options = { operationName: 'getTEIs' };
+    }
 
-    return post({
-      username,
-      password,
-      body,
-      url,
-    }).then(result => {
-      console.log('Result:', JSON.stringify(result.body, null, 2));
-      return { ...state, references: [result, ...state.references] };
-    });
+    return getData('trackedEntityInstances', params, options, callback)(state);
   };
 }
 
 /**
- * Create a "dataElement" pairing for DHIS2.
+ * Upsert(Create or update) one or many Tracked Entity Instances. Update if the record exists otherwise insert a new record.
+ * This is useful for idempotency and duplicate management
  * @public
- * @example
- * dataElement(key, value)
- * @constructor
- * @param {string} dataElement - Payload data for the Data Element key
- * @param {variable} value - Payload data for the Data Element value
- * @param {string} comment - comment for the Data Element
- * @returns {Operation}
- */
-export function dataElement(dataElement, value, comment) {
-  return { dataElement, value, comment };
-}
-
-/**
- * Create one or many new Tracked Entity Instances
- * @public
- * @example
- * createTEI(data)
- * @constructor
- * @param {object} data - Payload data for new tracked entity instance(s)
- * @returns {Operation}
- */
-export function createTEI(data) {
-  return state => {
-    const body = expandReferences(data)(state);
-    const { username, password, hostUrl } = state.configuration;
-    const url = resolveUrl(hostUrl + '/', 'api/trackedEntityInstances');
-
-    console.log(
-      `Posting tracked entity instance of type '${
-        body.trackedEntityType
-      }' to org unit '${body.orgUnit}' with ${
-        body.attributes && body.attributes.length
-      } attributes and ${
-        body.enrollments && body.enrollments.length
-      } enrollments.`
-    );
-
-    return post({
-      username,
-      password,
-      body,
-      url,
-    }).then(result => {
-      console.log('Result:', JSON.stringify(result.body, null, 2));
-      return { ...state, references: [result, ...state.references] };
-    });
-  };
-}
-
-/**
- * Update existing Tracked Entity Instances
- * @public
- * @example
- * updateTEI(tei, data)
- * @constructor
- * @param {object} tei - identifier for the TEI to be updated
- * @param {object} data - Payload data for updating a TEI
- * @returns {Operation}
- */
-export function updateTEI(tei, data) {
-  return state => {
-    const body = expandReferences(data)(state);
-    const { username, password, hostUrl } = state.configuration;
-    const url = hostUrl.concat(`/api/trackedEntityInstances/${tei}`);
-
-    console.log(
-      `Updating tracked entity instance of type '${
-        body.trackedEntityType
-      }' to org unit '${body.orgUnit}' with ${
-        body.attributes && body.attributes.length
-      } attributes and ${
-        body.enrollments && body.enrollments.length
-      } enrollments.`
-    );
-
-    return put({
-      username,
-      password,
-      body,
-      url,
-    }).then(result => {
-      console.log('Result:', JSON.stringify(result.body, null, 2));
-      return { ...state, references: [result, ...state.references] };
-    });
-  };
-}
-
-/**
- * Create or update one or many new Tracked Entity Instances
- * @public
- * @example
- * upsertTEI('w75KJ2mc4zz', state.data, { replace: true })
- * @constructor
+ * @function
  * @param {string} uniqueAttributeId - Tracked Entity Instance unique identifier used during matching
- * @param {object} data - Payload data for new/updated tracked entity instance(s)
- * @param {object} options - Optional options for update method. Defaults to {replace: true}
- * @returns {Operation}
+ * @param {Object<symbol,any>} data - Payload data for new/updated tracked entity instance(s)
+ * @param {options} [options] - Optional `options` for `upserTEI` operation. Defaults to `{responseType: 'json',replace: false, apiVersion: null,requireUniqueAttributeConfig: true}`
+ * @param {requestCallback} [callback] - Optional `callback` to handle the response.
+ * @throws {RangeError} - Throws `RangeError` when `uniqueAttributeId` is `invalid` or `not unique`.
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of upsertTEI</caption>
+ * upsertTEI('lZGmxYbs97q', state.data);
  */
-export function upsertTEI(uniqueAttributeId, data, options) {
+export function upsertTEI(uniqueAttributeId, data, options, callback) {
   return state => {
+    uniqueAttributeId = recursivelyExpandReferences(uniqueAttributeId)(state);
+
+    const body = recursivelyExpandReferences(data)(state);
+
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options.operationName = 'upsertTEI';
+    else {
+      options = { operationName: 'upsertTEI' };
+    }
+
     const { password, username, hostUrl } = state.configuration;
-    const { replace } = options;
 
-    const body = expandReferences(data)(state);
-    const url = resolveUrl(hostUrl + '/', `api/trackedEntityInstances`);
-    const uniqueAttributeUrl = `${hostUrl}/api/trackedEntityAttributes/${uniqueAttributeId}`;
-    const trackedEntityType = state.data.trackedEntityType;
-    const trackedEntityTypeUrl = `${hostUrl}/api/trackedEntityTypes/${trackedEntityType}?fields=*`;
+    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
-    const uniqueAttributeValue = state.data.attributes.find(
-      obj => obj.attribute === uniqueAttributeId
-    ).value;
+    const requireUniqueAttributeConfig =
+      options?.requireUniqueAttributeConfig ?? true;
 
-    const query = {
-      ou: state.data.orgUnit,
-      ouMode: 'ACCESSIBLE',
-      filter: `${uniqueAttributeId}:EQ:${uniqueAttributeValue}`,
-      skipPaging: true,
+    const params = {
+      ou: body.orgUnit,
     };
 
-    console.log(
-      `Checking if Tracked Entity Type ${trackedEntityType} exists...`
+    const uniqueAttributeValue = body.attributes?.find(
+      obj => obj?.attribute === uniqueAttributeId
+    )?.value;
+
+    const trackedEntityType = body.trackedEntityType;
+
+    const uniqueAttributeUrl = buildUrl(
+      `/trackedEntityAttributes/${uniqueAttributeId}`,
+      hostUrl,
+      apiVersion
     );
 
-    return get({
-      username,
-      password,
-      query: null,
-      url: trackedEntityTypeUrl,
-    }).then(result => {
-      let tet = JSON.parse(result.text);
+    const trackedEntityTypeUrl = buildUrl(
+      `/trackedEntityTypes/${trackedEntityType}?fields=*`,
+      hostUrl,
+      apiVersion
+    );
 
-      console.log(
-        `Tracked Entity Type ${trackedEntityType}(${tet.name}) found.`
-      );
+    const findTrackedEntityType = () => {
+      return axios
+        .get(trackedEntityTypeUrl, { auth: { username, password } })
+        .then(result => {
+          const attribute = result.data?.trackedEntityTypeAttributes?.find(
+            obj => obj?.trackedEntityAttribute?.id === uniqueAttributeId
+          );
+          return {
+            ...result.data,
+            upsertAttributeAssigned: attribute ? true : false,
+          };
+        });
+    };
 
-      console.log(
-        `Checking if attribute ${uniqueAttributeId} is assigned to ${tet.name} Entity Type... `
-      );
-      const attribute = tet.trackedEntityTypeAttributes.find(
-        obj => obj.trackedEntityAttribute.id === uniqueAttributeId
-      );
-      if (attribute) {
-        console.log(
-          `Attribute ${attribute.name}(${uniqueAttributeId}) is assigned to ${tet.name}.`
+    const isAttributeUnique = () => {
+      return axios
+        .get(uniqueAttributeUrl, { auth: { username, password } })
+        .then(result => {
+          const foundAttribute = result.data;
+          return { unique: foundAttribute.unique, name: foundAttribute.name };
+        });
+    };
+    return Promise.all([
+      findTrackedEntityType(),
+      requireUniqueAttributeConfig === true
+        ? isAttributeUnique()
+        : Promise.resolve({ unique: true }),
+    ]).then(([entityType, attribute]) => {
+      if (!entityType.upsertAttributeAssigned) {
+        Log.error('');
+        throw new RangeError(
+          `Tracked Entity Attribute ${uniqueAttributeId} is not assigned to ${entityType.name} Entity Type. Ensure, in DHIS2, this tracked entity attribute is assigned to ${entityType.name} and that it is marked as unique.`
         );
-
-        console.log(
-          `Checking if attribute ${attribute.name}(${uniqueAttributeId}) is unique...`
+      }
+      if (!attribute.unique) {
+        Log.error('');
+        throw new RangeError(
+          `Attribute ${
+            attribute.name ?? ''
+          }(${uniqueAttributeId}) is not unique. Ensure, in DHIS2, this tracked entity attribute is marked as unique.`
         );
+      }
+      return upsert(
+        'trackedEntityInstances',
+        {
+          attributeId: uniqueAttributeId,
+          attributeValue: uniqueAttributeValue,
+        },
+        body,
+        params,
+        options,
+        callback
+      )(state);
+    });
+  };
+}
 
-        return get({
+/**
+ * Create a DHIS2 Tracked Entity Instance
+ * @public
+ * @function
+ * @param {object<any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `create`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `createTEI` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `createTEI`</caption>
+ * createTEI(state.data);
+ */
+export function createTEI(data, params, options, callback) {
+  return state => {
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options.operationName = 'createTEI';
+    else {
+      options = { operationName: 'createTEI' };
+    }
+
+    return create(
+      'trackedEntityInstances',
+      data,
+      params,
+      options,
+      callback
+    )(state);
+  };
+}
+
+/**
+ * Update a DHIS2 Tracked Entity Instance
+ * @public
+ * @function
+ * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
+ * @param {object<any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `create`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `updateTEI` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `updateTEI`</caption>
+ * update('PVqUD2hvU4E', state.data);
+ */
+export function updateTEI(path, data, params, options, callback) {
+  return state => {
+    options = recursivelyExpandReferences(options)(state);
+    if (options) options.operationName = 'updateTEI';
+    else {
+      options = { operationName: 'updateTEI' };
+    }
+    return update(
+      'trackedEntityInstances',
+      path,
+      data,
+      params,
+      options,
+      callback
+    )(state);
+  };
+}
+
+/**
+ * Get DHIS2 Events, single events with no registration(annonymous events) or single event with registration and multiple events with registration(tracker events)
+ * @public
+ * @function
+ * @param {array} params - `import` parameters for `getEvents`.
+ * @param {string} [responseType] - Optional response type. Defaults to `json`
+ * @param {eventOptions} [options] - Optional `flags` for the behavior of the `getEvents` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Query for `all events` with `children` of a certain `organisation unit`</caption>
+ * getEvents([{ orgUnit: 'YuQRtpLP10I' }, { ouMode: 'CHILDREN' }]);
+ * @example <caption>- Query for `all events` with all `descendants` of a certain `organisation unit`, implying all organisation units in the `sub-hierarchy`</caption>
+ * getEvents([{ orgUnit: 'O6uvpzGd5pu' }, { ouMode: 'DESCENDANTS' }]);
+ * @example <caption>- Query for `all events` with a `certain program` and `organisation unit`</caption>
+ * getEvents([{ orgUnit: 'DiszpKrYNg8' }, { program: 'eBAyeGv0exc' }]);
+ * @example <caption>- Query for all `events` with a `certain program` and `organisation unit`, `sorting` by `due date ascending`</caption>
+ * getEvents([
+ * { orgUnit: 'DiszpKrYNg8' },
+ * { program: 'eBAyeGv0exc' },
+ * { order: 'dueDate' },
+ * ]);
+ * @example <caption>- Query for the `10 events` with the `newest event date` in a `certain program` and `organisation unit` - by `paging` and `ordering` by `due date descending`</caption>
+ * getEvents([
+ * { orgUnit: 'DiszpKrYNg8' },
+ * { program: 'eBAyeGv0exc' },
+ * { order: 'eventDate:desc' },
+ * { pageSize: 10 },
+ * { page: 1 },
+ * ]);
+ * @example <caption>- Query for `all events` with a `certain program` and `organisation unit` for a specific `tracked entity instance`</caption>
+ * getEvents([
+ * { orgUnit: 'DiszpKrYNg8' },
+ * { program: 'eBAyeGv0exc' },
+ * { trackedEntityInstance: 'gfVxE3ALA9m' },
+ * ]);
+ * @example <caption>- Query for `all events` with a `certain program` and `organisation unit` `older` or `equal to 2014-02-03`</caption>
+ * getEvents([
+ * { orgUnit: 'DiszpKrYNg8' },
+ * { program: 'eBAyeGv0exc' },
+ * { endDate: '2014-02-03' },
+ * ]);
+ * @example <caption>- Query for `all events` with a `certain program stage`, `organisation unit` and `tracked entity instance` in the `year 2014`</caption>
+ * getEvents([
+ * { orgUnit: 'DiszpKrYNg8' },
+ * { program: 'eBAyeGv0exc' },
+ * { trackedEntityInstance: 'gfVxE3ALA9m' },
+ * { startDate: '2014-01-01' },
+ * { endDate: '2014-12-31' },
+ * ]);
+ * @example <caption>- Retrieve `events` with specified `Organisation unit` and `Program`, and use `Attribute:Gq0oWTf2DtN` as `identifier scheme`</caption>
+ * getEvents([
+ * { orgUnit: 'DiszpKrYNg8' },
+ * { program: 'lxAQ7Zs9VYR' },
+ * { idScheme: 'Attribute:Gq0oWTf2DtN' },
+ * ]);
+ * @example <caption>- Retrieve `events` with specified `Organisation unit` and `Program`, and use `UID` as `identifier scheme` for `orgUnits`, `Code` as `identifier scheme` for `Program stages`, and `Attribute:Gq0oWTf2DtN` as `identifier scheme` for the rest of the `metadata` with `assigned attribute`.</caption>
+ * getEvents([
+ * { orgUnit: 'DiszpKrYNg8' },
+ * { program: 'lxAQ7Zs9VYR' },
+ * { idScheme: 'Attribute:Gq0oWTf2DtN' },
+ * { orgUnitIdScheme: 'UID' },
+ * { programStageIdScheme: 'Code' },
+ * ]);
+ */
+export function getEvents(params, options, callback) {
+  return state => {
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options.operationName = 'getEvents';
+    else {
+      options = { operationName: 'getEvents' };
+    }
+    return getData('events', params, responseType, options, callback)(state);
+  };
+}
+
+/**
+ * Create a DHIS2 Events
+ * - You will need a `program` which can be looked up using the `getPrograms` operation, an `orgUnit` which can be looked up using the `getMetadata` operation and passing `{organisationUnits: true}` as `resources` param, and a list of `valid data element identifiers` which can be looked up using the `getMetadata` passing `{dataElements: true}` as `resources` param.
+ * - For events with registration, a `tracked entity instance identifier is required`
+ * - For sending `events` to `programs with multiple stages`, you will need to also include the `programStage` identifier, the identifiers for `programStages` can be found in the `programStages` resource via a call to `getMetadata` operation.
+ * @public
+ * @function
+ * @param {object<any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `createEvents`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param { {apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `createEvents` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `createEvents` for a `single event` can look like this:</caption>
+ * createEvents(state.data);
+ * // Example shape for state.data
+ * data: {
+ *   program: 'eBAyeGv0exc',
+ *   orgUnit: 'DiszpKrYNg8',
+ *   eventDate: date,
+ *   status: 'COMPLETED',
+ *   completedDate: date,
+ *   storedBy: 'admin',
+ *   coordinate: {
+ *     latitude: 59.8,
+ *     longitude: 10.9,
+ *   },
+ *   dataValues: [
+ *     {
+ *       dataElement: 'qrur9Dvnyt5',
+ *       value: '33',
+ *     },
+ *     {
+ *       dataElement: 'oZg33kd9taw',
+ *       value: 'Male',
+ *     },
+ *     {
+ *       dataElement: 'msodh3rEMJa',
+ *       value: date,
+ *     },
+ *   ],
+ * },
+ * @example <caption>- Example `expression.js` of `createEvents` for sending `multiple events` at the same time</caption>
+ * createEvents(state.data);
+ * // Example shape for state.data
+ *
+ */
+export function createEvents(data, params, options, callback) {
+  return state => {
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options.operationName = 'createEvents';
+    else {
+      options = { operationName: 'createEvents' };
+    }
+    return create('events', data, params, options, callback)(state);
+  };
+}
+
+/**
+ * Update a DHIS2 Events
+ * - To update an existing event, the format of the payload is the same as that of `creating an event` via `createEvents` operations
+ * - But  you should supply the `identifier` of the object you are updating
+ * - The payload has to contain `all`, even `non-modified`, `attributes`.
+ * - Attributes that were present before and are not present in the current payload any more will be removed by DHIS2.
+ * - If you do not want this behavior, please use `upsert` operation to upsert your events.
+ * @public
+ * @function
+ * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
+ * @param {object<any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `updateEvents`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `updateEvents` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `updateEvents`</caption>
+ * updateEvents('PVqUD2hvU4E', state.data);
+ * @todo Support `merge` via custom `partial updates` mechanism since `PATCH` is not `natively` supported on this endpoint
+ */
+export function updateEvents(path, data, params, options, callback) {
+  return state => {
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options.operationName = 'updateEvents';
+    else {
+      options = { operationName: 'updateEvents' };
+    }
+    return update('events', path, data, params, options, callback)(state);
+  };
+}
+
+/**
+ * Get DHIS2 Programs
+ * @public
+ * @function
+ * @param {array} params - `import` parameters for `getPrograms`.
+ * @param {string} [responseType] - Optional response type. Defaults to `json`
+ * @param {eventOptions} [options] - Optional `flags` for the behavior of the `getPrograms` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Query for `all programs` with a certain `organisation unit`</caption>
+ * getPrograms([{ orgUnit: 'DiszpKrYNg8' }, { fields: '*' }]);
+ */
+export function getPrograms(params, options, callback) {
+  return state => {
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options.operationName = 'getPrograms';
+    else {
+      options = { operationName: 'getPrograms' };
+    }
+    return getData('programs', params, options, callback)(state);
+  };
+}
+
+/**
+ * Create a DHIS2 Programs
+ * @public
+ * @function
+ * @param {object<any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `createPrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `createPrograms` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `createPrograms` for a `single program` can look like this:</caption>
+ * createPrograms(state.data);
+ * @see {singleProgramSampleState}
+ * @example <caption>- Example `expression.js` of `createPrograms` for sending `multiple programs` at the same time</caption>
+ * createPrograms(state.data);
+ * @see {multipleProgramsSampleState}
+ */
+export function createPrograms(data, params, options, callback) {
+  return state => {
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options.operationName = 'createPrograms';
+    else {
+      options = { operationName: 'createPrograms' };
+    }
+    return create('programs', data, options, params, callback)(state);
+  };
+}
+
+/**
+ * Update DHIS2 Programs
+ * - To update an existing program, the format of the payload is the same as that of `creating an event` via `createEvents` operations
+ * - But  you should supply the `identifier` of the object you are updating
+ * - The payload has to contain `all`, even `non-modified`, `attributes`.
+ * - Attributes that were present before and are not present in the current payload any more will be removed by DHIS2.
+ * - If you do not want this behavior, please use `upsert` operation to upsert your events.
+ * @public
+ * @function
+ * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
+ * @param {object<any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `updatePrograms` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `updatePrograms`</caption>
+ * updatePrograms('PVqUD2hvU4E', state.data);
+ * @todo Support `merge` via custom `partial updates` mechanism since `PATCH` is not `natively` supported on this endpoint
+ */
+export function updatePrograms(path, data, params, options, callback) {
+  return state => {
+    options = recursivelyExpandReferences(options)(state);
+    if (options) options.operationName = 'updatePrograms';
+    else {
+      options = { operationName: 'updatePrograms' };
+    }
+    return update('programs', path, data, params, options, callback)(state);
+  };
+}
+
+/**
+ * Get DHIS2 Enrollments
+ * @public
+ * @function
+ * @param {array} params - `import` parameters for `getEnrollments`.
+ * @param {string} [responseType] - Optional response type. Defaults to `json`
+ * @param {eventOptions} [options] - Optional `flags` for the behavior of the `getEnrollments` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- A query for `all enrollments` associated with a `specific organisation unit` can look like this:</caption>
+ * getEnrollments([{ ou: 'DiszpKrYNg8' }, { fields: '*' }]);
+ * @example <caption>- To constrain the response to `enrollments` which are part of a `specific program` you can include a `program query parameter`</caption>
+ * getEnrollments([
+ * { ou: 'O6uvpzGd5pu' },
+ * { ouMode: 'DESCENDANTS' },
+ * { program: 'ur1Edk5Oe2n' },
+ * { fields: '*' },
+ * ]);
+ * @example <caption>- To specify `program enrollment dates` as `part of the query`</caption>
+ * getEnrollments([
+ * { ou: 'O6uvpzGd5pu' },
+ * { ouMode: 'DESCENDANTS' },
+ * { program: 'ur1Edk5Oe2n' },
+ * { programStartDate: '2013-01-01' },
+ * { programEndDate: '2013-09-01' },
+ * { fields: '*' },
+ * ]);
+ * @example <caption>- To constrain the response to `enrollments` of a `specific tracked entity` you can include a `tracked entity query parameter`</caption>
+ * getEnrollments([
+ * { ou: 'O6uvpzGd5pu' },
+ * { ouMode: 'DESCENDANTS' },
+ * { program: 'ur1Edk5Oe2n' },
+ * { trackedEntity: 'cyl5vuJ5ETQ' },
+ * { fields: '*' },
+ * ]);
+ * @example <caption>- To constrain the response to `enrollments` of a `specific tracked entity instance` you can include a `tracked entity instance query parameter`, in this case we have `restricted` it to available `enrollments viewable for current user`</caption>
+ * getEnrollments([
+ * { ouMode: 'ACCESSIBLE' },
+ * { trackedEntityInstance: 'tphfdyIiVL6' },
+ * { fields: '*' },
+ * ]);
+ * @example <caption>- By default the `enrollments` are returned in `pages of size 50`, to change this you can use the `page` and `pageSize query parameters`</caption>
+ * getEnrollments([
+ * { ou: 'O6uvpzGd5pu' },
+ * { ouMode: 'DESCENDANTS' },
+ * { page: 2 },
+ * { pageSize: 3 },
+ * { fields: '*' },
+ * ]);
+ */
+export function getEnrollments(params, responseType, options, callback) {
+  return state => {
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options.operationName = 'getEnrollments';
+    else {
+      options = { operationName: 'getEnrollments' };
+    }
+    return getData('enrollments', params, options, callback)(state);
+  };
+}
+
+/**
+ * Create a DHIS2 Enrollment
+ * - Enrolling a tracked entity instance into a program
+ * - For enrolling `persons` into a `program`, you will need to first get the `identifier of the person` from the `trackedEntityInstances resource` via the `getTEIs` operation.
+ * - Then, you will need to get the `program identifier` from the `programs` resource via the `getPrograms` operation.
+ * @public
+ * @function
+ * @param {object<any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `createEnrollment`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `createEnrollment` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `createEnrollment` of a `person` into a `program` can look like this:</caption>
+ * createEnrollment(state.data);
+ * @see {enrollmentSampleState}
+ */
+export function enrollTEI(data, params, options, callback) {
+  return state => {
+    options = recursivelyExpandReferences(options)(state);
+    if (options) options.operationName = 'enrollTEI';
+    else {
+      options = { operationName: 'enrollTEI' };
+    }
+    return create('enrollments', data, options, params, callback)(state);
+  };
+}
+
+/**
+ * Update a DHIS2 Enrollemts
+ * - To update an existing enrollment, the format of the payload is the same as that of `creating an event` via `createEvents` operations
+ * - But  you should supply the `identifier` of the object you are updating
+ * - The payload has to contain `all`, even `non-modified`, `attributes`.
+ * - Attributes that were present before and are not present in the current payload any more will be removed by DHIS2.
+ * - If you do not want this behavior, please use `upsert` operation to upsert your events.
+ * @public
+ * @function
+ * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
+ * @param {object<any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `updatePrograms` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `updateEnromments`</caption>
+ * updatePrograms('PVqUD2hvU4E', state.data);
+ * @todo Support `merge` via custom `partial updates` mechanism since `PATCH` is not `natively` supported on this endpoint
+ */
+export function updateEnrollments(path, data, params, options, callback) {
+  return state => {
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options.operationName = 'updateEnrollments';
+    else {
+      options = { operationName: 'updateEnrollments' };
+    }
+    return update('enrollments', path, data, params, options, callback)(state);
+  };
+}
+
+/**
+ * Cancel a DHIS2 Enrollment
+ * - To cancel an existing enrollment, you should supply the `enrollment identifier`(`enrollemt-id`)
+ * @public
+ * @function
+ * @param {string} enrollmentId - The `enrollment-id` of the enrollment you wish to cancel
+ * @param {array} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `updatePrograms` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `cancelEnrollment`</caption>
+ * cancelEnrollments('PVqUD2hvU4E');
+ */
+export function cancelEnrollment(enrollmentId, params, options, callback) {
+  return state => {
+    enrollmentId = recursivelyExpandReferences(enrollmentId)(state);
+
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options.operationName = 'cancelEnrollment';
+    else {
+      options = { operationName: 'cancelEnrollment' };
+    }
+
+    const path = `${enrollmentId}/cancelled`;
+
+    return update('enrollments', path, null, params, options, callback)(state);
+  };
+}
+
+/**
+ * Complete a DHIS2 Enrollment
+ * - To complete an existing enrollment, you should supply the `enrollment identifier`(`enrollemt-id`)
+ * @public
+ * @function
+ * @param {string} enrollmentId - The `enrollment-id` of the enrollment you wish to cancel
+ * @param {array} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `updatePrograms` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `completeEnrollment`</caption>
+ * completeEnrollment('PVqUD2hvU4E');
+ */
+export function completeEnrollment(enrollmentId, params, options, callback) {
+  return state => {
+    enrollmentId = recursivelyExpandReferences(enrollmentId)(state);
+
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options.operationName = 'completeEnrollment';
+    else {
+      options = { operationName: 'completeEnrollment' };
+    }
+
+    const path = `${enrollmentId}/completed`;
+
+    return update('enrollments', path, null, params, options, callback)(state);
+  };
+}
+
+/**
+ * Get DHIS2 Relationships(links) between two entities in tracker. These entities can be tracked entity instances, enrollments and events.
+ * - All the tracker operations, `getTEIs`, `getEnrollments` and `getEvents` also list their relationships if requested in the `field` filter.
+ * - To list all relationships, this requires you to provide the UID of the trackedEntityInstance, Enrollment or event that you want to list all the relationships for.
+ * @public
+ * @function
+ * @param {array} params - `import` parameters for `getRelationships`.
+ * @param {string} [responseType] - Optional response type. Defaults to `json`
+ * @param {eventOptions} [options] - Optional `flags` for the behavior of the `getRelationships` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- A query for `all relationships` associated with a `specific tracked entity instance` can look like this:</caption>
+ * getRelationships([{ tei: 'F8yKM85NbxW' }, { fields: '*' }]);
+ * @example <caption>- A query for `all relationships` associated with a `enrollment` can look like this:</caption>
+ * getRelationships([{ enrollment: 'LXmiAMnJLrS' }, { fields: '*' }]);
+ * @example <caption>- A query for `all relationships` associated with a `event` can look like this:</caption>
+ * getRelationships([{ event: 'TgJUhG6P6TJ' }, { fields: '*' }]);
+ */
+export function getRelationships(params, options, callback) {
+  return state => {
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options.operationName = 'getRelationships';
+    else {
+      options = { operationName: 'getRelationships' };
+    }
+
+    return getData('relationships', params, options, callback)(state);
+  };
+}
+
+/**
+ * Get DHIS2 Data Values.
+ * - This operation retrives data values from DHIS2 Web API by interacting with the `dataValueSets` resource
+ * - Data values can be retrieved in XML, JSON and CSV format.
+ * @public
+ * @function
+ * @param {array} params - `Query` parameters for `getDataValues`. E.g. `{dataset: 'pBOMPrpg1QX', limit: 3, period: 2021, orgUnit: 'DiszpKrYNg8'} Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#data-values DHIS2 API docs} for available `Data Value Set Query Parameters`.
+ * @param {{apiVersion: number,operationName: string,responseType: string}} [options] - Optional `options` for `getDataValues` operation. Defaults to `{operationName: 'getDataValues', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
+ * @param {requestCallback} [callback] - Optional `callback` to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example getting **two** `data values` associated with a specific `orgUnit`, `dataSet`, and `period `</caption>
+ * getDataValues({
+ *   orgUnit: 'DiszpKrYNg8',
+ *   period: '202010',
+ *   dataSet: 'pBOMPrpg1QX',
+ *   limit: 2,
+ *  })
+ */
+export function getDataValues(params, options, callback) {
+  return state => {
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options.operationName = 'getDataValues';
+    else {
+      options = { operationName: 'getDataValues' };
+    }
+
+    return getData('dataValueSets', params, options, callback)(state);
+  };
+}
+
+/**
+ * Create DHIS2 Data Values
+ * - This is used to send aggregated data to DHIS2
+ * - A data value set represents a set of data values which have a relationship, usually from being captured off the same data entry form.
+ * - To send a set of related data values sharing the same period and organisation unit, we need to identify the period, the data set, the org unit (facility) and the data elements for which to report.
+ * - You can also use this operation to send large bulks of data values which don't necessarily are logically related.
+ * - To send data values that are not linked to a `dataSet`, you do not need to specify the dataSet and completeDate attributes. Instead, you will specify the period and orgUnit attributes on the individual data value elements instead of on the outer data value set element. This will enable us to send data values for various periods and organisation units
+ * @public
+ * @function
+ * @param {object} data - The `data values` to upload or create. See example shape.
+ * @param {object} [params] - Optional `import` parameters for `createDataValues`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`. Run `discover` or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#data-values DHIS2 Docs API} to learn about available data values import parameters.
+ * @param  {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `createDataVaues` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `createDataValues`  for sending a set of related data values sharing the same period and organisation unit</caption>
+ * createDataValues(state.data);
+ * // Example shape for state.data
+ * data: {
+ *   dataSet: 'pBOMPrpg1QX',
+ *   completeDate: '2014-02-03',
+ *   period: '201401',
+ *   orgUnit: 'DiszpKrYNg8',
+ *   dataValues: [
+ *     {
+ *       dataElement: 'f7n9E0hX8qk',
+ *       value: '1',
+ *     },
+ *     {
+ *       dataElement: 'Ix2HsbDMLea',
+ *       value: '2',
+ *     },
+ *     {
+ *       dataElement: 'eY5ehpbEsB7',
+ *       value: '3',
+ *     },
+ *   ],
+ * }
+ * @example <caption>- Example `expression.js` of `createDataValues`  for sending large bulks of data values which don't necessarily are logically related</caption>
+ * createDataValues(state.data);
+ * // Example shape for state.data
+ * {
+ *   dataValues: [
+ *  {
+ *       dataElement: 'f7n9E0hX8qk',
+ *       period: '201401',
+ *       orgUnit: 'DiszpKrYNg8',
+ *       value: '12',
+ *     },
+ *     {
+ *       dataElement: 'f7n9E0hX8qk',
+ *       period: '201401',
+ *       orgUnit: 'FNnj3jKGS7i',
+ *       value: '14',
+ *     },
+ *     {
+ *       dataElement: 'f7n9E0hX8qk',
+ *       period: '201402',
+ *       orgUnit: 'DiszpKrYNg8',
+ *       value: '16',
+ *     },
+ *     {
+ *       dataElement: 'f7n9E0hX8qk',
+ *       period: '201402',
+ *      orgUnit: 'Jkhdsf8sdf4',
+ *       value: '18',
+ *     },
+ *   ]
+ * }
+ *
+ */
+export function createDataValues(data, options, params, callback) {
+  return state => {
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options.operationName = 'createDataValues';
+    else {
+      options = { operationName: 'createDataValues' };
+    }
+    return create('dataValueSets', data, options, params, callback)(state);
+  };
+}
+//#endregion
+
+//#region GENERIC HELPER OPERATIONS
+
+/**
+ * Generate valid, random DHIS2 identifiers
+ * - Useful for client generated Ids compatible with DHIS2
+ * @public
+ * @function
+ * @param {{apiVersion: number,limit: number,responseType: string}} [options] - Optional `options` for `getMetadata` operation. Defaults to `{apiVersion: state.configuration.apiVersion,limit: 1,responseType: 'json'}`
+ * @param {requestCallback} [callback] - Callback to handle response
+ * @returns {Promise<state>} state
+ * @example <caption>Example generating `one UID` from the DHIS2 server</caption>
+ * generateDhis2UID();
+ * @example <caption>Example generating `three UIDs` from the DHIS2 server</caption>
+ * generateDhis2UID({limit: 3});
+ */
+export function generateDhis2UID(options, callback) {
+  return state => {
+    options = recursivelyExpandReferences(options)(state);
+    if (options) options.operationName = 'generateDhis2UID';
+    else {
+      options = { operationName: 'generateDhis2UID' };
+    }
+    const limit = { limit: options?.limit ?? 1 };
+
+    delete options?.limit;
+
+    return getData('system/id', limit, options, callback)(state);
+  };
+}
+
+/**
+ * Discover available `DHIS2` `api` `endpoint` `query parameters` and allowed `operators` for a given resource's endpoint.
+ * @public
+ * @function
+ * @param {string} httpMethod - The HTTP to inspect parameter usage for a given endpoint, e.g., `get`, `post`,`put`,`patch`,`delete`
+ * @param {string} endpoint - The path for a given endpoint. E.g. `/trackedEntityInstances` or `/dataValueSets`
+ * @returns {Promise<state>} state
+ * @example <caption>Example getting a list of `parameters allowed` on a given `endpoint` for specific `http method`</caption>
+ * discover('post', '/trackedEntityInstances')
+ */
+export function discover(httpMethod, endpoint) {
+  return state => {
+    Log.info(
+      `Discovering query/import parameters for ${COLORS.FgGreen}${httpMethod}${ESCAPE} on ${COLORS.FgGreen}${endpoint}${ESCAPE}`
+    );
+    return axios
+      .get(
+        'https://dhis2.github.io/dhis2-api-specification/spec/metadata_openapi.json',
+        {
+          transformResponse: [
+            data => {
+              let tempData = JSON.parse(data);
+              let filteredData = tempData.paths[endpoint][httpMethod];
+              return {
+                ...filteredData,
+                parameters: filteredData.parameters.reduce(
+                  (acc, currentValue) => {
+                    let index = currentValue['$ref'].lastIndexOf('/') + 1;
+                    let paramRef = currentValue['$ref'].slice(index);
+                    let param = tempData.components.parameters[paramRef];
+
+                    if (param.schema['$ref']) {
+                      let schemaRefIndex =
+                        param.schema['$ref'].lastIndexOf('/') + 1;
+                      let schemaRef = param.schema['$ref'].slice(
+                        schemaRefIndex
+                      );
+                      param.schema = tempData.components.schemas[schemaRef];
+                    }
+
+                    param.schema = JSON.stringify(param.schema);
+
+                    let descIndex;
+                    if (
+                      indexOf(param.description, ',') === -1 &&
+                      indexOf(param.description, '.') > -1
+                    )
+                      descIndex = indexOf(param.description, '.');
+                    else if (
+                      indexOf(param.description, ',') > -1 &&
+                      indexOf(param.description, '.') > -1
+                    ) {
+                      descIndex =
+                        indexOf(param.description, '.') <
+                        indexOf(param.description, ',')
+                          ? indexOf(param.description, '.')
+                          : indexOf(param.description, ',');
+                    } else {
+                      descIndex = param.description.length;
+                    }
+
+                    param.description = param.description.slice(0, descIndex);
+
+                    acc[paramRef] = param;
+                    return acc;
+                  },
+                  {}
+                ),
+              };
+            },
+          ],
+        }
+      )
+      .then(result => {
+        Log.info(
+          `\t=======================================================================================\n\tQuery Parameters for ${
+            COLORS.FgGreen
+          }${httpMethod}${ESCAPE} on ${COLORS.FgGreen}${endpoint}${ESCAPE} [${
+            result.data.description ?? '<description_missing>'
+          }]\n\t=======================================================================================`
+        );
+        console.table(result.data.parameters, [
+          'in',
+          'required',
+          'description',
+        ]);
+        console.table(result.data.parameters, ['schema']);
+        console.log(
+          `=========================================Responses===============================\n${prettyJson(
+            result.data.responses
+          )}\n=======================================================================================`
+        );
+        return { ...state, data: result.data };
+      });
+  };
+}
+
+/**
+ * Access analytical, aggregated data in DHIS2 you can work with the analytics resource
+ * - The analytics resource is powerful as it lets you query and retrieve data aggregated along all available data dimensions.
+ * - For instance, you can ask the analytics resource to provide the aggregated data values for a set of data elements, periods and organisation units.
+ * - Also, you can retrieve the aggregated data for a combination of any number of dimensions based on data elements and organisation unit group sets.
+ * @public
+ * @function
+ * @param {object} params - Analytics `query parameters`, e.g. `{dx: 'fbfJHSPpUQD;cYeuwXTCPkU',filters: ['pe:2014Q1;2014Q2','ou:O6uvpzGd5pu;lc3eMKXaEfw']}`. Run `discover` or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#analytics DHIS2 API docs} to get the params available.
+ * @param {{apiVersion: number,responseType: string}}[options] - `Optional` options for `getAnalytics` operation. Defaults to `{apiVersion: state.configuration.apiVersion, responseType: 'json'}`.
+ * @param {requestCallback} [callback] - Callback to handle response
+ * @returns {Promise<state>} state
+ * @example <caption>Example getting a list of data elements filtered by the periods and organisation units</caption>
+ *  getAnalytics({
+ *    dimensions: ['dx:fbfJHSPpUQD;cYeuwXTCPkU'],
+ *    filters: ['pe:2014Q1;2014Q2', 'ou:O6uvpzGd5pu;lc3eMKXaEfw'],
+ *  })
+ * @example <caption>Example getting only records where the data value is greater or equal to 6500 and less than 33000</caption>
+ * getAnalytics({
+ *   dimensions: [
+ *    'dx:fbfJHSPpUQD;cYeuwXTCPkU',
+ *    'pe:2014',
+ *    'ou:O6uvpzGd5pu;lc3eMKXaEfw',
+ *   ],
+ *   measureCriteria: 'GE:6500;LT:33000',
+ * })
+ * @example <caption>Example getting only records for a certain date range using startDate and endDate</caption>
+ * getAnalytics({
+ *   dimensions: ['dx:fbfJHSPpUQD;cYeuwXTCPkU', 'ou:ImspTQPwCqd'],
+ *     startDate: '2018-01-01',
+ *     endDate: '2018-06-01',
+ * })
+ */
+export function getAnalytics(params, options, callback) {
+  return state => {
+    options = recursivelyExpandReferences(options)(state);
+
+    if (options) options.operationName = 'getAnalytics';
+    else {
+      options = { operationName: 'getAnalytics' };
+    }
+    return getData(`analytics`, params, options, callback)(state);
+  };
+}
+
+/**
+ * Get a list of DHIS2 api resources
+ * @public
+ * @function
+ * @param {object} params - The optional query parameters for this endpoint. E.g `{filter: 'singular:like:attribute'}`.
+ * @param {{filter: string, fields: string, responseType: string}} [options] - The `optional` options, specifiying the filter expression. E.g. `singular:eq:attribute`.
+ * @param {requestCallback} [callback] - The `optional callback function that will be called to handle data returned by this function.
+ * @returns Promise<state> state
+ * @example <caption>Example getting a list of `all DHIS2 resources`</caption>
+ * getResources();
+ * @example <caption>Example getting a resource named `attribute`, in `json` format</caption>
+ * getResources({ filter: 'singular:eq:attribute' });
+ * @example <caption>Example getting a resource named `attribute`, in `xml` format, returning all the fields</caption>
+ *  getResources('dataElement', {
+ *      filter: 'singular:eq:attribute',
+ *      fields: '*',
+ *      responseType: 'xml',
+ *   })
+ */
+export function getResources(params, options, callback) {
+  return state => {
+    params = recursivelyExpandReferences(params)(state);
+
+    options = recursivelyExpandReferences(options)(state);
+
+    const operationName = 'getResources';
+
+    const { username, password, hostUrl } = state.configuration;
+
+    const responseType = options?.responseType ?? 'json';
+
+    const filter = params?.filter;
+
+    const queryParams = params;
+
+    const headers = {
+      Accept: CONTENT_TYPES[responseType] ?? 'application/json',
+    };
+
+    const path = '/resources';
+
+    const url = buildUrl(path, hostUrl, null, false);
+
+    const transformResponse = function (data, headers) {
+      if (filter) {
+        if (
+          (headers['content-type']?.split(';')[0] ?? null) ===
+          CONTENT_TYPES.json
+        ) {
+          let tempData = JSON.parse(data);
+          return {
+            ...tempData,
+            resources: applyFilter(tempData.resources, ...parseFilter(filter)),
+          };
+        } else {
+          Log.warn(
+            'Filters on this resource are only supported for json content types. Skipping filtering ...'
+          );
+        }
+      }
+      return data;
+    };
+
+    logOperation(operationName);
+
+    logWaitingForServer(url, queryParams);
+
+    warnExpectLargeResult(queryParams, url);
+
+    return axios
+      .request({
+        url,
+        method: 'GET',
+        auth: { username, password },
+        responseType,
+        headers,
+        params: queryParams,
+        transformResponse,
+      })
+      .then(result => {
+        Log.info(
+          `${COLORS.FgGreen}${operationName} succeeded${ESCAPE}. The result of this operation will be in ${operationName}state.data${ESCAPE} or in your ${operationName}callback${ESCAPE}.`
+        );
+        if (callback) return callback(composeNextState(state, result.data));
+        return composeNextState(state, result.data);
+      });
+  };
+}
+
+/**
+ * Get the schema of a given resource type, in any data format supported by DHIS2
+ * @public
+ * @function
+ * @param {string} resourceType - The type of resource to be updated(`singular` version of the `resource name`). E.g. `dataElement`, `organisationUnit`, etc. Run `getResources` to see available resources and their corresponding `singular` names.
+ * @param {Object} params - Optional `query parameters` for the `getSchema` operation. e.g. `{ fields: 'properties' ,skipPaging: true}`. Run`discover` or See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#metadata-export-examples DHIS2 API Docs}
+ * @param {{apiVersion: number,resourceType: string}} [options] - Optional options for `getSchema` method. Defaults to `{apiVersion: state.configuration.apiVersion, responseType: 'json'}`
+ * @param {Function} [callback] - Optional `callback` to handle the response
+ * @returns Promise<state> state
+ * @example <caption>Example getting the `schema` for `dataElement`</caption>
+ * getSchema('dataElement');
+ * @example <caption>Example getting the `schema` for `dataElement`, only returning the `properties` field</caption>
+ * getSchema('dataElement', { fields: 'properties' });
+ * @example <caption>Example getting the `schema` for `dataElement` in XML</caption>
+ * getSchema('dataElement', '{ fields: '*' }, { responseType: 'xml' });
+ */
+export function getSchema(resourceType, params, options, callback) {
+  return state => {
+    resourceType = recursivelyExpandReferences(resourceType)(state);
+
+    params = recursivelyExpandReferences(params)(state);
+
+    options = recursivelyExpandReferences(options)(state);
+
+    const operationName = 'getSchema';
+
+    const { username, password, hostUrl } = state.configuration;
+
+    const responseType = options?.responseType ?? 'json';
+
+    const filters = params?.filters;
+
+    delete params?.filters;
+
+    let queryParams = new URLSearchParams(params);
+
+    filters?.map(f => queryParams.append('filter', f));
+
+    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
+
+    const headers = {
+      Accept: CONTENT_TYPES[responseType] ?? 'application/json',
+    };
+
+    const url = buildUrl(`/schemas/${resourceType ?? ''}`, hostUrl, apiVersion);
+
+    logOperation(operationName);
+
+    logApiVersion(apiVersion);
+
+    logWaitingForServer(url, queryParams);
+
+    warnExpectLargeResult(resourceType, url);
+
+    return axios
+      .request({
+        method: 'GET',
+        url,
+        auth: {
           username,
           password,
-          query: null,
-          url: uniqueAttributeUrl,
-        }).then(result => {
-          const foundAttribute = JSON.parse(result.text);
+        },
+        responseType,
+        params: queryParams,
+        headers,
+      })
+      .then(result => {
+        Log.info(
+          `${COLORS.FgGreen}${operationName} succeeded${ESCAPE}. The result of this operation will be in ${operationName}state.data${ESCAPE} or in your ${operationName}callback${ESCAPE}.`
+        );
+        if (callback) return callback(composeNextState(state, result.data));
+        return composeNextState(state, result.data);
+      });
+  };
+}
 
-          if (foundAttribute.unique) {
-            console.log(
-              `Tracked Entity Attribute ${attribute.name}(${uniqueAttributeId}) is unique. Proceeding to checking if Tracked Entity Instance exists...`
-            );
-            return get({
+/**
+ * A generic helper method for getting data of any kind from DHIS2.
+ * - This can be used to get `DataValueSets`,`events`,`trackedEntityInstances`,`etc.`
+ * @public
+ * @function
+ * @param {string} resourceType - The type of resource to get(use its `plural` name). E.g. `dataElements`, `trackedEntityInstances`,`organisationUnits`, etc.
+ * @param {object} [params] - Optional `query parameters` e.g. `{ou: 'DiszpKrYNg8'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 docs} for more details on which params to use for a given type of resource.
+ * @param {{apiVersion: number,operationName: string,responseType: string}}[options] - `Optional` options for `getData` operation. Defaults to `{operationName: 'getData', apiVersion: state.configuration.apiVersion, responseType: 'json'}`.
+ * @param {requestCallback} [callback]  - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>Example getting one `trackedEntityInstance` with `Id` 'dNpxRu1mWG5' for a given `orgUnit(DiszpKrYNg8)`</caption>
+ *  getData('trackedEntityInstances', {
+ *    fields: '*',
+ *    ou: 'DiszpKrYNg8',
+ *    entityType: 'nEenWmSyUEp',
+ *    trackedEntityInstance: 'dNpxRu1mWG5',
+ *  })
+ *
+ */
+export function getData(resourceType, params, options, callback) {
+  return state => {
+    resourceType = recursivelyExpandReferences(resourceType)(state);
+
+    params = recursivelyExpandReferences(params)(state);
+
+    options = recursivelyExpandReferences(options)(state);
+
+    const operationName = options?.operationName ?? 'getData';
+
+    const { username, password, hostUrl } = state.configuration;
+
+    const responseType = options?.responseType ?? 'json';
+
+    const filters = params?.filters;
+
+    const dimensions = params?.dimensions;
+
+    delete params?.filters;
+
+    let queryParams = new URLSearchParams(params);
+
+    filters?.map(f => queryParams.append('filter', f));
+
+    dimensions?.map(d => queryParams.append('dimension', d));
+
+    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
+
+    const headers = {
+      Accept: CONTENT_TYPES[responseType] ?? 'application/json',
+    };
+
+    const url = buildUrl(`/${resourceType}`, hostUrl, apiVersion);
+
+    logOperation(operationName);
+
+    logApiVersion(apiVersion);
+
+    logWaitingForServer(url, queryParams);
+
+    warnExpectLargeResult(resourceType, url);
+
+    return axios
+      .request({
+        method: 'GET',
+        url,
+        auth: {
+          username,
+          password,
+        },
+        responseType,
+        params: queryParams,
+        headers,
+      })
+      .then(result => {
+        Log.info(
+          `${COLORS.FgGreen}${operationName} succeeded${ESCAPE}. The result of this operation will be in ${operationName} ${COLORS.FgGreen}state.data${ESCAPE} or in your ${COLORS.FgGreen}callback${ESCAPE}.`
+        );
+        if (callback) return callback(composeNextState(state, result.data));
+        return composeNextState(state, result.data);
+      });
+  };
+}
+
+/**
+ * A generic helper function to get metadata records from a given DHIS2 instance
+ * @public
+ * @function
+ * @param {string[]} resources - Required. List of metadata resources to fetch. E.g. `['organisationUnits', 'attributes']` or like `'dataSets'` if you only want a single type of resource. See `getResources` to see the types of resources available.
+ * @param {object} [params] - Optional `query parameters` e.g. `{filters: ['name:like:ANC'],fields:'*'}`. See `discover` or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#metadata-export DHIS2 API docs}
+ * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional `options` for `getMetadata` operation. Defaults to `{operationName: 'getMetadata', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
+ * @param {requestCallback} [callback] - Optional `callback` to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>Example getting a list of `ALL` `organisation units`</caption>
+ * getMetadata('organisationUnits')
+ * @example <caption>Example getting a list of `data elements` and `indicators` where `name` includes the word **ANC**</caption>
+ * getMetadata(['dataElements', 'indicators'], {
+ *      filters: ['name:like:ANC'],
+ *  })
+ */
+export function getMetadata(resources, params, options, callback) {
+  return state => {
+    resources = recursivelyExpandReferences(resources)(state);
+
+    params = recursivelyExpandReferences(params)(state);
+
+    options = recursivelyExpandReferences(options)(state);
+
+    const operationName = 'getMetadata';
+
+    const { username, password, hostUrl } = state.configuration;
+
+    const responseType = options?.responseType ?? 'json';
+
+    if (typeof resources === 'string') {
+      let res = {};
+      res[resources] = true;
+      resources = res;
+    } else {
+      resources = resources.reduce((acc, currentValue) => {
+        acc[currentValue] = true;
+        return acc;
+      }, {});
+    }
+
+    let queryParams = {
+      ...resources,
+      ...params,
+    };
+
+    const filters = queryParams?.filters;
+
+    delete queryParams?.filters;
+
+    queryParams = new URLSearchParams(queryParams);
+
+    filters?.map(f => queryParams.append('filter', f));
+
+    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
+
+    const headers = {
+      Accept: CONTENT_TYPES[responseType] ?? 'application/json',
+    };
+
+    const url = buildUrl('/metadata', hostUrl, apiVersion);
+
+    logOperation(operationName);
+
+    logApiVersion(apiVersion);
+
+    logWaitingForServer(url, queryParams);
+
+    warnExpectLargeResult(queryParams, url);
+
+    return axios
+      .request({
+        method: 'GET',
+        url,
+        auth: {
+          username,
+          password,
+        },
+        responseType,
+        params: queryParams,
+        headers,
+      })
+      .then(result => {
+        Log.info(
+          `${COLORS.FgGreen}${operationName} succeeded${ESCAPE}. The result of this operation will be in ${COLORS.FgGreen}${operationName} state.data${ESCAPE} or in your ${COLORS.FgGreen}callback${ESCAPE}.`
+        );
+        if (callback) return callback(composeNextState(state, result.data));
+        return composeNextState(state, result.data);
+      });
+  };
+}
+
+/**
+ * A generic helper method to create a record of any kind in DHIS2
+ * @public
+ * @function
+ * @param {string} resourceType - Type of resource to create. E.g. `trackedEntityInstances`
+ * @param {Object<symbol,any>} data - Data that will be used to create a given instance of resource
+ * @param {Object} [options] - Optional `options` to control the behavior of the `create` operation.` Defaults to `{operationName: 'create', apiVersion: null, responseType: 'json'}`
+ * @param {Object} [params] - Optional `import parameters` for a given a resource. E.g. `{dryRun: true, importStrategy: CREATE}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 API documentation} or {@link discover}. Defauls to `DHIS2 default params` for a given resource type.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>- Example `expression.js` of `create`</caption>
+ * create('events', state.data);
+ */
+export function create(resourceType, data, options, params, callback) {
+  return state => {
+    resourceType = recursivelyExpandReferences(resourceType)(state);
+
+    const body = recursivelyExpandReferences(data)(state);
+
+    options = recursivelyExpandReferences(options)(state);
+
+    params = recursivelyExpandReferences(params)(state);
+
+    const operationName = options?.operationName ?? 'create';
+
+    const { username, password, hostUrl } = state.configuration;
+
+    const responseType = options?.responseType ?? 'json';
+
+    const filters = params?.filters;
+
+    delete params?.filters;
+
+    let queryParams = new URLSearchParams(params);
+
+    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
+
+    const url = buildUrl('/' + resourceType, hostUrl, apiVersion);
+
+    const headers = {
+      Accept: CONTENT_TYPES[responseType] ?? 'application/json',
+      'Content-Type': 'application/json',
+    };
+
+    logOperation(operationName);
+
+    logApiVersion(apiVersion);
+
+    logWaitingForServer(url, queryParams);
+
+    warnExpectLargeResult(resourceType, url);
+
+    return axios
+      .request({
+        method: 'POST',
+        url,
+        auth: {
+          username,
+          password,
+        },
+        params: queryParams,
+        data: body,
+        headers,
+      })
+      .then(result => {
+        Log.info(
+          `${
+            COLORS.FgGreen
+          }${operationName} succeeded${ESCAPE}. Created ${resourceType}: ${
+            COLORS.FgGreen
+          }${
+            result.data.response?.importSummaries
+              ? result.data.response.importSummaries[0].href
+              : result.data.response?.reference
+          }${ESCAPE}.\nSummary:\n${prettyJson(result.data)}`
+        );
+        if (callback) return callback(composeNextState(state, result.data));
+        return composeNextState(state, result.data);
+      });
+  };
+}
+
+/**
+ *  A generic helper function to update a resource object of any type.
+ * - It requires to send `all required fields` or the `full body`
+ * @public
+ * @function
+ * @param {string} resourceType - The type of resource to be updated. E.g. `dataElements`, `organisationUnits`, etc.
+ * @param {string} path - The `id` or `path` to the `object` to be updated. E.g. `FTRrcoaog83` or `FTRrcoaog83/{collection-name}/{object-id}`
+ * @param {object} data - Data to update. It requires to send `all required fields` or the `full body`. If you want `partial updates`, use `patch` operation.
+ * @param {object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
+ * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional options for update method. Defaults to `{operationName: 'update', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
+ * @param {requestCallback} [callback]  - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>Example `updating` a `data element`</caption>
+ * update('dataElements', 'FTRrcoaog83',
+ * {
+ *   displayName: 'New display name',
+ *   aggregationType: 'SUM',
+ *   domainType: 'AGGREGATE',
+ *   valueType: 'NUMBER',
+ *   name: 'Accute Flaccid Paralysis (Deaths < 5 yrs)',
+ *   shortName: 'Accute Flaccid Paral (Deaths < 5 yrs)',
+ * });
+ *
+ */
+export function update(resourceType, path, data, params, options, callback) {
+  return state => {
+    resourceType = recursivelyExpandReferences(resourceType)(state);
+
+    path = recursivelyExpandReferences(path)(state);
+
+    const body = recursivelyExpandReferences(data)(state);
+
+    params = recursivelyExpandReferences(params)(state);
+
+    options = recursivelyExpandReferences(options)(state);
+
+    const { username, password, hostUrl } = state.configuration;
+
+    const operationName = options?.operationName ?? 'update';
+
+    const responseType = options?.responseType ?? 'json';
+
+    const filters = params?.filters;
+
+    delete params?.filters;
+
+    let queryParams = new URLSearchParams(params);
+
+    filters?.map(f => queryParams.append('filter', f));
+
+    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
+
+    const url = buildUrl('/' + resourceType + '/' + path, hostUrl, apiVersion);
+
+    const headers = {
+      Accept: CONTENT_TYPES[responseType] ?? 'application/json',
+    };
+
+    logOperation(operationName);
+
+    logApiVersion(apiVersion);
+
+    logWaitingForServer(url, queryParams);
+
+    warnExpectLargeResult(resourceType, url);
+
+    return axios
+      .request({
+        method: 'PUT',
+        url,
+        auth: {
+          username,
+          password,
+        },
+        params: queryParams,
+        data: body,
+        headers,
+      })
+      .then(result => {
+        Log.info(
+          `${
+            COLORS.FgGreen
+          }${operationName} succeeded${ESCAPE}. Updated ${resourceType}.\nSummary:\n${prettyJson(
+            result.data
+          )}`
+        );
+        if (callback) return callback(composeNextState(state, result.data));
+        return composeNextState(state, result.data);
+      });
+  };
+}
+
+/**
+ * A generic helper function to send partial updates on one or more object properties.
+ * - You are not required to send the full body of object properties.
+ * - This is useful for cases where you don't want or need to update all properties on a object.
+ * @public
+ * @function
+ * @param {string} resourceType - The type of resource to be updated. E.g. `dataElements`, `organisationUnits`, etc.
+ * @param {string} path - The `id` or `path` to the `object` to be updated. E.g. `FTRrcoaog83` or `FTRrcoaog83/{collection-name}/{object-id}`
+ * @param {object} data - Data to update. Include only the fields you want to update. E.g. `{name: "New Name"}`
+ * @param {object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
+ * @param {{apiVersion: number,operationName: string,responseType: string}} [options] - Optional options for update method. Defaults to `{operationName: 'patch', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>Example `patching` a `data element`</caption>
+ * patch('dataElements', 'FTRrcoaog83',
+ * {
+ *   name: 'New Name',
+ * });
+ */
+export function patch(resourceType, path, data, params, options, callback) {
+  return state => {
+    resourceType = recursivelyExpandReferences(resourceType)(state);
+
+    path = recursivelyExpandReferences(path)(state);
+
+    const body = recursivelyExpandReferences(data)(state);
+
+    params = recursivelyExpandReferences(params)(state);
+
+    options = recursivelyExpandReferences(options)(state);
+
+    const operationName = options?.operationName ?? 'patch';
+
+    const { username, password, hostUrl } = state.configuration;
+
+    const responseType = options?.responseType ?? 'json';
+
+    let queryParams = params;
+
+    const filters = queryParams?.filters;
+
+    delete queryParams?.filters;
+
+    queryParams = new URLSearchParams(queryParams);
+
+    filters?.map(f => queryParams.append('filter', f));
+
+    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
+
+    const url = buildUrl('/' + resourceType + '/' + path, hostUrl, apiVersion);
+
+    const headers = {
+      Accept: CONTENT_TYPES[responseType] ?? 'application/json',
+    };
+
+    logOperation(operationName);
+
+    logApiVersion(apiVersion);
+
+    logWaitingForServer(url, queryParams);
+
+    warnExpectLargeResult(resourceType, url);
+
+    return axios
+      .request({
+        method: 'PATCH',
+        url,
+        auth: {
+          username,
+          password,
+        },
+        params: queryParams,
+        data: body,
+        headers,
+      })
+      .then(result => {
+        let resultObject = {
+          status: result.status,
+          statusText: result.statusText,
+        };
+        Log.info(
+          `${
+            COLORS.FgGreen
+          }${operationName} succeeded${ESCAPE}. Updated ${resourceType}.\nSummary:\n${prettyJson(
+            resultObject
+          )}`
+        );
+        if (callback) return callback(composeNextState(state, resultObject));
+        return composeNextState(state, resultObject);
+      });
+  };
+}
+
+/**
+ *  A generic helper function to delete an object
+ * @public
+ * @function
+ * @param {string} resourceType - The type of resource to be deleted. E.g. `trackedEntityInstances`, `organisationUnits`, etc.
+ * @param {string} path - Can be an `id` of an `object` or `path` to the `nested object` to `delete`.
+ * @param {object} [data] - Optional. This is useful when you want to remove multiple objects from a collection in one request. You can send `data` as, for example, `{"identifiableObjects": [{"id": "IDA"}, {"id": "IDB"}, {"id": "IDC"}]}`. See more {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#deleting-objects on DHIS2 API docs}
+ * @param {object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
+ * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional `options` for `del` operation. Defaults to `{operationName: 'delete', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @example <caption>Example`deleting` a `tracked entity instance`</caption>
+ * del('trackedEntityInstances', 'LcRd6Nyaq7T');
+ */
+export function del(resourceType, path, data, params, options, callback) {
+  return state => {
+    resourceType = recursivelyExpandReferences(resourceType)(state);
+
+    path = recursivelyExpandReferences(path)(state);
+
+    const body = recursivelyExpandReferences(data)(state);
+
+    params = recursivelyExpandReferences(params)(state);
+
+    options = recursivelyExpandReferences(options)(state);
+
+    const operationName = options?.operationName ?? 'delete';
+
+    const { username, password, hostUrl } = state.configuration;
+
+    const responseType = options?.responseType ?? 'json';
+
+    let queryParams = params;
+
+    const filters = queryParams?.filters;
+
+    delete queryParams?.filters;
+
+    queryParams = new URLSearchParams(queryParams);
+
+    filters?.map(f => queryParams.append('filter', f));
+
+    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
+
+    const headers = {
+      Accept: CONTENT_TYPES[responseType] ?? 'application/json',
+    };
+
+    const url = buildUrl('/' + resourceType + '/' + path, hostUrl, apiVersion);
+
+    logOperation(operationName);
+
+    logApiVersion(apiVersion);
+
+    logWaitingForServer(url, queryParams);
+
+    warnExpectLargeResult(resourceType, url);
+
+    return axios
+      .request({
+        method: 'DELETE',
+        url,
+        auth: {
+          username,
+          password,
+        },
+        params: queryParams,
+        data: body,
+        headers,
+      })
+      .then(result => {
+        Log.info(
+          `${
+            COLORS.FgGreen
+          }${operationName} succeeded${ESCAPE}. DELETED ${resourceType}.\nSummary:\n${prettyJson(
+            result.data
+          )}`
+        );
+        if (callback) return callback(composeNextState(state, result.data));
+        return composeNextState(state, result.data);
+      });
+  };
+}
+
+/**
+ * A generic helper function used to atomically either insert a row, or on the basis of the row already existing,
+ * UPDATE that existing row instead.
+ * @public
+ * @function
+ * @param {string} resourceType - The type of a resource to `insert` or `update`. E.g. `trackedEntityInstances`
+ * @param {Object} uniqueAttribute - An object containing a `attributeId` and `attributeValue` which will be used to uniquely identify the record
+ * @param {String} uniqueAttribute.attributeId - the id of the attribute to match on
+ * @param {String} uniqueAttribute.attributeValue - the value of the attribute to match on
+ * @param {Object<any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters e.g. `{ou: 'lZGmxYbs97q', filters: [w75KJ2mc4zz:EQ:Jane]}`
+ * @param {options} [options={replace: false, apiVersion: null, responseType: 'json'}] - Optional options for update method {@link options}.`
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise<state>} state
+ * @throws {RangeError}
+ * @example <caption>- Example `expression.js` of upsert</caption>
+ * ```javascript
+ * upsert(
+ *      'trackedEntityInstances',
+ *       {
+ *         attributeId: 'lZGmxYbs97q',
+ *         attributeValue: state =>
+ *           state.data.attributes.find(obj => obj.attribute === 'lZGmxYbs97q')
+ *             .value,
+ *       },
+ *       state.data,
+ *       { ou: 'TSyzvBiovKh' }
+ *     )
+ * ```
+ * @todo Tweak/refine to mimic implementation based on the following inspiration: {@link https://sqlite.org/lang_upsert.html sqlite upsert} and {@link https://wiki.postgresql.org/wiki/UPSERT postgresql upsert}
+ * @todo Test implementation for upserting metadata
+ * @todo Test implementation for upserting data values
+ * @todo Implement the updateCondition
+ */
+export function upsert(
+  resourceType,
+  uniqueAttribute,
+  data,
+  params,
+  options,
+  callback
+) {
+  return state => {
+    resourceType = recursivelyExpandReferences(resourceType)(state);
+
+    uniqueAttribute = recursivelyExpandReferences(uniqueAttribute)(state);
+
+    const body = recursivelyExpandReferences(data)(state);
+
+    params = recursivelyExpandReferences(params)(state);
+
+    options = recursivelyExpandReferences(options)(state);
+
+    const operationName = options?.operationName ?? 'upsert';
+
+    const { username, password, hostUrl } = state.configuration;
+
+    const replace = options?.replace ?? false;
+
+    const responseType = options?.responseType ?? 'json';
+
+    const { attributeId, attributeValue } = uniqueAttribute;
+
+    const filters = params?.filters;
+
+    delete params.filters;
+
+    let queryParams = new URLSearchParams(params);
+
+    filters?.map(f => queryParams.append('filter', f));
+
+    const op = resourceType === 'trackedEntityInstances' ? 'EQ' : 'eq';
+
+    queryParams.append('filter', `${attributeId}:${op}:${attributeValue}`);
+
+    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
+
+    const url = buildUrl('/' + resourceType, hostUrl, apiVersion);
+
+    const headers = {
+      Accept: CONTENT_TYPES[responseType] ?? 'application/json',
+    };
+
+    logOperation(operationName);
+
+    logApiVersion(apiVersion);
+
+    logWaitingForServer(url, queryParams);
+
+    warnExpectLargeResult(resourceType, url);
+
+    const getResouceName = () => {
+      return axios
+        .get(hostUrl + '/api/resources', {
+          auth: { username, password },
+          transformResponse: [
+            function (data, headers) {
+              let filter = `plural:eq:${resourceType}`;
+              if (filter) {
+                if (
+                  (headers['content-type']?.split(';')[0] ?? null) ===
+                  CONTENT_TYPES.json
+                ) {
+                  let tempData = JSON.parse(data);
+                  return {
+                    ...tempData,
+                    resources: applyFilter(
+                      tempData.resources,
+                      ...parseFilter(filter)
+                    ),
+                  };
+                } else {
+                  Log.warn(
+                    'Filters on this resource are only supported for json content types. Skipping filtering ...'
+                  );
+                }
+              }
+              return data;
+            },
+          ],
+        })
+        .then(result => result.data.resources[0].singular);
+    };
+
+    const findRecordsWithValueOnAttribute = () => {
+      console.log(queryParams);
+      return axios.request({
+        method: 'GET',
+        url,
+        auth: {
+          username,
+          password,
+        },
+        params: queryParams,
+        headers,
+      });
+    };
+
+    Log.info(
+      `Checking if a record exists that matches this filter: ${COLORS.FgGreen}attribute{ id: ${attributeId}, value: ${attributeValue} }\x1b[0m ...`
+    );
+    return Promise.all([
+      getResouceName(),
+      findRecordsWithValueOnAttribute(),
+    ]).then(([resourceName, recordsWithValue]) => {
+      const recordsWithValueCount = recordsWithValue.data[resourceType].length;
+      if (recordsWithValueCount > 1) {
+        Log.error('');
+        throw new RangeError(
+          `Cannot upsert on Non-unique attribute. The operation found more than one records with the same value of ${attributeValue} for ${attributeId}`
+        );
+      } else if (recordsWithValueCount === 1) {
+        // TODO
+        // Log.info(
+        //   `Unique record found, proceeding to checking if attribute is NULLABLE ...`
+        // );
+        // if (recordsWithNulls.data[resourceType].length > 0) {
+        //   throw new Error(
+        //     `Cannot upsert on Nullable attribute. The operation found records with a NULL value on ${attributeId}.`
+        //   );
+        // }
+        Log.info(
+          `${
+            COLORS.FgGreen
+          }Attribute has unique values${ESCAPE}. Proceeding to ${
+            COLORS.FgGreen
+          }${replace ? 'replace' : 'merge'}${ESCAPE} ...`
+        );
+
+        const row1 = recordsWithValue.data[resourceType][0];
+        const useCustomPATCH = ['trackedEntityInstances'].includes(resourceType)
+          ? true
+          : false;
+        const method = replace
+          ? 'PUT'
+          : useCustomPATCH === true
+          ? 'PUT'
+          : 'PATCH';
+
+        const id = row1['id'] ?? row1[resourceName];
+
+        const updateUrl = `${url}/${id}`;
+
+        const payload = useCustomPATCH
+          ? {
+              ...row1,
+              ...body,
+              attributes: [...row1.attributes, ...body.attributes],
+            }
+          : body;
+
+        return axios
+          .request({
+            method,
+            url: updateUrl,
+            auth: {
               username,
               password,
-              query,
-              url,
-            }).then(result => {
-              console.log(`query ${JSON.stringify(query, null, 2)}`);
-
-              let tei_body = JSON.parse(result.text);
-
-              if (tei_body.trackedEntityInstances.length <= 0) {
-                console.log(
-                  `Tracked Entity Instance  with filter ${query.filter} not found, proceeding to create...`
-                );
-
-                return post({
-                  username,
-                  password,
-                  body,
-                  url,
-                  query: null,
-                }).then(result => {
-                  console.log(
-                    `POST succeeded. ${
-                      result.header.location
-                    }\nSummary:\n${JSON.stringify(
-                      JSON.parse(result.text),
-                      null,
-                      2
-                    )}`
-                  );
-
-                  return {
-                    ...state,
-                    references: [result, ...state.references],
-                  };
-                });
-              } else {
-                const row1 = tei_body.trackedEntityInstances[0];
-
-                const payload = replace
-                  ? body
-                  : {
-                      ...row1,
-                      ...body,
-                      attributes: [...row1.attributes, ...body.attributes],
-                    };
-
-                const updateUrl = `${url}/${row1.trackedEntityInstance}`;
-
-                console.log(
-                  `Tracked Entity Instance  with filter ${query.filter} found(${
-                    row1.trackedEntityInstance
-                  }), proceeding to ${
-                    replace ? 'replace' : 'merge data with'
-                  } the existing TEI...`
-                );
-
-                return put({
-                  username,
-                  password,
-                  body: payload,
-                  url: updateUrl,
-                  query: null,
-                }).then(result => {
-                  console.log(`Upsert succeeded. Updated TEI: ${updateUrl}`);
-                  console.log(
-                    `Summary:\n${JSON.stringify(
-                      JSON.parse(result.text),
-                      null,
-                      2
-                    )}`
-                  );
-
-                  return {
-                    ...state,
-                    references: [result, ...state.references],
-                  };
-                });
-              }
-            });
-          } else {
-            throw new Error(
-              `Attribute ${attribute.name}(${uniqueAttributeId}) is not unique. Ensure, in DHIS2, this tracked entity attribute is marked as unique.`
+            },
+            data: payload,
+            params: queryParams,
+            headers,
+          })
+          .then(result => {
+            Log.info(
+              `${
+                COLORS.FgGreen
+              }${operationName} succeeded${ESCAPE}. Updated ${resourceName}: ${
+                COLORS.FgGreen
+              }${updateUrl}${ESCAPE}.\nSummary:\n${prettyJson(result.data)}`
             );
-          }
-        });
-      } else {
-        throw new Error(
-          `Tracked Entity Attribute ${uniqueAttributeId} is not assigned to ${tet.name} Entity Type. Ensure, in DHIS2, this tracked entity attribute is assigned to ${tet.name} and that it is marked as unique.`
+            if (callback) return callback(composeNextState(state, result.data));
+            return composeNextState(state, result.data);
+          });
+      } else if (recordsWithValueCount === 0) {
+        Log.info(
+          `${COLORS.FgGreen}Existing record not found${ESCAPE}, proceeding to ${COLORS.FgGreen}CREATE(POST)${ESCAPE} ...`
         );
+
+        // We must delete the filter and ou params so the POST request is not interpreted as a GET request by the server
+        queryParams.delete('filter');
+        queryParams.delete('ou');
+
+        return axios
+          .request({
+            method: 'POST',
+            url,
+            auth: {
+              username,
+              password,
+            },
+            data: body,
+            params: queryParams,
+            headers,
+          })
+          .then(result => {
+            Log.info(
+              `${
+                COLORS.FgGreen
+              }${operationName} succeeded${ESCAPE}. Created ${resourceName}: ${
+                COLORS.FgGreen
+              }${
+                result.data.response.importSummaries
+                  ? result.data.response.importSummaries[0].href
+                  : result.data.response?.reference
+              }${ESCAPE}.\nSummary:\n${prettyJson(result.data)}`
+            );
+            if (callback) return callback(composeNextState(state, result.data));
+            return composeNextState(state, result.data);
+          });
       }
     });
   };
 }
+//#endregion
 
-// /**
-//  * Create and enroll TrackedEntityInstances
-//  * @example
-//  * execute(
-//  *   createEnrollTEI(te, orgUnit, attributes, enrollments)
-//  * )(state)
-//  * @constructor
-//  * @param {object} enrollmentData - Payload data for new enrollment
-//  * @returns {Operation}
-//  */
-// export function upsertEnroll(upsertData) {
-//
-//   return state => {
-//     const body = expandReferences(trackedEntityInstanceData)(state);
-//     const { username, password, hostUrl } = state.configuration;
-//     const url = resolveUrl(hostUrl + '/', 'api/trackedEntityInstances')
-//
-//     return post({ username, password, body, url })
-//     .then((result) => {
-//       console.log("Result:", JSON.stringify(result.body, null, 2));
-//       return { ...state, references: [ result, ...state.references ] }
-//     })
-//
-//   }
-// }
-
-/**
- * Enroll a tracked entity instance in a program
- * @public
- * @example
- * enroll(tei, enrollmentData)
- * @constructor
- * @param {object} tei
- * @param {object} enrollmentData - Payload data for new enrollment
- * @returns {Operation}
- */
-export function enroll(tei, enrollmentData) {
-  return state => {
-    const body = expandReferences(enrollmentData)(state);
-    body['trackedEntityInstance'] = tei;
-    const { username, password, hostUrl } = state.configuration;
-    const url = resolveUrl(hostUrl + '/', 'api/enrollments');
-
-    console.log('Enrolling tracked entity instance.');
-
-    return post({
-      username,
-      password,
-      body,
-      url,
-    }).then(result => {
-      console.log('Result:', JSON.stringify(result.body, null, 2));
-      return { ...state, references: [result, ...state.references] };
-    });
-  };
-}
-
-/**
- * Fetch analytics
- * @public
- * @example
- * fetchAnalytics({
- *   query: {
- *     dimension: ["dx:CYI5LEmm3cG", "pe:LAST_6_MONTHS"],
- *     filter: "ou:t7vi7vJqWvi",
- *     displayProperty: "NAME",
- *     outputIdScheme: "UID"
- *   }},
- *   postUrl: "yourposturl"
- * )
- * @constructor
- * @param {object} params - data to query for events
- * @param {String} postUrl - (optional) URL to post the result
- * @returns {Operation}
- */
-export function fetchAnalytics(params, postUrl) {
-  return state => {
-    const data = expandReferences(params)(state);
-    const { username, password, hostUrl } = state.configuration;
-    const url = resolveUrl(hostUrl + '/', 'api/26/analytics.json?');
-    const query = data.query || expandDataValues(params)(state);
-
-    console.log(`Getting analytics data for query: ${query}`);
-
-    return get({ username, password, query, url })
-      .then(result => {
-        console.log('Get Result:', result.body);
-        return result;
-      })
-      .then(result => {
-        if (postUrl) {
-          const body = result.body;
-          const url = postUrl;
-
-          return post({ username, password, body, url }).then(result => {
-            console.log('Post Result:', result.statusCode);
-            return {
-              ...state,
-              references: [result, ...state.references],
-            };
-          });
-        } else {
-          return {
-            ...state,
-            references: [result, ...state.references],
-          };
-        }
-      });
-  };
-}
+//#region EXPORTS
+export { attribute } from './Utils';
 
 exports.axios = axios;
 
@@ -629,3 +2057,4 @@ export {
   lastReferenceValue,
   alterState,
 } from 'language-common';
+//#endregion

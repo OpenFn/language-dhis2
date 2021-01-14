@@ -32,16 +32,36 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.execute = execute;
-exports.fetchData = fetchData;
-exports.fetchEvents = fetchEvents;
-exports.event = event;
-exports.dataValueSet = dataValueSet;
-exports.dataElement = dataElement;
+exports.getTEIs = getTEIs;
+exports.upsertTEI = upsertTEI;
 exports.createTEI = createTEI;
 exports.updateTEI = updateTEI;
-exports.upsertTEI = upsertTEI;
-exports.enroll = enroll;
-exports.fetchAnalytics = fetchAnalytics;
+exports.getEvents = getEvents;
+exports.createEvents = createEvents;
+exports.updateEvents = updateEvents;
+exports.getPrograms = getPrograms;
+exports.createPrograms = createPrograms;
+exports.updatePrograms = updatePrograms;
+exports.getEnrollments = getEnrollments;
+exports.enrollTEI = enrollTEI;
+exports.updateEnrollments = updateEnrollments;
+exports.cancelEnrollment = cancelEnrollment;
+exports.completeEnrollment = completeEnrollment;
+exports.getRelationships = getRelationships;
+exports.getDataValues = getDataValues;
+exports.createDataValues = createDataValues;
+exports.generateDhis2UID = generateDhis2UID;
+exports.discover = discover;
+exports.getAnalytics = getAnalytics;
+exports.getResources = getResources;
+exports.getSchema = getSchema;
+exports.getData = getData;
+exports.getMetadata = getMetadata;
+exports.create = create;
+exports.update = update;
+exports.patch = patch;
+exports.del = del;
+exports.upsert = upsert;
 Object.defineProperty(exports, "field", {
   enumerable: true,
   get: function get() {
@@ -96,38 +116,51 @@ Object.defineProperty(exports, "alterState", {
     return _languageCommon.alterState;
   }
 });
+Object.defineProperty(exports, "attribute", {
+  enumerable: true,
+  get: function get() {
+    return _Utils.attribute;
+  }
+});
 
 var _axios = _interopRequireDefault(require("axios"));
 
 var _languageCommon = require("language-common");
 
-var _Client = require("./Client");
+var _lodash = require("lodash");
 
-var _url4 = require("url");
-
-var _fp = require("lodash/fp");
+var _Utils = require("./Utils");
 
 function _interopRequireDefault(obj) { return obj &amp;&amp; obj.__esModule ? obj : { "default": obj }; }
-
-function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" &amp;&amp; typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj &amp;&amp; typeof Symbol === "function" &amp;&amp; obj.constructor === Symbol &amp;&amp; obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" &amp;&amp; o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
-
 function _iterableToArray(iter) { if (typeof Symbol !== "undefined" &amp;&amp; Symbol.iterator in Object(iter)) return Array.from(iter); }
 
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" &amp;&amp; o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i &lt; len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i &amp;&amp; _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n &amp;&amp; _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
 function _objectSpread(target) { for (var i = 1; i &lt; arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+//#endregion
+//#region CONFIG HELPERS, INTERCEPTORS and TYPE DEFINITIONS
 
 /**
  * Execute a sequence of operations.
@@ -155,8 +188,8 @@ function execute() {
   };
 }
 /**
- * Migrates "apiUrl" to "hostUrl" if "hostUrl" is blank.
- * For OpenFn.org users with the old-style configuration.
+ * Migrates `apiUrl` to `hostUrl` if `hostUrl` is `blank`.
+ * For `OpenFn.org` users with the `old-style configuration`.
  * @example
  * configMigrationHelper(state)
  * @constructor
@@ -171,548 +204,1765 @@ function configMigrationHelper(state) {
       apiUrl = _state$configuration.apiUrl;
 
   if (!hostUrl) {
-    console.log('DEPRECATION WARNING: Please migrate instance address from `apiUrl` to `hostUrl`.');
+    _Utils.Log.warn('DEPRECATION WARNING: Please migrate instance address from `apiUrl` to `hostUrl`.');
+
     state.configuration.hostUrl = apiUrl;
     return state;
   }
 
   return state;
 }
+/* `Axios` Interceptors */
+
+
+_axios["default"].interceptors.response.use(function (response) {
+  var _response$headers$con, _response;
+
+  var contentType = (_response$headers$con = response.headers['content-type']) === null || _response$headers$con === void 0 ? void 0 : _response$headers$con.split(';')[0];
+  var acceptHeaders = response.config.headers['Accept'].split(';')[0].split(',');
+
+  if (response.config.method === 'get') {
+    if ((0, _lodash.indexOf)(acceptHeaders, contentType) === -1) {
+      var newError = {
+        status: 404,
+        message: 'Unexpected content,returned',
+        responseData: response.data
+      };
+
+      _Utils.Log.error(newError.message);
+
+      return Promise.reject(newError);
+    }
+  }
+
+  if (typeof ((_response = response) === null || _response === void 0 ? void 0 : _response.data) === 'string' &amp;&amp; contentType === (_Utils.CONTENT_TYPES === null || _Utils.CONTENT_TYPES === void 0 ? void 0 : _Utils.CONTENT_TYPES.json)) {
+    try {
+      response = _objectSpread({}, response, {
+        data: JSON.parse(response.data)
+      });
+    } catch (error) {
+      /** Keep quiet */
+    }
+  }
+
+  return response;
+}, function (error) {
+  var _error$response3, _error$response3$data;
+
+  _Utils.Log.error("".concat(error === null || error === void 0 ? void 0 : error.message));
+
+  try {
+    var _error$response, _error$response$data;
+
+    console.log(JSON.stringify((_error$response = error.response) === null || _error$response === void 0 ? void 0 : (_error$response$data = _error$response.data) === null || _error$response$data === void 0 ? void 0 : _error$response$data.response, null, 2));
+  } catch (err) {
+    var _error$response2, _error$response2$data;
+
+    /* Keep quiet! Just log the above error again */
+    console.log((_error$response2 = error.response) === null || _error$response2 === void 0 ? void 0 : (_error$response2$data = _error$response2.data) === null || _error$response2$data === void 0 ? void 0 : _error$response2$data.response);
+  }
+
+  console.log((_error$response3 = error.response) === null || _error$response3 === void 0 ? void 0 : (_error$response3$data = _error$response3.data) === null || _error$response3$data === void 0 ? void 0 : _error$response3$data.response);
+  return Promise.reject(error);
+});
 /**
- * Fetch a dataValueSet
+ * Type definition for the `result returned` by `OpenFn operations`
  * @public
- * @example
- * fetchData({
- *   fields: {
- *     dataSet: 'pBOMPrpg1QX',
- *     orgUnit: 'DiszpKrYNg8',
- *     period: '201401'
- *   },
- *   postUrl: "yourposturl"
- * });
- * @constructor
- * @param {object} params - data to query for events
- * @param {String} postUrl - (optional) URL to post the result
- * @returns {Operation}
+ * @typedef {{configuration: object, references: object[], data: object}} state
+ */
+
+/**
+ * Type definition for the `callback` supplied to `OpenFn operations`
+ * @public
+ * @callback requestCallback
+ * @param {state} state
+ * @returns {state}
+ */
+
+/**
+ * Type definition for `options` `parameter` object used in `DHIS2 adaptor's operations`.
+ * @public
+ * @typedef {{ replace: boolean, apiVersion: number, supportApiVersion: boolean,requireUniqueAttributeConfig: boolean}} options
+ *
+ */
+//#endregion
+//#region COMMONLY USED HELPER OPERATIONS
+
+/**
+ * Get DHIS2 Tracked Entity Instance(s)
+ * @public
+ * @function
+ * @param {array} params - `import` parameters for `getTEIs`. E.g. `[{fields: '*'},{ ou: 'DiszpKrYNg8' },{ skipPaging: true },])`
+ * @param {string} [responseType] - Optional response type. Defaults to `json`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `getTEIs` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `getTEIs` `expression.js` for fetching a `single` `Tracked Entity Instance`&lt;/caption>
+ * getTEIs([
+ * {
+ *   fields: '*',
+ * },
+ * { ou: 'CMqUILyVnBL' },
+ * { trackedEntityInstance: 'HNTA9qD6EEG' },
+ * { skipPaging: true },
+ * ]);
  */
 
 
-function fetchData(params, postUrl) {
+function getTEIs(params, options, callback) {
   return function (state) {
-    var data = (0, _languageCommon.expandReferences)(params)(state);
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    if (options) options.operationName = 'getTEIs';else {
+      options = {
+        operationName: 'getTEIs'
+      };
+    }
+    return getData('trackedEntityInstances', params, options, callback)(state);
+  };
+}
+/**
+ * Upsert(Create or update) one or many Tracked Entity Instances. Update if the record exists otherwise insert a new record.
+ * This is useful for idempotency and duplicate management
+ * @public
+ * @function
+ * @param {string} uniqueAttributeId - Tracked Entity Instance unique identifier used during matching
+ * @param {Object&lt;symbol,any>} data - Payload data for new/updated tracked entity instance(s)
+ * @param {options} [options] - Optional `options` for `upserTEI` operation. Defaults to `{responseType: 'json',replace: false, apiVersion: null,requireUniqueAttributeConfig: true}`
+ * @param {requestCallback} [callback] - Optional `callback` to handle the response.
+ * @throws {RangeError} - Throws `RangeError` when `uniqueAttributeId` is `invalid` or `not unique`.
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of upsertTEI&lt;/caption>
+ * upsertTEI('lZGmxYbs97q', state.data);
+ */
+
+
+function upsertTEI(uniqueAttributeId, data, options, callback) {
+  return function (state) {
+    var _options$apiVersion, _options, _options$requireUniqu, _options2, _body$attributes, _body$attributes$find;
+
+    uniqueAttributeId = (0, _Utils.recursivelyExpandReferences)(uniqueAttributeId)(state);
+    var body = (0, _Utils.recursivelyExpandReferences)(data)(state);
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    if (options) options.operationName = 'upsertTEI';else {
+      options = {
+        operationName: 'upsertTEI'
+      };
+    }
     var _state$configuration2 = state.configuration,
-        username = _state$configuration2.username,
         password = _state$configuration2.password,
+        username = _state$configuration2.username,
         hostUrl = _state$configuration2.hostUrl;
-    var url = (0, _url4.resolve)(hostUrl + '/', 'api/dataValueSets.json?');
-    var query = data.fields || expandDataValues(params)(state);
-    console.log('Getting Data Value Sets:');
-    return (0, _Client.get)({
-      username: username,
-      password: password,
-      query: query,
-      url: url
-    }).then(function (result) {
-      console.log('Get Result:', result.body);
-      return result;
-    }).then(function (result) {
-      if (postUrl) {
-        var body = result.body;
-        var _url = postUrl;
-        return (0, _Client.post)({
+    var apiVersion = (_options$apiVersion = (_options = options) === null || _options === void 0 ? void 0 : _options.apiVersion) !== null &amp;&amp; _options$apiVersion !== void 0 ? _options$apiVersion : state.configuration.apiVersion;
+    var requireUniqueAttributeConfig = (_options$requireUniqu = (_options2 = options) === null || _options2 === void 0 ? void 0 : _options2.requireUniqueAttributeConfig) !== null &amp;&amp; _options$requireUniqu !== void 0 ? _options$requireUniqu : true;
+    var params = {
+      ou: body.orgUnit
+    };
+    var uniqueAttributeValue = (_body$attributes = body.attributes) === null || _body$attributes === void 0 ? void 0 : (_body$attributes$find = _body$attributes.find(function (obj) {
+      return (obj === null || obj === void 0 ? void 0 : obj.attribute) === uniqueAttributeId;
+    })) === null || _body$attributes$find === void 0 ? void 0 : _body$attributes$find.value;
+    var trackedEntityType = body.trackedEntityType;
+    var uniqueAttributeUrl = (0, _Utils.buildUrl)("/trackedEntityAttributes/".concat(uniqueAttributeId), hostUrl, apiVersion);
+    var trackedEntityTypeUrl = (0, _Utils.buildUrl)("/trackedEntityTypes/".concat(trackedEntityType, "?fields=*"), hostUrl, apiVersion);
+
+    var findTrackedEntityType = function findTrackedEntityType() {
+      return _axios["default"].get(trackedEntityTypeUrl, {
+        auth: {
           username: username,
-          password: password,
-          body: body,
-          url: _url
-        }).then(function (result) {
-          console.log('Post Result:', result.statusCode);
-          return _objectSpread({}, state, {
-            references: [result].concat(_toConsumableArray(state.references))
-          });
+          password: password
+        }
+      }).then(function (result) {
+        var _result$data, _result$data$trackedE;
+
+        var attribute = (_result$data = result.data) === null || _result$data === void 0 ? void 0 : (_result$data$trackedE = _result$data.trackedEntityTypeAttributes) === null || _result$data$trackedE === void 0 ? void 0 : _result$data$trackedE.find(function (obj) {
+          var _obj$trackedEntityAtt;
+
+          return (obj === null || obj === void 0 ? void 0 : (_obj$trackedEntityAtt = obj.trackedEntityAttribute) === null || _obj$trackedEntityAtt === void 0 ? void 0 : _obj$trackedEntityAtt.id) === uniqueAttributeId;
         });
-      } else {
-        return _objectSpread({}, state, {
-          references: [result].concat(_toConsumableArray(state.references))
+        return _objectSpread({}, result.data, {
+          upsertAttributeAssigned: attribute ? true : false
         });
+      });
+    };
+
+    var isAttributeUnique = function isAttributeUnique() {
+      return _axios["default"].get(uniqueAttributeUrl, {
+        auth: {
+          username: username,
+          password: password
+        }
+      }).then(function (result) {
+        var foundAttribute = result.data;
+        return {
+          unique: foundAttribute.unique,
+          name: foundAttribute.name
+        };
+      });
+    };
+
+    return Promise.all([findTrackedEntityType(), requireUniqueAttributeConfig === true ? isAttributeUnique() : Promise.resolve({
+      unique: true
+    })]).then(function (_ref) {
+      var _ref2 = _slicedToArray(_ref, 2),
+          entityType = _ref2[0],
+          attribute = _ref2[1];
+
+      if (!entityType.upsertAttributeAssigned) {
+        _Utils.Log.error('');
+
+        throw new RangeError("Tracked Entity Attribute ".concat(uniqueAttributeId, " is not assigned to ").concat(entityType.name, " Entity Type. Ensure, in DHIS2, this tracked entity attribute is assigned to ").concat(entityType.name, " and that it is marked as unique."));
       }
+
+      if (!attribute.unique) {
+        var _attribute$name;
+
+        _Utils.Log.error('');
+
+        throw new RangeError("Attribute ".concat((_attribute$name = attribute.name) !== null &amp;&amp; _attribute$name !== void 0 ? _attribute$name : '', "(").concat(uniqueAttributeId, ") is not unique. Ensure, in DHIS2, this tracked entity attribute is marked as unique."));
+      }
+
+      return upsert('trackedEntityInstances', {
+        attributeId: uniqueAttributeId,
+        attributeValue: uniqueAttributeValue
+      }, body, params, options, callback)(state);
     });
   };
 }
 /**
- * Fetch an event
+ * Create a DHIS2 Tracked Entity Instance
  * @public
- * @example
- * fetchEvents({
- *   fields: {
- *     orgUnit: 'DiszpKrYNg8',
- *     period: '201401'
- *   }},
- *   postUrl: "yourposturl"
- * )
- * @constructor
- * @param {object} params - data to query for events
- * @param {String} postUrl - (optional) URL to post the result
- * @returns {Operation}
+ * @function
+ * @param {object&lt;any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `create`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `createTEI` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of `createTEI`&lt;/caption>
+ * createTEI(state.data);
  */
 
 
-function fetchEvents(params, postUrl) {
+function createTEI(data, params, options, callback) {
   return function (state) {
-    var data = (0, _languageCommon.expandReferences)(params)(state);
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    if (options) options.operationName = 'createTEI';else {
+      options = {
+        operationName: 'createTEI'
+      };
+    }
+    return create('trackedEntityInstances', data, params, options, callback)(state);
+  };
+}
+/**
+ * Update a DHIS2 Tracked Entity Instance
+ * @public
+ * @function
+ * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
+ * @param {object&lt;any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `create`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `updateTEI` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of `updateTEI`&lt;/caption>
+ * update('PVqUD2hvU4E', state.data);
+ */
+
+
+function updateTEI(path, data, params, options, callback) {
+  return function (state) {
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    if (options) options.operationName = 'updateTEI';else {
+      options = {
+        operationName: 'updateTEI'
+      };
+    }
+    return update('trackedEntityInstances', path, data, params, options, callback)(state);
+  };
+}
+/**
+ * Get DHIS2 Events, single events with no registration(annonymous events) or single event with registration and multiple events with registration(tracker events)
+ * @public
+ * @function
+ * @param {array} params - `import` parameters for `getEvents`.
+ * @param {string} [responseType] - Optional response type. Defaults to `json`
+ * @param {eventOptions} [options] - Optional `flags` for the behavior of the `getEvents` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Query for `all events` with `children` of a certain `organisation unit`&lt;/caption>
+ * getEvents([{ orgUnit: 'YuQRtpLP10I' }, { ouMode: 'CHILDREN' }]);
+ * @example &lt;caption>- Query for `all events` with all `descendants` of a certain `organisation unit`, implying all organisation units in the `sub-hierarchy`&lt;/caption>
+ * getEvents([{ orgUnit: 'O6uvpzGd5pu' }, { ouMode: 'DESCENDANTS' }]);
+ * @example &lt;caption>- Query for `all events` with a `certain program` and `organisation unit`&lt;/caption>
+ * getEvents([{ orgUnit: 'DiszpKrYNg8' }, { program: 'eBAyeGv0exc' }]);
+ * @example &lt;caption>- Query for all `events` with a `certain program` and `organisation unit`, `sorting` by `due date ascending`&lt;/caption>
+ * getEvents([
+ * { orgUnit: 'DiszpKrYNg8' },
+ * { program: 'eBAyeGv0exc' },
+ * { order: 'dueDate' },
+ * ]);
+ * @example &lt;caption>- Query for the `10 events` with the `newest event date` in a `certain program` and `organisation unit` - by `paging` and `ordering` by `due date descending`&lt;/caption>
+ * getEvents([
+ * { orgUnit: 'DiszpKrYNg8' },
+ * { program: 'eBAyeGv0exc' },
+ * { order: 'eventDate:desc' },
+ * { pageSize: 10 },
+ * { page: 1 },
+ * ]);
+ * @example &lt;caption>- Query for `all events` with a `certain program` and `organisation unit` for a specific `tracked entity instance`&lt;/caption>
+ * getEvents([
+ * { orgUnit: 'DiszpKrYNg8' },
+ * { program: 'eBAyeGv0exc' },
+ * { trackedEntityInstance: 'gfVxE3ALA9m' },
+ * ]);
+ * @example &lt;caption>- Query for `all events` with a `certain program` and `organisation unit` `older` or `equal to 2014-02-03`&lt;/caption>
+ * getEvents([
+ * { orgUnit: 'DiszpKrYNg8' },
+ * { program: 'eBAyeGv0exc' },
+ * { endDate: '2014-02-03' },
+ * ]);
+ * @example &lt;caption>- Query for `all events` with a `certain program stage`, `organisation unit` and `tracked entity instance` in the `year 2014`&lt;/caption>
+ * getEvents([
+ * { orgUnit: 'DiszpKrYNg8' },
+ * { program: 'eBAyeGv0exc' },
+ * { trackedEntityInstance: 'gfVxE3ALA9m' },
+ * { startDate: '2014-01-01' },
+ * { endDate: '2014-12-31' },
+ * ]);
+ * @example &lt;caption>- Retrieve `events` with specified `Organisation unit` and `Program`, and use `Attribute:Gq0oWTf2DtN` as `identifier scheme`&lt;/caption>
+ * getEvents([
+ * { orgUnit: 'DiszpKrYNg8' },
+ * { program: 'lxAQ7Zs9VYR' },
+ * { idScheme: 'Attribute:Gq0oWTf2DtN' },
+ * ]);
+ * @example &lt;caption>- Retrieve `events` with specified `Organisation unit` and `Program`, and use `UID` as `identifier scheme` for `orgUnits`, `Code` as `identifier scheme` for `Program stages`, and `Attribute:Gq0oWTf2DtN` as `identifier scheme` for the rest of the `metadata` with `assigned attribute`.&lt;/caption>
+ * getEvents([
+ * { orgUnit: 'DiszpKrYNg8' },
+ * { program: 'lxAQ7Zs9VYR' },
+ * { idScheme: 'Attribute:Gq0oWTf2DtN' },
+ * { orgUnitIdScheme: 'UID' },
+ * { programStageIdScheme: 'Code' },
+ * ]);
+ */
+
+
+function getEvents(params, options, callback) {
+  return function (state) {
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    if (options) options.operationName = 'getEvents';else {
+      options = {
+        operationName: 'getEvents'
+      };
+    }
+    return getData('events', params, responseType, options, callback)(state);
+  };
+}
+/**
+ * Create a DHIS2 Events
+ * - You will need a `program` which can be looked up using the `getPrograms` operation, an `orgUnit` which can be looked up using the `getMetadata` operation and passing `{organisationUnits: true}` as `resources` param, and a list of `valid data element identifiers` which can be looked up using the `getMetadata` passing `{dataElements: true}` as `resources` param.
+ * - For events with registration, a `tracked entity instance identifier is required`
+ * - For sending `events` to `programs with multiple stages`, you will need to also include the `programStage` identifier, the identifiers for `programStages` can be found in the `programStages` resource via a call to `getMetadata` operation.
+ * @public
+ * @function
+ * @param {object&lt;any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `createEvents`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param { {apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `createEvents` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of `createEvents` for a `single event` can look like this:&lt;/caption>
+ * createEvents(state.data);
+ * // Example shape for state.data
+ * data: {
+ *   program: 'eBAyeGv0exc',
+ *   orgUnit: 'DiszpKrYNg8',
+ *   eventDate: date,
+ *   status: 'COMPLETED',
+ *   completedDate: date,
+ *   storedBy: 'admin',
+ *   coordinate: {
+ *     latitude: 59.8,
+ *     longitude: 10.9,
+ *   },
+ *   dataValues: [
+ *     {
+ *       dataElement: 'qrur9Dvnyt5',
+ *       value: '33',
+ *     },
+ *     {
+ *       dataElement: 'oZg33kd9taw',
+ *       value: 'Male',
+ *     },
+ *     {
+ *       dataElement: 'msodh3rEMJa',
+ *       value: date,
+ *     },
+ *   ],
+ * },
+ * @example &lt;caption>- Example `expression.js` of `createEvents` for sending `multiple events` at the same time&lt;/caption>
+ * createEvents(state.data);
+ * // Example shape for state.data
+ *
+ */
+
+
+function createEvents(data, params, options, callback) {
+  return function (state) {
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    if (options) options.operationName = 'createEvents';else {
+      options = {
+        operationName: 'createEvents'
+      };
+    }
+    return create('events', data, params, options, callback)(state);
+  };
+}
+/**
+ * Update a DHIS2 Events
+ * - To update an existing event, the format of the payload is the same as that of `creating an event` via `createEvents` operations
+ * - But  you should supply the `identifier` of the object you are updating
+ * - The payload has to contain `all`, even `non-modified`, `attributes`.
+ * - Attributes that were present before and are not present in the current payload any more will be removed by DHIS2.
+ * - If you do not want this behavior, please use `upsert` operation to upsert your events.
+ * @public
+ * @function
+ * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
+ * @param {object&lt;any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `updateEvents`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `updateEvents` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of `updateEvents`&lt;/caption>
+ * updateEvents('PVqUD2hvU4E', state.data);
+ * @todo Support `merge` via custom `partial updates` mechanism since `PATCH` is not `natively` supported on this endpoint
+ */
+
+
+function updateEvents(path, data, params, options, callback) {
+  return function (state) {
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    if (options) options.operationName = 'updateEvents';else {
+      options = {
+        operationName: 'updateEvents'
+      };
+    }
+    return update('events', path, data, params, options, callback)(state);
+  };
+}
+/**
+ * Get DHIS2 Programs
+ * @public
+ * @function
+ * @param {array} params - `import` parameters for `getPrograms`.
+ * @param {string} [responseType] - Optional response type. Defaults to `json`
+ * @param {eventOptions} [options] - Optional `flags` for the behavior of the `getPrograms` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Query for `all programs` with a certain `organisation unit`&lt;/caption>
+ * getPrograms([{ orgUnit: 'DiszpKrYNg8' }, { fields: '*' }]);
+ */
+
+
+function getPrograms(params, options, callback) {
+  return function (state) {
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    if (options) options.operationName = 'getPrograms';else {
+      options = {
+        operationName: 'getPrograms'
+      };
+    }
+    return getData('programs', params, options, callback)(state);
+  };
+}
+/**
+ * Create a DHIS2 Programs
+ * @public
+ * @function
+ * @param {object&lt;any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `createPrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `createPrograms` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of `createPrograms` for a `single program` can look like this:&lt;/caption>
+ * createPrograms(state.data);
+ * @see {singleProgramSampleState}
+ * @example &lt;caption>- Example `expression.js` of `createPrograms` for sending `multiple programs` at the same time&lt;/caption>
+ * createPrograms(state.data);
+ * @see {multipleProgramsSampleState}
+ */
+
+
+function createPrograms(data, params, options, callback) {
+  return function (state) {
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    if (options) options.operationName = 'createPrograms';else {
+      options = {
+        operationName: 'createPrograms'
+      };
+    }
+    return create('programs', data, options, params, callback)(state);
+  };
+}
+/**
+ * Update DHIS2 Programs
+ * - To update an existing program, the format of the payload is the same as that of `creating an event` via `createEvents` operations
+ * - But  you should supply the `identifier` of the object you are updating
+ * - The payload has to contain `all`, even `non-modified`, `attributes`.
+ * - Attributes that were present before and are not present in the current payload any more will be removed by DHIS2.
+ * - If you do not want this behavior, please use `upsert` operation to upsert your events.
+ * @public
+ * @function
+ * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
+ * @param {object&lt;any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `updatePrograms` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of `updatePrograms`&lt;/caption>
+ * updatePrograms('PVqUD2hvU4E', state.data);
+ * @todo Support `merge` via custom `partial updates` mechanism since `PATCH` is not `natively` supported on this endpoint
+ */
+
+
+function updatePrograms(path, data, params, options, callback) {
+  return function (state) {
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    if (options) options.operationName = 'updatePrograms';else {
+      options = {
+        operationName: 'updatePrograms'
+      };
+    }
+    return update('programs', path, data, params, options, callback)(state);
+  };
+}
+/**
+ * Get DHIS2 Enrollments
+ * @public
+ * @function
+ * @param {array} params - `import` parameters for `getEnrollments`.
+ * @param {string} [responseType] - Optional response type. Defaults to `json`
+ * @param {eventOptions} [options] - Optional `flags` for the behavior of the `getEnrollments` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- A query for `all enrollments` associated with a `specific organisation unit` can look like this:&lt;/caption>
+ * getEnrollments([{ ou: 'DiszpKrYNg8' }, { fields: '*' }]);
+ * @example &lt;caption>- To constrain the response to `enrollments` which are part of a `specific program` you can include a `program query parameter`&lt;/caption>
+ * getEnrollments([
+ * { ou: 'O6uvpzGd5pu' },
+ * { ouMode: 'DESCENDANTS' },
+ * { program: 'ur1Edk5Oe2n' },
+ * { fields: '*' },
+ * ]);
+ * @example &lt;caption>- To specify `program enrollment dates` as `part of the query`&lt;/caption>
+ * getEnrollments([
+ * { ou: 'O6uvpzGd5pu' },
+ * { ouMode: 'DESCENDANTS' },
+ * { program: 'ur1Edk5Oe2n' },
+ * { programStartDate: '2013-01-01' },
+ * { programEndDate: '2013-09-01' },
+ * { fields: '*' },
+ * ]);
+ * @example &lt;caption>- To constrain the response to `enrollments` of a `specific tracked entity` you can include a `tracked entity query parameter`&lt;/caption>
+ * getEnrollments([
+ * { ou: 'O6uvpzGd5pu' },
+ * { ouMode: 'DESCENDANTS' },
+ * { program: 'ur1Edk5Oe2n' },
+ * { trackedEntity: 'cyl5vuJ5ETQ' },
+ * { fields: '*' },
+ * ]);
+ * @example &lt;caption>- To constrain the response to `enrollments` of a `specific tracked entity instance` you can include a `tracked entity instance query parameter`, in this case we have `restricted` it to available `enrollments viewable for current user`&lt;/caption>
+ * getEnrollments([
+ * { ouMode: 'ACCESSIBLE' },
+ * { trackedEntityInstance: 'tphfdyIiVL6' },
+ * { fields: '*' },
+ * ]);
+ * @example &lt;caption>- By default the `enrollments` are returned in `pages of size 50`, to change this you can use the `page` and `pageSize query parameters`&lt;/caption>
+ * getEnrollments([
+ * { ou: 'O6uvpzGd5pu' },
+ * { ouMode: 'DESCENDANTS' },
+ * { page: 2 },
+ * { pageSize: 3 },
+ * { fields: '*' },
+ * ]);
+ */
+
+
+function getEnrollments(params, responseType, options, callback) {
+  return function (state) {
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    if (options) options.operationName = 'getEnrollments';else {
+      options = {
+        operationName: 'getEnrollments'
+      };
+    }
+    return getData('enrollments', params, options, callback)(state);
+  };
+}
+/**
+ * Create a DHIS2 Enrollment
+ * - Enrolling a tracked entity instance into a program
+ * - For enrolling `persons` into a `program`, you will need to first get the `identifier of the person` from the `trackedEntityInstances resource` via the `getTEIs` operation.
+ * - Then, you will need to get the `program identifier` from the `programs` resource via the `getPrograms` operation.
+ * @public
+ * @function
+ * @param {object&lt;any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `createEnrollment`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `createEnrollment` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of `createEnrollment` of a `person` into a `program` can look like this:&lt;/caption>
+ * createEnrollment(state.data);
+ * @see {enrollmentSampleState}
+ */
+
+
+function enrollTEI(data, params, options, callback) {
+  return function (state) {
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    if (options) options.operationName = 'enrollTEI';else {
+      options = {
+        operationName: 'enrollTEI'
+      };
+    }
+    return create('enrollments', data, options, params, callback)(state);
+  };
+}
+/**
+ * Update a DHIS2 Enrollemts
+ * - To update an existing enrollment, the format of the payload is the same as that of `creating an event` via `createEvents` operations
+ * - But  you should supply the `identifier` of the object you are updating
+ * - The payload has to contain `all`, even `non-modified`, `attributes`.
+ * - Attributes that were present before and are not present in the current payload any more will be removed by DHIS2.
+ * - If you do not want this behavior, please use `upsert` operation to upsert your events.
+ * @public
+ * @function
+ * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
+ * @param {object&lt;any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `updatePrograms` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of `updateEnromments`&lt;/caption>
+ * updatePrograms('PVqUD2hvU4E', state.data);
+ * @todo Support `merge` via custom `partial updates` mechanism since `PATCH` is not `natively` supported on this endpoint
+ */
+
+
+function updateEnrollments(path, data, params, options, callback) {
+  return function (state) {
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    if (options) options.operationName = 'updateEnrollments';else {
+      options = {
+        operationName: 'updateEnrollments'
+      };
+    }
+    return update('enrollments', path, data, params, options, callback)(state);
+  };
+}
+/**
+ * Cancel a DHIS2 Enrollment
+ * - To cancel an existing enrollment, you should supply the `enrollment identifier`(`enrollemt-id`)
+ * @public
+ * @function
+ * @param {string} enrollmentId - The `enrollment-id` of the enrollment you wish to cancel
+ * @param {array} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `updatePrograms` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of `cancelEnrollment`&lt;/caption>
+ * cancelEnrollments('PVqUD2hvU4E');
+ */
+
+
+function cancelEnrollment(enrollmentId, params, options, callback) {
+  return function (state) {
+    enrollmentId = (0, _Utils.recursivelyExpandReferences)(enrollmentId)(state);
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    if (options) options.operationName = 'cancelEnrollment';else {
+      options = {
+        operationName: 'cancelEnrollment'
+      };
+    }
+    var path = "".concat(enrollmentId, "/cancelled");
+    return update('enrollments', path, null, params, options, callback)(state);
+  };
+}
+/**
+ * Complete a DHIS2 Enrollment
+ * - To complete an existing enrollment, you should supply the `enrollment identifier`(`enrollemt-id`)
+ * @public
+ * @function
+ * @param {string} enrollmentId - The `enrollment-id` of the enrollment you wish to cancel
+ * @param {array} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {createOptions} [options] - Optional `flags` for the behavior of the `updatePrograms` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of `completeEnrollment`&lt;/caption>
+ * completeEnrollment('PVqUD2hvU4E');
+ */
+
+
+function completeEnrollment(enrollmentId, params, options, callback) {
+  return function (state) {
+    enrollmentId = (0, _Utils.recursivelyExpandReferences)(enrollmentId)(state);
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    if (options) options.operationName = 'completeEnrollment';else {
+      options = {
+        operationName: 'completeEnrollment'
+      };
+    }
+    var path = "".concat(enrollmentId, "/completed");
+    return update('enrollments', path, null, params, options, callback)(state);
+  };
+}
+/**
+ * Get DHIS2 Relationships(links) between two entities in tracker. These entities can be tracked entity instances, enrollments and events.
+ * - All the tracker operations, `getTEIs`, `getEnrollments` and `getEvents` also list their relationships if requested in the `field` filter.
+ * - To list all relationships, this requires you to provide the UID of the trackedEntityInstance, Enrollment or event that you want to list all the relationships for.
+ * @public
+ * @function
+ * @param {array} params - `import` parameters for `getRelationships`.
+ * @param {string} [responseType] - Optional response type. Defaults to `json`
+ * @param {eventOptions} [options] - Optional `flags` for the behavior of the `getRelationships` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- A query for `all relationships` associated with a `specific tracked entity instance` can look like this:&lt;/caption>
+ * getRelationships([{ tei: 'F8yKM85NbxW' }, { fields: '*' }]);
+ * @example &lt;caption>- A query for `all relationships` associated with a `enrollment` can look like this:&lt;/caption>
+ * getRelationships([{ enrollment: 'LXmiAMnJLrS' }, { fields: '*' }]);
+ * @example &lt;caption>- A query for `all relationships` associated with a `event` can look like this:&lt;/caption>
+ * getRelationships([{ event: 'TgJUhG6P6TJ' }, { fields: '*' }]);
+ */
+
+
+function getRelationships(params, options, callback) {
+  return function (state) {
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    if (options) options.operationName = 'getRelationships';else {
+      options = {
+        operationName: 'getRelationships'
+      };
+    }
+    return getData('relationships', params, options, callback)(state);
+  };
+}
+/**
+ * Get DHIS2 Data Values.
+ * - This operation retrives data values from DHIS2 Web API by interacting with the `dataValueSets` resource
+ * - Data values can be retrieved in XML, JSON and CSV format.
+ * @public
+ * @function
+ * @param {array} params - `Query` parameters for `getDataValues`. E.g. `{dataset: 'pBOMPrpg1QX', limit: 3, period: 2021, orgUnit: 'DiszpKrYNg8'} Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#data-values DHIS2 API docs} for available `Data Value Set Query Parameters`.
+ * @param {{apiVersion: number,operationName: string,responseType: string}} [options] - Optional `options` for `getDataValues` operation. Defaults to `{operationName: 'getDataValues', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
+ * @param {requestCallback} [callback] - Optional `callback` to handle the response
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example getting **two** `data values` associated with a specific `orgUnit`, `dataSet`, and `period `&lt;/caption>
+ * getDataValues({
+ *   orgUnit: 'DiszpKrYNg8',
+ *   period: '202010',
+ *   dataSet: 'pBOMPrpg1QX',
+ *   limit: 2,
+ *  })
+ */
+
+
+function getDataValues(params, options, callback) {
+  return function (state) {
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    if (options) options.operationName = 'getDataValues';else {
+      options = {
+        operationName: 'getDataValues'
+      };
+    }
+    return getData('dataValueSets', params, options, callback)(state);
+  };
+}
+/**
+ * Create DHIS2 Data Values
+ * - This is used to send aggregated data to DHIS2
+ * - A data value set represents a set of data values which have a relationship, usually from being captured off the same data entry form.
+ * - To send a set of related data values sharing the same period and organisation unit, we need to identify the period, the data set, the org unit (facility) and the data elements for which to report.
+ * - You can also use this operation to send large bulks of data values which don't necessarily are logically related.
+ * - To send data values that are not linked to a `dataSet`, you do not need to specify the dataSet and completeDate attributes. Instead, you will specify the period and orgUnit attributes on the individual data value elements instead of on the outer data value set element. This will enable us to send data values for various periods and organisation units
+ * @public
+ * @function
+ * @param {object} data - The `data values` to upload or create. See example shape.
+ * @param {object} [params] - Optional `import` parameters for `createDataValues`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`. Run `discover` or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#data-values DHIS2 Docs API} to learn about available data values import parameters.
+ * @param  {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `createDataVaues` operation.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of `createDataValues`  for sending a set of related data values sharing the same period and organisation unit&lt;/caption>
+ * createDataValues(state.data);
+ * // Example shape for state.data
+ * data: {
+ *   dataSet: 'pBOMPrpg1QX',
+ *   completeDate: '2014-02-03',
+ *   period: '201401',
+ *   orgUnit: 'DiszpKrYNg8',
+ *   dataValues: [
+ *     {
+ *       dataElement: 'f7n9E0hX8qk',
+ *       value: '1',
+ *     },
+ *     {
+ *       dataElement: 'Ix2HsbDMLea',
+ *       value: '2',
+ *     },
+ *     {
+ *       dataElement: 'eY5ehpbEsB7',
+ *       value: '3',
+ *     },
+ *   ],
+ * }
+ * @example &lt;caption>- Example `expression.js` of `createDataValues`  for sending large bulks of data values which don't necessarily are logically related&lt;/caption>
+ * createDataValues(state.data);
+ * // Example shape for state.data
+ * {
+ *   dataValues: [
+ *  {
+ *       dataElement: 'f7n9E0hX8qk',
+ *       period: '201401',
+ *       orgUnit: 'DiszpKrYNg8',
+ *       value: '12',
+ *     },
+ *     {
+ *       dataElement: 'f7n9E0hX8qk',
+ *       period: '201401',
+ *       orgUnit: 'FNnj3jKGS7i',
+ *       value: '14',
+ *     },
+ *     {
+ *       dataElement: 'f7n9E0hX8qk',
+ *       period: '201402',
+ *       orgUnit: 'DiszpKrYNg8',
+ *       value: '16',
+ *     },
+ *     {
+ *       dataElement: 'f7n9E0hX8qk',
+ *       period: '201402',
+ *      orgUnit: 'Jkhdsf8sdf4',
+ *       value: '18',
+ *     },
+ *   ]
+ * }
+ *
+ */
+
+
+function createDataValues(data, options, params, callback) {
+  return function (state) {
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    if (options) options.operationName = 'createDataValues';else {
+      options = {
+        operationName: 'createDataValues'
+      };
+    }
+    return create('dataValueSets', data, options, params, callback)(state);
+  };
+} //#endregion
+//#region GENERIC HELPER OPERATIONS
+
+/**
+ * Generate valid, random DHIS2 identifiers
+ * - Useful for client generated Ids compatible with DHIS2
+ * @public
+ * @function
+ * @param {{apiVersion: number,limit: number,responseType: string}} [options] - Optional `options` for `getMetadata` operation. Defaults to `{apiVersion: state.configuration.apiVersion,limit: 1,responseType: 'json'}`
+ * @param {requestCallback} [callback] - Callback to handle response
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>Example generating `one UID` from the DHIS2 server&lt;/caption>
+ * generateDhis2UID();
+ * @example &lt;caption>Example generating `three UIDs` from the DHIS2 server&lt;/caption>
+ * generateDhis2UID({limit: 3});
+ */
+
+
+function generateDhis2UID(options, callback) {
+  return function (state) {
+    var _options$limit, _options3, _options4;
+
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    if (options) options.operationName = 'generateDhis2UID';else {
+      options = {
+        operationName: 'generateDhis2UID'
+      };
+    }
+    var limit = {
+      limit: (_options$limit = (_options3 = options) === null || _options3 === void 0 ? void 0 : _options3.limit) !== null &amp;&amp; _options$limit !== void 0 ? _options$limit : 1
+    };
+    (_options4 = options) === null || _options4 === void 0 ? true : delete _options4.limit;
+    return getData('system/id', limit, options, callback)(state);
+  };
+}
+/**
+ * Discover available `DHIS2` `api` `endpoint` `query parameters` and allowed `operators` for a given resource's endpoint.
+ * @public
+ * @function
+ * @param {string} httpMethod - The HTTP to inspect parameter usage for a given endpoint, e.g., `get`, `post`,`put`,`patch`,`delete`
+ * @param {string} endpoint - The path for a given endpoint. E.g. `/trackedEntityInstances` or `/dataValueSets`
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>Example getting a list of `parameters allowed` on a given `endpoint` for specific `http method`&lt;/caption>
+ * discover('post', '/trackedEntityInstances')
+ */
+
+
+function discover(httpMethod, endpoint) {
+  return function (state) {
+    _Utils.Log.info("Discovering query/import parameters for ".concat(_Utils.COLORS.FgGreen).concat(httpMethod).concat(_Utils.ESCAPE, " on ").concat(_Utils.COLORS.FgGreen).concat(endpoint).concat(_Utils.ESCAPE));
+
+    return _axios["default"].get('https://dhis2.github.io/dhis2-api-specification/spec/metadata_openapi.json', {
+      transformResponse: [function (data) {
+        var tempData = JSON.parse(data);
+        var filteredData = tempData.paths[endpoint][httpMethod];
+        return _objectSpread({}, filteredData, {
+          parameters: filteredData.parameters.reduce(function (acc, currentValue) {
+            var index = currentValue['$ref'].lastIndexOf('/') + 1;
+            var paramRef = currentValue['$ref'].slice(index);
+            var param = tempData.components.parameters[paramRef];
+
+            if (param.schema['$ref']) {
+              var schemaRefIndex = param.schema['$ref'].lastIndexOf('/') + 1;
+              var schemaRef = param.schema['$ref'].slice(schemaRefIndex);
+              param.schema = tempData.components.schemas[schemaRef];
+            }
+
+            param.schema = JSON.stringify(param.schema);
+            var descIndex;
+            if ((0, _lodash.indexOf)(param.description, ',') === -1 &amp;&amp; (0, _lodash.indexOf)(param.description, '.') > -1) descIndex = (0, _lodash.indexOf)(param.description, '.');else if ((0, _lodash.indexOf)(param.description, ',') > -1 &amp;&amp; (0, _lodash.indexOf)(param.description, '.') > -1) {
+              descIndex = (0, _lodash.indexOf)(param.description, '.') &lt; (0, _lodash.indexOf)(param.description, ',') ? (0, _lodash.indexOf)(param.description, '.') : (0, _lodash.indexOf)(param.description, ',');
+            } else {
+              descIndex = param.description.length;
+            }
+            param.description = param.description.slice(0, descIndex);
+            acc[paramRef] = param;
+            return acc;
+          }, {})
+        });
+      }]
+    }).then(function (result) {
+      var _result$data$descript;
+
+      _Utils.Log.info("\t=======================================================================================\n\tQuery Parameters for ".concat(_Utils.COLORS.FgGreen).concat(httpMethod).concat(_Utils.ESCAPE, " on ").concat(_Utils.COLORS.FgGreen).concat(endpoint).concat(_Utils.ESCAPE, " [").concat((_result$data$descript = result.data.description) !== null &amp;&amp; _result$data$descript !== void 0 ? _result$data$descript : '&lt;description_missing>', "]\n\t======================================================================================="));
+
+      console.table(result.data.parameters, ['in', 'required', 'description']);
+      console.table(result.data.parameters, ['schema']);
+      console.log("=========================================Responses===============================\n".concat((0, _Utils.prettyJson)(result.data.responses), "\n======================================================================================="));
+      return _objectSpread({}, state, {
+        data: result.data
+      });
+    });
+  };
+}
+/**
+ * Access analytical, aggregated data in DHIS2 you can work with the analytics resource
+ * - The analytics resource is powerful as it lets you query and retrieve data aggregated along all available data dimensions.
+ * - For instance, you can ask the analytics resource to provide the aggregated data values for a set of data elements, periods and organisation units.
+ * - Also, you can retrieve the aggregated data for a combination of any number of dimensions based on data elements and organisation unit group sets.
+ * @public
+ * @function
+ * @param {object} params - Analytics `query parameters`, e.g. `{dx: 'fbfJHSPpUQD;cYeuwXTCPkU',filters: ['pe:2014Q1;2014Q2','ou:O6uvpzGd5pu;lc3eMKXaEfw']}`. Run `discover` or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#analytics DHIS2 API docs} to get the params available.
+ * @param {{apiVersion: number,responseType: string}}[options] - `Optional` options for `getAnalytics` operation. Defaults to `{apiVersion: state.configuration.apiVersion, responseType: 'json'}`.
+ * @param {requestCallback} [callback] - Callback to handle response
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>Example getting a list of data elements filtered by the periods and organisation units&lt;/caption>
+ *  getAnalytics({
+ *    dimensions: ['dx:fbfJHSPpUQD;cYeuwXTCPkU'],
+ *    filters: ['pe:2014Q1;2014Q2', 'ou:O6uvpzGd5pu;lc3eMKXaEfw'],
+ *  })
+ * @example &lt;caption>Example getting only records where the data value is greater or equal to 6500 and less than 33000&lt;/caption>
+ * getAnalytics({
+ *   dimensions: [
+ *    'dx:fbfJHSPpUQD;cYeuwXTCPkU',
+ *    'pe:2014',
+ *    'ou:O6uvpzGd5pu;lc3eMKXaEfw',
+ *   ],
+ *   measureCriteria: 'GE:6500;LT:33000',
+ * })
+ * @example &lt;caption>Example getting only records for a certain date range using startDate and endDate&lt;/caption>
+ * getAnalytics({
+ *   dimensions: ['dx:fbfJHSPpUQD;cYeuwXTCPkU', 'ou:ImspTQPwCqd'],
+ *     startDate: '2018-01-01',
+ *     endDate: '2018-06-01',
+ * })
+ */
+
+
+function getAnalytics(params, options, callback) {
+  return function (state) {
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    if (options) options.operationName = 'getAnalytics';else {
+      options = {
+        operationName: 'getAnalytics'
+      };
+    }
+    return getData("analytics", params, options, callback)(state);
+  };
+}
+/**
+ * Get a list of DHIS2 api resources
+ * @public
+ * @function
+ * @param {object} params - The optional query parameters for this endpoint. E.g `{filter: 'singular:like:attribute'}`.
+ * @param {{filter: string, fields: string, responseType: string}} [options] - The `optional` options, specifiying the filter expression. E.g. `singular:eq:attribute`.
+ * @param {requestCallback} [callback] - The `optional callback function that will be called to handle data returned by this function.
+ * @returns Promise&lt;state> state
+ * @example &lt;caption>Example getting a list of `all DHIS2 resources`&lt;/caption>
+ * getResources();
+ * @example &lt;caption>Example getting a resource named `attribute`, in `json` format&lt;/caption>
+ * getResources({ filter: 'singular:eq:attribute' });
+ * @example &lt;caption>Example getting a resource named `attribute`, in `xml` format, returning all the fields&lt;/caption>
+ *  getResources('dataElement', {
+ *      filter: 'singular:eq:attribute',
+ *      fields: '*',
+ *      responseType: 'xml',
+ *   })
+ */
+
+
+function getResources(params, options, callback) {
+  return function (state) {
+    var _options$responseType, _options5, _params, _CONTENT_TYPES$respon;
+
+    params = (0, _Utils.recursivelyExpandReferences)(params)(state);
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    var operationName = 'getResources';
     var _state$configuration3 = state.configuration,
         username = _state$configuration3.username,
         password = _state$configuration3.password,
         hostUrl = _state$configuration3.hostUrl;
-    var url = (0, _url4.resolve)(hostUrl + '/', 'api/events.json?');
-    var query = data.fields || expandDataValues(params)(state);
-    console.log('Getting Events Data:');
-    return (0, _Client.get)({
-      username: username,
-      password: password,
-      query: query,
-      url: url
-    }).then(function (result) {
-      console.log('Get Result:', result.body);
-      return result;
-    }).then(function (result) {
-      if (postUrl) {
-        var body = result.body;
-        var _url2 = postUrl;
-        return (0, _Client.post)({
-          username: username,
-          password: password,
-          body: body,
-          url: _url2
-        }).then(function (result) {
-          console.log('Post Result:', result.statusCode);
-          return _objectSpread({}, state, {
-            references: [result].concat(_toConsumableArray(state.references))
+    var responseType = (_options$responseType = (_options5 = options) === null || _options5 === void 0 ? void 0 : _options5.responseType) !== null &amp;&amp; _options$responseType !== void 0 ? _options$responseType : 'json';
+    var filter = (_params = params) === null || _params === void 0 ? void 0 : _params.filter;
+    var queryParams = params;
+    var headers = {
+      Accept: (_CONTENT_TYPES$respon = _Utils.CONTENT_TYPES[responseType]) !== null &amp;&amp; _CONTENT_TYPES$respon !== void 0 ? _CONTENT_TYPES$respon : 'application/json'
+    };
+    var path = '/resources';
+    var url = (0, _Utils.buildUrl)(path, hostUrl, null, false);
+
+    var transformResponse = function transformResponse(data, headers) {
+      if (filter) {
+        var _headers$contentType, _headers$contentType2;
+
+        if (((_headers$contentType = (_headers$contentType2 = headers['content-type']) === null || _headers$contentType2 === void 0 ? void 0 : _headers$contentType2.split(';')[0]) !== null &amp;&amp; _headers$contentType !== void 0 ? _headers$contentType : null) === _Utils.CONTENT_TYPES.json) {
+          var tempData = JSON.parse(data);
+          return _objectSpread({}, tempData, {
+            resources: _Utils.applyFilter.apply(void 0, [tempData.resources].concat(_toConsumableArray((0, _Utils.parseFilter)(filter))))
           });
-        });
-      } else {
-        return _objectSpread({}, state, {
-          references: [result].concat(_toConsumableArray(state.references))
-        });
+        } else {
+          _Utils.Log.warn('Filters on this resource are only supported for json content types. Skipping filtering ...');
+        }
       }
+
+      return data;
+    };
+
+    (0, _Utils.logOperation)(operationName);
+    (0, _Utils.logWaitingForServer)(url, queryParams);
+    (0, _Utils.warnExpectLargeResult)(queryParams, url);
+    return _axios["default"].request({
+      url: url,
+      method: 'GET',
+      auth: {
+        username: username,
+        password: password
+      },
+      responseType: responseType,
+      headers: headers,
+      params: queryParams,
+      transformResponse: transformResponse
+    }).then(function (result) {
+      _Utils.Log.info("".concat(_Utils.COLORS.FgGreen).concat(operationName, " succeeded").concat(_Utils.ESCAPE, ". The result of this operation will be in ").concat(operationName, "state.data").concat(_Utils.ESCAPE, " or in your ").concat(operationName, "callback").concat(_Utils.ESCAPE, "."));
+
+      if (callback) return callback((0, _languageCommon.composeNextState)(state, result.data));
+      return (0, _languageCommon.composeNextState)(state, result.data);
     });
   };
 }
 /**
- * Create an event
+ * Get the schema of a given resource type, in any data format supported by DHIS2
  * @public
- * @example
- * event(eventData)
- * @constructor
- * @param {object} eventData - Payload data for the event
- * @returns {Operation}
+ * @function
+ * @param {string} resourceType - The type of resource to be updated(`singular` version of the `resource name`). E.g. `dataElement`, `organisationUnit`, etc. Run `getResources` to see available resources and their corresponding `singular` names.
+ * @param {Object} params - Optional `query parameters` for the `getSchema` operation. e.g. `{ fields: 'properties' ,skipPaging: true}`. Run`discover` or See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#metadata-export-examples DHIS2 API Docs}
+ * @param {{apiVersion: number,resourceType: string}} [options] - Optional options for `getSchema` method. Defaults to `{apiVersion: state.configuration.apiVersion, responseType: 'json'}`
+ * @param {Function} [callback] - Optional `callback` to handle the response
+ * @returns Promise&lt;state> state
+ * @example &lt;caption>Example getting the `schema` for `dataElement`&lt;/caption>
+ * getSchema('dataElement');
+ * @example &lt;caption>Example getting the `schema` for `dataElement`, only returning the `properties` field&lt;/caption>
+ * getSchema('dataElement', { fields: 'properties' });
+ * @example &lt;caption>Example getting the `schema` for `dataElement` in XML&lt;/caption>
+ * getSchema('dataElement', '{ fields: '*' }, { responseType: 'xml' });
  */
 
 
-function event(eventData) {
+function getSchema(resourceType, params, options, callback) {
   return function (state) {
-    var body = (0, _languageCommon.expandReferences)(eventData)(state);
+    var _options$responseType2, _options6, _params2, _params3, _options$apiVersion2, _options7, _CONTENT_TYPES$respon2, _resourceType;
+
+    resourceType = (0, _Utils.recursivelyExpandReferences)(resourceType)(state);
+    params = (0, _Utils.recursivelyExpandReferences)(params)(state);
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    var operationName = 'getSchema';
     var _state$configuration4 = state.configuration,
         username = _state$configuration4.username,
         password = _state$configuration4.password,
         hostUrl = _state$configuration4.hostUrl;
-    var url = (0, _url4.resolve)(hostUrl + '/', 'api/events');
-    console.log("Posting event to org unit '".concat(body.orgUnit, "'."));
-    return (0, _Client.post)({
-      username: username,
-      password: password,
-      body: body,
-      url: url
+    var responseType = (_options$responseType2 = (_options6 = options) === null || _options6 === void 0 ? void 0 : _options6.responseType) !== null &amp;&amp; _options$responseType2 !== void 0 ? _options$responseType2 : 'json';
+    var filters = (_params2 = params) === null || _params2 === void 0 ? void 0 : _params2.filters;
+    (_params3 = params) === null || _params3 === void 0 ? true : delete _params3.filters;
+    var queryParams = new URLSearchParams(params);
+    filters === null || filters === void 0 ? void 0 : filters.map(function (f) {
+      return queryParams.append('filter', f);
+    });
+    var apiVersion = (_options$apiVersion2 = (_options7 = options) === null || _options7 === void 0 ? void 0 : _options7.apiVersion) !== null &amp;&amp; _options$apiVersion2 !== void 0 ? _options$apiVersion2 : state.configuration.apiVersion;
+    var headers = {
+      Accept: (_CONTENT_TYPES$respon2 = _Utils.CONTENT_TYPES[responseType]) !== null &amp;&amp; _CONTENT_TYPES$respon2 !== void 0 ? _CONTENT_TYPES$respon2 : 'application/json'
+    };
+    var url = (0, _Utils.buildUrl)("/schemas/".concat((_resourceType = resourceType) !== null &amp;&amp; _resourceType !== void 0 ? _resourceType : ''), hostUrl, apiVersion);
+    (0, _Utils.logOperation)(operationName);
+    (0, _Utils.logApiVersion)(apiVersion);
+    (0, _Utils.logWaitingForServer)(url, queryParams);
+    (0, _Utils.warnExpectLargeResult)(resourceType, url);
+    return _axios["default"].request({
+      method: 'GET',
+      url: url,
+      auth: {
+        username: username,
+        password: password
+      },
+      responseType: responseType,
+      params: queryParams,
+      headers: headers
     }).then(function (result) {
-      console.log('Result:', JSON.stringify(result.body, null, 2));
-      return _objectSpread({}, state, {
-        references: [result].concat(_toConsumableArray(state.references))
-      });
+      _Utils.Log.info("".concat(_Utils.COLORS.FgGreen).concat(operationName, " succeeded").concat(_Utils.ESCAPE, ". The result of this operation will be in ").concat(operationName, "state.data").concat(_Utils.ESCAPE, " or in your ").concat(operationName, "callback").concat(_Utils.ESCAPE, "."));
+
+      if (callback) return callback((0, _languageCommon.composeNextState)(state, result.data));
+      return (0, _languageCommon.composeNextState)(state, result.data);
     });
   };
 }
-
-function expandDataValues(obj) {
-  return function (state) {
-    return (0, _fp.mapValues)(function (value) {
-      if (_typeof(value) == 'object') {
-        return value.map(function (item) {
-          return expandDataValues(item)(state);
-        });
-      } else {
-        return typeof value == 'function' ? value(state) : value;
-      }
-    })(obj);
-  };
-}
 /**
- * Send data values using the dataValueSets resource
+ * A generic helper method for getting data of any kind from DHIS2.
+ * - This can be used to get `DataValueSets`,`events`,`trackedEntityInstances`,`etc.`
  * @public
- * @example
- *  dataValueSet({
- *    dataSet: dataValue("set"),
- *    orgUnit: "DiszpKrYNg8",
- *    period: "201402",
- *    completeData: "2014-03-03",
- *    dataValues: [
- *      dataElement("f7n9E0hX8qk", dataValue("name")),
- *      dataElement("Ix2HsbDMLea", dataValue("age")),
- *      dataElement("eY5ehpbEsB7", 30)
- *    ]
- * });
- * @constructor
- * @param {object} data - Payload data for the data value set
- * @returns {Operation}
+ * @function
+ * @param {string} resourceType - The type of resource to get(use its `plural` name). E.g. `dataElements`, `trackedEntityInstances`,`organisationUnits`, etc.
+ * @param {object} [params] - Optional `query parameters` e.g. `{ou: 'DiszpKrYNg8'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 docs} for more details on which params to use for a given type of resource.
+ * @param {{apiVersion: number,operationName: string,responseType: string}}[options] - `Optional` options for `getData` operation. Defaults to `{operationName: 'getData', apiVersion: state.configuration.apiVersion, responseType: 'json'}`.
+ * @param {requestCallback} [callback]  - Optional callback to handle the response
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>Example getting one `trackedEntityInstance` with `Id` 'dNpxRu1mWG5' for a given `orgUnit(DiszpKrYNg8)`&lt;/caption>
+ *  getData('trackedEntityInstances', {
+ *    fields: '*',
+ *    ou: 'DiszpKrYNg8',
+ *    entityType: 'nEenWmSyUEp',
+ *    trackedEntityInstance: 'dNpxRu1mWG5',
+ *  })
+ *
  */
 
 
-function dataValueSet(data) {
+function getData(resourceType, params, options, callback) {
   return function (state) {
-    var body = expandDataValues(data)(state);
+    var _options$operationNam, _options8, _options$responseType3, _options9, _params4, _params5, _params6, _options$apiVersion3, _options10, _CONTENT_TYPES$respon3;
+
+    resourceType = (0, _Utils.recursivelyExpandReferences)(resourceType)(state);
+    params = (0, _Utils.recursivelyExpandReferences)(params)(state);
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    var operationName = (_options$operationNam = (_options8 = options) === null || _options8 === void 0 ? void 0 : _options8.operationName) !== null &amp;&amp; _options$operationNam !== void 0 ? _options$operationNam : 'getData';
     var _state$configuration5 = state.configuration,
         username = _state$configuration5.username,
         password = _state$configuration5.password,
         hostUrl = _state$configuration5.hostUrl;
-    var url = (0, _url4.resolve)(hostUrl + '/', 'api/dataValueSets');
-    console.log("Posting data value set ".concat(body.dataSet, " to org unit '").concat(body.orgUnit, "' with ").concat(body.dataValues &amp;&amp; body.dataValues.length, " data values."));
-    return (0, _Client.post)({
-      username: username,
-      password: password,
-      body: body,
-      url: url
+    var responseType = (_options$responseType3 = (_options9 = options) === null || _options9 === void 0 ? void 0 : _options9.responseType) !== null &amp;&amp; _options$responseType3 !== void 0 ? _options$responseType3 : 'json';
+    var filters = (_params4 = params) === null || _params4 === void 0 ? void 0 : _params4.filters;
+    var dimensions = (_params5 = params) === null || _params5 === void 0 ? void 0 : _params5.dimensions;
+    (_params6 = params) === null || _params6 === void 0 ? true : delete _params6.filters;
+    var queryParams = new URLSearchParams(params);
+    filters === null || filters === void 0 ? void 0 : filters.map(function (f) {
+      return queryParams.append('filter', f);
+    });
+    dimensions === null || dimensions === void 0 ? void 0 : dimensions.map(function (d) {
+      return queryParams.append('dimension', d);
+    });
+    var apiVersion = (_options$apiVersion3 = (_options10 = options) === null || _options10 === void 0 ? void 0 : _options10.apiVersion) !== null &amp;&amp; _options$apiVersion3 !== void 0 ? _options$apiVersion3 : state.configuration.apiVersion;
+    var headers = {
+      Accept: (_CONTENT_TYPES$respon3 = _Utils.CONTENT_TYPES[responseType]) !== null &amp;&amp; _CONTENT_TYPES$respon3 !== void 0 ? _CONTENT_TYPES$respon3 : 'application/json'
+    };
+    var url = (0, _Utils.buildUrl)("/".concat(resourceType), hostUrl, apiVersion);
+    (0, _Utils.logOperation)(operationName);
+    (0, _Utils.logApiVersion)(apiVersion);
+    (0, _Utils.logWaitingForServer)(url, queryParams);
+    (0, _Utils.warnExpectLargeResult)(resourceType, url);
+    return _axios["default"].request({
+      method: 'GET',
+      url: url,
+      auth: {
+        username: username,
+        password: password
+      },
+      responseType: responseType,
+      params: queryParams,
+      headers: headers
     }).then(function (result) {
-      console.log('Result:', JSON.stringify(result.body, null, 2));
-      return _objectSpread({}, state, {
-        references: [result].concat(_toConsumableArray(state.references))
-      });
+      _Utils.Log.info("".concat(_Utils.COLORS.FgGreen).concat(operationName, " succeeded").concat(_Utils.ESCAPE, ". The result of this operation will be in ").concat(operationName, " ").concat(_Utils.COLORS.FgGreen, "state.data").concat(_Utils.ESCAPE, " or in your ").concat(_Utils.COLORS.FgGreen, "callback").concat(_Utils.ESCAPE, "."));
+
+      if (callback) return callback((0, _languageCommon.composeNextState)(state, result.data));
+      return (0, _languageCommon.composeNextState)(state, result.data);
     });
   };
 }
 /**
- * Create a "dataElement" pairing for DHIS2.
+ * A generic helper function to get metadata records from a given DHIS2 instance
  * @public
- * @example
- * dataElement(key, value)
- * @constructor
- * @param {string} dataElement - Payload data for the Data Element key
- * @param {variable} value - Payload data for the Data Element value
- * @param {string} comment - comment for the Data Element
- * @returns {Operation}
+ * @function
+ * @param {string[]} resources - Required. List of metadata resources to fetch. E.g. `['organisationUnits', 'attributes']` or like `'dataSets'` if you only want a single type of resource. See `getResources` to see the types of resources available.
+ * @param {object} [params] - Optional `query parameters` e.g. `{filters: ['name:like:ANC'],fields:'*'}`. See `discover` or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#metadata-export DHIS2 API docs}
+ * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional `options` for `getMetadata` operation. Defaults to `{operationName: 'getMetadata', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
+ * @param {requestCallback} [callback] - Optional `callback` to handle the response
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>Example getting a list of `ALL` `organisation units`&lt;/caption>
+ * getMetadata('organisationUnits')
+ * @example &lt;caption>Example getting a list of `data elements` and `indicators` where `name` includes the word **ANC**&lt;/caption>
+ * getMetadata(['dataElements', 'indicators'], {
+ *      filters: ['name:like:ANC'],
+ *  })
  */
 
 
-function dataElement(dataElement, value, comment) {
-  return {
-    dataElement: dataElement,
-    value: value,
-    comment: comment
-  };
-}
-/**
- * Create one or many new Tracked Entity Instances
- * @public
- * @example
- * createTEI(data)
- * @constructor
- * @param {object} data - Payload data for new tracked entity instance(s)
- * @returns {Operation}
- */
-
-
-function createTEI(data) {
+function getMetadata(resources, params, options, callback) {
   return function (state) {
-    var body = (0, _languageCommon.expandReferences)(data)(state);
+    var _options$responseType4, _options11, _queryParams, _queryParams2, _options$apiVersion4, _options12, _CONTENT_TYPES$respon4;
+
+    resources = (0, _Utils.recursivelyExpandReferences)(resources)(state);
+    params = (0, _Utils.recursivelyExpandReferences)(params)(state);
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    var operationName = 'getMetadata';
     var _state$configuration6 = state.configuration,
         username = _state$configuration6.username,
         password = _state$configuration6.password,
         hostUrl = _state$configuration6.hostUrl;
-    var url = (0, _url4.resolve)(hostUrl + '/', 'api/trackedEntityInstances');
-    console.log("Posting tracked entity instance of type '".concat(body.trackedEntityType, "' to org unit '").concat(body.orgUnit, "' with ").concat(body.attributes &amp;&amp; body.attributes.length, " attributes and ").concat(body.enrollments &amp;&amp; body.enrollments.length, " enrollments."));
-    return (0, _Client.post)({
-      username: username,
-      password: password,
-      body: body,
-      url: url
+    var responseType = (_options$responseType4 = (_options11 = options) === null || _options11 === void 0 ? void 0 : _options11.responseType) !== null &amp;&amp; _options$responseType4 !== void 0 ? _options$responseType4 : 'json';
+
+    if (typeof resources === 'string') {
+      var res = {};
+      res[resources] = true;
+      resources = res;
+    } else {
+      resources = resources.reduce(function (acc, currentValue) {
+        acc[currentValue] = true;
+        return acc;
+      }, {});
+    }
+
+    var queryParams = _objectSpread({}, resources, {}, params);
+
+    var filters = (_queryParams = queryParams) === null || _queryParams === void 0 ? void 0 : _queryParams.filters;
+    (_queryParams2 = queryParams) === null || _queryParams2 === void 0 ? true : delete _queryParams2.filters;
+    queryParams = new URLSearchParams(queryParams);
+    filters === null || filters === void 0 ? void 0 : filters.map(function (f) {
+      return queryParams.append('filter', f);
+    });
+    var apiVersion = (_options$apiVersion4 = (_options12 = options) === null || _options12 === void 0 ? void 0 : _options12.apiVersion) !== null &amp;&amp; _options$apiVersion4 !== void 0 ? _options$apiVersion4 : state.configuration.apiVersion;
+    var headers = {
+      Accept: (_CONTENT_TYPES$respon4 = _Utils.CONTENT_TYPES[responseType]) !== null &amp;&amp; _CONTENT_TYPES$respon4 !== void 0 ? _CONTENT_TYPES$respon4 : 'application/json'
+    };
+    var url = (0, _Utils.buildUrl)('/metadata', hostUrl, apiVersion);
+    (0, _Utils.logOperation)(operationName);
+    (0, _Utils.logApiVersion)(apiVersion);
+    (0, _Utils.logWaitingForServer)(url, queryParams);
+    (0, _Utils.warnExpectLargeResult)(queryParams, url);
+    return _axios["default"].request({
+      method: 'GET',
+      url: url,
+      auth: {
+        username: username,
+        password: password
+      },
+      responseType: responseType,
+      params: queryParams,
+      headers: headers
     }).then(function (result) {
-      console.log('Result:', JSON.stringify(result.body, null, 2));
-      return _objectSpread({}, state, {
-        references: [result].concat(_toConsumableArray(state.references))
-      });
+      _Utils.Log.info("".concat(_Utils.COLORS.FgGreen).concat(operationName, " succeeded").concat(_Utils.ESCAPE, ". The result of this operation will be in ").concat(_Utils.COLORS.FgGreen).concat(operationName, " state.data").concat(_Utils.ESCAPE, " or in your ").concat(_Utils.COLORS.FgGreen, "callback").concat(_Utils.ESCAPE, "."));
+
+      if (callback) return callback((0, _languageCommon.composeNextState)(state, result.data));
+      return (0, _languageCommon.composeNextState)(state, result.data);
     });
   };
 }
 /**
- * Update existing Tracked Entity Instances
+ * A generic helper method to create a record of any kind in DHIS2
  * @public
- * @example
- * updateTEI(tei, data)
- * @constructor
- * @param {object} tei - identifier for the TEI to be updated
- * @param {object} data - Payload data for updating a TEI
- * @returns {Operation}
+ * @function
+ * @param {string} resourceType - Type of resource to create. E.g. `trackedEntityInstances`
+ * @param {Object&lt;symbol,any>} data - Data that will be used to create a given instance of resource
+ * @param {Object} [options] - Optional `options` to control the behavior of the `create` operation.` Defaults to `{operationName: 'create', apiVersion: null, responseType: 'json'}`
+ * @param {Object} [params] - Optional `import parameters` for a given a resource. E.g. `{dryRun: true, importStrategy: CREATE}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 API documentation} or {@link discover}. Defauls to `DHIS2 default params` for a given resource type.
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of `create`&lt;/caption>
+ * create('events', state.data);
  */
 
 
-function updateTEI(tei, data) {
+function create(resourceType, data, options, params, callback) {
   return function (state) {
-    var body = (0, _languageCommon.expandReferences)(data)(state);
+    var _options$operationNam2, _options13, _options$responseType5, _options14, _params7, _params8, _options$apiVersion5, _options15, _CONTENT_TYPES$respon5;
+
+    resourceType = (0, _Utils.recursivelyExpandReferences)(resourceType)(state);
+    var body = (0, _Utils.recursivelyExpandReferences)(data)(state);
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    params = (0, _Utils.recursivelyExpandReferences)(params)(state);
+    var operationName = (_options$operationNam2 = (_options13 = options) === null || _options13 === void 0 ? void 0 : _options13.operationName) !== null &amp;&amp; _options$operationNam2 !== void 0 ? _options$operationNam2 : 'create';
     var _state$configuration7 = state.configuration,
         username = _state$configuration7.username,
         password = _state$configuration7.password,
         hostUrl = _state$configuration7.hostUrl;
-    var url = hostUrl.concat("/api/trackedEntityInstances/".concat(tei));
-    console.log("Updating tracked entity instance of type '".concat(body.trackedEntityType, "' to org unit '").concat(body.orgUnit, "' with ").concat(body.attributes &amp;&amp; body.attributes.length, " attributes and ").concat(body.enrollments &amp;&amp; body.enrollments.length, " enrollments."));
-    return (0, _Client.put)({
-      username: username,
-      password: password,
-      body: body,
-      url: url
+    var responseType = (_options$responseType5 = (_options14 = options) === null || _options14 === void 0 ? void 0 : _options14.responseType) !== null &amp;&amp; _options$responseType5 !== void 0 ? _options$responseType5 : 'json';
+    var filters = (_params7 = params) === null || _params7 === void 0 ? void 0 : _params7.filters;
+    (_params8 = params) === null || _params8 === void 0 ? true : delete _params8.filters;
+    var queryParams = new URLSearchParams(params);
+    var apiVersion = (_options$apiVersion5 = (_options15 = options) === null || _options15 === void 0 ? void 0 : _options15.apiVersion) !== null &amp;&amp; _options$apiVersion5 !== void 0 ? _options$apiVersion5 : state.configuration.apiVersion;
+    var url = (0, _Utils.buildUrl)('/' + resourceType, hostUrl, apiVersion);
+    var headers = {
+      Accept: (_CONTENT_TYPES$respon5 = _Utils.CONTENT_TYPES[responseType]) !== null &amp;&amp; _CONTENT_TYPES$respon5 !== void 0 ? _CONTENT_TYPES$respon5 : 'application/json',
+      'Content-Type': 'application/json'
+    };
+    (0, _Utils.logOperation)(operationName);
+    (0, _Utils.logApiVersion)(apiVersion);
+    (0, _Utils.logWaitingForServer)(url, queryParams);
+    (0, _Utils.warnExpectLargeResult)(resourceType, url);
+    return _axios["default"].request({
+      method: 'POST',
+      url: url,
+      auth: {
+        username: username,
+        password: password
+      },
+      params: queryParams,
+      data: body,
+      headers: headers
     }).then(function (result) {
-      console.log('Result:', JSON.stringify(result.body, null, 2));
-      return _objectSpread({}, state, {
-        references: [result].concat(_toConsumableArray(state.references))
-      });
+      var _result$data$response, _result$data$response2;
+
+      _Utils.Log.info("".concat(_Utils.COLORS.FgGreen).concat(operationName, " succeeded").concat(_Utils.ESCAPE, ". Created ").concat(resourceType, ": ").concat(_Utils.COLORS.FgGreen).concat(((_result$data$response = result.data.response) === null || _result$data$response === void 0 ? void 0 : _result$data$response.importSummaries) ? result.data.response.importSummaries[0].href : (_result$data$response2 = result.data.response) === null || _result$data$response2 === void 0 ? void 0 : _result$data$response2.reference).concat(_Utils.ESCAPE, ".\nSummary:\n").concat((0, _Utils.prettyJson)(result.data)));
+
+      if (callback) return callback((0, _languageCommon.composeNextState)(state, result.data));
+      return (0, _languageCommon.composeNextState)(state, result.data);
     });
   };
 }
 /**
- * Create or update one or many new Tracked Entity Instances
+ *  A generic helper function to update a resource object of any type.
+ * - It requires to send `all required fields` or the `full body`
  * @public
- * @example
- * upsertTEI('w75KJ2mc4zz', state.data, { replace: true })
- * @constructor
- * @param {string} uniqueAttributeId - Tracked Entity Instance unique identifier used during matching
- * @param {object} data - Payload data for new/updated tracked entity instance(s)
- * @param {object} options - Optional options for update method. Defaults to {replace: true}
- * @returns {Operation}
+ * @function
+ * @param {string} resourceType - The type of resource to be updated. E.g. `dataElements`, `organisationUnits`, etc.
+ * @param {string} path - The `id` or `path` to the `object` to be updated. E.g. `FTRrcoaog83` or `FTRrcoaog83/{collection-name}/{object-id}`
+ * @param {object} data - Data to update. It requires to send `all required fields` or the `full body`. If you want `partial updates`, use `patch` operation.
+ * @param {object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
+ * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional options for update method. Defaults to `{operationName: 'update', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
+ * @param {requestCallback} [callback]  - Optional callback to handle the response
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>Example `updating` a `data element`&lt;/caption>
+ * update('dataElements', 'FTRrcoaog83',
+ * {
+ *   displayName: 'New display name',
+ *   aggregationType: 'SUM',
+ *   domainType: 'AGGREGATE',
+ *   valueType: 'NUMBER',
+ *   name: 'Accute Flaccid Paralysis (Deaths &lt; 5 yrs)',
+ *   shortName: 'Accute Flaccid Paral (Deaths &lt; 5 yrs)',
+ * });
+ *
  */
 
 
-function upsertTEI(uniqueAttributeId, data, options) {
+function update(resourceType, path, data, params, options, callback) {
   return function (state) {
+    var _options$operationNam3, _options16, _options$responseType6, _options17, _params9, _params10, _options$apiVersion6, _options18, _CONTENT_TYPES$respon6;
+
+    resourceType = (0, _Utils.recursivelyExpandReferences)(resourceType)(state);
+    path = (0, _Utils.recursivelyExpandReferences)(path)(state);
+    var body = (0, _Utils.recursivelyExpandReferences)(data)(state);
+    params = (0, _Utils.recursivelyExpandReferences)(params)(state);
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
     var _state$configuration8 = state.configuration,
-        password = _state$configuration8.password,
         username = _state$configuration8.username,
+        password = _state$configuration8.password,
         hostUrl = _state$configuration8.hostUrl;
-    var replace = options.replace;
-    var body = (0, _languageCommon.expandReferences)(data)(state);
-    var url = (0, _url4.resolve)(hostUrl + '/', "api/trackedEntityInstances");
-    var uniqueAttributeUrl = "".concat(hostUrl, "/api/trackedEntityAttributes/").concat(uniqueAttributeId);
-    var trackedEntityType = state.data.trackedEntityType;
-    var trackedEntityTypeUrl = "".concat(hostUrl, "/api/trackedEntityTypes/").concat(trackedEntityType, "?fields=*");
-    var uniqueAttributeValue = state.data.attributes.find(function (obj) {
-      return obj.attribute === uniqueAttributeId;
-    }).value;
-    var query = {
-      ou: state.data.orgUnit,
-      ouMode: 'ACCESSIBLE',
-      filter: "".concat(uniqueAttributeId, ":EQ:").concat(uniqueAttributeValue),
-      skipPaging: true
+    var operationName = (_options$operationNam3 = (_options16 = options) === null || _options16 === void 0 ? void 0 : _options16.operationName) !== null &amp;&amp; _options$operationNam3 !== void 0 ? _options$operationNam3 : 'update';
+    var responseType = (_options$responseType6 = (_options17 = options) === null || _options17 === void 0 ? void 0 : _options17.responseType) !== null &amp;&amp; _options$responseType6 !== void 0 ? _options$responseType6 : 'json';
+    var filters = (_params9 = params) === null || _params9 === void 0 ? void 0 : _params9.filters;
+    (_params10 = params) === null || _params10 === void 0 ? true : delete _params10.filters;
+    var queryParams = new URLSearchParams(params);
+    filters === null || filters === void 0 ? void 0 : filters.map(function (f) {
+      return queryParams.append('filter', f);
+    });
+    var apiVersion = (_options$apiVersion6 = (_options18 = options) === null || _options18 === void 0 ? void 0 : _options18.apiVersion) !== null &amp;&amp; _options$apiVersion6 !== void 0 ? _options$apiVersion6 : state.configuration.apiVersion;
+    var url = (0, _Utils.buildUrl)('/' + resourceType + '/' + path, hostUrl, apiVersion);
+    var headers = {
+      Accept: (_CONTENT_TYPES$respon6 = _Utils.CONTENT_TYPES[responseType]) !== null &amp;&amp; _CONTENT_TYPES$respon6 !== void 0 ? _CONTENT_TYPES$respon6 : 'application/json'
     };
-    console.log("Checking if Tracked Entity Type ".concat(trackedEntityType, " exists..."));
-    return (0, _Client.get)({
-      username: username,
-      password: password,
-      query: null,
-      url: trackedEntityTypeUrl
+    (0, _Utils.logOperation)(operationName);
+    (0, _Utils.logApiVersion)(apiVersion);
+    (0, _Utils.logWaitingForServer)(url, queryParams);
+    (0, _Utils.warnExpectLargeResult)(resourceType, url);
+    return _axios["default"].request({
+      method: 'PUT',
+      url: url,
+      auth: {
+        username: username,
+        password: password
+      },
+      params: queryParams,
+      data: body,
+      headers: headers
     }).then(function (result) {
-      var tet = JSON.parse(result.text);
-      console.log("Tracked Entity Type ".concat(trackedEntityType, "(").concat(tet.name, ") found."));
-      console.log("Checking if attribute ".concat(uniqueAttributeId, " is assigned to ").concat(tet.name, " Entity Type... "));
-      var attribute = tet.trackedEntityTypeAttributes.find(function (obj) {
-        return obj.trackedEntityAttribute.id === uniqueAttributeId;
-      });
+      _Utils.Log.info("".concat(_Utils.COLORS.FgGreen).concat(operationName, " succeeded").concat(_Utils.ESCAPE, ". Updated ").concat(resourceType, ".\nSummary:\n").concat((0, _Utils.prettyJson)(result.data)));
 
-      if (attribute) {
-        console.log("Attribute ".concat(attribute.name, "(").concat(uniqueAttributeId, ") is assigned to ").concat(tet.name, "."));
-        console.log("Checking if attribute ".concat(attribute.name, "(").concat(uniqueAttributeId, ") is unique..."));
-        return (0, _Client.get)({
-          username: username,
-          password: password,
-          query: null,
-          url: uniqueAttributeUrl
-        }).then(function (result) {
-          var foundAttribute = JSON.parse(result.text);
-
-          if (foundAttribute.unique) {
-            console.log("Tracked Entity Attribute ".concat(attribute.name, "(").concat(uniqueAttributeId, ") is unique. Proceeding to checking if Tracked Entity Instance exists..."));
-            return (0, _Client.get)({
-              username: username,
-              password: password,
-              query: query,
-              url: url
-            }).then(function (result) {
-              console.log("query ".concat(JSON.stringify(query, null, 2)));
-              var tei_body = JSON.parse(result.text);
-
-              if (tei_body.trackedEntityInstances.length &lt;= 0) {
-                console.log("Tracked Entity Instance  with filter ".concat(query.filter, " not found, proceeding to create..."));
-                return (0, _Client.post)({
-                  username: username,
-                  password: password,
-                  body: body,
-                  url: url,
-                  query: null
-                }).then(function (result) {
-                  console.log("POST succeeded. ".concat(result.header.location, "\nSummary:\n").concat(JSON.stringify(JSON.parse(result.text), null, 2)));
-                  return _objectSpread({}, state, {
-                    references: [result].concat(_toConsumableArray(state.references))
-                  });
-                });
-              } else {
-                var row1 = tei_body.trackedEntityInstances[0];
-                var payload = replace ? body : _objectSpread({}, row1, {}, body, {
-                  attributes: [].concat(_toConsumableArray(row1.attributes), _toConsumableArray(body.attributes))
-                });
-                var updateUrl = "".concat(url, "/").concat(row1.trackedEntityInstance);
-                console.log("Tracked Entity Instance  with filter ".concat(query.filter, " found(").concat(row1.trackedEntityInstance, "), proceeding to ").concat(replace ? 'replace' : 'merge data with', " the existing TEI..."));
-                return (0, _Client.put)({
-                  username: username,
-                  password: password,
-                  body: payload,
-                  url: updateUrl,
-                  query: null
-                }).then(function (result) {
-                  console.log("Upsert succeeded. Updated TEI: ".concat(updateUrl));
-                  console.log("Summary:\n".concat(JSON.stringify(JSON.parse(result.text), null, 2)));
-                  return _objectSpread({}, state, {
-                    references: [result].concat(_toConsumableArray(state.references))
-                  });
-                });
-              }
-            });
-          } else {
-            throw new Error("Attribute ".concat(attribute.name, "(").concat(uniqueAttributeId, ") is not unique. Ensure, in DHIS2, this tracked entity attribute is marked as unique."));
-          }
-        });
-      } else {
-        throw new Error("Tracked Entity Attribute ".concat(uniqueAttributeId, " is not assigned to ").concat(tet.name, " Entity Type. Ensure, in DHIS2, this tracked entity attribute is assigned to ").concat(tet.name, " and that it is marked as unique."));
-      }
+      if (callback) return callback((0, _languageCommon.composeNextState)(state, result.data));
+      return (0, _languageCommon.composeNextState)(state, result.data);
     });
   };
-} // /**
-//  * Create and enroll TrackedEntityInstances
-//  * @example
-//  * execute(
-//  *   createEnrollTEI(te, orgUnit, attributes, enrollments)
-//  * )(state)
-//  * @constructor
-//  * @param {object} enrollmentData - Payload data for new enrollment
-//  * @returns {Operation}
-//  */
-// export function upsertEnroll(upsertData) {
-//
-//   return state => {
-//     const body = expandReferences(trackedEntityInstanceData)(state);
-//     const { username, password, hostUrl } = state.configuration;
-//     const url = resolveUrl(hostUrl + '/', 'api/trackedEntityInstances')
-//
-//     return post({ username, password, body, url })
-//     .then((result) => {
-//       console.log("Result:", JSON.stringify(result.body, null, 2));
-//       return { ...state, references: [ result, ...state.references ] }
-//     })
-//
-//   }
-// }
-
+}
 /**
- * Enroll a tracked entity instance in a program
+ * A generic helper function to send partial updates on one or more object properties.
+ * - You are not required to send the full body of object properties.
+ * - This is useful for cases where you don't want or need to update all properties on a object.
  * @public
- * @example
- * enroll(tei, enrollmentData)
- * @constructor
- * @param {object} tei
- * @param {object} enrollmentData - Payload data for new enrollment
- * @returns {Operation}
+ * @function
+ * @param {string} resourceType - The type of resource to be updated. E.g. `dataElements`, `organisationUnits`, etc.
+ * @param {string} path - The `id` or `path` to the `object` to be updated. E.g. `FTRrcoaog83` or `FTRrcoaog83/{collection-name}/{object-id}`
+ * @param {object} data - Data to update. Include only the fields you want to update. E.g. `{name: "New Name"}`
+ * @param {object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
+ * @param {{apiVersion: number,operationName: string,responseType: string}} [options] - Optional options for update method. Defaults to `{operationName: 'patch', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>Example `patching` a `data element`&lt;/caption>
+ * patch('dataElements', 'FTRrcoaog83',
+ * {
+ *   name: 'New Name',
+ * });
  */
 
 
-function enroll(tei, enrollmentData) {
+function patch(resourceType, path, data, params, options, callback) {
   return function (state) {
-    var body = (0, _languageCommon.expandReferences)(enrollmentData)(state);
-    body['trackedEntityInstance'] = tei;
+    var _options$operationNam4, _options19, _options$responseType7, _options20, _queryParams3, _queryParams4, _options$apiVersion7, _options21, _CONTENT_TYPES$respon7;
+
+    resourceType = (0, _Utils.recursivelyExpandReferences)(resourceType)(state);
+    path = (0, _Utils.recursivelyExpandReferences)(path)(state);
+    var body = (0, _Utils.recursivelyExpandReferences)(data)(state);
+    params = (0, _Utils.recursivelyExpandReferences)(params)(state);
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    var operationName = (_options$operationNam4 = (_options19 = options) === null || _options19 === void 0 ? void 0 : _options19.operationName) !== null &amp;&amp; _options$operationNam4 !== void 0 ? _options$operationNam4 : 'patch';
     var _state$configuration9 = state.configuration,
         username = _state$configuration9.username,
         password = _state$configuration9.password,
         hostUrl = _state$configuration9.hostUrl;
-    var url = (0, _url4.resolve)(hostUrl + '/', 'api/enrollments');
-    console.log('Enrolling tracked entity instance.');
-    return (0, _Client.post)({
-      username: username,
-      password: password,
-      body: body,
-      url: url
+    var responseType = (_options$responseType7 = (_options20 = options) === null || _options20 === void 0 ? void 0 : _options20.responseType) !== null &amp;&amp; _options$responseType7 !== void 0 ? _options$responseType7 : 'json';
+    var queryParams = params;
+    var filters = (_queryParams3 = queryParams) === null || _queryParams3 === void 0 ? void 0 : _queryParams3.filters;
+    (_queryParams4 = queryParams) === null || _queryParams4 === void 0 ? true : delete _queryParams4.filters;
+    queryParams = new URLSearchParams(queryParams);
+    filters === null || filters === void 0 ? void 0 : filters.map(function (f) {
+      return queryParams.append('filter', f);
+    });
+    var apiVersion = (_options$apiVersion7 = (_options21 = options) === null || _options21 === void 0 ? void 0 : _options21.apiVersion) !== null &amp;&amp; _options$apiVersion7 !== void 0 ? _options$apiVersion7 : state.configuration.apiVersion;
+    var url = (0, _Utils.buildUrl)('/' + resourceType + '/' + path, hostUrl, apiVersion);
+    var headers = {
+      Accept: (_CONTENT_TYPES$respon7 = _Utils.CONTENT_TYPES[responseType]) !== null &amp;&amp; _CONTENT_TYPES$respon7 !== void 0 ? _CONTENT_TYPES$respon7 : 'application/json'
+    };
+    (0, _Utils.logOperation)(operationName);
+    (0, _Utils.logApiVersion)(apiVersion);
+    (0, _Utils.logWaitingForServer)(url, queryParams);
+    (0, _Utils.warnExpectLargeResult)(resourceType, url);
+    return _axios["default"].request({
+      method: 'PATCH',
+      url: url,
+      auth: {
+        username: username,
+        password: password
+      },
+      params: queryParams,
+      data: body,
+      headers: headers
     }).then(function (result) {
-      console.log('Result:', JSON.stringify(result.body, null, 2));
-      return _objectSpread({}, state, {
-        references: [result].concat(_toConsumableArray(state.references))
-      });
+      var resultObject = {
+        status: result.status,
+        statusText: result.statusText
+      };
+
+      _Utils.Log.info("".concat(_Utils.COLORS.FgGreen).concat(operationName, " succeeded").concat(_Utils.ESCAPE, ". Updated ").concat(resourceType, ".\nSummary:\n").concat((0, _Utils.prettyJson)(resultObject)));
+
+      if (callback) return callback((0, _languageCommon.composeNextState)(state, resultObject));
+      return (0, _languageCommon.composeNextState)(state, resultObject);
     });
   };
 }
 /**
- * Fetch analytics
+ *  A generic helper function to delete an object
  * @public
- * @example
- * fetchAnalytics({
- *   query: {
- *     dimension: ["dx:CYI5LEmm3cG", "pe:LAST_6_MONTHS"],
- *     filter: "ou:t7vi7vJqWvi",
- *     displayProperty: "NAME",
- *     outputIdScheme: "UID"
- *   }},
- *   postUrl: "yourposturl"
- * )
- * @constructor
- * @param {object} params - data to query for events
- * @param {String} postUrl - (optional) URL to post the result
- * @returns {Operation}
+ * @function
+ * @param {string} resourceType - The type of resource to be deleted. E.g. `trackedEntityInstances`, `organisationUnits`, etc.
+ * @param {string} path - Can be an `id` of an `object` or `path` to the `nested object` to `delete`.
+ * @param {object} [data] - Optional. This is useful when you want to remove multiple objects from a collection in one request. You can send `data` as, for example, `{"identifiableObjects": [{"id": "IDA"}, {"id": "IDB"}, {"id": "IDC"}]}`. See more {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#deleting-objects on DHIS2 API docs}
+ * @param {object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
+ * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional `options` for `del` operation. Defaults to `{operationName: 'delete', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>Example`deleting` a `tracked entity instance`&lt;/caption>
+ * del('trackedEntityInstances', 'LcRd6Nyaq7T');
  */
 
 
-function fetchAnalytics(params, postUrl) {
+function del(resourceType, path, data, params, options, callback) {
   return function (state) {
-    var data = (0, _languageCommon.expandReferences)(params)(state);
+    var _options$operationNam5, _options22, _options$responseType8, _options23, _queryParams5, _queryParams6, _options$apiVersion8, _options24, _CONTENT_TYPES$respon8;
+
+    resourceType = (0, _Utils.recursivelyExpandReferences)(resourceType)(state);
+    path = (0, _Utils.recursivelyExpandReferences)(path)(state);
+    var body = (0, _Utils.recursivelyExpandReferences)(data)(state);
+    params = (0, _Utils.recursivelyExpandReferences)(params)(state);
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    var operationName = (_options$operationNam5 = (_options22 = options) === null || _options22 === void 0 ? void 0 : _options22.operationName) !== null &amp;&amp; _options$operationNam5 !== void 0 ? _options$operationNam5 : 'delete';
     var _state$configuration10 = state.configuration,
         username = _state$configuration10.username,
         password = _state$configuration10.password,
         hostUrl = _state$configuration10.hostUrl;
-    var url = (0, _url4.resolve)(hostUrl + '/', 'api/26/analytics.json?');
-    var query = data.query || expandDataValues(params)(state);
-    console.log("Getting analytics data for query: ".concat(query));
-    return (0, _Client.get)({
-      username: username,
-      password: password,
-      query: query,
-      url: url
+    var responseType = (_options$responseType8 = (_options23 = options) === null || _options23 === void 0 ? void 0 : _options23.responseType) !== null &amp;&amp; _options$responseType8 !== void 0 ? _options$responseType8 : 'json';
+    var queryParams = params;
+    var filters = (_queryParams5 = queryParams) === null || _queryParams5 === void 0 ? void 0 : _queryParams5.filters;
+    (_queryParams6 = queryParams) === null || _queryParams6 === void 0 ? true : delete _queryParams6.filters;
+    queryParams = new URLSearchParams(queryParams);
+    filters === null || filters === void 0 ? void 0 : filters.map(function (f) {
+      return queryParams.append('filter', f);
+    });
+    var apiVersion = (_options$apiVersion8 = (_options24 = options) === null || _options24 === void 0 ? void 0 : _options24.apiVersion) !== null &amp;&amp; _options$apiVersion8 !== void 0 ? _options$apiVersion8 : state.configuration.apiVersion;
+    var headers = {
+      Accept: (_CONTENT_TYPES$respon8 = _Utils.CONTENT_TYPES[responseType]) !== null &amp;&amp; _CONTENT_TYPES$respon8 !== void 0 ? _CONTENT_TYPES$respon8 : 'application/json'
+    };
+    var url = (0, _Utils.buildUrl)('/' + resourceType + '/' + path, hostUrl, apiVersion);
+    (0, _Utils.logOperation)(operationName);
+    (0, _Utils.logApiVersion)(apiVersion);
+    (0, _Utils.logWaitingForServer)(url, queryParams);
+    (0, _Utils.warnExpectLargeResult)(resourceType, url);
+    return _axios["default"].request({
+      method: 'DELETE',
+      url: url,
+      auth: {
+        username: username,
+        password: password
+      },
+      params: queryParams,
+      data: body,
+      headers: headers
     }).then(function (result) {
-      console.log('Get Result:', result.body);
-      return result;
-    }).then(function (result) {
-      if (postUrl) {
-        var body = result.body;
-        var _url3 = postUrl;
-        return (0, _Client.post)({
+      _Utils.Log.info("".concat(_Utils.COLORS.FgGreen).concat(operationName, " succeeded").concat(_Utils.ESCAPE, ". DELETED ").concat(resourceType, ".\nSummary:\n").concat((0, _Utils.prettyJson)(result.data)));
+
+      if (callback) return callback((0, _languageCommon.composeNextState)(state, result.data));
+      return (0, _languageCommon.composeNextState)(state, result.data);
+    });
+  };
+}
+/**
+ * A generic helper function used to atomically either insert a row, or on the basis of the row already existing,
+ * UPDATE that existing row instead.
+ * @public
+ * @function
+ * @param {string} resourceType - The type of a resource to `insert` or `update`. E.g. `trackedEntityInstances`
+ * @param {Object} uniqueAttribute - An object containing a `attributeId` and `attributeValue` which will be used to uniquely identify the record
+ * @param {String} uniqueAttribute.attributeId - the id of the attribute to match on
+ * @param {String} uniqueAttribute.attributeValue - the value of the attribute to match on
+ * @param {Object&lt;any,any>} data - The update data containing new values
+ * @param {array} [params] - Optional `import` parameters e.g. `{ou: 'lZGmxYbs97q', filters: [w75KJ2mc4zz:EQ:Jane]}`
+ * @param {options} [options={replace: false, apiVersion: null, responseType: 'json'}] - Optional options for update method {@link options}.`
+ * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @returns {Promise&lt;state>} state
+ * @throws {RangeError}
+ * @example &lt;caption>- Example `expression.js` of upsert&lt;/caption>
+ * ```javascript
+ * upsert(
+ *      'trackedEntityInstances',
+ *       {
+ *         attributeId: 'lZGmxYbs97q',
+ *         attributeValue: state =>
+ *           state.data.attributes.find(obj => obj.attribute === 'lZGmxYbs97q')
+ *             .value,
+ *       },
+ *       state.data,
+ *       { ou: 'TSyzvBiovKh' }
+ *     )
+ * ```
+ * @todo Tweak/refine to mimic implementation based on the following inspiration: {@link https://sqlite.org/lang_upsert.html sqlite upsert} and {@link https://wiki.postgresql.org/wiki/UPSERT postgresql upsert}
+ * @todo Test implementation for upserting metadata
+ * @todo Test implementation for upserting data values
+ * @todo Implement the updateCondition
+ */
+
+
+function upsert(resourceType, uniqueAttribute, data, params, options, callback) {
+  return function (state) {
+    var _options$operationNam6, _options25, _options$replace, _options26, _options$responseType9, _options27, _params11, _options$apiVersion9, _options28, _CONTENT_TYPES$respon9;
+
+    resourceType = (0, _Utils.recursivelyExpandReferences)(resourceType)(state);
+    uniqueAttribute = (0, _Utils.recursivelyExpandReferences)(uniqueAttribute)(state);
+    var body = (0, _Utils.recursivelyExpandReferences)(data)(state);
+    params = (0, _Utils.recursivelyExpandReferences)(params)(state);
+    options = (0, _Utils.recursivelyExpandReferences)(options)(state);
+    var operationName = (_options$operationNam6 = (_options25 = options) === null || _options25 === void 0 ? void 0 : _options25.operationName) !== null &amp;&amp; _options$operationNam6 !== void 0 ? _options$operationNam6 : 'upsert';
+    var _state$configuration11 = state.configuration,
+        username = _state$configuration11.username,
+        password = _state$configuration11.password,
+        hostUrl = _state$configuration11.hostUrl;
+    var replace = (_options$replace = (_options26 = options) === null || _options26 === void 0 ? void 0 : _options26.replace) !== null &amp;&amp; _options$replace !== void 0 ? _options$replace : false;
+    var responseType = (_options$responseType9 = (_options27 = options) === null || _options27 === void 0 ? void 0 : _options27.responseType) !== null &amp;&amp; _options$responseType9 !== void 0 ? _options$responseType9 : 'json';
+    var _uniqueAttribute = uniqueAttribute,
+        attributeId = _uniqueAttribute.attributeId,
+        attributeValue = _uniqueAttribute.attributeValue;
+    var filters = (_params11 = params) === null || _params11 === void 0 ? void 0 : _params11.filters;
+    delete params.filters;
+    var queryParams = new URLSearchParams(params);
+    filters === null || filters === void 0 ? void 0 : filters.map(function (f) {
+      return queryParams.append('filter', f);
+    });
+    var op = resourceType === 'trackedEntityInstances' ? 'EQ' : 'eq';
+    queryParams.append('filter', "".concat(attributeId, ":").concat(op, ":").concat(attributeValue));
+    var apiVersion = (_options$apiVersion9 = (_options28 = options) === null || _options28 === void 0 ? void 0 : _options28.apiVersion) !== null &amp;&amp; _options$apiVersion9 !== void 0 ? _options$apiVersion9 : state.configuration.apiVersion;
+    var url = (0, _Utils.buildUrl)('/' + resourceType, hostUrl, apiVersion);
+    var headers = {
+      Accept: (_CONTENT_TYPES$respon9 = _Utils.CONTENT_TYPES[responseType]) !== null &amp;&amp; _CONTENT_TYPES$respon9 !== void 0 ? _CONTENT_TYPES$respon9 : 'application/json'
+    };
+    (0, _Utils.logOperation)(operationName);
+    (0, _Utils.logApiVersion)(apiVersion);
+    (0, _Utils.logWaitingForServer)(url, queryParams);
+    (0, _Utils.warnExpectLargeResult)(resourceType, url);
+
+    var getResouceName = function getResouceName() {
+      return _axios["default"].get(hostUrl + '/api/resources', {
+        auth: {
           username: username,
-          password: password,
-          body: body,
-          url: _url3
+          password: password
+        },
+        transformResponse: [function (data, headers) {
+          var filter = "plural:eq:".concat(resourceType);
+
+          if (filter) {
+            var _headers$contentType3, _headers$contentType4;
+
+            if (((_headers$contentType3 = (_headers$contentType4 = headers['content-type']) === null || _headers$contentType4 === void 0 ? void 0 : _headers$contentType4.split(';')[0]) !== null &amp;&amp; _headers$contentType3 !== void 0 ? _headers$contentType3 : null) === _Utils.CONTENT_TYPES.json) {
+              var tempData = JSON.parse(data);
+              return _objectSpread({}, tempData, {
+                resources: _Utils.applyFilter.apply(void 0, [tempData.resources].concat(_toConsumableArray((0, _Utils.parseFilter)(filter))))
+              });
+            } else {
+              _Utils.Log.warn('Filters on this resource are only supported for json content types. Skipping filtering ...');
+            }
+          }
+
+          return data;
+        }]
+      }).then(function (result) {
+        return result.data.resources[0].singular;
+      });
+    };
+
+    var findRecordsWithValueOnAttribute = function findRecordsWithValueOnAttribute() {
+      console.log(queryParams);
+      return _axios["default"].request({
+        method: 'GET',
+        url: url,
+        auth: {
+          username: username,
+          password: password
+        },
+        params: queryParams,
+        headers: headers
+      });
+    };
+
+    _Utils.Log.info("Checking if a record exists that matches this filter: ".concat(_Utils.COLORS.FgGreen, "attribute{ id: ").concat(attributeId, ", value: ").concat(attributeValue, " }\x1B[0m ..."));
+
+    return Promise.all([getResouceName(), findRecordsWithValueOnAttribute()]).then(function (_ref3) {
+      var _ref4 = _slicedToArray(_ref3, 2),
+          resourceName = _ref4[0],
+          recordsWithValue = _ref4[1];
+
+      var recordsWithValueCount = recordsWithValue.data[resourceType].length;
+
+      if (recordsWithValueCount > 1) {
+        _Utils.Log.error('');
+
+        throw new RangeError("Cannot upsert on Non-unique attribute. The operation found more than one records with the same value of ".concat(attributeValue, " for ").concat(attributeId));
+      } else if (recordsWithValueCount === 1) {
+        var _row1$id;
+
+        // TODO
+        // Log.info(
+        //   `Unique record found, proceeding to checking if attribute is NULLABLE ...`
+        // );
+        // if (recordsWithNulls.data[resourceType].length > 0) {
+        //   throw new Error(
+        //     `Cannot upsert on Nullable attribute. The operation found records with a NULL value on ${attributeId}.`
+        //   );
+        // }
+        _Utils.Log.info("".concat(_Utils.COLORS.FgGreen, "Attribute has unique values").concat(_Utils.ESCAPE, ". Proceeding to ").concat(_Utils.COLORS.FgGreen).concat(replace ? 'replace' : 'merge').concat(_Utils.ESCAPE, " ..."));
+
+        var row1 = recordsWithValue.data[resourceType][0];
+        var useCustomPATCH = ['trackedEntityInstances'].includes(resourceType) ? true : false;
+        var method = replace ? 'PUT' : useCustomPATCH === true ? 'PUT' : 'PATCH';
+        var id = (_row1$id = row1['id']) !== null &amp;&amp; _row1$id !== void 0 ? _row1$id : row1[resourceName];
+        var updateUrl = "".concat(url, "/").concat(id);
+        var payload = useCustomPATCH ? _objectSpread({}, row1, {}, body, {
+          attributes: [].concat(_toConsumableArray(row1.attributes), _toConsumableArray(body.attributes))
+        }) : body;
+        return _axios["default"].request({
+          method: method,
+          url: updateUrl,
+          auth: {
+            username: username,
+            password: password
+          },
+          data: payload,
+          params: queryParams,
+          headers: headers
         }).then(function (result) {
-          console.log('Post Result:', result.statusCode);
-          return _objectSpread({}, state, {
-            references: [result].concat(_toConsumableArray(state.references))
-          });
+          _Utils.Log.info("".concat(_Utils.COLORS.FgGreen).concat(operationName, " succeeded").concat(_Utils.ESCAPE, ". Updated ").concat(resourceName, ": ").concat(_Utils.COLORS.FgGreen).concat(updateUrl).concat(_Utils.ESCAPE, ".\nSummary:\n").concat((0, _Utils.prettyJson)(result.data)));
+
+          if (callback) return callback((0, _languageCommon.composeNextState)(state, result.data));
+          return (0, _languageCommon.composeNextState)(state, result.data);
         });
-      } else {
-        return _objectSpread({}, state, {
-          references: [result].concat(_toConsumableArray(state.references))
+      } else if (recordsWithValueCount === 0) {
+        _Utils.Log.info("".concat(_Utils.COLORS.FgGreen, "Existing record not found").concat(_Utils.ESCAPE, ", proceeding to ").concat(_Utils.COLORS.FgGreen, "CREATE(POST)").concat(_Utils.ESCAPE, " ...")); // We must delete the filter and ou params so the POST request is not interpreted as a GET request by the server
+
+
+        queryParams["delete"]('filter');
+        queryParams["delete"]('ou');
+        return _axios["default"].request({
+          method: 'POST',
+          url: url,
+          auth: {
+            username: username,
+            password: password
+          },
+          data: body,
+          params: queryParams,
+          headers: headers
+        }).then(function (result) {
+          var _result$data$response3;
+
+          _Utils.Log.info("".concat(_Utils.COLORS.FgGreen).concat(operationName, " succeeded").concat(_Utils.ESCAPE, ". Created ").concat(resourceName, ": ").concat(_Utils.COLORS.FgGreen).concat(result.data.response.importSummaries ? result.data.response.importSummaries[0].href : (_result$data$response3 = result.data.response) === null || _result$data$response3 === void 0 ? void 0 : _result$data$response3.reference).concat(_Utils.ESCAPE, ".\nSummary:\n").concat((0, _Utils.prettyJson)(result.data)));
+
+          if (callback) return callback((0, _languageCommon.composeNextState)(state, result.data));
+          return (0, _languageCommon.composeNextState)(state, result.data);
         });
       }
     });
   };
-}
+} //#endregion
+//#region EXPORTS
 
-exports.axios = _axios["default"];
+
+exports.axios = _axios["default"]; //#endregion
 </code></pre>
         </article>
     </section>
@@ -723,13 +1973,13 @@ exports.axios = _axios["default"];
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="configMigrationHelper.html">configMigrationHelper</a></li><li><a href="createTEI.html">createTEI</a></li><li><a href="dataElement.html">dataElement</a></li><li><a href="dataValueSet.html">dataValueSet</a></li><li><a href="enroll.html">enroll</a></li><li><a href="event.html">event</a></li><li><a href="execute.html">execute</a></li><li><a href="fetchAnalytics.html">fetchAnalytics</a></li><li><a href="fetchData.html">fetchData</a></li><li><a href="fetchEvents.html">fetchEvents</a></li><li><a href="updateTEI.html">updateTEI</a></li><li><a href="upsertTEI.html">upsertTEI</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="configMigrationHelper.html">configMigrationHelper</a></li><li><a href="execute.html">execute</a></li></ul><h3>Global</h3><ul><li><a href="global.html#attribute">attribute</a></li><li><a href="global.html#buildUrl">buildUrl</a></li><li><a href="global.html#cancelEnrollment">cancelEnrollment</a></li><li><a href="global.html#completeEnrollment">completeEnrollment</a></li><li><a href="global.html#composeSuccessMessage">composeSuccessMessage</a></li><li><a href="global.html#create">create</a></li><li><a href="global.html#createDataValues">createDataValues</a></li><li><a href="global.html#createEvents">createEvents</a></li><li><a href="global.html#createPrograms">createPrograms</a></li><li><a href="global.html#createTEI">createTEI</a></li><li><a href="global.html#del">del</a></li><li><a href="global.html#discover">discover</a></li><li><a href="global.html#enrollTEI">enrollTEI</a></li><li><a href="global.html#FIELD_FILTERS_PRESETS">FIELD_FILTERS_PRESETS</a></li><li><a href="global.html#FIELD_TRANSFORMERS">FIELD_TRANSFORMERS</a></li><li><a href="global.html#generateDhis2UID">generateDhis2UID</a></li><li><a href="global.html#getAnalytics">getAnalytics</a></li><li><a href="global.html#getData">getData</a></li><li><a href="global.html#getDataValues">getDataValues</a></li><li><a href="global.html#getEnrollments">getEnrollments</a></li><li><a href="global.html#getEvents">getEvents</a></li><li><a href="global.html#getMetadata">getMetadata</a></li><li><a href="global.html#getPrograms">getPrograms</a></li><li><a href="global.html#getRelationships">getRelationships</a></li><li><a href="global.html#getResources">getResources</a></li><li><a href="global.html#getSchema">getSchema</a></li><li><a href="global.html#getTEIs">getTEIs</a></li><li><a href="global.html#handleResponse">handleResponse</a></li><li><a href="global.html#logApiVersion">logApiVersion</a></li><li><a href="global.html#logWaitingForServer">logWaitingForServer</a></li><li><a href="global.html#patch">patch</a></li><li><a href="global.html#prettyJson">prettyJson</a></li><li><a href="global.html#recursivelyExpandReferences">recursivelyExpandReferences</a></li><li><a href="global.html#requestHttpHead">requestHttpHead</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#updateEnrollments">updateEnrollments</a></li><li><a href="global.html#updateEvents">updateEvents</a></li><li><a href="global.html#updatePrograms">updatePrograms</a></li><li><a href="global.html#updateTEI">updateTEI</a></li><li><a href="global.html#upsert">upsert</a></li><li><a href="global.html#upsertTEI">upsertTEI</a></li><li><a href="global.html#value">value</a></li><li><a href="global.html#warnExpectLargeResult">warnExpectLargeResult</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Mon Dec 14 2020 11:22:43 GMT-0500 (Eastern Standard Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Thu Jan 14 2021 13:44:30 GMT+0000 (Greenwich Mean Time)
 </footer>
 
 <script> prettyPrint(); </script>
