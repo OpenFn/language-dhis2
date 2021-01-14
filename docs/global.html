@@ -98,94 +98,7 @@
 
         
             
-<h4 class="name" id="CONTENT_TYPES"><span class="type-signature"></span>CONTENT_TYPES<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    To filter the metadata there are several filter operations that can be applied to the returned list of
- metadata.
- The format of the filter itself is straight-forward and follows the pattern property:operator:value,
- where property is the property on the metadata you want to filter on, operator is the
-comparison operator you want to perform and value is the value to check
-against (not all operators require value).
- Please see the schema , by running getSchema(), to discover which properties are available.
- Recursive filtering, ie. filtering on associated objects or collection of objects, are supported as
- well.
-
-Operators will be applied as logical and query, if you need a or query, use `in` operator.
-The filtering mechanism allows for recursion.
-
-You can do filtering within collections, e.g. 
-to get data elements which are members of the "ANC" data element group you can use the following
- query using the id property of the associated data element groups:
-/api/26/dataElements.json?filter=dataElementGroups.id:eq:qfxEYY9xAl6
-
-The default logical operator applied to the filters are AND which means that all object filters must 
-be matched. 
-There are however cases where you want to match on one of several filters (maybe id and code field)
-and in those cases it is possible to switch the root logical operator from AND to OR using 
-the rootJunction parameter
-
-Example: Filtering where the logical operator has been switched to OR and now only one of the filters must match to have a result returned
-/api/dataElements.json?filter=id:in:[id1,id2]&filter=code:eq:code1&rootJunction=OR
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Utils.js.html">Utils.js</a>, <a href="Utils.js.html#line382">line 382</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="FIELD_FILTERS_PRESETS"><span class="type-signature"></span>FIELD_FILTERS_PRESETS<span class="type-signature"></span></h4>
+<h4 class="name" id="FIELD_TRANSFORMERS"><span class="type-signature">(constant) </span>FIELD_TRANSFORMERS<span class="type-signature"></span></h4>
 
 
 
@@ -233,878 +146,7 @@ Multipe transformers can be used by repeating the transformer syntax:
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Utils.js.html">Utils.js</a>, <a href="Utils.js.html#line584">line 584</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="FIELD_FILTERS_PRESETS"><span class="type-signature"></span>FIELD_FILTERS_PRESETS<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    allow further customization of the properties on the server side.
-/api/26/dataElements/ID?fields=id~rename(i),name~rename(n)
-This will rename the id property to i and name property to n.
-Multipe transformers can be used by repeating the transformer syntax:
-/api/26/dataElementGroups.json?fields=id,displayName,dataElements~isNotEmpty~rename(haveDataElements)
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_lang_dhis2.js.html">utils_lang_dhis2.js</a>, <a href="utils_lang_dhis2.js.html#line798">line 798</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="FIELD_TRANSFORMERS"><span class="type-signature"></span>FIELD_TRANSFORMERS<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    OTHER NOTES
-
-1.10.5. Validating payloads
-System wide validation of metadata payloads are enabled from 2.19 release, this means that create/update operations on the web-api endpoints will be checked for valid payload before allowed changes to be made, to find out what validations are in place for a endpoint, please have a look at the /api/schemas endpoint, i.e. to figure out which constraints a data element have, you would go to /api/schemas/dataElement.
-
-You can also validate your payload manually by sending it to the proper schema endpoint. If you wanted to validate the constant from the create section before, you would send it like this:
-
-POST /api/schemas/constant
-{ payload }
-A simple (non-validating) example would be:
-
-curl -X POST -d "{\"name\": \"some name\"}" -H "Content-Type: application/json" 
--u admin:district https://play.dhis2.org/dev/api/schemas/dataElement
-Which would yield the result:
-
-[
-   {
-      "message" : "Required property missing.",
-      "property" : "type"
-   },
-   {
-      "property" : "aggregationOperator",
-      "message" : "Required property missing."
-   },
-   {
-      "property" : "domainType",
-      "message" : "Required property missing."
-   },
-   {
-      "property" : "shortName",
-      "message" : "Required property missing."
-   }
-]
-1.10.6. Partial updates
-For cases where you don't want or need to update all properties on a object (which means downloading a potentially huge payload, change one property, then upload again) we now support partial update, both for single properties and for multiple properties.
-
-The format for updating a single property is the same as when you are updating a complete object, just with only 1 property in the JSON/XML file, i.e.:
-
-curl -X PATCH -d "{\"name\": \"New Name\"}" -H "Content-Type: application/json" 
--u admin:district https://play.dhis2.org/dev/api/26/dataElements/fbfJHSPpUQD/name
-Please note that we are including the property name two times, one time in the payload, and one time in the endpoint, the generic endpoint for this is /api/type/id/property-name, and the Content-Type must also be included as usual (since we support multiple formats).
-
-The format for updating multiple properties are similar, just that we don't include the property names in the url, i.e.:
-
-{ // file.json
-  "name": "Updated Name",
-  "zeroIsSignificant": true
-}
-curl -X PATCH -d @file.json -H "Content-Type: application/json" 
--u admin:district https://play.dhis2.org/dev/api/26/dataElements/fbfJHSPpUQD
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Utils.js.html">Utils.js</a>, <a href="Utils.js.html#line664">line 664</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="FIELD_TRANSFORMERS"><span class="type-signature"></span>FIELD_TRANSFORMERS<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    OTHER NOTES
-
-1.10.5. Validating payloads
-System wide validation of metadata payloads are enabled from 2.19 release, this means that create/update operations on the web-api endpoints will be checked for valid payload before allowed changes to be made, to find out what validations are in place for a endpoint, please have a look at the /api/schemas endpoint, i.e. to figure out which constraints a data element have, you would go to /api/schemas/dataElement.
-
-You can also validate your payload manually by sending it to the proper schema endpoint. If you wanted to validate the constant from the create section before, you would send it like this:
-
-POST /api/schemas/constant
-{ payload }
-A simple (non-validating) example would be:
-
-curl -X POST -d "{\"name\": \"some name\"}" -H "Content-Type: application/json" 
--u admin:district https://play.dhis2.org/dev/api/schemas/dataElement
-Which would yield the result:
-
-[
-   {
-      "message" : "Required property missing.",
-      "property" : "type"
-   },
-   {
-      "property" : "aggregationOperator",
-      "message" : "Required property missing."
-   },
-   {
-      "property" : "domainType",
-      "message" : "Required property missing."
-   },
-   {
-      "property" : "shortName",
-      "message" : "Required property missing."
-   }
-]
-1.10.6. Partial updates
-For cases where you don't want or need to update all properties on a object (which means downloading a potentially huge payload, change one property, then upload again) we now support partial update, both for single properties and for multiple properties.
-
-The format for updating a single property is the same as when you are updating a complete object, just with only 1 property in the JSON/XML file, i.e.:
-
-curl -X PATCH -d "{\"name\": \"New Name\"}" -H "Content-Type: application/json" 
--u admin:district https://play.dhis2.org/dev/api/26/dataElements/fbfJHSPpUQD/name
-Please note that we are including the property name two times, one time in the payload, and one time in the endpoint, the generic endpoint for this is /api/type/id/property-name, and the Content-Type must also be included as usual (since we support multiple formats).
-
-The format for updating multiple properties are similar, just that we don't include the property names in the url, i.e.:
-
-{ // file.json
-  "name": "Updated Name",
-  "zeroIsSignificant": true
-}
-curl -X PATCH -d @file.json -H "Content-Type: application/json" 
--u admin:district https://play.dhis2.org/dev/api/26/dataElements/fbfJHSPpUQD
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_lang_dhis2.js.html">utils_lang_dhis2.js</a>, <a href="utils_lang_dhis2.js.html#line878">line 878</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="HTTP_METHODS"><span class="type-signature"></span>HTTP_METHODS<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Helper constant for http verbs
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_lang_dhis2.js.html">utils_lang_dhis2.js</a>, <a href="utils_lang_dhis2.js.html#line206">line 206</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="HTTP_METHODS"><span class="type-signature"></span>HTTP_METHODS<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Warn user when there is too much data expected to be returned on a given resource type
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_lang_dhis2.js.html">utils_lang_dhis2.js</a>, <a href="utils_lang_dhis2.js.html#line220">line 220</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="Log"><span class="type-signature"></span>Log<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Custom logger with timestamps and colors
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Utils.js.html">Utils.js</a>, <a href="Utils.js.html#line94">line 94</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="Log"><span class="type-signature"></span>Log<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Compose success message
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Utils.js.html">Utils.js</a>, <a href="Utils.js.html#line131">line 131</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="Log"><span class="type-signature"></span>Log<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Custom logger with timestamps
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js_.html">utils.js</a>, <a href="utils.js_.html#line56">line 56</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="Log"><span class="type-signature"></span>Log<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Custom logger with timestamps and colors
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_lang_dhis2.js.html">utils_lang_dhis2.js</a>, <a href="utils_lang_dhis2.js.html#line89">line 89</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="Log"><span class="type-signature"></span>Log<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Compose success message
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_lang_dhis2.js.html">utils_lang_dhis2.js</a>, <a href="utils_lang_dhis2.js.html#line126">line 126</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="PUNCTUATIONS"><span class="type-signature"></span>PUNCTUATIONS<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    The following query parameters are available for customizing your request.
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_lang_dhis2.js.html">utils_lang_dhis2.js</a>, <a href="utils_lang_dhis2.js.html#line361">line 361</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="QUERY_PARAMETERS"><span class="type-signature"></span>QUERY_PARAMETERS<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    To filter the metadata there are several filter operations that can be applied to the returned list of
- metadata.
- The format of the filter itself is straight-forward and follows the pattern property:operator:value,
- where property is the property on the metadata you want to filter on, operator is the
-comparison operator you want to perform and value is the value to check
-against (not all operators require value).
- Please see the schema , by running getSchema(), to discover which properties are available.
- Recursive filtering, ie. filtering on associated objects or collection of objects, are supported as
- well.
-
-Operators will be applied as logical and query, if you need a or query, use `in` operator.
-The filtering mechanism allows for recursion.
-
-You can do filtering within collections, e.g. 
-to get data elements which are members of the "ANC" data element group you can use the following
- query using the id property of the associated data element groups:
-/api/26/dataElements.json?filter=dataElementGroups.id:eq:qfxEYY9xAl6
-
-The default logical operator applied to the filters are AND which means that all object filters must 
-be matched. 
-There are however cases where you want to match on one of several filters (maybe id and code field)
-and in those cases it is possible to switch the root logical operator from AND to OR using 
-the rootJunction parameter
-
-Example: Filtering where the logical operator has been switched to OR and now only one of the filters must match to have a result returned
-/api/dataElements.json?filter=id:in:[id1,id2]&filter=code:eq:code1&rootJunction=OR
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_lang_dhis2.js.html">utils_lang_dhis2.js</a>, <a href="utils_lang_dhis2.js.html#line596">line 596</a>
+        <a href="Utils.js.html">Utils.js</a>, <a href="Utils.js.html#line714">line 714</a>
     </li></ul></dd>
     
 
@@ -1132,7 +174,7 @@ Example: Filtering where the logical operator has been switched to OR and now on
     
 
     
-    <h4 class="name" id="buildUrl"><span class="type-signature"></span>buildUrl<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="attribute"><span class="type-signature"></span>attribute<span class="signature">(attributeId, attributeValue)</span><span class="type-signature"></span></h4>
     
 
     
@@ -1140,183 +182,7 @@ Example: Filtering where the logical operator has been switched to OR and now on
 
 
 <div class="description">
-    Build url for a given operation
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Utils.js.html">Utils.js</a>, <a href="Utils.js.html#line245">line 245</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="buildUrl"><span class="type-signature"></span>buildUrl<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Build url for a given operation
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_lang_dhis2.js.html">utils_lang_dhis2.js</a>, <a href="utils_lang_dhis2.js.html#line243">line 243</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="composeNextState"><span class="type-signature"></span>composeNextState<span class="signature">(result)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Compose next state based on the result of a given operation
+    Helper function that returns an attribute of the format `{attribute: 'lZGmxYbs97q',value: 'Banda'}`, given an `Id` and the `value`
 </div>
 
 
@@ -1352,1088 +218,7 @@ Example: Filtering where the logical operator has been switched to OR and now on
 
         <tr>
             
-                <td class="name"><code>result</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Success result of an http call</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Utils.js.html">Utils.js</a>, <a href="Utils.js.html#line200">line 200</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="composeNextState"><span class="type-signature"></span>composeNextState<span class="signature">(result)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Compose next state based on the result of a given operation
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>result</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">Success result of an http call</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_lang_dhis2.js.html">utils_lang_dhis2.js</a>, <a href="utils_lang_dhis2.js.html#line195">line 195</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="discover"><span class="type-signature"></span>discover<span class="signature">(operation, resourceType)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    TODO
-
-Discover available parameters and allowed operators for a given resource's endpoint
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>operation</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">*</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>resourceType</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">*</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Adaptor.js.html">Adaptor.js</a>, <a href="Adaptor.js.html#line373">line 373</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>discover('getData, /api/trackedEntityInstances')</code></pre>
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="generateUID"><span class="type-signature"></span>generateUID<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    TODO
-
-Create a DHIS2 UID-Useful for client generated Ids compatible with DHIS2
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Utils.js.html">Utils.js</a>, <a href="Utils.js.html#line60">line 60</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="generateUID"><span class="type-signature"></span>generateUID<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    TODO
-
-Create a DHIS2 UID-Useful for client generated Ids compatible with DHIS2
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_lang_dhis2.js.html">utils_lang_dhis2.js</a>, <a href="utils_lang_dhis2.js.html#line55">line 55</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="getData"><span class="type-signature"></span>getData<span class="signature">(resourceType, params, options)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>resourceType</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">*</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>params</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">*</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>options</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">*</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Adaptor.js.html">Adaptor.js</a>, <a href="Adaptor.js.html#line483">line 483</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>getData(
-'trackedEntityInstances',
-{
- fields: '*',
-    ou: 'DiszpKrYNg8',
-    entityType: 'nEenWmSyUEp',
-    // filter: 'id:eq:FQ2o8UBlcrS',
-    skipPaging: true,
-    async: true,
-    // filter: 'id:eq:PWxgadk4sCG',
-  },
-  {
-    includeSystem: false,
-  }
-);</code></pre>
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="getMetadata"><span class="type-signature"></span>getMetadata<span class="signature">(resources, params, options, callback)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Get metadata
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>resources</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">*</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>params</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">*</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>options</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">*</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">*</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Adaptor.js.html">Adaptor.js</a>, <a href="Adaptor.js.html#line528">line 528</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>getMetadata(
-  'attributes',
-  {
-    fields: '*',
-    // filter: 'id:eq:PWxgadk4sCG',
-  },
-  {
-    includeSystem: false,
-  }
-);</code></pre>
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="getResources"><span class="type-signature"></span>getResources<span class="signature">(params, options, callback)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Get DHIS2 resources
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>params</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The optional query parameters for this endpoint.
-                <h6>Properties</h6>
-                
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>filter</code></td>
+                <td class="name"><code>attributeId</code></td>
             
 
             <td class="type">
@@ -2449,69 +234,26 @@ Create a DHIS2 UID-Useful for client generated Ids compatible with DHIS2
 
             
 
-            <td class="description last">The optional filter parameter, specifiying the filter expression.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
+            <td class="description last"></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>options</code></td>
+                <td class="name"><code>attributeValue</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Object</span>
+<span class="param-type">string</span>
+|
 
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The optional flags to control behavior of function
-                <h6>Properties</h6>
-                
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>supportApiVersion</code></td>
-            
-
-            <td class="type">
-            
-                
 <span class="param-type">boolean</span>
+|
+
+<span class="param-type">number</span>
 
 
             
@@ -2521,37 +263,7 @@ Create a DHIS2 UID-Useful for client generated Ids compatible with DHIS2
 
             
 
-            <td class="description last">The optional flag, only set to `true` if endpoint supports use of api versions in url. Defaults to `false`</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-            </td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The optional function that will be called to handle data returned by this function. Defaults to `state.data`</td>
+            <td class="description last"></td>
         </tr>
 
     
@@ -2592,7 +304,7 @@ Create a DHIS2 UID-Useful for client generated Ids compatible with DHIS2
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Adaptor.js.html">Adaptor.js</a>, <a href="Adaptor.js.html#line386">line 386</a>
+        <a href="Utils.js.html">Utils.js</a>, <a href="Utils.js.html#line112">line 112</a>
     </li></ul></dd>
     
 
@@ -2628,12 +340,192 @@ Create a DHIS2 UID-Useful for client generated Ids compatible with DHIS2
     
 
     
-    <h4 class="name" id="getSchema"><span class="type-signature"></span>getSchema<span class="signature">(resourceType, params, options, callback)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="buildUrl"><span class="type-signature"></span>buildUrl<span class="signature">()</span><span class="type-signature"></span></h4>
     
 
     
 
 
+
+<div class="description">
+    Build url for a given operation
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Utils.js.html">Utils.js</a>, <a href="Utils.js.html#line100">line 100</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="composeSuccessMessage"><span class="type-signature"></span>composeSuccessMessage<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Compose success message
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Utils.js.html">Utils.js</a>, <a href="Utils.js.html#line47">line 47</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="handleResponse"><span class="type-signature"></span>handleResponse<span class="signature">(url, params)</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Handle http response
+</div>
 
 
 
@@ -2668,13 +560,13 @@ Create a DHIS2 UID-Useful for client generated Ids compatible with DHIS2
 
         <tr>
             
-                <td class="name"><code>resourceType</code></td>
+                <td class="name"><code>url</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">string</span>
+<span class="param-type">*</span>
 
 
             
@@ -2711,39 +603,394 @@ Create a DHIS2 UID-Useful for client generated Ids compatible with DHIS2
         </tr>
 
     
+    </tbody>
+</table>
 
-        <tr>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Utils.js.html">Utils.js</a>, <a href="Utils.js.html#line183">line 183</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
             
-                <td class="name"><code>options</code></td>
+
+    
+
+    
+    <h4 class="name" id="logApiVersion"><span class="type-signature"></span>logApiVersion<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Log api version
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Utils.js.html">Utils.js</a>, <a href="Utils.js.html#line84">line 84</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
             
 
-            <td class="type">
+    
+
+    
+    <h4 class="name" id="logWaitingForServer"><span class="type-signature"></span>logWaitingForServer<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Inform user, you are waiting for the server to respond on a given url with params
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Utils.js.html">Utils.js</a>, <a href="Utils.js.html#line67">line 67</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
             
-                
-<span class="param-type">*</span>
+
+    
+
+    
+    <h4 class="name" id="prettyJson"><span class="type-signature"></span>prettyJson<span class="signature">()</span><span class="type-signature"></span></h4>
+    
+
+    
 
 
+
+<div class="description">
+    Print easy-readable JSON objects, uses JSON.stringify.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Utils.js.html">Utils.js</a>, <a href="Utils.js.html#line193">line 193</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
             
-            </td>
 
-            
+    
 
-            
+    
+    <h4 class="name" id="recursivelyExpandReferences"><span class="type-signature"></span>recursivelyExpandReferences<span class="signature">(thing)</span><span class="type-signature"> &rarr; {object|number|string|boolean|array}</span></h4>
+    
 
-            <td class="description last"></td>
-        </tr>
+    
 
+
+
+<div class="description">
+    Recursively expand object|number|string|boolean|array, each time resolving function calls and returning the resolved values
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
     
 
         <tr>
             
-                <td class="name"><code>callback</code></td>
+                <td class="name"><code>thing</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">*</span>
+<span class="param-type">any</span>
 
 
             
@@ -2753,7 +1000,7 @@ Create a DHIS2 UID-Useful for client generated Ids compatible with DHIS2
 
             
 
-            <td class="description last"></td>
+            <td class="description last">Thing to expand</td>
         </tr>
 
     
@@ -2794,7 +1041,7 @@ Create a DHIS2 UID-Useful for client generated Ids compatible with DHIS2
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Adaptor.js.html">Adaptor.js</a>, <a href="Adaptor.js.html#line434">line 434</a>
+        <a href="Utils.js.html">Utils.js</a>, <a href="Utils.js.html#line10">line 10</a>
     </li></ul></dd>
     
 
@@ -2819,916 +1066,40 @@ Create a DHIS2 UID-Useful for client generated Ids compatible with DHIS2
 
 
 
-
-
-
-
+<h5>Returns:</h5>
 
         
-            
-
-    
-
-    
-    <h4 class="name" id="isValidUID"><span class="type-signature"></span>isValidUID<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    TODO
-
-Validate if valid DHIS2 UID
+<div class="param-desc">
+    expandedResult
 </div>
 
 
 
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Utils.js.html">Utils.js</a>, <a href="Utils.js.html#line76">line 76</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>isValidUID('MmwcGkxy876')
-// true
-isValidUID(12345)
-// false</code></pre>
-
-
-
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
         
-            
+<span class="param-type">object</span>
+|
 
-    
+<span class="param-type">number</span>
+|
 
-    
-    <h4 class="name" id="isValidUID"><span class="type-signature"></span>isValidUID<span class="signature">()</span><span class="type-signature"></span></h4>
-    
+<span class="param-type">string</span>
+|
 
-    
+<span class="param-type">boolean</span>
+|
 
-
-
-<div class="description">
-    Validate if valid DHIS2 UID
-</div>
+<span class="param-type">array</span>
 
 
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js_.html">utils.js</a>, <a href="utils.js_.html#line38">line 38</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
+    </dd>
 </dl>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Example</h5>
     
-    <pre class="prettyprint"><code>isValidUID('MmwcGkxy876')
-// true
-isValidUID(12345)
-// false
-isValidUID('MmwcGkxy876 ')
-// false</code></pre>
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="isValidUID"><span class="type-signature"></span>isValidUID<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    TODO
-
-Validate if valid DHIS2 UID
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_lang_dhis2.js.html">utils_lang_dhis2.js</a>, <a href="utils_lang_dhis2.js.html#line71">line 71</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    <h5>Example</h5>
-    
-    <pre class="prettyprint"><code>isValidUID('MmwcGkxy876')
-// true
-isValidUID(12345)
-// false</code></pre>
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="logApiVersion"><span class="type-signature"></span>logApiVersion<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Log api version
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Utils.js.html">Utils.js</a>, <a href="Utils.js.html#line281">line 281</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="logApiVersion"><span class="type-signature"></span>logApiVersion<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Log api version
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_lang_dhis2.js.html">utils_lang_dhis2.js</a>, <a href="utils_lang_dhis2.js.html#line279">line 279</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="logWaitingForServer"><span class="type-signature"></span>logWaitingForServer<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Inform user, you are waiting for the server to respond on a given url with params
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Utils.js.html">Utils.js</a>, <a href="Utils.js.html#line235">line 235</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="logWaitingForServer"><span class="type-signature"></span>logWaitingForServer<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Inform user, you are waiting for the server to respond on a given url with params
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_lang_dhis2.js.html">utils_lang_dhis2.js</a>, <a href="utils_lang_dhis2.js.html#line233">line 233</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="prettyJson"><span class="type-signature"></span>prettyJson<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Print easy-readable JSON objects, uses JSON.stringify.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Utils.js.html">Utils.js</a>, <a href="Utils.js.html#line85">line 85</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="prettyJson"><span class="type-signature"></span>prettyJson<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Print easy-readable JSON objects.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils.js_.html">utils.js</a>, <a href="utils.js_.html#line47">line 47</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="prettyJson"><span class="type-signature"></span>prettyJson<span class="signature">()</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Print easy-readable JSON objects, uses JSON.stringify.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="utils_lang_dhis2.js.html">utils_lang_dhis2.js</a>, <a href="utils_lang_dhis2.js.html#line80">line 80</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -3843,7 +1214,7 @@ This will give us a sense of how big the result would be and warn the user, acco
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Utils.js.html">Utils.js</a>, <a href="Utils.js.html#line224">line 224</a>
+        <a href="Utils.js.html">Utils.js</a>, <a href="Utils.js.html#line125">line 125</a>
     </li></ul></dd>
     
 
@@ -3980,7 +1351,7 @@ This will give us a sense of how big the result would be and warn the user, acco
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Utils.js.html">Utils.js</a>, <a href="Utils.js.html#line213">line 213</a>
+        <a href="Utils.js.html">Utils.js</a>, <a href="Utils.js.html#line56">line 56</a>
     </li></ul></dd>
     
 
@@ -4026,13 +1397,13 @@ This will give us a sense of how big the result would be and warn the user, acco
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="configMigrationHelper.html">configMigrationHelper</a></li><li><a href="execute.html">execute</a></li></ul><h3>Global</h3><ul><li><a href="global.html#buildUrl">buildUrl</a></li><li><a href="global.html#composeNextState">composeNextState</a></li><li><a href="global.html#CONTENT_TYPES">CONTENT_TYPES</a></li><li><a href="global.html#discover">discover</a></li><li><a href="global.html#FIELD_FILTERS_PRESETS">FIELD_FILTERS_PRESETS</a></li><li><a href="global.html#FIELD_TRANSFORMERS">FIELD_TRANSFORMERS</a></li><li><a href="global.html#generateUID">generateUID</a></li><li><a href="global.html#getData">getData</a></li><li><a href="global.html#getMetadata">getMetadata</a></li><li><a href="global.html#getResources">getResources</a></li><li><a href="global.html#getSchema">getSchema</a></li><li><a href="global.html#HTTP_METHODS">HTTP_METHODS</a></li><li><a href="global.html#isValidUID">isValidUID</a></li><li><a href="global.html#Log">Log</a></li><li><a href="global.html#logApiVersion">logApiVersion</a></li><li><a href="global.html#logWaitingForServer">logWaitingForServer</a></li><li><a href="global.html#prettyJson">prettyJson</a></li><li><a href="global.html#PUNCTUATIONS">PUNCTUATIONS</a></li><li><a href="global.html#QUERY_PARAMETERS">QUERY_PARAMETERS</a></li><li><a href="global.html#requestHttpHead">requestHttpHead</a></li><li><a href="global.html#warnExpectLargeResult">warnExpectLargeResult</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Adaptor.html">Adaptor</a></li></ul><h3>Classes</h3><ul><li><a href="module-Adaptor.execute.html">execute</a></li><li><a href="module-Adaptor.upsertTEI.html">upsertTEI</a></li><li><a href="module-Adaptor-configMigrationHelper.html">configMigrationHelper</a></li></ul><h3>Global</h3><ul><li><a href="global.html#attribute">attribute</a></li><li><a href="global.html#buildUrl">buildUrl</a></li><li><a href="global.html#composeSuccessMessage">composeSuccessMessage</a></li><li><a href="global.html#FIELD_TRANSFORMERS">FIELD_TRANSFORMERS</a></li><li><a href="global.html#handleResponse">handleResponse</a></li><li><a href="global.html#logApiVersion">logApiVersion</a></li><li><a href="global.html#logWaitingForServer">logWaitingForServer</a></li><li><a href="global.html#prettyJson">prettyJson</a></li><li><a href="global.html#recursivelyExpandReferences">recursivelyExpandReferences</a></li><li><a href="global.html#requestHttpHead">requestHttpHead</a></li><li><a href="global.html#warnExpectLargeResult">warnExpectLargeResult</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Mon Dec 14 2020 20:29:34 GMT+0200 (Central Africa Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Thu Jan 14 2021 11:12:27 GMT+0000 (Greenwich Mean Time)
 </footer>
 
 <script> prettyPrint(); </script>

@@ -29,10 +29,14 @@
 <header>
     
 <<<<<<< HEAD
+<<<<<<< HEAD
         <h2><span class="attribs"><span class="type-signature"></span></span>upsertTEI<span class="signature">(uniqueAttributeId, data, options)</span><span class="type-signature"> &rarr; {Operation}</span></h2>
 =======
         <h2><span class="attribs"><span class="type-signature"></span></span>upsertTEI<span class="signature">(uniqueAttributeId, data, options<span class="signature-attributes">opt</span>, updateCondition<span class="signature-attributes">opt</span>, params, callback<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;<a href="global.html#state">state</a>>}</span></h2>
 >>>>>>> 747a859... ready to test upsert and upsertTEI
+=======
+        <h2><span class="attribs"><span class="type-signature"></span></span>upsertTEI<span class="signature">(uniqueAttributeId, data, options<span class="signature-attributes">opt</span>, callback<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;<a href="global.html#state">state</a>>}</span></h2>
+>>>>>>> 1d27d2c... update language-common
         
     
 </header>
@@ -46,10 +50,14 @@
 
     
 <<<<<<< HEAD
+<<<<<<< HEAD
     <h4 class="name" id="upsertTEI"><span class="type-signature"></span>new upsertTEI<span class="signature">(uniqueAttributeId, data, options)</span><span class="type-signature"> &rarr; {Operation}</span></h4>
 =======
     <h4 class="name" id="upsertTEI"><span class="type-signature"></span>new upsertTEI<span class="signature">(uniqueAttributeId, data, options<span class="signature-attributes">opt</span>, updateCondition<span class="signature-attributes">opt</span>, params, callback<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;<a href="global.html#state">state</a>>}</span></h4>
 >>>>>>> 747a859... ready to test upsert and upsertTEI
+=======
+    <h4 class="name" id="upsertTEI"><span class="type-signature"></span>new upsertTEI<span class="signature">(uniqueAttributeId, data, options<span class="signature-attributes">opt</span>, callback<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise.&lt;<a href="global.html#state">state</a>>}</span></h4>
+>>>>>>> 1d27d2c... update language-common
     
 
     
@@ -94,9 +102,12 @@ This is useful for idempotency and duplicate management
         
 
         
+<<<<<<< HEAD
         <th>Default</th>
         
 >>>>>>> 747a859... ready to test upsert and upsertTEI
+=======
+>>>>>>> 1d27d2c... update language-common
 
         <th class="last">Description</th>
     </tr>
@@ -133,11 +144,14 @@ This is useful for idempotency and duplicate management
             
 
             
+<<<<<<< HEAD
                 <td class="default">
                 
                 </td>
 >>>>>>> 747a859... ready to test upsert and upsertTEI
             
+=======
+>>>>>>> 1d27d2c... update language-common
 
             <td class="description last">Tracked Entity Instance unique identifier used during matching</td>
         </tr>
@@ -176,11 +190,14 @@ This is useful for idempotency and duplicate management
             
 
             
+<<<<<<< HEAD
                 <td class="default">
                 
                 </td>
 >>>>>>> 747a859... ready to test upsert and upsertTEI
             
+=======
+>>>>>>> 1d27d2c... update language-common
 
             <td class="description last">Payload data for new/updated tracked entity instance(s)</td>
         </tr>
@@ -217,6 +234,7 @@ This is useful for idempotency and duplicate management
             
 
             
+<<<<<<< HEAD
                 <td class="default">
                 
                     {replace: false, apiVersion: null, supportApiVersion: false,requireUniqueAttributeConfig: true}
@@ -299,8 +317,10 @@ This is useful for idempotency and duplicate management
                 
                 </td>
             
+=======
+>>>>>>> 1d27d2c... update language-common
 
-            <td class="description last"></td>
+            <td class="description last">Optional `options` for `upserTEI` operation. Defaults to `{responseType: 'json',replace: false, apiVersion: null,requireUniqueAttributeConfig: true}`</td>
         </tr>
 
     
@@ -331,10 +351,6 @@ This is useful for idempotency and duplicate management
                 </td>
             
 
-            
-                <td class="default">
-                
-                </td>
             
 
             <td class="description last">Optional `callback` to handle the response.</td>
@@ -380,10 +396,14 @@ This is useful for idempotency and duplicate management
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
 <<<<<<< HEAD
+<<<<<<< HEAD
         <a href="Adaptor.js.html">Adaptor.js</a>, <a href="Adaptor.js.html#line462">line 462</a>
 =======
         <a href="Adaptor.js.html">Adaptor.js</a>, <a href="Adaptor.js.html#line262">line 262</a>
 >>>>>>> 747a859... ready to test upsert and upsertTEI
+=======
+        <a href="Adaptor.js.html">Adaptor.js</a>, <a href="Adaptor.js.html#line284">line 284</a>
+>>>>>>> 1d27d2c... update language-common
     </li></ul></dd>
     
 
@@ -398,6 +418,8 @@ This is useful for idempotency and duplicate management
     <dd class="tag-todo">
         <ul>
             <li>Implement updateCondition</li>
+        
+            <li>Upsert many TEIs in a single call</li>
         </ul>
     </dd>
     
@@ -490,8 +512,12 @@ This is useful for idempotency and duplicate management
 =======
         <p class="code-caption">- Example `expression.js` of upsertTEI</p>
     
+<<<<<<< HEAD
     <pre class="prettyprint"><code>upsertTEI('aX5hD4qUpRW', state.data);</code></pre>
 >>>>>>> 747a859... ready to test upsert and upsertTEI
+=======
+    <pre class="prettyprint"><code>upsertTEI('lZGmxYbs97q', state.data);</code></pre>
+>>>>>>> 1d27d2c... update language-common
 
 
 
@@ -528,20 +554,28 @@ This is useful for idempotency and duplicate management
 
 <nav>
 <<<<<<< HEAD
+<<<<<<< HEAD
     <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="configMigrationHelper.html">configMigrationHelper</a></li><li><a href="createTEI.html">createTEI</a></li><li><a href="dataElement.html">dataElement</a></li><li><a href="dataValueSet.html">dataValueSet</a></li><li><a href="enroll.html">enroll</a></li><li><a href="event.html">event</a></li><li><a href="execute.html">execute</a></li><li><a href="fetchAnalytics.html">fetchAnalytics</a></li><li><a href="fetchData.html">fetchData</a></li><li><a href="fetchEvents.html">fetchEvents</a></li><li><a href="updateTEI.html">updateTEI</a></li><li><a href="upsertTEI.html">upsertTEI</a></li></ul>
 =======
     <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="configMigrationHelper.html">configMigrationHelper</a></li><li><a href="discover.html">discover</a></li><li><a href="execute.html">execute</a></li><li><a href="upsertTEI.html">upsertTEI</a></li></ul><h3>Global</h3><ul><li><a href="global.html#buildUrl">buildUrl</a></li><li><a href="global.html#cancelEnrollment">cancelEnrollment</a></li><li><a href="global.html#completeEnrollment">completeEnrollment</a></li><li><a href="global.html#composeSuccessMessage">composeSuccessMessage</a></li><li><a href="global.html#create">create</a></li><li><a href="global.html#createDataValues">createDataValues</a></li><li><a href="global.html#createEnrollment">createEnrollment</a></li><li><a href="global.html#createEvents">createEvents</a></li><li><a href="global.html#createPrograms">createPrograms</a></li><li><a href="global.html#createTEI">createTEI</a></li><li><a href="global.html#del">del</a></li><li><a href="global.html#FIELD_FILTERS_PRESETS">FIELD_FILTERS_PRESETS</a></li><li><a href="global.html#FIELD_TRANSFORMERS">FIELD_TRANSFORMERS</a></li><li><a href="global.html#generateDhis2UID">generateDhis2UID</a></li><li><a href="global.html#getAnalytics">getAnalytics</a></li><li><a href="global.html#getData">getData</a></li><li><a href="global.html#getDataValues">getDataValues</a></li><li><a href="global.html#getEnrollments">getEnrollments</a></li><li><a href="global.html#getEvents">getEvents</a></li><li><a href="global.html#getMetadata">getMetadata</a></li><li><a href="global.html#getPrograms">getPrograms</a></li><li><a href="global.html#getRelationships">getRelationships</a></li><li><a href="global.html#getResources">getResources</a></li><li><a href="global.html#getTEIs">getTEIs</a></li><li><a href="global.html#handleResponse">handleResponse</a></li><li><a href="global.html#logApiVersion">logApiVersion</a></li><li><a href="global.html#logWaitingForServer">logWaitingForServer</a></li><li><a href="global.html#patch">patch</a></li><li><a href="global.html#prettyJson">prettyJson</a></li><li><a href="global.html#requestHttpHead">requestHttpHead</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#updateEnrollments">updateEnrollments</a></li><li><a href="global.html#updateEvents">updateEvents</a></li><li><a href="global.html#updatePrograms">updatePrograms</a></li><li><a href="global.html#updateTEI">updateTEI</a></li><li><a href="global.html#upsert">upsert</a></li><li><a href="global.html#value">value</a></li><li><a href="global.html#warnExpectLargeResult">warnExpectLargeResult</a></li></ul>
 >>>>>>> 747a859... ready to test upsert and upsertTEI
+=======
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="configMigrationHelper.html">configMigrationHelper</a></li><li><a href="execute.html">execute</a></li><li><a href="upsertTEI.html">upsertTEI</a></li></ul><h3>Global</h3><ul><li><a href="global.html#attribute">attribute</a></li><li><a href="global.html#buildUrl">buildUrl</a></li><li><a href="global.html#cancelEnrollment">cancelEnrollment</a></li><li><a href="global.html#completeEnrollment">completeEnrollment</a></li><li><a href="global.html#composeSuccessMessage">composeSuccessMessage</a></li><li><a href="global.html#create">create</a></li><li><a href="global.html#createDataValues">createDataValues</a></li><li><a href="global.html#createEvents">createEvents</a></li><li><a href="global.html#createPrograms">createPrograms</a></li><li><a href="global.html#createTEI">createTEI</a></li><li><a href="global.html#del">del</a></li><li><a href="global.html#discover">discover</a></li><li><a href="global.html#enrollTEI">enrollTEI</a></li><li><a href="global.html#FIELD_FILTERS_PRESETS">FIELD_FILTERS_PRESETS</a></li><li><a href="global.html#FIELD_TRANSFORMERS">FIELD_TRANSFORMERS</a></li><li><a href="global.html#generateDhis2UID">generateDhis2UID</a></li><li><a href="global.html#getAnalytics">getAnalytics</a></li><li><a href="global.html#getData">getData</a></li><li><a href="global.html#getDataValues">getDataValues</a></li><li><a href="global.html#getEnrollments">getEnrollments</a></li><li><a href="global.html#getEvents">getEvents</a></li><li><a href="global.html#getMetadata">getMetadata</a></li><li><a href="global.html#getPrograms">getPrograms</a></li><li><a href="global.html#getRelationships">getRelationships</a></li><li><a href="global.html#getResources">getResources</a></li><li><a href="global.html#getSchema">getSchema</a></li><li><a href="global.html#getTEIs">getTEIs</a></li><li><a href="global.html#handleResponse">handleResponse</a></li><li><a href="global.html#logApiVersion">logApiVersion</a></li><li><a href="global.html#logWaitingForServer">logWaitingForServer</a></li><li><a href="global.html#patch">patch</a></li><li><a href="global.html#prettyJson">prettyJson</a></li><li><a href="global.html#recursivelyExpandReferences">recursivelyExpandReferences</a></li><li><a href="global.html#requestHttpHead">requestHttpHead</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#updateEnrollments">updateEnrollments</a></li><li><a href="global.html#updateEvents">updateEvents</a></li><li><a href="global.html#updatePrograms">updatePrograms</a></li><li><a href="global.html#updateTEI">updateTEI</a></li><li><a href="global.html#upsert">upsert</a></li><li><a href="global.html#value">value</a></li><li><a href="global.html#warnExpectLargeResult">warnExpectLargeResult</a></li></ul>
+>>>>>>> 1d27d2c... update language-common
 </nav>
 
 <br class="clear">
 
 <footer>
 <<<<<<< HEAD
+<<<<<<< HEAD
     Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Mon Dec 14 2020 11:22:43 GMT-0500 (Eastern Standard Time)
 =======
     Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Wed Dec 30 2020 15:45:02 GMT+0200 (Central Africa Time)
 >>>>>>> 747a859... ready to test upsert and upsertTEI
+=======
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Thu Jan 14 2021 09:01:48 GMT+0000 (Greenwich Mean Time)
+>>>>>>> 1d27d2c... update language-common
 </footer>
 
 <script> prettyPrint(); </script>
