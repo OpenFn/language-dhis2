@@ -1,4 +1,32 @@
-"use strict";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: Adaptor.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: Adaptor.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>"use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
@@ -103,13 +131,13 @@ var _lodash = require("lodash");
 
 var _Utils = require("./Utils");
 
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+function _interopRequireDefault(obj) { return obj &amp;&amp; obj.__esModule ? obj : { "default": obj }; }
 
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" &amp;&amp; Symbol.iterator in Object(iter)) return Array.from(iter); }
 
 function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
 
@@ -117,17 +145,17 @@ function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArra
 
 function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
 
-function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" &amp;&amp; o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
-function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i &lt; len; i++) { arr2[i] = arr[i]; } return arr2; }
 
-function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i &amp;&amp; _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n &amp;&amp; _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
 
 function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
-function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+function _objectSpread(target) { for (var i = 1; i &lt; arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
@@ -147,7 +175,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
  * @returns {Operation}
  */
 function execute() {
-  for (var _len = arguments.length, operations = new Array(_len), _key = 0; _key < _len; _key++) {
+  for (var _len = arguments.length, operations = new Array(_len), _key = 0; _key &lt; _len; _key++) {
     operations[_key] = arguments[_key];
   }
 
@@ -207,7 +235,7 @@ _axios["default"].interceptors.response.use(function (response) {
     }
   }
 
-  if (typeof ((_response = response) === null || _response === void 0 ? void 0 : _response.data) === 'string' && contentType === (_Utils.CONTENT_TYPES === null || _Utils.CONTENT_TYPES === void 0 ? void 0 : _Utils.CONTENT_TYPES.json)) {
+  if (typeof ((_response = response) === null || _response === void 0 ? void 0 : _response.data) === 'string' &amp;&amp; contentType === (_Utils.CONTENT_TYPES === null || _Utils.CONTENT_TYPES === void 0 ? void 0 : _Utils.CONTENT_TYPES.json)) {
     try {
       response = _objectSpread({}, response, {
         data: JSON.parse(response.data)
@@ -268,8 +296,8 @@ _axios["default"].interceptors.response.use(function (response) {
  * @param {string} [responseType] - Optional response type. Defaults to `json`
  * @param {createOptions} [options] - Optional `flags` for the behavior of the `getTEIs` operation.
  * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `getTEIs` `expression.js` for fetching a `single` `Tracked Entity Instance`</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `getTEIs` `expression.js` for fetching a `single` `Tracked Entity Instance`&lt;/caption>
  * getTEIs([
  * {
  *   fields: '*',
@@ -298,12 +326,12 @@ function getTEIs(params, options, callback) {
  * @public
  * @function
  * @param {string} uniqueAttributeId - Tracked Entity Instance unique identifier used during matching
- * @param {Object<symbol,any>} data - Payload data for new/updated tracked entity instance(s)
+ * @param {Object&lt;symbol,any>} data - Payload data for new/updated tracked entity instance(s)
  * @param {options} [options] - Optional `options` for `upserTEI` operation. Defaults to `{responseType: 'json',replace: false, apiVersion: null,requireUniqueAttributeConfig: true}`
  * @param {requestCallback} [callback] - Optional `callback` to handle the response.
  * @throws {RangeError} - Throws `RangeError` when `uniqueAttributeId` is `invalid` or `not unique`.
- * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` of upsertTEI</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of upsertTEI&lt;/caption>
  * upsertTEI('lZGmxYbs97q', state.data);
  */
 
@@ -324,8 +352,8 @@ function upsertTEI(uniqueAttributeId, data, options, callback) {
         password = _state$configuration2.password,
         username = _state$configuration2.username,
         hostUrl = _state$configuration2.hostUrl;
-    var apiVersion = (_options$apiVersion = (_options = options) === null || _options === void 0 ? void 0 : _options.apiVersion) !== null && _options$apiVersion !== void 0 ? _options$apiVersion : state.configuration.apiVersion;
-    var requireUniqueAttributeConfig = (_options$requireUniqu = (_options2 = options) === null || _options2 === void 0 ? void 0 : _options2.requireUniqueAttributeConfig) !== null && _options$requireUniqu !== void 0 ? _options$requireUniqu : true;
+    var apiVersion = (_options$apiVersion = (_options = options) === null || _options === void 0 ? void 0 : _options.apiVersion) !== null &amp;&amp; _options$apiVersion !== void 0 ? _options$apiVersion : state.configuration.apiVersion;
+    var requireUniqueAttributeConfig = (_options$requireUniqu = (_options2 = options) === null || _options2 === void 0 ? void 0 : _options2.requireUniqueAttributeConfig) !== null &amp;&amp; _options$requireUniqu !== void 0 ? _options$requireUniqu : true;
     var params = {
       ou: body.orgUnit
     };
@@ -389,7 +417,7 @@ function upsertTEI(uniqueAttributeId, data, options, callback) {
 
         _Utils.Log.error('');
 
-        throw new RangeError("Attribute ".concat((_attribute$name = attribute.name) !== null && _attribute$name !== void 0 ? _attribute$name : '', "(").concat(uniqueAttributeId, ") is not unique. Ensure, in DHIS2, this tracked entity attribute is marked as unique."));
+        throw new RangeError("Attribute ".concat((_attribute$name = attribute.name) !== null &amp;&amp; _attribute$name !== void 0 ? _attribute$name : '', "(").concat(uniqueAttributeId, ") is not unique. Ensure, in DHIS2, this tracked entity attribute is marked as unique."));
       }
 
       return upsert('trackedEntityInstances', {
@@ -403,12 +431,12 @@ function upsertTEI(uniqueAttributeId, data, options, callback) {
  * Create a DHIS2 Tracked Entity Instance
  * @public
  * @function
- * @param {object<any,any>} data - The update data containing new values
+ * @param {object&lt;any,any>} data - The update data containing new values
  * @param {array} [params] - Optional `import` parameters for `create`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
  * @param {createOptions} [options] - Optional `flags` for the behavior of the `createTEI` operation.
  * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` of `createTEI`</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of `createTEI`&lt;/caption>
  * createTEI(state.data);
  */
 
@@ -429,12 +457,12 @@ function createTEI(data, params, options, callback) {
  * @public
  * @function
  * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
- * @param {object<any,any>} data - The update data containing new values
+ * @param {object&lt;any,any>} data - The update data containing new values
  * @param {array} [params] - Optional `import` parameters for `create`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
  * @param {createOptions} [options] - Optional `flags` for the behavior of the `updateTEI` operation.
  * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` of `updateTEI`</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of `updateTEI`&lt;/caption>
  * update('PVqUD2hvU4E', state.data);
  */
 
@@ -458,20 +486,20 @@ function updateTEI(path, data, params, options, callback) {
  * @param {string} [responseType] - Optional response type. Defaults to `json`
  * @param {eventOptions} [options] - Optional `flags` for the behavior of the `getEvents` operation.
  * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Query for `all events` with `children` of a certain `organisation unit`</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Query for `all events` with `children` of a certain `organisation unit`&lt;/caption>
  * getEvents([{ orgUnit: 'YuQRtpLP10I' }, { ouMode: 'CHILDREN' }]);
- * @example <caption>- Query for `all events` with all `descendants` of a certain `organisation unit`, implying all organisation units in the `sub-hierarchy`</caption>
+ * @example &lt;caption>- Query for `all events` with all `descendants` of a certain `organisation unit`, implying all organisation units in the `sub-hierarchy`&lt;/caption>
  * getEvents([{ orgUnit: 'O6uvpzGd5pu' }, { ouMode: 'DESCENDANTS' }]);
- * @example <caption>- Query for `all events` with a `certain program` and `organisation unit`</caption>
+ * @example &lt;caption>- Query for `all events` with a `certain program` and `organisation unit`&lt;/caption>
  * getEvents([{ orgUnit: 'DiszpKrYNg8' }, { program: 'eBAyeGv0exc' }]);
- * @example <caption>- Query for all `events` with a `certain program` and `organisation unit`, `sorting` by `due date ascending`</caption>
+ * @example &lt;caption>- Query for all `events` with a `certain program` and `organisation unit`, `sorting` by `due date ascending`&lt;/caption>
  * getEvents([
  * { orgUnit: 'DiszpKrYNg8' },
  * { program: 'eBAyeGv0exc' },
  * { order: 'dueDate' },
  * ]);
- * @example <caption>- Query for the `10 events` with the `newest event date` in a `certain program` and `organisation unit` - by `paging` and `ordering` by `due date descending`</caption>
+ * @example &lt;caption>- Query for the `10 events` with the `newest event date` in a `certain program` and `organisation unit` - by `paging` and `ordering` by `due date descending`&lt;/caption>
  * getEvents([
  * { orgUnit: 'DiszpKrYNg8' },
  * { program: 'eBAyeGv0exc' },
@@ -479,19 +507,19 @@ function updateTEI(path, data, params, options, callback) {
  * { pageSize: 10 },
  * { page: 1 },
  * ]);
- * @example <caption>- Query for `all events` with a `certain program` and `organisation unit` for a specific `tracked entity instance`</caption>
+ * @example &lt;caption>- Query for `all events` with a `certain program` and `organisation unit` for a specific `tracked entity instance`&lt;/caption>
  * getEvents([
  * { orgUnit: 'DiszpKrYNg8' },
  * { program: 'eBAyeGv0exc' },
  * { trackedEntityInstance: 'gfVxE3ALA9m' },
  * ]);
- * @example <caption>- Query for `all events` with a `certain program` and `organisation unit` `older` or `equal to 2014-02-03`</caption>
+ * @example &lt;caption>- Query for `all events` with a `certain program` and `organisation unit` `older` or `equal to 2014-02-03`&lt;/caption>
  * getEvents([
  * { orgUnit: 'DiszpKrYNg8' },
  * { program: 'eBAyeGv0exc' },
  * { endDate: '2014-02-03' },
  * ]);
- * @example <caption>- Query for `all events` with a `certain program stage`, `organisation unit` and `tracked entity instance` in the `year 2014`</caption>
+ * @example &lt;caption>- Query for `all events` with a `certain program stage`, `organisation unit` and `tracked entity instance` in the `year 2014`&lt;/caption>
  * getEvents([
  * { orgUnit: 'DiszpKrYNg8' },
  * { program: 'eBAyeGv0exc' },
@@ -499,13 +527,13 @@ function updateTEI(path, data, params, options, callback) {
  * { startDate: '2014-01-01' },
  * { endDate: '2014-12-31' },
  * ]);
- * @example <caption>- Retrieve `events` with specified `Organisation unit` and `Program`, and use `Attribute:Gq0oWTf2DtN` as `identifier scheme`</caption>
+ * @example &lt;caption>- Retrieve `events` with specified `Organisation unit` and `Program`, and use `Attribute:Gq0oWTf2DtN` as `identifier scheme`&lt;/caption>
  * getEvents([
  * { orgUnit: 'DiszpKrYNg8' },
  * { program: 'lxAQ7Zs9VYR' },
  * { idScheme: 'Attribute:Gq0oWTf2DtN' },
  * ]);
- * @example <caption>- Retrieve `events` with specified `Organisation unit` and `Program`, and use `UID` as `identifier scheme` for `orgUnits`, `Code` as `identifier scheme` for `Program stages`, and `Attribute:Gq0oWTf2DtN` as `identifier scheme` for the rest of the `metadata` with `assigned attribute`.</caption>
+ * @example &lt;caption>- Retrieve `events` with specified `Organisation unit` and `Program`, and use `UID` as `identifier scheme` for `orgUnits`, `Code` as `identifier scheme` for `Program stages`, and `Attribute:Gq0oWTf2DtN` as `identifier scheme` for the rest of the `metadata` with `assigned attribute`.&lt;/caption>
  * getEvents([
  * { orgUnit: 'DiszpKrYNg8' },
  * { program: 'lxAQ7Zs9VYR' },
@@ -534,12 +562,12 @@ function getEvents(params, options, callback) {
  * - For sending `events` to `programs with multiple stages`, you will need to also include the `programStage` identifier, the identifiers for `programStages` can be found in the `programStages` resource via a call to `getMetadata` operation.
  * @public
  * @function
- * @param {object<any,any>} data - The update data containing new values
+ * @param {object&lt;any,any>} data - The update data containing new values
  * @param {array} [params] - Optional `import` parameters for `createEvents`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
  * @param { {apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `createEvents` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` of `createEvents` for a `single event` can look like this:</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of `createEvents` for a `single event` can look like this:&lt;/caption>
  * createEvents(state.data);
  * // Example shape for state.data
  * data: {
@@ -568,7 +596,7 @@ function getEvents(params, options, callback) {
  *     },
  *   ],
  * },
- * @example <caption>- Example `expression.js` of `createEvents` for sending `multiple events` at the same time</caption>
+ * @example &lt;caption>- Example `expression.js` of `createEvents` for sending `multiple events` at the same time&lt;/caption>
  * createEvents(state.data);
  * // Example shape for state.data
  *
@@ -596,12 +624,12 @@ function createEvents(data, params, options, callback) {
  * @public
  * @function
  * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
- * @param {object<any,any>} data - The update data containing new values
+ * @param {object&lt;any,any>} data - The update data containing new values
  * @param {array} [params] - Optional `import` parameters for `updateEvents`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
  * @param {createOptions} [options] - Optional `flags` for the behavior of the `updateEvents` operation.
  * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` of `updateEvents`</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of `updateEvents`&lt;/caption>
  * updateEvents('PVqUD2hvU4E', state.data);
  * @todo Support `merge` via custom `partial updates` mechanism since `PATCH` is not `natively` supported on this endpoint
  */
@@ -626,8 +654,8 @@ function updateEvents(path, data, params, options, callback) {
  * @param {string} [responseType] - Optional response type. Defaults to `json`
  * @param {eventOptions} [options] - Optional `flags` for the behavior of the `getPrograms` operation.
  * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Query for `all programs` with a certain `organisation unit`</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Query for `all programs` with a certain `organisation unit`&lt;/caption>
  * getPrograms([{ orgUnit: 'DiszpKrYNg8' }, { fields: '*' }]);
  */
 
@@ -647,15 +675,15 @@ function getPrograms(params, options, callback) {
  * Create a DHIS2 Programs
  * @public
  * @function
- * @param {object<any,any>} data - The update data containing new values
+ * @param {object&lt;any,any>} data - The update data containing new values
  * @param {array} [params] - Optional `import` parameters for `createPrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
  * @param {createOptions} [options] - Optional `flags` for the behavior of the `createPrograms` operation.
  * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` of `createPrograms` for a `single program` can look like this:</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of `createPrograms` for a `single program` can look like this:&lt;/caption>
  * createPrograms(state.data);
  * @see {singleProgramSampleState}
- * @example <caption>- Example `expression.js` of `createPrograms` for sending `multiple programs` at the same time</caption>
+ * @example &lt;caption>- Example `expression.js` of `createPrograms` for sending `multiple programs` at the same time&lt;/caption>
  * createPrograms(state.data);
  * @see {multipleProgramsSampleState}
  */
@@ -682,12 +710,12 @@ function createPrograms(data, params, options, callback) {
  * @public
  * @function
  * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
- * @param {object<any,any>} data - The update data containing new values
+ * @param {object&lt;any,any>} data - The update data containing new values
  * @param {array} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
  * @param {createOptions} [options] - Optional `flags` for the behavior of the `updatePrograms` operation.
  * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` of `updatePrograms`</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of `updatePrograms`&lt;/caption>
  * updatePrograms('PVqUD2hvU4E', state.data);
  * @todo Support `merge` via custom `partial updates` mechanism since `PATCH` is not `natively` supported on this endpoint
  */
@@ -712,17 +740,17 @@ function updatePrograms(path, data, params, options, callback) {
  * @param {string} [responseType] - Optional response type. Defaults to `json`
  * @param {eventOptions} [options] - Optional `flags` for the behavior of the `getEnrollments` operation.
  * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- A query for `all enrollments` associated with a `specific organisation unit` can look like this:</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- A query for `all enrollments` associated with a `specific organisation unit` can look like this:&lt;/caption>
  * getEnrollments([{ ou: 'DiszpKrYNg8' }, { fields: '*' }]);
- * @example <caption>- To constrain the response to `enrollments` which are part of a `specific program` you can include a `program query parameter`</caption>
+ * @example &lt;caption>- To constrain the response to `enrollments` which are part of a `specific program` you can include a `program query parameter`&lt;/caption>
  * getEnrollments([
  * { ou: 'O6uvpzGd5pu' },
  * { ouMode: 'DESCENDANTS' },
  * { program: 'ur1Edk5Oe2n' },
  * { fields: '*' },
  * ]);
- * @example <caption>- To specify `program enrollment dates` as `part of the query`</caption>
+ * @example &lt;caption>- To specify `program enrollment dates` as `part of the query`&lt;/caption>
  * getEnrollments([
  * { ou: 'O6uvpzGd5pu' },
  * { ouMode: 'DESCENDANTS' },
@@ -731,7 +759,7 @@ function updatePrograms(path, data, params, options, callback) {
  * { programEndDate: '2013-09-01' },
  * { fields: '*' },
  * ]);
- * @example <caption>- To constrain the response to `enrollments` of a `specific tracked entity` you can include a `tracked entity query parameter`</caption>
+ * @example &lt;caption>- To constrain the response to `enrollments` of a `specific tracked entity` you can include a `tracked entity query parameter`&lt;/caption>
  * getEnrollments([
  * { ou: 'O6uvpzGd5pu' },
  * { ouMode: 'DESCENDANTS' },
@@ -739,13 +767,13 @@ function updatePrograms(path, data, params, options, callback) {
  * { trackedEntity: 'cyl5vuJ5ETQ' },
  * { fields: '*' },
  * ]);
- * @example <caption>- To constrain the response to `enrollments` of a `specific tracked entity instance` you can include a `tracked entity instance query parameter`, in this case we have `restricted` it to available `enrollments viewable for current user`</caption>
+ * @example &lt;caption>- To constrain the response to `enrollments` of a `specific tracked entity instance` you can include a `tracked entity instance query parameter`, in this case we have `restricted` it to available `enrollments viewable for current user`&lt;/caption>
  * getEnrollments([
  * { ouMode: 'ACCESSIBLE' },
  * { trackedEntityInstance: 'tphfdyIiVL6' },
  * { fields: '*' },
  * ]);
- * @example <caption>- By default the `enrollments` are returned in `pages of size 50`, to change this you can use the `page` and `pageSize query parameters`</caption>
+ * @example &lt;caption>- By default the `enrollments` are returned in `pages of size 50`, to change this you can use the `page` and `pageSize query parameters`&lt;/caption>
  * getEnrollments([
  * { ou: 'O6uvpzGd5pu' },
  * { ouMode: 'DESCENDANTS' },
@@ -774,12 +802,12 @@ function getEnrollments(params, responseType, options, callback) {
  * - Then, you will need to get the `program identifier` from the `programs` resource via the `getPrograms` operation.
  * @public
  * @function
- * @param {object<any,any>} data - The update data containing new values
+ * @param {object&lt;any,any>} data - The update data containing new values
  * @param {array} [params] - Optional `import` parameters for `createEnrollment`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
  * @param {createOptions} [options] - Optional `flags` for the behavior of the `createEnrollment` operation.
  * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` of `createEnrollment` of a `person` into a `program` can look like this:</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of `createEnrollment` of a `person` into a `program` can look like this:&lt;/caption>
  * createEnrollment(state.data);
  * @see {enrollmentSampleState}
  */
@@ -806,12 +834,12 @@ function enrollTEI(data, params, options, callback) {
  * @public
  * @function
  * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
- * @param {object<any,any>} data - The update data containing new values
+ * @param {object&lt;any,any>} data - The update data containing new values
  * @param {array} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
  * @param {createOptions} [options] - Optional `flags` for the behavior of the `updatePrograms` operation.
  * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` of `updateEnromments`</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of `updateEnromments`&lt;/caption>
  * updatePrograms('PVqUD2hvU4E', state.data);
  * @todo Support `merge` via custom `partial updates` mechanism since `PATCH` is not `natively` supported on this endpoint
  */
@@ -837,8 +865,8 @@ function updateEnrollments(path, data, params, options, callback) {
  * @param {array} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
  * @param {createOptions} [options] - Optional `flags` for the behavior of the `updatePrograms` operation.
  * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` of `cancelEnrollment`</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of `cancelEnrollment`&lt;/caption>
  * cancelEnrollments('PVqUD2hvU4E');
  */
 
@@ -865,8 +893,8 @@ function cancelEnrollment(enrollmentId, params, options, callback) {
  * @param {array} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
  * @param {createOptions} [options] - Optional `flags` for the behavior of the `updatePrograms` operation.
  * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` of `completeEnrollment`</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of `completeEnrollment`&lt;/caption>
  * completeEnrollment('PVqUD2hvU4E');
  */
 
@@ -894,12 +922,12 @@ function completeEnrollment(enrollmentId, params, options, callback) {
  * @param {string} [responseType] - Optional response type. Defaults to `json`
  * @param {eventOptions} [options] - Optional `flags` for the behavior of the `getRelationships` operation.
  * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- A query for `all relationships` associated with a `specific tracked entity instance` can look like this:</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- A query for `all relationships` associated with a `specific tracked entity instance` can look like this:&lt;/caption>
  * getRelationships([{ tei: 'F8yKM85NbxW' }, { fields: '*' }]);
- * @example <caption>- A query for `all relationships` associated with a `enrollment` can look like this:</caption>
+ * @example &lt;caption>- A query for `all relationships` associated with a `enrollment` can look like this:&lt;/caption>
  * getRelationships([{ enrollment: 'LXmiAMnJLrS' }, { fields: '*' }]);
- * @example <caption>- A query for `all relationships` associated with a `event` can look like this:</caption>
+ * @example &lt;caption>- A query for `all relationships` associated with a `event` can look like this:&lt;/caption>
  * getRelationships([{ event: 'TgJUhG6P6TJ' }, { fields: '*' }]);
  */
 
@@ -924,8 +952,8 @@ function getRelationships(params, options, callback) {
  * @param {array} params - `Query` parameters for `getDataValues`. E.g. `{dataset: 'pBOMPrpg1QX', limit: 3, period: 2021, orgUnit: 'DiszpKrYNg8'} Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#data-values DHIS2 API docs} for available `Data Value Set Query Parameters`.
  * @param {{apiVersion: number,operationName: string,responseType: string}} [options] - Optional `options` for `getDataValues` operation. Defaults to `{operationName: 'getDataValues', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
  * @param {requestCallback} [callback] - Optional `callback` to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example getting **two** `data values` associated with a specific `orgUnit`, `dataSet`, and `period `</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example getting **two** `data values` associated with a specific `orgUnit`, `dataSet`, and `period `&lt;/caption>
  * getDataValues({
  *   orgUnit: 'DiszpKrYNg8',
  *   period: '202010',
@@ -959,8 +987,8 @@ function getDataValues(params, options, callback) {
  * @param {object} [params] - Optional `import` parameters for `createDataValues`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`. Run `discover` or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#data-values DHIS2 Docs API} to learn about available data values import parameters.
  * @param  {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `createDataVaues` operation.
  * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` of `createDataValues`  for sending a set of related data values sharing the same period and organisation unit</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of `createDataValues`  for sending a set of related data values sharing the same period and organisation unit&lt;/caption>
  * createDataValues(state.data);
  * // Example shape for state.data
  * data: {
@@ -983,7 +1011,7 @@ function getDataValues(params, options, callback) {
  *     },
  *   ],
  * }
- * @example <caption>- Example `expression.js` of `createDataValues`  for sending large bulks of data values which don't necessarily are logically related</caption>
+ * @example &lt;caption>- Example `expression.js` of `createDataValues`  for sending large bulks of data values which don't necessarily are logically related&lt;/caption>
  * createDataValues(state.data);
  * // Example shape for state.data
  * {
@@ -1038,10 +1066,10 @@ function createDataValues(data, options, params, callback) {
  * @function
  * @param {{apiVersion: number,limit: number,responseType: string}} [options] - Optional `options` for `getMetadata` operation. Defaults to `{apiVersion: state.configuration.apiVersion,limit: 1,responseType: 'json'}`
  * @param {requestCallback} [callback] - Callback to handle response
- * @returns {Promise<state>} state
- * @example <caption>Example generating `one UID` from the DHIS2 server</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>Example generating `one UID` from the DHIS2 server&lt;/caption>
  * generateDhis2UID();
- * @example <caption>Example generating `three UIDs` from the DHIS2 server</caption>
+ * @example &lt;caption>Example generating `three UIDs` from the DHIS2 server&lt;/caption>
  * generateDhis2UID({limit: 3});
  */
 
@@ -1057,7 +1085,7 @@ function generateDhis2UID(options, callback) {
       };
     }
     var limit = {
-      limit: (_options$limit = (_options3 = options) === null || _options3 === void 0 ? void 0 : _options3.limit) !== null && _options$limit !== void 0 ? _options$limit : 1
+      limit: (_options$limit = (_options3 = options) === null || _options3 === void 0 ? void 0 : _options3.limit) !== null &amp;&amp; _options$limit !== void 0 ? _options$limit : 1
     };
     (_options4 = options) === null || _options4 === void 0 ? true : delete _options4.limit;
     return getData('system/id', limit, options, callback)(state);
@@ -1069,8 +1097,8 @@ function generateDhis2UID(options, callback) {
  * @function
  * @param {string} httpMethod - The HTTP to inspect parameter usage for a given endpoint, e.g., `get`, `post`,`put`,`patch`,`delete`
  * @param {string} endpoint - The path for a given endpoint. E.g. `/trackedEntityInstances` or `/dataValueSets`
- * @returns {Promise<state>} state
- * @example <caption>Example getting a list of `parameters allowed` on a given `endpoint` for specific `http method`</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>Example getting a list of `parameters allowed` on a given `endpoint` for specific `http method`&lt;/caption>
  * discover('post', '/trackedEntityInstances')
  */
 
@@ -1097,8 +1125,8 @@ function discover(httpMethod, endpoint) {
 
             param.schema = JSON.stringify(param.schema);
             var descIndex;
-            if ((0, _lodash.indexOf)(param.description, ',') === -1 && (0, _lodash.indexOf)(param.description, '.') > -1) descIndex = (0, _lodash.indexOf)(param.description, '.');else if ((0, _lodash.indexOf)(param.description, ',') > -1 && (0, _lodash.indexOf)(param.description, '.') > -1) {
-              descIndex = (0, _lodash.indexOf)(param.description, '.') < (0, _lodash.indexOf)(param.description, ',') ? (0, _lodash.indexOf)(param.description, '.') : (0, _lodash.indexOf)(param.description, ',');
+            if ((0, _lodash.indexOf)(param.description, ',') === -1 &amp;&amp; (0, _lodash.indexOf)(param.description, '.') > -1) descIndex = (0, _lodash.indexOf)(param.description, '.');else if ((0, _lodash.indexOf)(param.description, ',') > -1 &amp;&amp; (0, _lodash.indexOf)(param.description, '.') > -1) {
+              descIndex = (0, _lodash.indexOf)(param.description, '.') &lt; (0, _lodash.indexOf)(param.description, ',') ? (0, _lodash.indexOf)(param.description, '.') : (0, _lodash.indexOf)(param.description, ',');
             } else {
               descIndex = param.description.length;
             }
@@ -1111,7 +1139,7 @@ function discover(httpMethod, endpoint) {
     }).then(function (result) {
       var _result$data$descript;
 
-      _Utils.Log.info("\t=======================================================================================\n\tQuery Parameters for ".concat(_Utils.COLORS.FgGreen).concat(httpMethod).concat(_Utils.ESCAPE, " on ").concat(_Utils.COLORS.FgGreen).concat(endpoint).concat(_Utils.ESCAPE, " [").concat((_result$data$descript = result.data.description) !== null && _result$data$descript !== void 0 ? _result$data$descript : '<description_missing>', "]\n\t======================================================================================="));
+      _Utils.Log.info("\t=======================================================================================\n\tQuery Parameters for ".concat(_Utils.COLORS.FgGreen).concat(httpMethod).concat(_Utils.ESCAPE, " on ").concat(_Utils.COLORS.FgGreen).concat(endpoint).concat(_Utils.ESCAPE, " [").concat((_result$data$descript = result.data.description) !== null &amp;&amp; _result$data$descript !== void 0 ? _result$data$descript : '&lt;description_missing>', "]\n\t======================================================================================="));
 
       console.table(result.data.parameters, ['in', 'required', 'description']);
       console.table(result.data.parameters, ['schema']);
@@ -1132,13 +1160,13 @@ function discover(httpMethod, endpoint) {
  * @param {object} params - Analytics `query parameters`, e.g. `{dx: 'fbfJHSPpUQD;cYeuwXTCPkU',filters: ['pe:2014Q1;2014Q2','ou:O6uvpzGd5pu;lc3eMKXaEfw']}`. Run `discover` or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#analytics DHIS2 API docs} to get the params available.
  * @param {{apiVersion: number,responseType: string}}[options] - `Optional` options for `getAnalytics` operation. Defaults to `{apiVersion: state.configuration.apiVersion, responseType: 'json'}`.
  * @param {requestCallback} [callback] - Callback to handle response
- * @returns {Promise<state>} state
- * @example <caption>Example getting a list of data elements filtered by the periods and organisation units</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>Example getting a list of data elements filtered by the periods and organisation units&lt;/caption>
  *  getAnalytics({
  *    dimensions: ['dx:fbfJHSPpUQD;cYeuwXTCPkU'],
  *    filters: ['pe:2014Q1;2014Q2', 'ou:O6uvpzGd5pu;lc3eMKXaEfw'],
  *  })
- * @example <caption>Example getting only records where the data value is greater or equal to 6500 and less than 33000</caption>
+ * @example &lt;caption>Example getting only records where the data value is greater or equal to 6500 and less than 33000&lt;/caption>
  * getAnalytics({
  *   dimensions: [
  *    'dx:fbfJHSPpUQD;cYeuwXTCPkU',
@@ -1147,7 +1175,7 @@ function discover(httpMethod, endpoint) {
  *   ],
  *   measureCriteria: 'GE:6500;LT:33000',
  * })
- * @example <caption>Example getting only records for a certain date range using startDate and endDate</caption>
+ * @example &lt;caption>Example getting only records for a certain date range using startDate and endDate&lt;/caption>
  * getAnalytics({
  *   dimensions: ['dx:fbfJHSPpUQD;cYeuwXTCPkU', 'ou:ImspTQPwCqd'],
  *     startDate: '2018-01-01',
@@ -1174,12 +1202,12 @@ function getAnalytics(params, options, callback) {
  * @param {object} params - The optional query parameters for this endpoint. E.g `{filter: 'singular:like:attribute'}`.
  * @param {{filter: string, fields: string, responseType: string}} [options] - The `optional` options, specifiying the filter expression. E.g. `singular:eq:attribute`.
  * @param {requestCallback} [callback] - The `optional callback function that will be called to handle data returned by this function.
- * @returns Promise<state> state
- * @example <caption>Example getting a list of `all DHIS2 resources`</caption>
+ * @returns Promise&lt;state> state
+ * @example &lt;caption>Example getting a list of `all DHIS2 resources`&lt;/caption>
  * getResources();
- * @example <caption>Example getting a resource named `attribute`, in `json` format</caption>
+ * @example &lt;caption>Example getting a resource named `attribute`, in `json` format&lt;/caption>
  * getResources({ filter: 'singular:eq:attribute' });
- * @example <caption>Example getting a resource named `attribute`, in `xml` format, returning all the fields</caption>
+ * @example &lt;caption>Example getting a resource named `attribute`, in `xml` format, returning all the fields&lt;/caption>
  *  getResources('dataElement', {
  *      filter: 'singular:eq:attribute',
  *      fields: '*',
@@ -1199,11 +1227,11 @@ function getResources(params, options, callback) {
         username = _state$configuration3.username,
         password = _state$configuration3.password,
         hostUrl = _state$configuration3.hostUrl;
-    var responseType = (_options$responseType = (_options5 = options) === null || _options5 === void 0 ? void 0 : _options5.responseType) !== null && _options$responseType !== void 0 ? _options$responseType : 'json';
+    var responseType = (_options$responseType = (_options5 = options) === null || _options5 === void 0 ? void 0 : _options5.responseType) !== null &amp;&amp; _options$responseType !== void 0 ? _options$responseType : 'json';
     var filter = (_params = params) === null || _params === void 0 ? void 0 : _params.filter;
     var queryParams = params;
     var headers = {
-      Accept: (_CONTENT_TYPES$respon = _Utils.CONTENT_TYPES[responseType]) !== null && _CONTENT_TYPES$respon !== void 0 ? _CONTENT_TYPES$respon : 'application/json'
+      Accept: (_CONTENT_TYPES$respon = _Utils.CONTENT_TYPES[responseType]) !== null &amp;&amp; _CONTENT_TYPES$respon !== void 0 ? _CONTENT_TYPES$respon : 'application/json'
     };
     var path = '/resources';
     var url = (0, _Utils.buildUrl)(path, hostUrl, null, false);
@@ -1212,7 +1240,7 @@ function getResources(params, options, callback) {
       if (filter) {
         var _headers$contentType, _headers$contentType2;
 
-        if (((_headers$contentType = (_headers$contentType2 = headers['content-type']) === null || _headers$contentType2 === void 0 ? void 0 : _headers$contentType2.split(';')[0]) !== null && _headers$contentType !== void 0 ? _headers$contentType : null) === _Utils.CONTENT_TYPES.json) {
+        if (((_headers$contentType = (_headers$contentType2 = headers['content-type']) === null || _headers$contentType2 === void 0 ? void 0 : _headers$contentType2.split(';')[0]) !== null &amp;&amp; _headers$contentType !== void 0 ? _headers$contentType : null) === _Utils.CONTENT_TYPES.json) {
           var tempData = JSON.parse(data);
           return _objectSpread({}, tempData, {
             resources: _Utils.applyFilter.apply(void 0, [tempData.resources].concat(_toConsumableArray((0, _Utils.parseFilter)(filter))))
@@ -1255,12 +1283,12 @@ function getResources(params, options, callback) {
  * @param {Object} params - Optional `query parameters` for the `getSchema` operation. e.g. `{ fields: 'properties' ,skipPaging: true}`. Run`discover` or See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#metadata-export-examples DHIS2 API Docs}
  * @param {{apiVersion: number,resourceType: string}} [options] - Optional options for `getSchema` method. Defaults to `{apiVersion: state.configuration.apiVersion, responseType: 'json'}`
  * @param {Function} [callback] - Optional `callback` to handle the response
- * @returns Promise<state> state
- * @example <caption>Example getting the `schema` for `dataElement`</caption>
+ * @returns Promise&lt;state> state
+ * @example &lt;caption>Example getting the `schema` for `dataElement`&lt;/caption>
  * getSchema('dataElement');
- * @example <caption>Example getting the `schema` for `dataElement`, only returning the `properties` field</caption>
+ * @example &lt;caption>Example getting the `schema` for `dataElement`, only returning the `properties` field&lt;/caption>
  * getSchema('dataElement', { fields: 'properties' });
- * @example <caption>Example getting the `schema` for `dataElement` in XML</caption>
+ * @example &lt;caption>Example getting the `schema` for `dataElement` in XML&lt;/caption>
  * getSchema('dataElement', '{ fields: '*' }, { responseType: 'xml' });
  */
 
@@ -1277,18 +1305,18 @@ function getSchema(resourceType, params, options, callback) {
         username = _state$configuration4.username,
         password = _state$configuration4.password,
         hostUrl = _state$configuration4.hostUrl;
-    var responseType = (_options$responseType2 = (_options6 = options) === null || _options6 === void 0 ? void 0 : _options6.responseType) !== null && _options$responseType2 !== void 0 ? _options$responseType2 : 'json';
+    var responseType = (_options$responseType2 = (_options6 = options) === null || _options6 === void 0 ? void 0 : _options6.responseType) !== null &amp;&amp; _options$responseType2 !== void 0 ? _options$responseType2 : 'json';
     var filters = (_params2 = params) === null || _params2 === void 0 ? void 0 : _params2.filters;
     (_params3 = params) === null || _params3 === void 0 ? true : delete _params3.filters;
     var queryParams = new URLSearchParams(params);
     filters === null || filters === void 0 ? void 0 : filters.map(function (f) {
       return queryParams.append('filter', f);
     });
-    var apiVersion = (_options$apiVersion2 = (_options7 = options) === null || _options7 === void 0 ? void 0 : _options7.apiVersion) !== null && _options$apiVersion2 !== void 0 ? _options$apiVersion2 : state.configuration.apiVersion;
+    var apiVersion = (_options$apiVersion2 = (_options7 = options) === null || _options7 === void 0 ? void 0 : _options7.apiVersion) !== null &amp;&amp; _options$apiVersion2 !== void 0 ? _options$apiVersion2 : state.configuration.apiVersion;
     var headers = {
-      Accept: (_CONTENT_TYPES$respon2 = _Utils.CONTENT_TYPES[responseType]) !== null && _CONTENT_TYPES$respon2 !== void 0 ? _CONTENT_TYPES$respon2 : 'application/json'
+      Accept: (_CONTENT_TYPES$respon2 = _Utils.CONTENT_TYPES[responseType]) !== null &amp;&amp; _CONTENT_TYPES$respon2 !== void 0 ? _CONTENT_TYPES$respon2 : 'application/json'
     };
-    var url = (0, _Utils.buildUrl)("/schemas/".concat((_resourceType = resourceType) !== null && _resourceType !== void 0 ? _resourceType : ''), hostUrl, apiVersion);
+    var url = (0, _Utils.buildUrl)("/schemas/".concat((_resourceType = resourceType) !== null &amp;&amp; _resourceType !== void 0 ? _resourceType : ''), hostUrl, apiVersion);
     (0, _Utils.logOperation)(operationName);
     (0, _Utils.logApiVersion)(apiVersion);
     (0, _Utils.logWaitingForServer)(url, queryParams);
@@ -1320,8 +1348,8 @@ function getSchema(resourceType, params, options, callback) {
  * @param {object} [params] - Optional `query parameters` e.g. `{ou: 'DiszpKrYNg8'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 docs} for more details on which params to use for a given type of resource.
  * @param {{apiVersion: number,operationName: string,responseType: string}}[options] - `Optional` options for `getData` operation. Defaults to `{operationName: 'getData', apiVersion: state.configuration.apiVersion, responseType: 'json'}`.
  * @param {requestCallback} [callback]  - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>Example getting one `trackedEntityInstance` with `Id` 'dNpxRu1mWG5' for a given `orgUnit(DiszpKrYNg8)`</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>Example getting one `trackedEntityInstance` with `Id` 'dNpxRu1mWG5' for a given `orgUnit(DiszpKrYNg8)`&lt;/caption>
  *  getData('trackedEntityInstances', {
  *    fields: '*',
  *    ou: 'DiszpKrYNg8',
@@ -1339,12 +1367,12 @@ function getData(resourceType, params, options, callback) {
     resourceType = (0, _Utils.recursivelyExpandReferences)(resourceType)(state);
     params = (0, _Utils.recursivelyExpandReferences)(params)(state);
     options = (0, _Utils.recursivelyExpandReferences)(options)(state);
-    var operationName = (_options$operationNam = (_options8 = options) === null || _options8 === void 0 ? void 0 : _options8.operationName) !== null && _options$operationNam !== void 0 ? _options$operationNam : 'getData';
+    var operationName = (_options$operationNam = (_options8 = options) === null || _options8 === void 0 ? void 0 : _options8.operationName) !== null &amp;&amp; _options$operationNam !== void 0 ? _options$operationNam : 'getData';
     var _state$configuration5 = state.configuration,
         username = _state$configuration5.username,
         password = _state$configuration5.password,
         hostUrl = _state$configuration5.hostUrl;
-    var responseType = (_options$responseType3 = (_options9 = options) === null || _options9 === void 0 ? void 0 : _options9.responseType) !== null && _options$responseType3 !== void 0 ? _options$responseType3 : 'json';
+    var responseType = (_options$responseType3 = (_options9 = options) === null || _options9 === void 0 ? void 0 : _options9.responseType) !== null &amp;&amp; _options$responseType3 !== void 0 ? _options$responseType3 : 'json';
     var filters = (_params4 = params) === null || _params4 === void 0 ? void 0 : _params4.filters;
     var dimensions = (_params5 = params) === null || _params5 === void 0 ? void 0 : _params5.dimensions;
     (_params6 = params) === null || _params6 === void 0 ? true : delete _params6.filters;
@@ -1355,9 +1383,9 @@ function getData(resourceType, params, options, callback) {
     dimensions === null || dimensions === void 0 ? void 0 : dimensions.map(function (d) {
       return queryParams.append('dimension', d);
     });
-    var apiVersion = (_options$apiVersion3 = (_options10 = options) === null || _options10 === void 0 ? void 0 : _options10.apiVersion) !== null && _options$apiVersion3 !== void 0 ? _options$apiVersion3 : state.configuration.apiVersion;
+    var apiVersion = (_options$apiVersion3 = (_options10 = options) === null || _options10 === void 0 ? void 0 : _options10.apiVersion) !== null &amp;&amp; _options$apiVersion3 !== void 0 ? _options$apiVersion3 : state.configuration.apiVersion;
     var headers = {
-      Accept: (_CONTENT_TYPES$respon3 = _Utils.CONTENT_TYPES[responseType]) !== null && _CONTENT_TYPES$respon3 !== void 0 ? _CONTENT_TYPES$respon3 : 'application/json'
+      Accept: (_CONTENT_TYPES$respon3 = _Utils.CONTENT_TYPES[responseType]) !== null &amp;&amp; _CONTENT_TYPES$respon3 !== void 0 ? _CONTENT_TYPES$respon3 : 'application/json'
     };
     var url = (0, _Utils.buildUrl)("/".concat(resourceType), hostUrl, apiVersion);
     (0, _Utils.logOperation)(operationName);
@@ -1390,10 +1418,10 @@ function getData(resourceType, params, options, callback) {
  * @param {object} [params] - Optional `query parameters` e.g. `{filters: ['name:like:ANC'],fields:'*'}`. See `discover` or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#metadata-export DHIS2 API docs}
  * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional `options` for `getMetadata` operation. Defaults to `{operationName: 'getMetadata', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
  * @param {requestCallback} [callback] - Optional `callback` to handle the response
- * @returns {Promise<state>} state
- * @example <caption>Example getting a list of `ALL` `organisation units`</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>Example getting a list of `ALL` `organisation units`&lt;/caption>
  * getMetadata('organisationUnits')
- * @example <caption>Example getting a list of `data elements` and `indicators` where `name` includes the word **ANC**</caption>
+ * @example &lt;caption>Example getting a list of `data elements` and `indicators` where `name` includes the word **ANC**&lt;/caption>
  * getMetadata(['dataElements', 'indicators'], {
  *      filters: ['name:like:ANC'],
  *  })
@@ -1412,7 +1440,7 @@ function getMetadata(resources, params, options, callback) {
         username = _state$configuration6.username,
         password = _state$configuration6.password,
         hostUrl = _state$configuration6.hostUrl;
-    var responseType = (_options$responseType4 = (_options11 = options) === null || _options11 === void 0 ? void 0 : _options11.responseType) !== null && _options$responseType4 !== void 0 ? _options$responseType4 : 'json';
+    var responseType = (_options$responseType4 = (_options11 = options) === null || _options11 === void 0 ? void 0 : _options11.responseType) !== null &amp;&amp; _options$responseType4 !== void 0 ? _options$responseType4 : 'json';
 
     if (typeof resources === 'string') {
       var res = {};
@@ -1433,9 +1461,9 @@ function getMetadata(resources, params, options, callback) {
     filters === null || filters === void 0 ? void 0 : filters.map(function (f) {
       return queryParams.append('filter', f);
     });
-    var apiVersion = (_options$apiVersion4 = (_options12 = options) === null || _options12 === void 0 ? void 0 : _options12.apiVersion) !== null && _options$apiVersion4 !== void 0 ? _options$apiVersion4 : state.configuration.apiVersion;
+    var apiVersion = (_options$apiVersion4 = (_options12 = options) === null || _options12 === void 0 ? void 0 : _options12.apiVersion) !== null &amp;&amp; _options$apiVersion4 !== void 0 ? _options$apiVersion4 : state.configuration.apiVersion;
     var headers = {
-      Accept: (_CONTENT_TYPES$respon4 = _Utils.CONTENT_TYPES[responseType]) !== null && _CONTENT_TYPES$respon4 !== void 0 ? _CONTENT_TYPES$respon4 : 'application/json'
+      Accept: (_CONTENT_TYPES$respon4 = _Utils.CONTENT_TYPES[responseType]) !== null &amp;&amp; _CONTENT_TYPES$respon4 !== void 0 ? _CONTENT_TYPES$respon4 : 'application/json'
     };
     var url = (0, _Utils.buildUrl)('/metadata', hostUrl, apiVersion);
     (0, _Utils.logOperation)(operationName);
@@ -1465,12 +1493,12 @@ function getMetadata(resources, params, options, callback) {
  * @public
  * @function
  * @param {string} resourceType - Type of resource to create. E.g. `trackedEntityInstances`
- * @param {Object<symbol,any>} data - Data that will be used to create a given instance of resource
+ * @param {Object&lt;symbol,any>} data - Data that will be used to create a given instance of resource
  * @param {Object} [options] - Optional `options` to control the behavior of the `create` operation.` Defaults to `{operationName: 'create', apiVersion: null, responseType: 'json'}`
  * @param {Object} [params] - Optional `import parameters` for a given a resource. E.g. `{dryRun: true, importStrategy: CREATE}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 API documentation} or {@link discover}. Defauls to `DHIS2 default params` for a given resource type.
  * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` of `create`</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>- Example `expression.js` of `create`&lt;/caption>
  * create('events', state.data);
  */
 
@@ -1483,19 +1511,19 @@ function create(resourceType, data, options, params, callback) {
     var body = (0, _Utils.recursivelyExpandReferences)(data)(state);
     options = (0, _Utils.recursivelyExpandReferences)(options)(state);
     params = (0, _Utils.recursivelyExpandReferences)(params)(state);
-    var operationName = (_options$operationNam2 = (_options13 = options) === null || _options13 === void 0 ? void 0 : _options13.operationName) !== null && _options$operationNam2 !== void 0 ? _options$operationNam2 : 'create';
+    var operationName = (_options$operationNam2 = (_options13 = options) === null || _options13 === void 0 ? void 0 : _options13.operationName) !== null &amp;&amp; _options$operationNam2 !== void 0 ? _options$operationNam2 : 'create';
     var _state$configuration7 = state.configuration,
         username = _state$configuration7.username,
         password = _state$configuration7.password,
         hostUrl = _state$configuration7.hostUrl;
-    var responseType = (_options$responseType5 = (_options14 = options) === null || _options14 === void 0 ? void 0 : _options14.responseType) !== null && _options$responseType5 !== void 0 ? _options$responseType5 : 'json';
+    var responseType = (_options$responseType5 = (_options14 = options) === null || _options14 === void 0 ? void 0 : _options14.responseType) !== null &amp;&amp; _options$responseType5 !== void 0 ? _options$responseType5 : 'json';
     var filters = (_params7 = params) === null || _params7 === void 0 ? void 0 : _params7.filters;
     (_params8 = params) === null || _params8 === void 0 ? true : delete _params8.filters;
     var queryParams = new URLSearchParams(params);
-    var apiVersion = (_options$apiVersion5 = (_options15 = options) === null || _options15 === void 0 ? void 0 : _options15.apiVersion) !== null && _options$apiVersion5 !== void 0 ? _options$apiVersion5 : state.configuration.apiVersion;
+    var apiVersion = (_options$apiVersion5 = (_options15 = options) === null || _options15 === void 0 ? void 0 : _options15.apiVersion) !== null &amp;&amp; _options$apiVersion5 !== void 0 ? _options$apiVersion5 : state.configuration.apiVersion;
     var url = (0, _Utils.buildUrl)('/' + resourceType, hostUrl, apiVersion);
     var headers = {
-      Accept: (_CONTENT_TYPES$respon5 = _Utils.CONTENT_TYPES[responseType]) !== null && _CONTENT_TYPES$respon5 !== void 0 ? _CONTENT_TYPES$respon5 : 'application/json',
+      Accept: (_CONTENT_TYPES$respon5 = _Utils.CONTENT_TYPES[responseType]) !== null &amp;&amp; _CONTENT_TYPES$respon5 !== void 0 ? _CONTENT_TYPES$respon5 : 'application/json',
       'Content-Type': 'application/json'
     };
     (0, _Utils.logOperation)(operationName);
@@ -1533,16 +1561,16 @@ function create(resourceType, data, options, params, callback) {
  * @param {object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
  * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional options for update method. Defaults to `{operationName: 'update', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
  * @param {requestCallback} [callback]  - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>Example `updating` a `data element`</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>Example `updating` a `data element`&lt;/caption>
  * update('dataElements', 'FTRrcoaog83',
  * {
  *   displayName: 'New display name',
  *   aggregationType: 'SUM',
  *   domainType: 'AGGREGATE',
  *   valueType: 'NUMBER',
- *   name: 'Accute Flaccid Paralysis (Deaths < 5 yrs)',
- *   shortName: 'Accute Flaccid Paral (Deaths < 5 yrs)',
+ *   name: 'Accute Flaccid Paralysis (Deaths &lt; 5 yrs)',
+ *   shortName: 'Accute Flaccid Paral (Deaths &lt; 5 yrs)',
  * });
  *
  */
@@ -1561,18 +1589,18 @@ function update(resourceType, path, data, params, options, callback) {
         username = _state$configuration8.username,
         password = _state$configuration8.password,
         hostUrl = _state$configuration8.hostUrl;
-    var operationName = (_options$operationNam3 = (_options16 = options) === null || _options16 === void 0 ? void 0 : _options16.operationName) !== null && _options$operationNam3 !== void 0 ? _options$operationNam3 : 'update';
-    var responseType = (_options$responseType6 = (_options17 = options) === null || _options17 === void 0 ? void 0 : _options17.responseType) !== null && _options$responseType6 !== void 0 ? _options$responseType6 : 'json';
+    var operationName = (_options$operationNam3 = (_options16 = options) === null || _options16 === void 0 ? void 0 : _options16.operationName) !== null &amp;&amp; _options$operationNam3 !== void 0 ? _options$operationNam3 : 'update';
+    var responseType = (_options$responseType6 = (_options17 = options) === null || _options17 === void 0 ? void 0 : _options17.responseType) !== null &amp;&amp; _options$responseType6 !== void 0 ? _options$responseType6 : 'json';
     var filters = (_params9 = params) === null || _params9 === void 0 ? void 0 : _params9.filters;
     (_params10 = params) === null || _params10 === void 0 ? true : delete _params10.filters;
     var queryParams = new URLSearchParams(params);
     filters === null || filters === void 0 ? void 0 : filters.map(function (f) {
       return queryParams.append('filter', f);
     });
-    var apiVersion = (_options$apiVersion6 = (_options18 = options) === null || _options18 === void 0 ? void 0 : _options18.apiVersion) !== null && _options$apiVersion6 !== void 0 ? _options$apiVersion6 : state.configuration.apiVersion;
+    var apiVersion = (_options$apiVersion6 = (_options18 = options) === null || _options18 === void 0 ? void 0 : _options18.apiVersion) !== null &amp;&amp; _options$apiVersion6 !== void 0 ? _options$apiVersion6 : state.configuration.apiVersion;
     var url = (0, _Utils.buildUrl)('/' + resourceType + '/' + path, hostUrl, apiVersion);
     var headers = {
-      Accept: (_CONTENT_TYPES$respon6 = _Utils.CONTENT_TYPES[responseType]) !== null && _CONTENT_TYPES$respon6 !== void 0 ? _CONTENT_TYPES$respon6 : 'application/json'
+      Accept: (_CONTENT_TYPES$respon6 = _Utils.CONTENT_TYPES[responseType]) !== null &amp;&amp; _CONTENT_TYPES$respon6 !== void 0 ? _CONTENT_TYPES$respon6 : 'application/json'
     };
     (0, _Utils.logOperation)(operationName);
     (0, _Utils.logApiVersion)(apiVersion);
@@ -1608,8 +1636,8 @@ function update(resourceType, path, data, params, options, callback) {
  * @param {object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
  * @param {{apiVersion: number,operationName: string,responseType: string}} [options] - Optional options for update method. Defaults to `{operationName: 'patch', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
  * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>Example `patching` a `data element`</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>Example `patching` a `data element`&lt;/caption>
  * patch('dataElements', 'FTRrcoaog83',
  * {
  *   name: 'New Name',
@@ -1626,12 +1654,12 @@ function patch(resourceType, path, data, params, options, callback) {
     var body = (0, _Utils.recursivelyExpandReferences)(data)(state);
     params = (0, _Utils.recursivelyExpandReferences)(params)(state);
     options = (0, _Utils.recursivelyExpandReferences)(options)(state);
-    var operationName = (_options$operationNam4 = (_options19 = options) === null || _options19 === void 0 ? void 0 : _options19.operationName) !== null && _options$operationNam4 !== void 0 ? _options$operationNam4 : 'patch';
+    var operationName = (_options$operationNam4 = (_options19 = options) === null || _options19 === void 0 ? void 0 : _options19.operationName) !== null &amp;&amp; _options$operationNam4 !== void 0 ? _options$operationNam4 : 'patch';
     var _state$configuration9 = state.configuration,
         username = _state$configuration9.username,
         password = _state$configuration9.password,
         hostUrl = _state$configuration9.hostUrl;
-    var responseType = (_options$responseType7 = (_options20 = options) === null || _options20 === void 0 ? void 0 : _options20.responseType) !== null && _options$responseType7 !== void 0 ? _options$responseType7 : 'json';
+    var responseType = (_options$responseType7 = (_options20 = options) === null || _options20 === void 0 ? void 0 : _options20.responseType) !== null &amp;&amp; _options$responseType7 !== void 0 ? _options$responseType7 : 'json';
     var queryParams = params;
     var filters = (_queryParams3 = queryParams) === null || _queryParams3 === void 0 ? void 0 : _queryParams3.filters;
     (_queryParams4 = queryParams) === null || _queryParams4 === void 0 ? true : delete _queryParams4.filters;
@@ -1639,10 +1667,10 @@ function patch(resourceType, path, data, params, options, callback) {
     filters === null || filters === void 0 ? void 0 : filters.map(function (f) {
       return queryParams.append('filter', f);
     });
-    var apiVersion = (_options$apiVersion7 = (_options21 = options) === null || _options21 === void 0 ? void 0 : _options21.apiVersion) !== null && _options$apiVersion7 !== void 0 ? _options$apiVersion7 : state.configuration.apiVersion;
+    var apiVersion = (_options$apiVersion7 = (_options21 = options) === null || _options21 === void 0 ? void 0 : _options21.apiVersion) !== null &amp;&amp; _options$apiVersion7 !== void 0 ? _options$apiVersion7 : state.configuration.apiVersion;
     var url = (0, _Utils.buildUrl)('/' + resourceType + '/' + path, hostUrl, apiVersion);
     var headers = {
-      Accept: (_CONTENT_TYPES$respon7 = _Utils.CONTENT_TYPES[responseType]) !== null && _CONTENT_TYPES$respon7 !== void 0 ? _CONTENT_TYPES$respon7 : 'application/json'
+      Accept: (_CONTENT_TYPES$respon7 = _Utils.CONTENT_TYPES[responseType]) !== null &amp;&amp; _CONTENT_TYPES$respon7 !== void 0 ? _CONTENT_TYPES$respon7 : 'application/json'
     };
     (0, _Utils.logOperation)(operationName);
     (0, _Utils.logApiVersion)(apiVersion);
@@ -1681,8 +1709,8 @@ function patch(resourceType, path, data, params, options, callback) {
  * @param {object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
  * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional `options` for `del` operation. Defaults to `{operationName: 'delete', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
  * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>Example`deleting` a `tracked entity instance`</caption>
+ * @returns {Promise&lt;state>} state
+ * @example &lt;caption>Example`deleting` a `tracked entity instance`&lt;/caption>
  * del('trackedEntityInstances', 'LcRd6Nyaq7T');
  */
 
@@ -1696,12 +1724,12 @@ function del(resourceType, path, data, params, options, callback) {
     var body = (0, _Utils.recursivelyExpandReferences)(data)(state);
     params = (0, _Utils.recursivelyExpandReferences)(params)(state);
     options = (0, _Utils.recursivelyExpandReferences)(options)(state);
-    var operationName = (_options$operationNam5 = (_options22 = options) === null || _options22 === void 0 ? void 0 : _options22.operationName) !== null && _options$operationNam5 !== void 0 ? _options$operationNam5 : 'delete';
+    var operationName = (_options$operationNam5 = (_options22 = options) === null || _options22 === void 0 ? void 0 : _options22.operationName) !== null &amp;&amp; _options$operationNam5 !== void 0 ? _options$operationNam5 : 'delete';
     var _state$configuration10 = state.configuration,
         username = _state$configuration10.username,
         password = _state$configuration10.password,
         hostUrl = _state$configuration10.hostUrl;
-    var responseType = (_options$responseType8 = (_options23 = options) === null || _options23 === void 0 ? void 0 : _options23.responseType) !== null && _options$responseType8 !== void 0 ? _options$responseType8 : 'json';
+    var responseType = (_options$responseType8 = (_options23 = options) === null || _options23 === void 0 ? void 0 : _options23.responseType) !== null &amp;&amp; _options$responseType8 !== void 0 ? _options$responseType8 : 'json';
     var queryParams = params;
     var filters = (_queryParams5 = queryParams) === null || _queryParams5 === void 0 ? void 0 : _queryParams5.filters;
     (_queryParams6 = queryParams) === null || _queryParams6 === void 0 ? true : delete _queryParams6.filters;
@@ -1709,9 +1737,9 @@ function del(resourceType, path, data, params, options, callback) {
     filters === null || filters === void 0 ? void 0 : filters.map(function (f) {
       return queryParams.append('filter', f);
     });
-    var apiVersion = (_options$apiVersion8 = (_options24 = options) === null || _options24 === void 0 ? void 0 : _options24.apiVersion) !== null && _options$apiVersion8 !== void 0 ? _options$apiVersion8 : state.configuration.apiVersion;
+    var apiVersion = (_options$apiVersion8 = (_options24 = options) === null || _options24 === void 0 ? void 0 : _options24.apiVersion) !== null &amp;&amp; _options$apiVersion8 !== void 0 ? _options$apiVersion8 : state.configuration.apiVersion;
     var headers = {
-      Accept: (_CONTENT_TYPES$respon8 = _Utils.CONTENT_TYPES[responseType]) !== null && _CONTENT_TYPES$respon8 !== void 0 ? _CONTENT_TYPES$respon8 : 'application/json'
+      Accept: (_CONTENT_TYPES$respon8 = _Utils.CONTENT_TYPES[responseType]) !== null &amp;&amp; _CONTENT_TYPES$respon8 !== void 0 ? _CONTENT_TYPES$respon8 : 'application/json'
     };
     var url = (0, _Utils.buildUrl)('/' + resourceType + '/' + path, hostUrl, apiVersion);
     (0, _Utils.logOperation)(operationName);
@@ -1745,13 +1773,13 @@ function del(resourceType, path, data, params, options, callback) {
  * @param {Object} uniqueAttribute - An object containing a `attributeId` and `attributeValue` which will be used to uniquely identify the record
  * @param {String} uniqueAttribute.attributeId - the id of the attribute to match on
  * @param {String} uniqueAttribute.attributeValue - the value of the attribute to match on
- * @param {Object<any,any>} data - The update data containing new values
+ * @param {Object&lt;any,any>} data - The update data containing new values
  * @param {array} [params] - Optional `import` parameters e.g. `{ou: 'lZGmxYbs97q', filters: [w75KJ2mc4zz:EQ:Jane]}`
  * @param {options} [options={replace: false, apiVersion: null, responseType: 'json'}] - Optional options for update method {@link options}.`
  * @param {requestCallback} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
+ * @returns {Promise&lt;state>} state
  * @throws {RangeError}
- * @example <caption>- Example `expression.js` of upsert</caption>
+ * @example &lt;caption>- Example `expression.js` of upsert&lt;/caption>
  * ```javascript
  * upsert(
  *      'trackedEntityInstances',
@@ -1781,13 +1809,13 @@ function upsert(resourceType, uniqueAttribute, data, params, options, callback) 
     var body = (0, _Utils.recursivelyExpandReferences)(data)(state);
     params = (0, _Utils.recursivelyExpandReferences)(params)(state);
     options = (0, _Utils.recursivelyExpandReferences)(options)(state);
-    var operationName = (_options$operationNam6 = (_options25 = options) === null || _options25 === void 0 ? void 0 : _options25.operationName) !== null && _options$operationNam6 !== void 0 ? _options$operationNam6 : 'upsert';
+    var operationName = (_options$operationNam6 = (_options25 = options) === null || _options25 === void 0 ? void 0 : _options25.operationName) !== null &amp;&amp; _options$operationNam6 !== void 0 ? _options$operationNam6 : 'upsert';
     var _state$configuration11 = state.configuration,
         username = _state$configuration11.username,
         password = _state$configuration11.password,
         hostUrl = _state$configuration11.hostUrl;
-    var replace = (_options$replace = (_options26 = options) === null || _options26 === void 0 ? void 0 : _options26.replace) !== null && _options$replace !== void 0 ? _options$replace : false;
-    var responseType = (_options$responseType9 = (_options27 = options) === null || _options27 === void 0 ? void 0 : _options27.responseType) !== null && _options$responseType9 !== void 0 ? _options$responseType9 : 'json';
+    var replace = (_options$replace = (_options26 = options) === null || _options26 === void 0 ? void 0 : _options26.replace) !== null &amp;&amp; _options$replace !== void 0 ? _options$replace : false;
+    var responseType = (_options$responseType9 = (_options27 = options) === null || _options27 === void 0 ? void 0 : _options27.responseType) !== null &amp;&amp; _options$responseType9 !== void 0 ? _options$responseType9 : 'json';
     var _uniqueAttribute = uniqueAttribute,
         attributeId = _uniqueAttribute.attributeId,
         attributeValue = _uniqueAttribute.attributeValue;
@@ -1799,10 +1827,10 @@ function upsert(resourceType, uniqueAttribute, data, params, options, callback) 
     });
     var op = resourceType === 'trackedEntityInstances' ? 'EQ' : 'eq';
     queryParams.append('filter', "".concat(attributeId, ":").concat(op, ":").concat(attributeValue));
-    var apiVersion = (_options$apiVersion9 = (_options28 = options) === null || _options28 === void 0 ? void 0 : _options28.apiVersion) !== null && _options$apiVersion9 !== void 0 ? _options$apiVersion9 : state.configuration.apiVersion;
+    var apiVersion = (_options$apiVersion9 = (_options28 = options) === null || _options28 === void 0 ? void 0 : _options28.apiVersion) !== null &amp;&amp; _options$apiVersion9 !== void 0 ? _options$apiVersion9 : state.configuration.apiVersion;
     var url = (0, _Utils.buildUrl)('/' + resourceType, hostUrl, apiVersion);
     var headers = {
-      Accept: (_CONTENT_TYPES$respon9 = _Utils.CONTENT_TYPES[responseType]) !== null && _CONTENT_TYPES$respon9 !== void 0 ? _CONTENT_TYPES$respon9 : 'application/json'
+      Accept: (_CONTENT_TYPES$respon9 = _Utils.CONTENT_TYPES[responseType]) !== null &amp;&amp; _CONTENT_TYPES$respon9 !== void 0 ? _CONTENT_TYPES$respon9 : 'application/json'
     };
     (0, _Utils.logOperation)(operationName);
     (0, _Utils.logApiVersion)(apiVersion);
@@ -1821,7 +1849,7 @@ function upsert(resourceType, uniqueAttribute, data, params, options, callback) 
           if (filter) {
             var _headers$contentType3, _headers$contentType4;
 
-            if (((_headers$contentType3 = (_headers$contentType4 = headers['content-type']) === null || _headers$contentType4 === void 0 ? void 0 : _headers$contentType4.split(';')[0]) !== null && _headers$contentType3 !== void 0 ? _headers$contentType3 : null) === _Utils.CONTENT_TYPES.json) {
+            if (((_headers$contentType3 = (_headers$contentType4 = headers['content-type']) === null || _headers$contentType4 === void 0 ? void 0 : _headers$contentType4.split(';')[0]) !== null &amp;&amp; _headers$contentType3 !== void 0 ? _headers$contentType3 : null) === _Utils.CONTENT_TYPES.json) {
               var tempData = JSON.parse(data);
               return _objectSpread({}, tempData, {
                 resources: _Utils.applyFilter.apply(void 0, [tempData.resources].concat(_toConsumableArray((0, _Utils.parseFilter)(filter))))
@@ -1882,7 +1910,7 @@ function upsert(resourceType, uniqueAttribute, data, params, options, callback) 
         var row1 = recordsWithValue.data[resourceType][0];
         var useCustomPATCH = ['trackedEntityInstances'].includes(resourceType) ? true : false;
         var method = replace ? 'PUT' : useCustomPATCH === true ? 'PUT' : 'PATCH';
-        var id = (_row1$id = row1['id']) !== null && _row1$id !== void 0 ? _row1$id : row1[resourceName];
+        var id = (_row1$id = row1['id']) !== null &amp;&amp; _row1$id !== void 0 ? _row1$id : row1[resourceName];
         var updateUrl = "".concat(url, "/").concat(id);
         var payload = useCustomPATCH ? _objectSpread({}, row1, {}, body, {
           attributes: [].concat(_toConsumableArray(row1.attributes), _toConsumableArray(body.attributes))
@@ -1935,3 +1963,26 @@ function upsert(resourceType, uniqueAttribute, data, params, options, callback) 
 
 
 exports.axios = _axios["default"]; //#endregion
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="configMigrationHelper.html">configMigrationHelper</a></li><li><a href="execute.html">execute</a></li></ul><h3>Global</h3><ul><li><a href="global.html#attribute">attribute</a></li><li><a href="global.html#buildUrl">buildUrl</a></li><li><a href="global.html#cancelEnrollment">cancelEnrollment</a></li><li><a href="global.html#completeEnrollment">completeEnrollment</a></li><li><a href="global.html#composeSuccessMessage">composeSuccessMessage</a></li><li><a href="global.html#create">create</a></li><li><a href="global.html#createDataValues">createDataValues</a></li><li><a href="global.html#createEvents">createEvents</a></li><li><a href="global.html#createPrograms">createPrograms</a></li><li><a href="global.html#createTEI">createTEI</a></li><li><a href="global.html#del">del</a></li><li><a href="global.html#discover">discover</a></li><li><a href="global.html#enrollTEI">enrollTEI</a></li><li><a href="global.html#FIELD_FILTERS_PRESETS">FIELD_FILTERS_PRESETS</a></li><li><a href="global.html#FIELD_TRANSFORMERS">FIELD_TRANSFORMERS</a></li><li><a href="global.html#generateDhis2UID">generateDhis2UID</a></li><li><a href="global.html#getAnalytics">getAnalytics</a></li><li><a href="global.html#getData">getData</a></li><li><a href="global.html#getDataValues">getDataValues</a></li><li><a href="global.html#getEnrollments">getEnrollments</a></li><li><a href="global.html#getEvents">getEvents</a></li><li><a href="global.html#getMetadata">getMetadata</a></li><li><a href="global.html#getPrograms">getPrograms</a></li><li><a href="global.html#getRelationships">getRelationships</a></li><li><a href="global.html#getResources">getResources</a></li><li><a href="global.html#getSchema">getSchema</a></li><li><a href="global.html#getTEIs">getTEIs</a></li><li><a href="global.html#handleResponse">handleResponse</a></li><li><a href="global.html#logApiVersion">logApiVersion</a></li><li><a href="global.html#logWaitingForServer">logWaitingForServer</a></li><li><a href="global.html#patch">patch</a></li><li><a href="global.html#prettyJson">prettyJson</a></li><li><a href="global.html#recursivelyExpandReferences">recursivelyExpandReferences</a></li><li><a href="global.html#requestHttpHead">requestHttpHead</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#updateEnrollments">updateEnrollments</a></li><li><a href="global.html#updateEvents">updateEvents</a></li><li><a href="global.html#updatePrograms">updatePrograms</a></li><li><a href="global.html#updateTEI">updateTEI</a></li><li><a href="global.html#upsert">upsert</a></li><li><a href="global.html#upsertTEI">upsertTEI</a></li><li><a href="global.html#value">value</a></li><li><a href="global.html#warnExpectLargeResult">warnExpectLargeResult</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Thu Jan 14 2021 13:34:01 GMT+0000 (Greenwich Mean Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
