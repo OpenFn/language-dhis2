@@ -345,65 +345,64 @@ export function updateTEI(path, data, params, options, callback) {
  * Get DHIS2 Events, single events with no registration(annonymous events) or single event with registration and multiple events with registration(tracker events)
  * @public
  * @function
- * @param {array} params - `import` parameters for `getEvents`.
- * @param {string} [responseType] - Optional response type. Defaults to `json`
- * @param {eventOptions} [options] - Optional `flags` for the behavior of the `getEvents` operation.
- * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @param {object} params - `import` parameters for `getEvents`.
+ * @param {{apiVersion: number,responseType: string}} [options] - `Optional` options for `getEvents` operation. Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`.
+ * @param {function} [callback] - Optional callback to handle the response
  * @returns {Promise<state>} state
  * @example <caption>- Query for `all events` with `children` of a certain `organisation unit`</caption>
- * getEvents([{ orgUnit: 'YuQRtpLP10I' }, { ouMode: 'CHILDREN' }]);
+ * getEvents({ orgUnit: 'YuQRtpLP10I', ouMode: 'CHILDREN' });
  * @example <caption>- Query for `all events` with all `descendants` of a certain `organisation unit`, implying all organisation units in the `sub-hierarchy`</caption>
- * getEvents([{ orgUnit: 'O6uvpzGd5pu' }, { ouMode: 'DESCENDANTS' }]);
+ * getEvents({ orgUnit: 'O6uvpzGd5pu', ouMode: 'DESCENDANTS' });
  * @example <caption>- Query for `all events` with a `certain program` and `organisation unit`</caption>
- * getEvents([{ orgUnit: 'DiszpKrYNg8' }, { program: 'eBAyeGv0exc' }]);
+ * getEvents({ orgUnit: 'DiszpKrYNg8', program: 'eBAyeGv0exc' });
  * @example <caption>- Query for all `events` with a `certain program` and `organisation unit`, `sorting` by `due date ascending`</caption>
- * getEvents([
- * { orgUnit: 'DiszpKrYNg8' },
- * { program: 'eBAyeGv0exc' },
- * { order: 'dueDate' },
- * ]);
+ * getEvents({
+ *  orgUnit: 'DiszpKrYNg8',
+ *  program: 'eBAyeGv0exc',
+ *  order: 'dueDate',
+ * });
  * @example <caption>- Query for the `10 events` with the `newest event date` in a `certain program` and `organisation unit` - by `paging` and `ordering` by `due date descending`</caption>
- * getEvents([
- * { orgUnit: 'DiszpKrYNg8' },
- * { program: 'eBAyeGv0exc' },
- * { order: 'eventDate:desc' },
- * { pageSize: 10 },
- * { page: 1 },
- * ]);
+ * getEvents({
+ *  orgUnit: 'DiszpKrYNg8',
+ *  program: 'eBAyeGv0exc',
+ *  order: 'eventDate:desc',
+ *  pageSize: 10,
+ *  page: 1,
+ * });
  * @example <caption>- Query for `all events` with a `certain program` and `organisation unit` for a specific `tracked entity instance`</caption>
- * getEvents([
- * { orgUnit: 'DiszpKrYNg8' },
- * { program: 'eBAyeGv0exc' },
- * { trackedEntityInstance: 'gfVxE3ALA9m' },
- * ]);
+ * getEvents({
+ *  orgUnit: 'DiszpKrYNg8' ,
+ *  program: 'eBAyeGv0exc' ,
+ *  trackedEntityInstance: 'gfVxE3ALA9m',
+ * });
  * @example <caption>- Query for `all events` with a `certain program` and `organisation unit` `older` or `equal to 2014-02-03`</caption>
- * getEvents([
- * { orgUnit: 'DiszpKrYNg8' },
- * { program: 'eBAyeGv0exc' },
- * { endDate: '2014-02-03' },
- * ]);
+ * getEvents({
+ *  orgUnit: 'DiszpKrYNg8',
+ *  program: 'eBAyeGv0exc',
+ *  endDate: '2014-02-03',
+ * });
  * @example <caption>- Query for `all events` with a `certain program stage`, `organisation unit` and `tracked entity instance` in the `year 2014`</caption>
- * getEvents([
- * { orgUnit: 'DiszpKrYNg8' },
- * { program: 'eBAyeGv0exc' },
- * { trackedEntityInstance: 'gfVxE3ALA9m' },
- * { startDate: '2014-01-01' },
- * { endDate: '2014-12-31' },
- * ]);
+ * getEvents({
+ *  orgUnit: 'DiszpKrYNg8',
+ *  program: 'eBAyeGv0exc',
+ *  trackedEntityInstance: 'gfVxE3ALA9m',
+ *  startDate: '2014-01-01',
+ *  endDate: '2014-12-31',
+ * });
  * @example <caption>- Retrieve `events` with specified `Organisation unit` and `Program`, and use `Attribute:Gq0oWTf2DtN` as `identifier scheme`</caption>
- * getEvents([
- * { orgUnit: 'DiszpKrYNg8' },
- * { program: 'lxAQ7Zs9VYR' },
- * { idScheme: 'Attribute:Gq0oWTf2DtN' },
- * ]);
+ * getEvents({
+ *  orgUnit: 'DiszpKrYNg8',
+ *  program: 'lxAQ7Zs9VYR',
+ *  idScheme: 'Attribute:Gq0oWTf2DtN',
+ * });
  * @example <caption>- Retrieve `events` with specified `Organisation unit` and `Program`, and use `UID` as `identifier scheme` for `orgUnits`, `Code` as `identifier scheme` for `Program stages`, and `Attribute:Gq0oWTf2DtN` as `identifier scheme` for the rest of the `metadata` with `assigned attribute`.</caption>
- * getEvents([
- * { orgUnit: 'DiszpKrYNg8' },
- * { program: 'lxAQ7Zs9VYR' },
- * { idScheme: 'Attribute:Gq0oWTf2DtN' },
- * { orgUnitIdScheme: 'UID' },
- * { programStageIdScheme: 'Code' },
- * ]);
+ * getEvents({
+ *  orgUnit: 'DiszpKrYNg8',
+ *  program: 'lxAQ7Zs9VYR',
+ *  idScheme: 'Attribute:Gq0oWTf2DtN',
+ *  orgUnitIdScheme: 'UID',
+ *  programStageIdScheme: 'Code',
+ * });
  */
 export function getEvents(params, options, callback) {
   return state => {
@@ -424,10 +423,10 @@ export function getEvents(params, options, callback) {
  * - For sending `events` to `programs with multiple stages`, you will need to also include the `programStage` identifier, the identifiers for `programStages` can be found in the `programStages` resource via a call to `getMetadata` operation.
  * @public
  * @function
- * @param {object<any,any>} data - The update data containing new values
- * @param {array} [params] - Optional `import` parameters for `createEvents`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
- * @param { {apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `createEvents` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
- * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @param {object} data - The payload containing new values
+ * @param {object} [params] - Optional `import parameters` for events. E.g. `{dryRun: true, importStrategy: CREATE, filters:[]}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#events DHIS2 Event Import parameters documentation} or run `discover`. Defauls to `DHIS2 default import parameters`.
+ * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `createEvents` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
+ * @param {function} [callback] - Optional callback to handle the response
  * @returns {Promise<state>} state
  * @example <caption>- Example `expression.js` of `createEvents` for a `single event` can look like this:</caption>
  * createEvents(state.data);
@@ -485,10 +484,10 @@ export function createEvents(data, params, options, callback) {
  * @public
  * @function
  * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
- * @param {object<any,any>} data - The update data containing new values
- * @param {array} [params] - Optional `import` parameters for `updateEvents`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
- * @param {createOptions} [options] - Optional `flags` for the behavior of the `updateEvents` operation.
- * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @param {object} data - The update data containing new values
+ * @param {object} [params] - Optional `import` parameters for `updateEvents`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `updateEvents` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
+ * @param {function} [callback] - Optional callback to handle the response
  * @returns {Promise<state>} state
  * @example <caption>- Example `expression.js` of `updateEvents`</caption>
  * updateEvents('PVqUD2hvU4E', state.data);
