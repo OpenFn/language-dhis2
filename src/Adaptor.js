@@ -150,7 +150,7 @@ export function getTEIs(params, options, callback) {
  * @function
  * @param {string} uniqueAttributeId - Tracked Entity Instance unique identifier used during matching
  * @param {object} data - Payload data for new tracked entity instance or updated data for an existing tracked entity instance
- * @param {{apiVersion: number,requireUniqueAttributeConfig: boolean,responseType: string}} [options] - `Optional` options for `upsertTEI` operation. Defaults to `{apiVersion: state.configuration.apiVersion,requireUniqueAttributeConfig: true,responseType: 'json'}`.
+ * @param {{apiVersion: number,strict: boolean,responseType: string}} [options] - `Optional` options for `upsertTEI` operation. Defaults to `{apiVersion: state.configuration.apiVersion,strict: true,responseType: 'json'}`.
  * @param {function} [callback] - Optional `callback` to handle the response.
  * @throws {RangeError} - Throws `RangeError` when `uniqueAttributeId` is `invalid` or `not unique`.
  * @returns {Promise<state>} state
@@ -174,8 +174,7 @@ export function upsertTEI(uniqueAttributeId, data, options, callback) {
 
     const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
 
-    const requireUniqueAttributeConfig =
-      options?.requireUniqueAttributeConfig ?? true;
+    const strict = options?.strict ?? true;
 
     const params = {
       ou: body.orgUnit,
@@ -223,9 +222,7 @@ export function upsertTEI(uniqueAttributeId, data, options, callback) {
     };
     return Promise.all([
       findTrackedEntityType(),
-      requireUniqueAttributeConfig === true
-        ? isAttributeUnique()
-        : Promise.resolve({ unique: true }),
+      strict === true ? isAttributeUnique() : Promise.resolve({ unique: true }),
     ]).then(([entityType, attribute]) => {
       if (!entityType.upsertAttributeAssigned) {
         Log.error('');
@@ -1750,7 +1747,7 @@ export function del(resourceType, path, data, params, options, callback) {
  * @param {{attributeId: string,attributeValue:any}} uniqueAttribute - An object containing a `attributeId` and `attributeValue` which will be used to uniquely identify the record
  * @param {object} data - The update data containing new values
  * @param {object} [params] - Optional `import` parameters e.g. `{ou: 'lZGmxYbs97q', filters: ['w75KJ2mc4zz:EQ:Jane']}`
- * @param {{replace:boolean, apiVersion: number,requireUniqueAttributeConfig: boolean,responseType: string}} [options] - `Optional` options for `upsertTEI` operation. Defaults to `{replace: false, apiVersion: state.configuration.apiVersion,requireUniqueAttributeConfig: true,responseType: 'json'}`.
+ * @param {{replace:boolean, apiVersion: number,strict: boolean,responseType: string}} [options] - `Optional` options for `upsertTEI` operation. Defaults to `{replace: false, apiVersion: state.configuration.apiVersion,strict: true,responseType: 'json'}`.
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Promise<state>} state
  * @throws {RangeError} - Throws range error
