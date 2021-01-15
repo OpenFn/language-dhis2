@@ -588,7 +588,7 @@ export function updatePrograms(path, data, params, options, callback) {
  * Get DHIS2 Enrollments
  * @public
  * @function
- * @param {object} params - `import` parameters for `getEnrollments`.
+ * @param {object} params - `Query` parameters for `getEnrollments`. See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#enrollment-management  here}
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `getEnrollments` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Promise<state>} state
@@ -633,7 +633,7 @@ export function updatePrograms(path, data, params, options, callback) {
  *  fields: '*' ,
  * });
  */
-export function getEnrollments(params, responseType, options, callback) {
+export function getEnrollments(params, options, callback) {
   return state => {
     options = recursivelyExpandReferences(options)(state);
 
@@ -768,17 +768,16 @@ export function completeEnrollment(enrollmentId, params, options, callback) {
  * - To list all relationships, this requires you to provide the UID of the trackedEntityInstance, Enrollment or event that you want to list all the relationships for.
  * @public
  * @function
- * @param {array} params - `import` parameters for `getRelationships`.
- * @param {string} [responseType] - Optional response type. Defaults to `json`
- * @param {eventOptions} [options] - Optional `flags` for the behavior of the `getRelationships` operation.
- * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @param {object} params - `Query` parameters for `getRelationships`. See examples {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#relationships here}
+ * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `getRelationships` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
+ * @param {function} [callback] - Optional callback to handle the response
  * @returns {Promise<state>} state
  * @example <caption>- A query for `all relationships` associated with a `specific tracked entity instance` can look like this:</caption>
- * getRelationships([{ tei: 'F8yKM85NbxW' }, { fields: '*' }]);
+ * getRelationships({ tei: 'F8yKM85NbxW', fields: '*' });
  * @example <caption>- A query for `all relationships` associated with a `enrollment` can look like this:</caption>
- * getRelationships([{ enrollment: 'LXmiAMnJLrS' }, { fields: '*' }]);
+ * getRelationships({ enrollment: 'LXmiAMnJLrS' ,  fields: '*' });
  * @example <caption>- A query for `all relationships` associated with a `event` can look like this:</caption>
- * getRelationships([{ event: 'TgJUhG6P6TJ' }, { fields: '*' }]);
+ * getRelationships({ event: 'TgJUhG6P6TJ' , fields: '*' });
  */
 export function getRelationships(params, options, callback) {
   return state => {
