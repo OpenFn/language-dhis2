@@ -1,5 +1,4 @@
 /** @module Adaptor */
-//#region IMPORTS
 import axios from 'axios';
 import { execute as commonExecute, composeNextState } from 'language-common';
 import { indexOf } from 'lodash';
@@ -17,12 +16,8 @@ import {
   COLORS,
   prettyJson,
   ESCAPE,
-  composeSuccessMessage,
   recursivelyExpandReferences,
 } from './Utils';
-//#endregion
-
-//#region CONFIG HELPERS, INTERCEPTORS and TYPE DEFINITIONS
 
 /**
  * Execute a sequence of operations.
@@ -71,7 +66,7 @@ function configMigrationHelper(state) {
   return state;
 }
 
-/* `Axios` Interceptors */
+// Axios Interceptors
 axios.interceptors.response.use(
   function (response) {
     const contentType = response.headers['content-type']?.split(';')[0];
@@ -119,49 +114,44 @@ axios.interceptors.response.use(
   }
 );
 
-/**
- * Type definition for the `result returned` by `OpenFn operations`
- * @public
- * @typedef {{configuration: object, references: object[], data: object}} state
- */
+// We will revert to this once simple-ast supports typedefs
+// /**
+//  * Type definition for the `result returned` by `OpenFn operations`
+//  * @public
+//  * @typedef {{configuration: object, references: object[], data: object}} state
+//  */
 
-/**
- * Type definition for the `callback` supplied to `OpenFn operations`
- * @public
- * @callback requestCallback
- * @param {state} state
- * @returns {state}
- */
+// /**
+//  * Type definition for the `callback` supplied to `OpenFn operations`
+//  * @public
+//  * @callback requestCallback
+//  * @param {state} state
+//  * @returns {state}
+//  */
 
-/**
- * Type definition for `options` `parameter` object used in `DHIS2 adaptor's operations`.
- * @public
- * @typedef {{ replace: boolean, apiVersion: number, supportApiVersion: boolean,requireUniqueAttributeConfig: boolean}} options
- *
- */
-
-//#endregion
-
-//#region COMMONLY USED HELPER OPERATIONS
+// /**
+//  * Type definition for `options` `parameter` object used in `DHIS2 adaptor's operations`.
+//  * @public
+//  * @typedef {{ replace: boolean, apiVersion: number, supportApiVersion: boolean,requireUniqueAttributeConfig: boolean}} options
+//  *
+//  */
 
 /**
  * Get DHIS2 Tracked Entity Instance(s)
  * @public
  * @function
- * @param {array} params - `import` parameters for `getTEIs`. E.g. `[{fields: '*'},{ ou: 'DiszpKrYNg8' },{ skipPaging: true },])`
- * @param {string} [responseType] - Optional response type. Defaults to `json`
- * @param {createOptions} [options] - Optional `flags` for the behavior of the `getTEIs` operation.
- * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @param {object} [params] - Optional `query parameters` e.g. `{ou: 'DiszpKrYNg8', filters: ['lZGmxYbs97q':GT:5']}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 docs} for more details on which params to use when querying tracked entities instances.
+ * @param {{apiVersion: number,responseType: string}} [options] - `Optional` options for `getTEIs` operation. Defaults to `{apiVersion: state.configuration.apiVersion, responseType: 'json'}`.
+ * @param {function} [callback] - Optional callback to handle the response
  * @returns {Promise<state>} state
  * @example <caption>- Example `getTEIs` `expression.js` for fetching a `single` `Tracked Entity Instance`</caption>
- * getTEIs([
+ * getTEIs(
  * {
  *   fields: '*',
- * },
- * { ou: 'CMqUILyVnBL' },
- * { trackedEntityInstance: 'HNTA9qD6EEG' },
- * { skipPaging: true },
- * ]);
+ *   ou: 'CMqUILyVnBL',
+ *   trackedEntityInstance: 'HNTA9qD6EEG',
+ *   skipPaging: true,
+ * });
  */
 export function getTEIs(params, options, callback) {
   return state => {
@@ -177,17 +167,17 @@ export function getTEIs(params, options, callback) {
 }
 
 /**
- * Upsert(Create or update) one or many Tracked Entity Instances. Update if the record exists otherwise insert a new record.
- * This is useful for idempotency and duplicate management
+ * Upsert(Create or update) a single Tracked Entity Instance. Update if the record exists otherwise insert a new record.
+ * - This is useful for idempotency and duplicate record management
  * @public
  * @function
  * @param {string} uniqueAttributeId - Tracked Entity Instance unique identifier used during matching
- * @param {Object<symbol,any>} data - Payload data for new/updated tracked entity instance(s)
- * @param {options} [options] - Optional `options` for `upserTEI` operation. Defaults to `{responseType: 'json',replace: false, apiVersion: null,requireUniqueAttributeConfig: true}`
- * @param {requestCallback} [callback] - Optional `callback` to handle the response.
+ * @param {object} data - Payload data for new tracked entity instance or updated data for an existing tracked entity instance
+ * @param {{apiVersion: number,requireUniqueAttributeConfig: boolean,responseType: string}} [options] - `Optional` options for `upsertTEI` operation. Defaults to `{apiVersion: state.configuration.apiVersion,requireUniqueAttributeConfig: true,responseType: 'json'}`.
+ * @param {function} [callback] - Optional `callback` to handle the response.
  * @throws {RangeError} - Throws `RangeError` when `uniqueAttributeId` is `invalid` or `not unique`.
  * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` of upsertTEI</caption>
+ * @example <caption>- Example `expression.js` for upserting a tracked entity instance on attribute with Id `lZGmxYbs97q`</caption>
  * upsertTEI('lZGmxYbs97q', state.data);
  */
 export function upsertTEI(uniqueAttributeId, data, options, callback) {
@@ -293,10 +283,10 @@ export function upsertTEI(uniqueAttributeId, data, options, callback) {
  * Create a DHIS2 Tracked Entity Instance
  * @public
  * @function
- * @param {object<any,any>} data - The update data containing new values
- * @param {array} [params] - Optional `import` parameters for `create`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
- * @param {createOptions} [options] - Optional `flags` for the behavior of the `createTEI` operation.
- * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @param {object} data - The update data containing new values
+ * @param {object} [params] - Optional `import parameters` for a given a resource. E.g. `{dryRun: true, importStrategy: CREATE}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#import-parameters_1 DHIS2 Import parameters documentation} or run `discover`. Defauls to `DHIS2 default import parameters`.
+ * @param {{apiVersion: number,responseType: string}} [options] - `Optional` options for `createTEI` operation. Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`.
+ * @param {function} [callback] - Optional callback to handle the response
  * @returns {Promise<state>} state
  * @example <caption>- Example `expression.js` of `createTEI`</caption>
  * createTEI(state.data);
@@ -325,10 +315,10 @@ export function createTEI(data, params, options, callback) {
  * @public
  * @function
  * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
- * @param {object<any,any>} data - The update data containing new values
- * @param {array} [params] - Optional `import` parameters for `create`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
- * @param {createOptions} [options] - Optional `flags` for the behavior of the `updateTEI` operation.
- * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @param {object} data - The update data containing new values
+ * @param {object} [params] - Optional `import parameters` for a given a resource. E.g. `{dryRun: true, importStrategy: CREATE, filters:[]}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#import-parameters_1 DHIS2 Import parameters documentation} or run `discover`. Defauls to `DHIS2 default import parameters`.
+ * @param {{apiVersion: number,responseType: string}} [options] - `Optional` options for `updateTEI` operation. Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`.
+ * @param {function} [callback] - Optional callback to handle the response
  * @returns {Promise<state>} state
  * @example <caption>- Example `expression.js` of `updateTEI`</caption>
  * update('PVqUD2hvU4E', state.data);
@@ -921,9 +911,6 @@ export function createDataValues(data, options, params, callback) {
     return create('dataValueSets', data, options, params, callback)(state);
   };
 }
-//#endregion
-
-//#region GENERIC HELPER OPERATIONS
 
 /**
  * Generate valid, random DHIS2 identifiers
@@ -1439,9 +1426,9 @@ export function getMetadata(resources, params, options, callback) {
  * @public
  * @function
  * @param {string} resourceType - Type of resource to create. E.g. `trackedEntityInstances`
- * @param {Object<symbol,any>} data - Data that will be used to create a given instance of resource
- * @param {Object} [options] - Optional `options` to control the behavior of the `create` operation.` Defaults to `{operationName: 'create', apiVersion: null, responseType: 'json'}`
- * @param {Object} [params] - Optional `import parameters` for a given a resource. E.g. `{dryRun: true, importStrategy: CREATE}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 API documentation} or {@link discover}. Defauls to `DHIS2 default params` for a given resource type.
+ * @param {object<symbol,any>} data - Data that will be used to create a given instance of resource
+ * @param {object} [options] - Optional `options` to control the behavior of the `create` operation.` Defaults to `{operationName: 'create', apiVersion: null, responseType: 'json'}`
+ * @param {object} [params] - Optional `import parameters` for a given a resource. E.g. `{dryRun: true, importStrategy: CREATE}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 API documentation} or {@link discover}. Defauls to `DHIS2 default params` for a given resource type.
  * @param {requestCallback} [callback] - Optional callback to handle the response
  * @returns {Promise<state>} state
  * @example <caption>- Example `expression.js` of `create`</caption>
@@ -2039,9 +2026,7 @@ export function upsert(
     });
   };
 }
-//#endregion
 
-//#region EXPORTS
 export { attribute } from './Utils';
 
 exports.axios = axios;
@@ -2057,4 +2042,3 @@ export {
   lastReferenceValue,
   alterState,
 } from 'language-common';
-//#endregion

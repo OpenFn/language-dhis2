@@ -4,8 +4,12 @@ import axios from 'axios';
 
 /**
  * Recursively expand object|number|string|boolean|array, each time resolving function calls and returning the resolved values
+ * @function
+ * @private
  * @param {any} thing - Thing to expand
- * @returns {object|number|string|boolean|array} expandedResult
+ * @returns {object|number|string|boolean|array} result - Expanded result
+ * @example <caption>Example expanding parameter with reference to `state`</caption>
+ * params = exapndReferences(params);
  */
 export function recursivelyExpandReferences(thing) {
   return state => {
@@ -24,6 +28,7 @@ export function recursivelyExpandReferences(thing) {
     return result;
   };
 }
+
 // Stuart
 // export function expandReferences(thing) {
 //   return state => {
@@ -41,8 +46,10 @@ export function recursivelyExpandReferences(thing) {
 //     return thing;
 //   };
 // }
+
 /**
  * Compose success message
+ *
  */
 export function composeSuccessMessage(operation) {
   return `${COLORS.FgGreen}${operation}${ESCAPE} succeeded. The body of this result will be available in ${COLORS.FgGreen}state.data${ESCAPE} or in your ${COLORS.FgGreen}callback${ESCAPE}.`;
