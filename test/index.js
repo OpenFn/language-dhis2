@@ -196,7 +196,7 @@ describe('upsert', () => {
       expect(result.data.response.deleted).to.eq(0);
       expect(result.data.response.ignored).to.eq(0);
     });
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 
   it('should update an existing TEI when a matching TEI is found by attribute ID', () => {
     return execute(
@@ -216,7 +216,7 @@ describe('upsert', () => {
       expect(state.data.response.importCount.ignored).to.eq(0);
       expect(state.data.response.importCount.ignored).to.eq(0);
     });
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 
   it('should create a new TEI when a matching TEI is not found by attribute ID', () => {
     let state = upsertNewState;
@@ -239,7 +239,7 @@ describe('upsert', () => {
       expect(state.data.response.deleted).to.eq(0);
       expect(state.data.response.ignored).to.eq(0);
     });
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 });
 
 describe('upsertTEI', () => {
@@ -257,7 +257,7 @@ describe('upsertTEI', () => {
       expect(state.data.response.importCount.deleted).to.eq(0);
       expect(state.data.response.importCount.ignored).to.eq(0);
     });
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 
   it('should create a new TEI when a matching TEI is not found by attribute ID', () => {
     let state = upsertNewTEIState;
@@ -268,7 +268,7 @@ describe('upsertTEI', () => {
       expect(state.data.response.deleted).to.eq(0);
       expect(state.data.response.ignored).to.eq(0);
     });
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 
   it('should allow the user to build a TEI object from a generic state', () => {
     let state = {
@@ -316,7 +316,7 @@ describe('upsertTEI', () => {
         state.data.response.ignored ?? state.data.response.importCount.ignored
       ).to.eq(0);
     });
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 
   it('should allow the user to use `attribute` and `dataValue` helper functions', () => {
     let state = {
@@ -358,7 +358,7 @@ describe('upsertTEI', () => {
         state.data.response.ignored ?? state.data.response.importCount.ignored
       ).to.eq(0);
     });
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 
   it('should allow the user to use `arrow function` to access data', () => {
     let state = {
@@ -400,7 +400,7 @@ describe('upsertTEI', () => {
         state.data.response.ignored ?? state.data.response.importCount.ignored
       ).to.eq(0);
     });
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 });
 
 describe('create', () => {
@@ -417,7 +417,7 @@ describe('create', () => {
       expect(state.data.response.deleted).to.eq(0);
       expect(state.data.response.ignored).to.eq(0);
     });
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 });
 
 describe('update', () => {
@@ -435,7 +435,7 @@ describe('update', () => {
       expect(result.data.httpStatusCode).to.eq(200);
       expect(result.data.response.uid).to.eq(state.data.id);
     });
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 
   it('should verify that the name of the data element was updated', () => {
     return execute(getData(`dataElements/${state.data.id}`))(state).then(
@@ -443,7 +443,7 @@ describe('update', () => {
         expect(result.data.name).to.eq(state.data.name);
       }
     );
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 });
 
 describe('patch', () => {
@@ -460,13 +460,13 @@ describe('patch', () => {
         expect(result.data.status).to.eq(204);
       }
     );
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 
   it('should verify that the name of the data element was updated', () => {
     return execute(getData(`dataElements/${state.id}`))(state).then(result => {
       expect(result.data.name).to.eq(state.data.name);
     });
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 });
 
 describe('delete', () => {
@@ -487,7 +487,7 @@ describe('delete', () => {
         expect(result.data.response.ignored).to.eq(0);
       }
     );
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 
   it('should delete the newly created tracked entity instance', () => {
     return execute(del('trackedEntityInstances', id))(state).then(result => {
@@ -496,7 +496,7 @@ describe('delete', () => {
       expect(result.data.response.importCount.ignored).to.eq(0);
       expect(result.data.response.importCount.deleted).to.eq(1);
     });
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 });
 
 describe('getMetadata', () => {
@@ -525,7 +525,7 @@ describe('getMetadata', () => {
       expect(result.data.dataElements.length).to.be.gte(1);
       expect(result.data.indicators.length).to.be.gte(1);
     });
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 });
 
 describe('getSchema', () => {
@@ -549,7 +549,7 @@ describe('getSchema', () => {
       expect(result.data).to.have.a.key('properties');
       expect(Object.keys(result.data).length).to.eq(1);
     });
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 
   it('should get the schema for dataElement in XML, returning all the fields', () => {
     let state = getState;
@@ -558,7 +558,7 @@ describe('getSchema', () => {
     )(state).then(result => {
       expect(result.data.slice(2, 5)).to.eq('xml');
     });
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 });
 
 describe('getResources', () => {
@@ -581,7 +581,7 @@ describe('getResources', () => {
       expect(result.data.resources.length).to.be.eq(1);
       expect(result.data.resources[0].singular).to.be.eq('attribute');
     });
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 
   it('should get a resource named `attribute`, in `xml` format, returning all the fields', () => {
     return execute(
@@ -593,7 +593,7 @@ describe('getResources', () => {
     )(state).then(result => {
       expect(result.data.slice(2, 5)).to.be.eq('xml');
     });
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 });
 
 describe('getAnalytics', () => {
@@ -629,7 +629,7 @@ describe('getAnalytics', () => {
       expect(result.data).to.be.not.null;
       expect(result.data).to.haveOwnProperty('rows');
     });
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 
   it('should allow users to send a date range using startDate and endDate', () => {
     return execute(
@@ -642,7 +642,7 @@ describe('getAnalytics', () => {
       expect(result.data).to.be.not.null;
       expect(result.data).to.haveOwnProperty('rows');
     });
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 });
 
 describe('discover', () => {
@@ -704,7 +704,7 @@ describe('createDataValues', () => {
       );
       expect(result.data.importCount.deleted).to.eq(0);
     });
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 
   it('should create large bulks of data values which are not logically related', () => {
     let state = createRelatedDataValues;
@@ -717,7 +717,7 @@ describe('createDataValues', () => {
       );
       expect(result.data.importCount.deleted).to.eq(0);
     });
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 });
 
 describe('createEvents', () => {
@@ -734,7 +734,7 @@ describe('createEvents', () => {
       expect(result.data.response.deleted).to.eq(0);
       expect(result.data.response.ignored).to.eq(0);
     });
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 
   it('should create two new events and link them to respective programs', () => {
     let state = sendDataForMultipleEventsState;
@@ -744,7 +744,7 @@ describe('createEvents', () => {
       expect(result.data.response.deleted).to.eq(0);
       expect(result.data.response.ignored).to.eq(0);
     });
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 });
 
 describe('enrollTEI', () => {
@@ -768,7 +768,7 @@ describe('enrollTEI', () => {
         expect(result.data.response.ignored).to.eq(0);
       }
     );
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 
   it('should enroll TEI into a given program', () => {
     let date = new Date();
@@ -790,5 +790,5 @@ describe('enrollTEI', () => {
       expect(result.data.response.deleted).to.eq(0);
       expect(result.data.response.ignored).to.eq(0);
     });
-  }).timeout(10 * 1000);
+  }).timeout(20 * 1000);
 });
