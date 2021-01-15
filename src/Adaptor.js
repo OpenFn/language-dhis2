@@ -66,7 +66,6 @@ function configMigrationHelper(state) {
   return state;
 }
 
-// Axios Interceptors
 axios.interceptors.response.use(
   function (response) {
     const contentType = response.headers['content-type']?.split(';')[0];
@@ -96,7 +95,7 @@ axios.interceptors.response.use(
       try {
         response = { ...response, data: JSON.parse(response.data) };
       } catch (error) {
-        /** Keep quiet */
+        /* Keep quiet */
       }
     }
     return response;
@@ -113,28 +112,6 @@ axios.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-// We will revert to this once simple-ast supports typedefs
-// /**
-//  * Type definition for the `result returned` by `OpenFn operations`
-//  * @public
-//  * @typedef {{configuration: object, references: object[], data: object}} state
-//  */
-
-// /**
-//  * Type definition for the `callback` supplied to `OpenFn operations`
-//  * @public
-//  * @callback requestCallback
-//  * @param {state} state
-//  * @returns {state}
-//  */
-
-// /**
-//  * Type definition for `options` `parameter` object used in `DHIS2 adaptor's operations`.
-//  * @public
-//  * @typedef {{ replace: boolean, apiVersion: number, supportApiVersion: boolean,requireUniqueAttributeConfig: boolean}} options
-//  *
-//  */
 
 /**
  * Get DHIS2 Tracked Entity Instance(s)
