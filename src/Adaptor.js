@@ -798,9 +798,9 @@ export function getRelationships(params, options, callback) {
  * - Data values can be retrieved in XML, JSON and CSV format.
  * @public
  * @function
- * @param {array} params - `Query` parameters for `getDataValues`. E.g. `{dataset: 'pBOMPrpg1QX', limit: 3, period: 2021, orgUnit: 'DiszpKrYNg8'} Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#data-values DHIS2 API docs} for available `Data Value Set Query Parameters`.
- * @param {{apiVersion: number,operationName: string,responseType: string}} [options] - Optional `options` for `getDataValues` operation. Defaults to `{operationName: 'getDataValues', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
- * @param {requestCallback} [callback] - Optional `callback` to handle the response
+ * @param {object} params - `Query` parameters for `getDataValues`. E.g. `{dataset: 'pBOMPrpg1QX', limit: 3, period: 2021, orgUnit: 'DiszpKrYNg8'} Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#data-values DHIS2 API docs} for available `Data Value Set Query Parameters`.
+ * @param {{apiVersion: number,responseType: string}} [options] - Optional `options` for `getDataValues` operation. Defaults to `{apiVersion: state.configuration.apiVersion, responseType: 'json'}`
+ * @param {function} [callback] - Optional `callback` to handle the response
  * @returns {Promise<state>} state
  * @example <caption>- Example getting **two** `data values` associated with a specific `orgUnit`, `dataSet`, and `period `</caption>
  * getDataValues({
@@ -833,9 +833,9 @@ export function getDataValues(params, options, callback) {
  * @public
  * @function
  * @param {object} data - The `data values` to upload or create. See example shape.
+ * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `createDataVaues` operation.
  * @param {object} [params] - Optional `import` parameters for `createDataValues`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`. Run `discover` or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#data-values DHIS2 Docs API} to learn about available data values import parameters.
- * @param  {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `createDataVaues` operation.
- * @param {requestCallback} [callback] - Optional callback to handle the response
+ * @param {function} [callback] - Optional callback to handle the response
  * @returns {Promise<state>} state
  * @example <caption>- Example `expression.js` of `createDataValues`  for sending a set of related data values sharing the same period and organisation unit</caption>
  * createDataValues(state.data);
@@ -891,7 +891,6 @@ export function getDataValues(params, options, callback) {
  *     },
  *   ]
  * }
- *
  */
 export function createDataValues(data, options, params, callback) {
   return state => {
@@ -910,8 +909,8 @@ export function createDataValues(data, options, params, callback) {
  * - Useful for client generated Ids compatible with DHIS2
  * @public
  * @function
- * @param {{apiVersion: number,limit: number,responseType: string}} [options] - Optional `options` for `getMetadata` operation. Defaults to `{apiVersion: state.configuration.apiVersion,limit: 1,responseType: 'json'}`
- * @param {requestCallback} [callback] - Callback to handle response
+ * @param {{apiVersion: number,limit: number,responseType: string}} [options] - Optional `options` for `generateDhis2UID` operation. Defaults to `{apiVersion: state.configuration.apiVersion,limit: 1,responseType: 'json'}`
+ * @param {function} [callback] - Callback to handle response
  * @returns {Promise<state>} state
  * @example <caption>Example generating `one UID` from the DHIS2 server</caption>
  * generateDhis2UID();
