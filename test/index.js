@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { dataValue } from 'language-common';
+import { dataValue } from '@openfn/language-common';
 import {
   execute,
   getData,
@@ -96,7 +96,7 @@ describe('live adaptor testing', () => {
     // PUT https://play.dhis2.org/2.35.1/api/userRoles/Ufph3mGRmMo // set user roles
     // PUT https://play.dhis2.org/2.35.1/api/29/trackedEntityTypes/nEenWmSyUEp?mergeMode=REPLACE // ensure trackedEntity types are set
     // PUT add Programs... // ??
-  })
+  });
 
   describe('buildUrl for getData', () => {
     before(() => {

@@ -14,8 +14,8 @@
     "lib/"
   ],
   "dependencies": {
+    "@openfn/language-common": "1.2.6",
     "axios": "^0.21.1",
-    "language-common": "github:openfn/language-common#v0.3.0",
     "lodash": "^4.17.19"
   },
   "devDependencies": {

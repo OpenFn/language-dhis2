@@ -1,6 +1,9 @@
 /** @module Adaptor */
 import axios from 'axios';
-import { execute as commonExecute, composeNextState } from 'language-common';
+import {
+  execute as commonExecute,
+  composeNextState,
+} from '@openfn/language-common';
 import { indexOf } from 'lodash';
 
 import {
@@ -1991,8 +1994,6 @@ export function upsert(
 
 export { attribute } from './Utils';
 
-exports.axios = axios;
-
 export {
   field,
   fields,
@@ -2003,4 +2004,5 @@ export {
   dataValue,
   lastReferenceValue,
   alterState,
-} from 'language-common';
+  http,
+} from '@openfn/language-common';
