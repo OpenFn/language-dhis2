@@ -247,7 +247,7 @@ export function upsertTEI(uniqueAttributeId, data, options, callback) {
       if (!entityType.upsertAttributeAssigned) {
         Log.error('');
         throw new RangeError(
-          `Tracked Entity Attribute ${uniqueAttributeId} is not assigned to ${entityType.name} Entity Type. Ensure, in DHIS2, this tracked entity attribute is assigned to ${entityType.name} and that it is marked as unique.`
+          `Tracked Entity Attribute ${uniqueAttributeId} is not assigned to the ${entityType.name} Entity Type.`
         );
       }
       if (!attribute.unique) {
@@ -255,7 +255,7 @@ export function upsertTEI(uniqueAttributeId, data, options, callback) {
         throw new RangeError(
           `Attribute ${
             attribute.name ?? ''
-          }(${uniqueAttributeId}) is not unique. Ensure, in DHIS2, this tracked entity attribute is marked as unique.`
+          }(${uniqueAttributeId}) is not marked as unique.`
         );
       }
       return upsert(
