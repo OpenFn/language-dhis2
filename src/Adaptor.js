@@ -117,16 +117,15 @@ axios.interceptors.response.use(
 );
 
 /**
- * Get DHIS2 Tracked Entity Instance(s)
+ * Get Tracked Entity Instance(s).
  * @public
  * @function
- * @param {object} [params] - Optional `query parameters` e.g. `{ou: 'DiszpKrYNg8', filters: ['lZGmxYbs97q':GT:5']}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 docs} for more details on which params to use when querying tracked entities instances.
+ * @param {Object} [params] - Optional `query parameters` e.g. `{ou: 'DiszpKrYNg8', filters: ['lZGmxYbs97q':GT:5']}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 docs} for more details on which params to use when querying tracked entities instances.
  * @param {{apiVersion: number,responseType: string}} [options] - `Optional` options for `getTEIs` operation. Defaults to `{apiVersion: state.configuration.apiVersion, responseType: 'json'}`.
- * @param {function} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `getTEIs` `expression.js` for fetching a `single` `Tracked Entity Instance`</caption>
- * getTEIs(
- * {
+ * @param {function} [callback] - Optional callback to handle the response.
+ * @returns {Operation}
+ * @example <caption>- Example `getTEIs` `expression.js` for fetching a `single` `Tracked Entity Instance` with all the fields included.</caption>
+ * getTEIs({
  *   fields: '*',
  *   ou: 'CMqUILyVnBL',
  *   trackedEntityInstance: 'HNTA9qD6EEG',
@@ -147,18 +146,36 @@ export function getTEIs(params, options, callback) {
 }
 
 /**
- * Upsert(Create or update) a single Tracked Entity Instance. Update if the record exists otherwise insert a new record.
- * - This is useful for idempotency and duplicate record management
+ * Update TEI if exists otherwise create.
+ * - Update if the record exists otherwise insert a new record.
+ * - This is useful for idempotency and duplicate record management.
  * @public
  * @function
- * @param {string} uniqueAttributeId - Tracked Entity Instance unique identifier used during matching
- * @param {object} data - Payload data for new tracked entity instance or updated data for an existing tracked entity instance
+ * @param {string} uniqueAttributeId - Tracked Entity Instance unique identifier attribute used during matching.
+ * @param {Object} data - Payload data for new tracked entity instance or updated data for an existing tracked entity instance.
  * @param {{apiVersion: number,strict: boolean,responseType: string}} [options] - `Optional` options for `upsertTEI` operation. Defaults to `{apiVersion: state.configuration.apiVersion,strict: true,responseType: 'json'}`.
  * @param {function} [callback] - Optional `callback` to handle the response.
  * @throws {RangeError} - Throws `RangeError` when `uniqueAttributeId` is `invalid` or `not unique`.
- * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` for upserting a tracked entity instance on attribute with Id `lZGmxYbs97q`</caption>
- * upsertTEI('lZGmxYbs97q', state.data);
+ * @returns {Operation}
+ * @example <caption>- Example `expression.js` for upserting a tracked entity instance on attribute with Id `lZGmxYbs97q`.</caption>
+ * upsertTEI('lZGmxYbs97q', {
+ *   orgUnit: 'TSyzvBiovKh',
+ *   trackedEntityType: 'nEenWmSyUEp',
+ *   attributes: [
+ *     {
+ *       attribute: 'lZGmxYbs97q',
+ *       value: '77790012',
+ *     },
+ *     {
+ *       attribute: 'w75KJ2mc4zz',
+ *       value: 'Gigiwe',
+ *     },
+ *     {
+ *       attribute: 'zDhUuAYrxNC',
+ *       value: 'Mwanza',
+ *     },
+ *   ],
+ * });
  */
 export function upsertTEI(uniqueAttributeId, data, options, callback) {
   return state => {
@@ -257,16 +274,38 @@ export function upsertTEI(uniqueAttributeId, data, options, callback) {
 }
 
 /**
- * Create a DHIS2 Tracked Entity Instance
+ * Create Tracked Entity Instance.
  * @public
  * @function
- * @param {object} data - The update data containing new values
- * @param {object} [params] - Optional `import parameters` for a given a resource. E.g. `{dryRun: true, importStrategy: CREATE}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#import-parameters_1 DHIS2 Import parameters documentation} or run `discover`. Defauls to `DHIS2 default import parameters`.
+ * @param {Object} data - The update data containing new values.
+ * @param {Object} [params] - Optional `import parameters` for a given a resource. E.g. `{dryRun: true, importStrategy: CREATE}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#import-parameters_1 DHIS2 Import parameters documentation} or run `discover`. Defauls to `DHIS2 default import parameters`.
  * @param {{apiVersion: number,responseType: string}} [options] - `Optional` options for `createTEI` operation. Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`.
- * @param {function} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` of `createTEI`</caption>
- * createTEI(state.data);
+ * @param {function} [callback] - Optional callback to handle the response.
+ * @returns {Operation}
+ * @example <caption>- Example `expression.js` of `createTEI`.</caption>
+ * createTEI({
+ *    orgUnit: 'TSyzvBiovKh',
+ *    trackedEntityType: 'nEenWmSyUEp',
+ *    attributes: [
+ *       {
+ *          attribute: 'lZGmxYbs97q',
+ *          value: valUpsertTEI,
+ *       },
+ *       {
+ *          attribute: 'w75KJ2mc4zz',
+ *          value: 'Gigiwe',
+ *       },
+ *    ],
+ *    enrollments: [
+ *       {
+ *          orgUnit: 'TSyzvBiovKh',
+ *          program: 'fDd25txQckK',
+ *          programState: 'lST1OZ5BDJ2',
+ *          enrollmentDate: '2021-01-04',
+ *          incidentDate: '2021-01-04',
+ *       },
+ *    ],
+ * });
  */
 export function createTEI(data, params, options, callback) {
   return state => {
@@ -288,17 +327,39 @@ export function createTEI(data, params, options, callback) {
 }
 
 /**
- * Update a DHIS2 Tracked Entity Instance
+ * Update a Tracked Entity Instance.
  * @public
  * @function
- * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
- * @param {object} data - The update data containing new values
- * @param {object} [params] - Optional `import parameters` for a given a resource. E.g. `{dryRun: true, importStrategy: CREATE, filters:[]}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#import-parameters_1 DHIS2 Import parameters documentation} or run `discover`. Defauls to `DHIS2 default import parameters`.
+ * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`).
+ * @param {Object} data - The update data containing new values.
+ * @param {Object} [params] - Optional `import parameters` for a given a resource. E.g. `{dryRun: true, importStrategy: CREATE, filters:[]}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#import-parameters_1 DHIS2 Import parameters documentation} or run `discover`. Defauls to `DHIS2 default import parameters`.
  * @param {{apiVersion: number,responseType: string}} [options] - `Optional` options for `updateTEI` operation. Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`.
- * @param {function} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- Example `expression.js` of `updateTEI`</caption>
- * update('PVqUD2hvU4E', state.data);
+ * @param {function} [callback] - Optional callback to handle the response.
+ * @returns {Operation}
+ * @example <caption>- Example `expression.js` of `updateTEI`.</caption>
+ * updateTEI('PVqUD2hvU4E', {
+ *    orgUnit: 'TSyzvBiovKh',
+ *    trackedEntityType: 'nEenWmSyUEp',
+ *    attributes: [
+ *       {
+ *          attribute: 'lZGmxYbs97q',
+ *          value: valUpsertTEI,
+ *       },
+ *       {
+ *          attribute: 'w75KJ2mc4zz',
+ *          value: 'Gigiwe',
+ *       },
+ *    ],
+ *    enrollments: [
+ *       {
+ *          orgUnit: 'TSyzvBiovKh',
+ *          program: 'fDd25txQckK',
+ *          programState: 'lST1OZ5BDJ2',
+ *          enrollmentDate: '2021-01-04',
+ *          incidentDate: '2021-01-04',
+ *       },
+ *    ],
+ * });
  */
 export function updateTEI(path, data, params, options, callback) {
   return state => {
@@ -319,67 +380,15 @@ export function updateTEI(path, data, params, options, callback) {
 }
 
 /**
- * Get DHIS2 Events, single events with no registration(annonymous events) or single event with registration and multiple events with registration(tracker events)
+ * Get annonymous events or tracker events.
  * @public
  * @function
- * @param {object} params - `import` parameters for `getEvents`.
+ * @param {Object} params - `import` parameters for `getEvents`. See examples here
  * @param {{apiVersion: number,responseType: string}} [options] - `Optional` options for `getEvents` operation. Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`.
- * @param {function} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
+ * @param {function} [callback] - Optional callback to handle the response.
+ * @returns {Operation}
  * @example <caption>- Query for `all events` with `children` of a certain `organisation unit`</caption>
  * getEvents({ orgUnit: 'YuQRtpLP10I', ouMode: 'CHILDREN' });
- * @example <caption>- Query for `all events` with all `descendants` of a certain `organisation unit`, implying all organisation units in the `sub-hierarchy`</caption>
- * getEvents({ orgUnit: 'O6uvpzGd5pu', ouMode: 'DESCENDANTS' });
- * @example <caption>- Query for `all events` with a `certain program` and `organisation unit`</caption>
- * getEvents({ orgUnit: 'DiszpKrYNg8', program: 'eBAyeGv0exc' });
- * @example <caption>- Query for all `events` with a `certain program` and `organisation unit`, `sorting` by `due date ascending`</caption>
- * getEvents({
- *  orgUnit: 'DiszpKrYNg8',
- *  program: 'eBAyeGv0exc',
- *  order: 'dueDate',
- * });
- * @example <caption>- Query for the `10 events` with the `newest event date` in a `certain program` and `organisation unit` - by `paging` and `ordering` by `due date descending`</caption>
- * getEvents({
- *  orgUnit: 'DiszpKrYNg8',
- *  program: 'eBAyeGv0exc',
- *  order: 'eventDate:desc',
- *  pageSize: 10,
- *  page: 1,
- * });
- * @example <caption>- Query for `all events` with a `certain program` and `organisation unit` for a specific `tracked entity instance`</caption>
- * getEvents({
- *  orgUnit: 'DiszpKrYNg8' ,
- *  program: 'eBAyeGv0exc' ,
- *  trackedEntityInstance: 'gfVxE3ALA9m',
- * });
- * @example <caption>- Query for `all events` with a `certain program` and `organisation unit` `older` or `equal to 2014-02-03`</caption>
- * getEvents({
- *  orgUnit: 'DiszpKrYNg8',
- *  program: 'eBAyeGv0exc',
- *  endDate: '2014-02-03',
- * });
- * @example <caption>- Query for `all events` with a `certain program stage`, `organisation unit` and `tracked entity instance` in the `year 2014`</caption>
- * getEvents({
- *  orgUnit: 'DiszpKrYNg8',
- *  program: 'eBAyeGv0exc',
- *  trackedEntityInstance: 'gfVxE3ALA9m',
- *  startDate: '2014-01-01',
- *  endDate: '2014-12-31',
- * });
- * @example <caption>- Retrieve `events` with specified `Organisation unit` and `Program`, and use `Attribute:Gq0oWTf2DtN` as `identifier scheme`</caption>
- * getEvents({
- *  orgUnit: 'DiszpKrYNg8',
- *  program: 'lxAQ7Zs9VYR',
- *  idScheme: 'Attribute:Gq0oWTf2DtN',
- * });
- * @example <caption>- Retrieve `events` with specified `Organisation unit` and `Program`, and use `UID` as `identifier scheme` for `orgUnits`, `Code` as `identifier scheme` for `Program stages`, and `Attribute:Gq0oWTf2DtN` as `identifier scheme` for the rest of the `metadata` with `assigned attribute`.</caption>
- * getEvents({
- *  orgUnit: 'DiszpKrYNg8',
- *  program: 'lxAQ7Zs9VYR',
- *  idScheme: 'Attribute:Gq0oWTf2DtN',
- *  orgUnitIdScheme: 'UID',
- *  programStageIdScheme: 'Code',
- * });
  */
 export function getEvents(params, options, callback) {
   return state => {
@@ -394,21 +403,19 @@ export function getEvents(params, options, callback) {
 }
 
 /**
- * Create a DHIS2 Events
+ * Create DHIS2 Events
  * - You will need a `program` which can be looked up using the `getPrograms` operation, an `orgUnit` which can be looked up using the `getMetadata` operation and passing `{organisationUnits: true}` as `resources` param, and a list of `valid data element identifiers` which can be looked up using the `getMetadata` passing `{dataElements: true}` as `resources` param.
  * - For events with registration, a `tracked entity instance identifier is required`
  * - For sending `events` to `programs with multiple stages`, you will need to also include the `programStage` identifier, the identifiers for `programStages` can be found in the `programStages` resource via a call to `getMetadata` operation.
  * @public
  * @function
- * @param {object} data - The payload containing new values
- * @param {object} [params] - Optional `import parameters` for events. E.g. `{dryRun: true, importStrategy: CREATE, filters:[]}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#events DHIS2 Event Import parameters documentation} or run `discover`. Defauls to `DHIS2 default import parameters`.
+ * @param {Object} data - The payload containing new values
+ * @param {Object} [params] - Optional `import parameters` for events. E.g. `{dryRun: true, importStrategy: CREATE, filters:[]}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#events DHIS2 Event Import parameters documentation} or run `discover`. Defauls to `DHIS2 default import parameters`.
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `createEvents` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
+ * @returns {Operation} state
  * @example <caption>- Example `expression.js` of `createEvents` for a `single event` can look like this:</caption>
- * createEvents(state.data);
- * // Example shape for state.data
- * data: {
+ * createEvents({
  *   program: 'eBAyeGv0exc',
  *   orgUnit: 'DiszpKrYNg8',
  *   eventDate: date,
@@ -433,11 +440,7 @@ export function getEvents(params, options, callback) {
  *       value: date,
  *     },
  *   ],
- * },
- * @example <caption>- Example `expression.js` of `createEvents` for sending `multiple events` at the same time</caption>
- * createEvents(state.data);
- * // Example shape for state.data
- *
+ * });
  */
 export function createEvents(data, params, options, callback) {
   return state => {
@@ -452,7 +455,7 @@ export function createEvents(data, params, options, callback) {
 }
 
 /**
- * Update a DHIS2 Events
+ * Update DHIS2 Event.
  * - To update an existing event, the format of the payload is the same as that of `creating an event` via `createEvents` operations
  * - But  you should supply the `identifier` of the object you are updating
  * - The payload has to contain `all`, even `non-modified`, `attributes`.
@@ -461,14 +464,35 @@ export function createEvents(data, params, options, callback) {
  * @public
  * @function
  * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
- * @param {object} data - The update data containing new values
- * @param {object} [params] - Optional `import` parameters for `updateEvents`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {Object} data - The update data containing new values
+ * @param {Object} [params] - Optional `import` parameters for `updateEvents`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `updateEvents` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
+ * @returns {Operation}
  * @example <caption>- Example `expression.js` of `updateEvents`</caption>
- * updateEvents('PVqUD2hvU4E', state.data);
- * @todo Support `merge` via custom `partial updates` mechanism since `PATCH` is not `natively` supported on this endpoint
+ * updateEvents('PVqUD2hvU4E', { events: [
+ *  {
+ *    program: 'eBAyeGv0exc',
+ *    orgUnit: 'DiszpKrYNg8',
+ *    eventDate: date,
+ *    status: 'COMPLETED',
+ *    storedBy: 'admin',
+ *    coordinate: {
+ *      latitude: '59.8',
+ *      longitude: '10.9',
+ *    },
+ *    dataValues: [
+ *      {
+ *        dataElement: 'qrur9Dvnyt5',
+ *        value: '22',
+ *      },
+ *      {
+ *        dataElement: 'oZg33kd9taw',
+ *        value: 'Male',
+ *      },
+ *    ],
+ *  }]
+ * });
  */
 export function updateEvents(path, data, params, options, callback) {
   return state => {
@@ -483,13 +507,13 @@ export function updateEvents(path, data, params, options, callback) {
 }
 
 /**
- * Get DHIS2 Tracker Programs
+ * Get DHIS2 Tracker Programs.
  * @public
  * @function
- * @param {object} params - `import` parameters for `getPrograms`. See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#tracker-web-api DHIS2 api documentation for allowed query parameters }
+ * @param {Object} params - `import` parameters for `getPrograms`. See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#tracker-web-api DHIS2 api documentation for allowed query parameters }
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `getPrograms` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
+ * @returns {Operation}
  * @example <caption>- Query for `all programs` with a certain `organisation unit`</caption>
  * getPrograms({ orgUnit: 'DiszpKrYNg8' , fields: '*' });
  */
@@ -506,17 +530,15 @@ export function getPrograms(params, options, callback) {
 }
 
 /**
- * Create a DHIS2 Tracker Programs
+ * Create a DHIS2 Tracker Program
  * @public
  * @function
- * @param {object} data - The update data containing new values
- * @param {object} [params] - Optional `import` parameters for `createPrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {Object} data - The update data containing new values
+ * @param {Object} [params] - Optional `import` parameters for `createPrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `getPrograms` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
+ * @returns {Operation}
  * @example <caption>- Example `expression.js` of `createPrograms` for a `single program` can look like this:</caption>
- * createPrograms(state.data);
- * @example <caption>- Example `expression.js` of `createPrograms` for sending `multiple programs` at the same time</caption>
  * createPrograms(state.data);
  */
 export function createPrograms(data, params, options, callback) {
@@ -541,14 +563,13 @@ export function createPrograms(data, params, options, callback) {
  * @public
  * @function
  * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
- * @param {object} data - The update data containing new values
- * @param {object} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {Object} data - The update data containing new values
+ * @param {Object} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `getPrograms` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
+ * @returns {Operation}
  * @example <caption>- Example `expression.js` of `updatePrograms`</caption>
  * updatePrograms('PVqUD2hvU4E', state.data);
- * @todo Support `merge` via custom `partial updates` mechanism since `PATCH` is not `natively` supported on this endpoint
  */
 export function updatePrograms(path, data, params, options, callback) {
   return state => {
@@ -565,49 +586,16 @@ export function updatePrograms(path, data, params, options, callback) {
  * Get DHIS2 Enrollments
  * @public
  * @function
- * @param {object} params - `Query` parameters for `getEnrollments`. See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#enrollment-management  here}
+ * @param {Object} params - `Query` parameters for `getEnrollments`. See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#enrollment-management  here}
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `getEnrollments` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
- * @example <caption>- A query for `all enrollments` associated with a `specific organisation unit` can look like this:</caption>
- * getEnrollments({ ou: 'DiszpKrYNg8' , fields: '*' });
+ * @returns {Operation}
  * @example <caption>- To constrain the response to `enrollments` which are part of a `specific program` you can include a `program query parameter`</caption>
  * getEnrollments({
  *   ou: 'O6uvpzGd5pu',
  *   ouMode: 'DESCENDANTS',
  *   program: 'ur1Edk5Oe2n',
  *   fields: '*',
- * });
- * @example <caption>- To specify `program enrollment dates` as `part of the query`</caption>
- * getEnrollments({
- *  ou: 'O6uvpzGd5pu' ,
- *  ouMode: 'DESCENDANTS' ,
- *  program: 'ur1Edk5Oe2n' ,
- *  programStartDate: '2013-01-01',
- *  programEndDate: '2013-09-01' ,
- *  fields: '*' ,
- * });
- * @example <caption>- To constrain the response to `enrollments` of a `specific tracked entity` you can include a `tracked entity query parameter`</caption>
- * getEnrollments({
- *  ou: 'O6uvpzGd5pu' ,
- *  ouMode: 'DESCENDANTS' ,
- *  program: 'ur1Edk5Oe2n' ,
- *  trackedEntity: 'cyl5vuJ5ETQ' ,
- *  fields: '*' ,
- * });
- * @example <caption>- To constrain the response to `enrollments` of a `specific tracked entity instance` you can include a `tracked entity instance query parameter`, in this case we have `restricted` it to available `enrollments viewable for current user`</caption>
- * getEnrollments({
- *  ouMode: 'ACCESSIBLE' ,
- *  trackedEntityInstance: 'tphfdyIiVL6' ,
- *  fields: '*' ,
- * });
- * @example <caption>- By default the `enrollments` are returned in `pages of size 50`, to change this you can use the `page` and `pageSize query parameters`</caption>
- * getEnrollments({
- *  ou: 'O6uvpzGd5pu' ,
- *  ouMode: 'DESCENDANTS' ,
- *  page: 2 ,
- *  pageSize: 3 ,
- *  fields: '*' ,
  * });
  */
 export function getEnrollments(params, options, callback) {
@@ -623,19 +611,36 @@ export function getEnrollments(params, options, callback) {
 }
 
 /**
- * Create a DHIS2 Enrollment
+ * Enroll a TEI into a program
  * - Enrolling a tracked entity instance into a program
  * - For enrolling `persons` into a `program`, you will need to first get the `identifier of the person` from the `trackedEntityInstances resource` via the `getTEIs` operation.
  * - Then, you will need to get the `program identifier` from the `programs` resource via the `getPrograms` operation.
  * @public
  * @function
- * @param {object} data - The enrollment data. See example {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#enrollment-management here }
- * @param {object} [params] - Optional `import` parameters for `createEnrollment`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {Object} data - The enrollment data. See example {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#enrollment-management here }
+ * @param {Object} [params] - Optional `import` parameters for `createEnrollment`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `enrollTEI` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
+ * @returns {Operation}
  * @example <caption>- Example `expression.js` of `createEnrollment` of a `person` into a `program` can look like this:</caption>
- * enrollTEI(state.data);
+ * enrollTEI({
+ *    trackedEntity: 'tracked-entity-id',
+ *    orgUnit: 'org-unit-id',
+ *    attributes: [
+ *    {
+ *       attribute: 'attribute-id',
+ *       value: 'attribute-value',
+ *    },
+ *    ],
+ *    enrollments: [
+ *    {
+ *       orgUnit: 'org-unit-id',
+ *       program: 'program-id',
+ *       enrollmentDate: '2013-09-17',
+ *       incidentDate: '2013-09-17',
+ *    },
+ *    ],
+ *});
  */
 export function enrollTEI(data, params, options, callback) {
   return state => {
@@ -658,14 +663,13 @@ export function enrollTEI(data, params, options, callback) {
  * @public
  * @function
  * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
- * @param {object} data - The update data containing new values
- * @param {object} [params] - Optional `import` parameters for `updateEnrollments`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {Object} data - The update data containing new values
+ * @param {Object} [params] - Optional `import` parameters for `updateEnrollments`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `updateEnrollments` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
+ * @returns {Operation}
  * @example <caption>- Example `expression.js` of `updateEnromments`</caption>
  * updateEnrollments('PVqUD2hvU4E', state.data);
- * @todo Support `merge` via custom `partial updates` mechanism since `PATCH` is not `natively` supported on this endpoint
  */
 export function updateEnrollments(path, data, params, options, callback) {
   return state => {
@@ -685,10 +689,10 @@ export function updateEnrollments(path, data, params, options, callback) {
  * @public
  * @function
  * @param {string} enrollmentId - The `enrollment-id` of the enrollment you wish to cancel
- * @param {object} [params] - Optional `import` parameters for `cancelEnrollment`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {Object} [params] - Optional `import` parameters for `cancelEnrollment`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `cancelEnrollment` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
+ * @returns {Operation}
  * @example <caption>- Example `expression.js` of `cancelEnrollment`</caption>
  * cancelEnrollments('PVqUD2hvU4E');
  */
@@ -715,10 +719,10 @@ export function cancelEnrollment(enrollmentId, params, options, callback) {
  * @public
  * @function
  * @param {string} enrollmentId - The `enrollment-id` of the enrollment you wish to cancel
- * @param {object} [params] - Optional `import` parameters for `completeEnrollment`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+ * @param {Object} [params] - Optional `import` parameters for `completeEnrollment`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `completeEnrollment` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
+ * @returns {Operation}
  * @example <caption>- Example `expression.js` of `completeEnrollment`</caption>
  * completeEnrollment('PVqUD2hvU4E');
  */
@@ -745,16 +749,12 @@ export function completeEnrollment(enrollmentId, params, options, callback) {
  * - To list all relationships, this requires you to provide the UID of the trackedEntityInstance, Enrollment or event that you want to list all the relationships for.
  * @public
  * @function
- * @param {object} params - `Query` parameters for `getRelationships`. See examples {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#relationships here}
+ * @param {Object} params - `Query` parameters for `getRelationships`. See examples {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#relationships here}
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `getRelationships` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
+ * @returns {Operation}
  * @example <caption>- A query for `all relationships` associated with a `specific tracked entity instance` can look like this:</caption>
  * getRelationships({ tei: 'F8yKM85NbxW', fields: '*' });
- * @example <caption>- A query for `all relationships` associated with a `enrollment` can look like this:</caption>
- * getRelationships({ enrollment: 'LXmiAMnJLrS' ,  fields: '*' });
- * @example <caption>- A query for `all relationships` associated with a `event` can look like this:</caption>
- * getRelationships({ event: 'TgJUhG6P6TJ' , fields: '*' });
  */
 export function getRelationships(params, options, callback) {
   return state => {
@@ -775,17 +775,17 @@ export function getRelationships(params, options, callback) {
  * - Data values can be retrieved in XML, JSON and CSV format.
  * @public
  * @function
- * @param {object} params - `Query` parameters for `getDataValues`. E.g. `{dataset: 'pBOMPrpg1QX', limit: 3, period: 2021, orgUnit: 'DiszpKrYNg8'} Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#data-values DHIS2 API docs} for available `Data Value Set Query Parameters`.
+ * @param {Object} params - `Query` parameters for `getDataValues`. E.g. `{dataset: 'pBOMPrpg1QX', limit: 3, period: 2021, orgUnit: 'DiszpKrYNg8'} Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#data-values DHIS2 API docs} for available `Data Value Set Query Parameters`.
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `options` for `getDataValues` operation. Defaults to `{apiVersion: state.configuration.apiVersion, responseType: 'json'}`
  * @param {function} [callback] - Optional `callback` to handle the response
- * @returns {Promise<state>} state
+ * @returns {Operation}
  * @example <caption>- Example getting **two** `data values` associated with a specific `orgUnit`, `dataSet`, and `period `</caption>
  * getDataValues({
  *   orgUnit: 'DiszpKrYNg8',
  *   period: '202010',
  *   dataSet: 'pBOMPrpg1QX',
  *   limit: 2,
- *  })
+ * });
  */
 export function getDataValues(params, options, callback) {
   return state => {
@@ -813,11 +813,9 @@ export function getDataValues(params, options, callback) {
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `createDataVaues` operation.
  * @param {object} [params] - Optional `import` parameters for `createDataValues`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`. Run `discover` or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#data-values DHIS2 Docs API} to learn about available data values import parameters.
  * @param {function} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
+ * @returns {Operation}
  * @example <caption>- Example `expression.js` of `createDataValues`  for sending a set of related data values sharing the same period and organisation unit</caption>
- * createDataValues(state.data);
- * // Example shape for state.data
- * data: {
+ * createDataValues({
  *   dataSet: 'pBOMPrpg1QX',
  *   completeDate: '2014-02-03',
  *   period: '201401',
@@ -836,38 +834,7 @@ export function getDataValues(params, options, callback) {
  *       value: '3',
  *     },
  *   ],
- * }
- * @example <caption>- Example `expression.js` of `createDataValues`  for sending large bulks of data values which don't necessarily are logically related</caption>
- * createDataValues(state.data);
- * // Example shape for state.data
- * {
- *   dataValues: [
- *  {
- *       dataElement: 'f7n9E0hX8qk',
- *       period: '201401',
- *       orgUnit: 'DiszpKrYNg8',
- *       value: '12',
- *     },
- *     {
- *       dataElement: 'f7n9E0hX8qk',
- *       period: '201401',
- *       orgUnit: 'FNnj3jKGS7i',
- *       value: '14',
- *     },
- *     {
- *       dataElement: 'f7n9E0hX8qk',
- *       period: '201402',
- *       orgUnit: 'DiszpKrYNg8',
- *       value: '16',
- *     },
- *     {
- *       dataElement: 'f7n9E0hX8qk',
- *       period: '201402',
- *      orgUnit: 'Jkhdsf8sdf4',
- *       value: '18',
- *     },
- *   ]
- * }
+ * });
  */
 export function createDataValues(data, options, params, callback) {
   return state => {
@@ -888,9 +855,7 @@ export function createDataValues(data, options, params, callback) {
  * @function
  * @param {{apiVersion: number,limit: number,responseType: string}} [options] - Optional `options` for `generateDhis2UID` operation. Defaults to `{apiVersion: state.configuration.apiVersion,limit: 1,responseType: 'json'}`
  * @param {function} [callback] - Callback to handle response
- * @returns {Promise<state>} state
- * @example <caption>Example generating `one UID` from the DHIS2 server</caption>
- * generateDhis2UID();
+ * @returns {Operation}
  * @example <caption>Example generating `three UIDs` from the DHIS2 server</caption>
  * generateDhis2UID({limit: 3});
  */
@@ -910,12 +875,12 @@ export function generateDhis2UID(options, callback) {
 }
 
 /**
- * Discover available `DHIS2` `api` `endpoint` `query parameters` and allowed `operators` for a given resource's endpoint.
+ * Discover `DHIS2` `api` `endpoint` `query parameters` and allowed `operators` for a given resource's endpoint.
  * @public
  * @function
  * @param {string} httpMethod - The HTTP to inspect parameter usage for a given endpoint, e.g., `get`, `post`,`put`,`patch`,`delete`
  * @param {string} endpoint - The path for a given endpoint. E.g. `/trackedEntityInstances` or `/dataValueSets`
- * @returns {Promise<state>} state
+ * @returns {Operation}
  * @example <caption>Example getting a list of `parameters allowed` on a given `endpoint` for specific `http method`</caption>
  * discover('post', '/trackedEntityInstances')
  */
@@ -1007,21 +972,16 @@ export function discover(httpMethod, endpoint) {
 }
 
 /**
- * Access analytical, aggregated data in DHIS2 you can work with the analytics resource
+ * Get analytical, aggregated data
  * - The analytics resource is powerful as it lets you query and retrieve data aggregated along all available data dimensions.
  * - For instance, you can ask the analytics resource to provide the aggregated data values for a set of data elements, periods and organisation units.
  * - Also, you can retrieve the aggregated data for a combination of any number of dimensions based on data elements and organisation unit group sets.
  * @public
  * @function
- * @param {object} params - Analytics `query parameters`, e.g. `{dx: 'fbfJHSPpUQD;cYeuwXTCPkU',filters: ['pe:2014Q1;2014Q2','ou:O6uvpzGd5pu;lc3eMKXaEfw']}`. Run `discover` or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#analytics DHIS2 API docs} to get the params available.
+ * @param {Object} params - Analytics `query parameters`, e.g. `{dx: 'fbfJHSPpUQD;cYeuwXTCPkU',filters: ['pe:2014Q1;2014Q2','ou:O6uvpzGd5pu;lc3eMKXaEfw']}`. Run `discover` or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#analytics DHIS2 API docs} to get the params available.
  * @param {{apiVersion: number,responseType: string}}[options] - `Optional` options for `getAnalytics` operation. Defaults to `{apiVersion: state.configuration.apiVersion, responseType: 'json'}`.
  * @param {function} [callback] - Callback to handle response
- * @returns {Promise<state>} state
- * @example <caption>Example getting a list of data elements filtered by the periods and organisation units</caption>
- *  getAnalytics({
- *    dimensions: ['dx:fbfJHSPpUQD;cYeuwXTCPkU'],
- *    filters: ['pe:2014Q1;2014Q2', 'ou:O6uvpzGd5pu;lc3eMKXaEfw'],
- *  })
+ * @returns {Operation}
  * @example <caption>Example getting only records where the data value is greater or equal to 6500 and less than 33000</caption>
  * getAnalytics({
  *   dimensions: [
@@ -1030,13 +990,7 @@ export function discover(httpMethod, endpoint) {
  *    'ou:O6uvpzGd5pu;lc3eMKXaEfw',
  *   ],
  *   measureCriteria: 'GE:6500;LT:33000',
- * })
- * @example <caption>Example getting only records for a certain date range using startDate and endDate</caption>
- * getAnalytics({
- *   dimensions: ['dx:fbfJHSPpUQD;cYeuwXTCPkU', 'ou:ImspTQPwCqd'],
- *     startDate: '2018-01-01',
- *     endDate: '2018-06-01',
- * })
+ * });
  */
 export function getAnalytics(params, options, callback) {
   return state => {
@@ -1051,23 +1005,19 @@ export function getAnalytics(params, options, callback) {
 }
 
 /**
- * Get a list of DHIS2 api resources
+ * Get DHIS2 api resources
  * @public
  * @function
- * @param {object} params - The optional query parameters for this endpoint. E.g `{filter: 'singular:like:attribute'}`.
+ * @param {Object} [params] - The `optional` query parameters for this endpoint. E.g `{filter: 'singular:like:attribute'}`.
  * @param {{filter: string, fields: string, responseType: string}} [options] - The `optional` options, specifiying the filter expression. E.g. `singular:eq:attribute`.
  * @param {function} [callback] - The `optional callback function that will be called to handle data returned by this function.
- * @returns {Promise<state>} state
- * @example <caption>Example getting a list of `all DHIS2 resources`</caption>
- * getResources();
- * @example <caption>Example getting a resource named `attribute`, in `json` format</caption>
- * getResources({ filter: 'singular:eq:attribute' });
+ * @returns {Operation}
  * @example <caption>Example getting a resource named `attribute`, in `xml` format, returning all the fields</caption>
- *  getResources('dataElement', {
+ * getResources('dataElement', {
  *      filter: 'singular:eq:attribute',
  *      fields: '*',
  *      responseType: 'xml',
- *   })
+ * });
  */
 export function getResources(params, options, callback) {
   return state => {
@@ -1140,18 +1090,14 @@ export function getResources(params, options, callback) {
 }
 
 /**
- * Get the schema of a given resource type, in any data format supported by DHIS2
+ * Get schema of a given resource type, in any data format supported by DHIS2
  * @public
  * @function
  * @param {string} resourceType - The type of resource to be updated(`singular` version of the `resource name`). E.g. `dataElement`, `organisationUnit`, etc. Run `getResources` to see available resources and their corresponding `singular` names.
- * @param {object} params - Optional `query parameters` for the `getSchema` operation. e.g. `{ fields: 'properties' ,skipPaging: true}`. Run`discover` or See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#metadata-export-examples DHIS2 API Docs}
+ * @param {Object} params - Optional `query parameters` for the `getSchema` operation. e.g. `{ fields: 'properties' ,skipPaging: true}`. Run`discover` or See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#metadata-export-examples DHIS2 API Docs}
  * @param {{apiVersion: number,resourceType: string}} [options] - Optional options for `getSchema` method. Defaults to `{apiVersion: state.configuration.apiVersion, responseType: 'json'}`
  * @param {function} [callback] - Optional `callback` to handle the response
- * @returns {Promise<state>} state
- * @example <caption>Example getting the `schema` for `dataElement`</caption>
- * getSchema('dataElement');
- * @example <caption>Example getting the `schema` for `dataElement`, only returning the `properties` field</caption>
- * getSchema('dataElement', { fields: 'properties' });
+ * @returns {Operation}
  * @example <caption>Example getting the `schema` for `dataElement` in XML</caption>
  * getSchema('dataElement', '{ fields: '*' }, { responseType: 'xml' });
  */
@@ -1216,23 +1162,22 @@ export function getSchema(resourceType, params, options, callback) {
 }
 
 /**
- * A generic helper method for getting data of any kind from DHIS2.
+ * Get data. Generic helper method for getting data of any kind from DHIS2.
  * - This can be used to get `DataValueSets`,`events`,`trackedEntityInstances`,`etc.`
  * @public
  * @function
  * @param {string} resourceType - The type of resource to get(use its `plural` name). E.g. `dataElements`, `trackedEntityInstances`,`organisationUnits`, etc.
- * @param {object} [params] - Optional `query parameters` e.g. `{ou: 'DiszpKrYNg8'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 docs} for more details on which params to use for a given type of resource.
+ * @param {Object} [params] - Optional `query parameters` e.g. `{ou: 'DiszpKrYNg8'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 docs} for more details on which params to use for a given type of resource.
  * @param {{apiVersion: number,operationName: string,responseType: string}}[options] - `Optional` options for `getData` operation. Defaults to `{operationName: 'getData', apiVersion: state.configuration.apiVersion, responseType: 'json'}`.
  * @param {function} [callback]  - Optional callback to handle the response
- * @returns {Promise<state>} state
+ * @returns {Operation} state
  * @example <caption>Example getting one `trackedEntityInstance` with `Id` 'dNpxRu1mWG5' for a given `orgUnit(DiszpKrYNg8)`</caption>
- *  getData('trackedEntityInstances', {
+ * getData('trackedEntityInstances', {
  *    fields: '*',
  *    ou: 'DiszpKrYNg8',
  *    entityType: 'nEenWmSyUEp',
  *    trackedEntityInstance: 'dNpxRu1mWG5',
- *  })
- *
+ * });
  */
 export function getData(resourceType, params, options, callback) {
   return state => {
@@ -1299,20 +1244,18 @@ export function getData(resourceType, params, options, callback) {
 }
 
 /**
- * A generic helper function to get metadata records from a given DHIS2 instance
+ * Get metadata. A generic helper function to get metadata records from a given DHIS2 instance
  * @public
  * @function
  * @param {string[]} resources - Required. List of metadata resources to fetch. E.g. `['organisationUnits', 'attributes']` or like `'dataSets'` if you only want a single type of resource. See `getResources` to see the types of resources available.
- * @param {object} [params] - Optional `query parameters` e.g. `{filters: ['name:like:ANC'],fields:'*'}`. See `discover` or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#metadata-export DHIS2 API docs}
+ * @param {Object} [params] - Optional `query parameters` e.g. `{filters: ['name:like:ANC'],fields:'*'}`. See `discover` or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#metadata-export DHIS2 API docs}
  * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional `options` for `getMetadata` operation. Defaults to `{operationName: 'getMetadata', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
  * @param {function} [callback] - Optional `callback` to handle the response
- * @returns {Promise<state>} state
- * @example <caption>Example getting a list of `ALL` `organisation units`</caption>
- * getMetadata('organisationUnits')
+ * @returns {Operation}
  * @example <caption>Example getting a list of `data elements` and `indicators` where `name` includes the word **ANC**</caption>
  * getMetadata(['dataElements', 'indicators'], {
  *      filters: ['name:like:ANC'],
- *  })
+ * });
  */
 export function getMetadata(resources, params, options, callback) {
   return state => {
@@ -1391,17 +1334,42 @@ export function getMetadata(resources, params, options, callback) {
 }
 
 /**
- * A generic helper method to create a record of any kind in DHIS2
+ * create data. A generic helper method to create a record of any kind in DHIS2
  * @public
  * @function
  * @param {string} resourceType - Type of resource to create. E.g. `trackedEntityInstances`
- * @param {object} data - Data that will be used to create a given instance of resource
- * @param {object} [options] - Optional `options` to control the behavior of the `create` operation.` Defaults to `{operationName: 'create', apiVersion: null, responseType: 'json'}`
- * @param {object} [params] - Optional `import parameters` for a given a resource. E.g. `{dryRun: true, importStrategy: CREATE}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 API documentation} or {@link discover}. Defauls to `DHIS2 default params` for a given resource type.
+ * @param {Object} data - Data that will be used to create a given instance of resource
+ * @param {Object} [options] - Optional `options` to control the behavior of the `create` operation.` Defaults to `{operationName: 'create', apiVersion: null, responseType: 'json'}`
+ * @param {Object} [params] - Optional `import parameters` for a given a resource. E.g. `{dryRun: true, importStrategy: CREATE}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 API documentation} or {@link discover}. Defauls to `DHIS2 default params` for a given resource type.
  * @param {function} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
+ * @returns {Operation}
  * @example <caption>- Example `expression.js` of `create`</caption>
- * create('events', state.data);
+ * create('events', {
+ *   program: 'eBAyeGv0exc',
+ *   orgUnit: 'DiszpKrYNg8',
+ *   eventDate: date,
+ *   status: 'COMPLETED',
+ *   completedDate: date,
+ *   storedBy: 'admin',
+ *   coordinate: {
+ *     latitude: 59.8,
+ *     longitude: 10.9,
+ *   },
+ *   dataValues: [
+ *     {
+ *       dataElement: 'qrur9Dvnyt5',
+ *       value: '33',
+ *     },
+ *     {
+ *       dataElement: 'oZg33kd9taw',
+ *       value: 'Male',
+ *     },
+ *     {
+ *       dataElement: 'msodh3rEMJa',
+ *       value: date,
+ *     },
+ *   ],
+ * });
  */
 export function create(resourceType, data, options, params, callback) {
   return state => {
@@ -1473,17 +1441,17 @@ export function create(resourceType, data, options, params, callback) {
 }
 
 /**
- *  A generic helper function to update a resource object of any type.
+ * Update data. A generic helper function to update a resource object of any type.
  * - It requires to send `all required fields` or the `full body`
  * @public
  * @function
  * @param {string} resourceType - The type of resource to be updated. E.g. `dataElements`, `organisationUnits`, etc.
  * @param {string} path - The `id` or `path` to the `object` to be updated. E.g. `FTRrcoaog83` or `FTRrcoaog83/{collection-name}/{object-id}`
- * @param {object} data - Data to update. It requires to send `all required fields` or the `full body`. If you want `partial updates`, use `patch` operation.
- * @param {object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
+ * @param {Object} data - Data to update. It requires to send `all required fields` or the `full body`. If you want `partial updates`, use `patch` operation.
+ * @param {Object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
  * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional options for update method. Defaults to `{operationName: 'update', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
  * @param {function} [callback]  - Optional callback to handle the response
- * @returns {Promise<state>} state
+ * @returns {Operation}
  * @example <caption>Example `updating` a `data element`</caption>
  * update('dataElements', 'FTRrcoaog83',
  * {
@@ -1565,18 +1533,18 @@ export function update(resourceType, path, data, params, options, callback) {
 }
 
 /**
- * A generic helper function to send partial updates on one or more object properties.
+ * Patch a record. A generic helper function to send partial updates on one or more object properties.
  * - You are not required to send the full body of object properties.
  * - This is useful for cases where you don't want or need to update all properties on a object.
  * @public
  * @function
  * @param {string} resourceType - The type of resource to be updated. E.g. `dataElements`, `organisationUnits`, etc.
  * @param {string} path - The `id` or `path` to the `object` to be updated. E.g. `FTRrcoaog83` or `FTRrcoaog83/{collection-name}/{object-id}`
- * @param {object} data - Data to update. Include only the fields you want to update. E.g. `{name: "New Name"}`
- * @param {object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
+ * @param {Object} data - Data to update. Include only the fields you want to update. E.g. `{name: "New Name"}`
+ * @param {Object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
  * @param {{apiVersion: number,operationName: string,responseType: string}} [options] - Optional options for update method. Defaults to `{operationName: 'patch', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
+ * @returns {Operation}
  * @example <caption>Example `patching` a `data element`</caption>
  * patch('dataElements', 'FTRrcoaog83',
  * {
@@ -1658,16 +1626,16 @@ export function patch(resourceType, path, data, params, options, callback) {
 }
 
 /**
- *  A generic helper function to delete an object
+ * Delete a record. A generic helper function to delete an object
  * @public
  * @function
  * @param {string} resourceType - The type of resource to be deleted. E.g. `trackedEntityInstances`, `organisationUnits`, etc.
  * @param {string} path - Can be an `id` of an `object` or `path` to the `nested object` to `delete`.
- * @param {object} [data] - Optional. This is useful when you want to remove multiple objects from a collection in one request. You can send `data` as, for example, `{"identifiableObjects": [{"id": "IDA"}, {"id": "IDB"}, {"id": "IDC"}]}`. See more {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#deleting-objects on DHIS2 API docs}
- * @param {object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
+ * @param {Object} [data] - Optional. This is useful when you want to remove multiple objects from a collection in one request. You can send `data` as, for example, `{"identifiableObjects": [{"id": "IDA"}, {"id": "IDB"}, {"id": "IDC"}]}`. See more {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#deleting-objects on DHIS2 API docs}
+ * @param {Object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
  * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional `options` for `del` operation. Defaults to `{operationName: 'delete', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
+ * @returns {Operation}
  * @example <caption>Example`deleting` a `tracked entity instance`</caption>
  * del('trackedEntityInstances', 'LcRd6Nyaq7T');
  */
@@ -1742,30 +1710,29 @@ export function del(resourceType, path, data, params, options, callback) {
 }
 
 /**
- * A generic helper function used to atomically either insert a row, or on the basis of the row already existing,
- * UPDATE that existing row instead.
+ * Upsert a record. A generic helper function used to atomically either insert a row, or on the basis of the row already existing, UPDATE that existing row instead.
  * @public
  * @function
  * @param {string} resourceType - The type of a resource to `insert` or `update`. E.g. `trackedEntityInstances`
  * @param {{attributeId: string,attributeValue:any}} uniqueAttribute - An object containing a `attributeId` and `attributeValue` which will be used to uniquely identify the record
- * @param {object} data - The update data containing new values
- * @param {object} [params] - Optional `import` parameters e.g. `{ou: 'lZGmxYbs97q', filters: ['w75KJ2mc4zz:EQ:Jane']}`
+ * @param {Object} data - The update data containing new values
+ * @param {Object} [params] - Optional `import` parameters e.g. `{ou: 'lZGmxYbs97q', filters: ['w75KJ2mc4zz:EQ:Jane']}`
  * @param {{replace:boolean, apiVersion: number,strict: boolean,responseType: string}} [options] - `Optional` options for `upsertTEI` operation. Defaults to `{replace: false, apiVersion: state.configuration.apiVersion,strict: true,responseType: 'json'}`.
  * @param {function} [callback] - Optional callback to handle the response
- * @returns {Promise<state>} state
  * @throws {RangeError} - Throws range error
+ * @returns {Operation}
  * @example <caption>- Example `expression.js` of upsert</caption>
  * upsert(
- *      'trackedEntityInstances',
- *       {
- *         attributeId: 'lZGmxYbs97q',
- *         attributeValue: state =>
- *           state.data.attributes.find(obj => obj.attribute === 'lZGmxYbs97q')
+ *    'trackedEntityInstances',
+ *    {
+ *       attributeId: 'lZGmxYbs97q',
+ *          attributeValue: state =>
+ *             state.data.attributes.find(obj => obj.attribute === 'lZGmxYbs97q')
  *             .value,
- *       },
- *       state.data,
- *       { ou: 'TSyzvBiovKh' }
- *     )
+ *    },
+ *    state.data,
+ *    { ou: 'TSyzvBiovKh' }
+ * );
  * @todo Tweak/refine to mimic implementation based on the following inspiration: {@link https://sqlite.org/lang_upsert.html sqlite upsert} and {@link https://wiki.postgresql.org/wiki/UPSERT postgresql upsert}
  * @todo Test implementation for upserting metadata
  * @todo Test implementation for upserting data values
