@@ -2,42 +2,6 @@ import { eq, filter, some, indexOf, lastIndexOf, trim } from 'lodash';
 import { mapValues } from 'lodash/fp';
 import axios from 'axios';
 
-export function recursivelyExpandReferences(thing) {
-  return state => {
-    if (typeof thing !== 'object')
-      return typeof thing == 'function' ? thing(state) : thing;
-    let result = mapValues(function (value) {
-      if (Array.isArray(value)) {
-        return value.map(item => {
-          return recursivelyExpandReferences(item)(state);
-        });
-      } else {
-        return recursivelyExpandReferences(value)(state);
-      }
-    })(thing);
-    if (Array.isArray(thing)) result = Object.values(result);
-    return result;
-  };
-}
-
-// Stuart
-// export function expandReferences(thing) {
-//   return state => {
-//     if (Array.isArray(thing)) {
-//       return thing.map(expandReferences(thing)(state));
-//     }
-//     if (typeof thing == 'object') {
-//       return Object.keys(thing).reduce((acc, key) => {
-//         return { ...acc, [key]: expandReferences(thing[key]) };
-//       }, {});
-//     }
-//     if (typeof thing == 'function') {
-//       return thing(state);
-//     }
-//     return thing;
-//   };
-// }
-
 export function composeSuccessMessage(operation) {
   return `${COLORS.FgGreen}${operation}${ESCAPE} succeeded. The body of this result will be available in ${COLORS.FgGreen}state.data${ESCAPE} or in your ${COLORS.FgGreen}callback${ESCAPE}.`;
 }
@@ -188,7 +152,7 @@ export class Log {
     ERROR: 'ERROR',
   };
 
-  static #MAIN_TAG = 'openfn';
+  static #MAIN_TAG = '@openfn';
 
   static #printMessage(prefix, message) {
     switch (prefix) {

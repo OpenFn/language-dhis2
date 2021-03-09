@@ -3,6 +3,7 @@ import axios from 'axios';
 import {
   execute as commonExecute,
   composeNextState,
+  expandReferences,
 } from '@openfn/language-common';
 import { indexOf } from 'lodash';
 
@@ -19,7 +20,6 @@ import {
   COLORS,
   prettyJson,
   ESCAPE,
-  recursivelyExpandReferences,
 } from './Utils';
 
 /**
@@ -134,7 +134,7 @@ axios.interceptors.response.use(
  */
 export function getTEIs(params, options, callback) {
   return state => {
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
 
     if (options) options.operationName = 'getTEIs';
     else {
@@ -179,11 +179,11 @@ export function getTEIs(params, options, callback) {
  */
 export function upsertTEI(uniqueAttributeId, data, options, callback) {
   return state => {
-    uniqueAttributeId = recursivelyExpandReferences(uniqueAttributeId)(state);
+    uniqueAttributeId = expandReferences(uniqueAttributeId)(state);
 
-    const body = recursivelyExpandReferences(data)(state);
+    const body = expandReferences(data)(state);
 
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
 
     if (options) options.operationName = 'upsertTEI';
     else {
@@ -309,7 +309,7 @@ export function upsertTEI(uniqueAttributeId, data, options, callback) {
  */
 export function createTEI(data, params, options, callback) {
   return state => {
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
 
     if (options) options.operationName = 'createTEI';
     else {
@@ -363,7 +363,7 @@ export function createTEI(data, params, options, callback) {
  */
 export function updateTEI(path, data, params, options, callback) {
   return state => {
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
     if (options) options.operationName = 'updateTEI';
     else {
       options = { operationName: 'updateTEI' };
@@ -392,7 +392,7 @@ export function updateTEI(path, data, params, options, callback) {
  */
 export function getEvents(params, options, callback) {
   return state => {
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
 
     if (options) options.operationName = 'getEvents';
     else {
@@ -444,7 +444,7 @@ export function getEvents(params, options, callback) {
  */
 export function createEvents(data, params, options, callback) {
   return state => {
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
 
     if (options) options.operationName = 'createEvents';
     else {
@@ -457,7 +457,7 @@ export function createEvents(data, params, options, callback) {
 /**
  * Update DHIS2 Event.
  * - To update an existing event, the format of the payload is the same as that of `creating an event` via `createEvents` operations
- * - But  you should supply the `identifier` of the object you are updating
+ * - But you should supply the `identifier` of the object you are updating
  * - The payload has to contain `all`, even `non-modified`, `attributes`.
  * - Attributes that were present before and are not present in the current payload any more will be removed by DHIS2.
  * - If you do not want this behavior, please use `upsert` operation to upsert your events.
@@ -496,7 +496,7 @@ export function createEvents(data, params, options, callback) {
  */
 export function updateEvents(path, data, params, options, callback) {
   return state => {
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
 
     if (options) options.operationName = 'updateEvents';
     else {
@@ -519,7 +519,7 @@ export function updateEvents(path, data, params, options, callback) {
  */
 export function getPrograms(params, options, callback) {
   return state => {
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
 
     if (options) options.operationName = 'getPrograms';
     else {
@@ -543,7 +543,7 @@ export function getPrograms(params, options, callback) {
  */
 export function createPrograms(data, params, options, callback) {
   return state => {
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
 
     if (options) options.operationName = 'createPrograms';
     else {
@@ -573,7 +573,7 @@ export function createPrograms(data, params, options, callback) {
  */
 export function updatePrograms(path, data, params, options, callback) {
   return state => {
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
     if (options) options.operationName = 'updatePrograms';
     else {
       options = { operationName: 'updatePrograms' };
@@ -600,7 +600,7 @@ export function updatePrograms(path, data, params, options, callback) {
  */
 export function getEnrollments(params, options, callback) {
   return state => {
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
 
     if (options) options.operationName = 'getEnrollments';
     else {
@@ -644,7 +644,7 @@ export function getEnrollments(params, options, callback) {
  */
 export function enrollTEI(data, params, options, callback) {
   return state => {
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
     if (options) options.operationName = 'enrollTEI';
     else {
       options = { operationName: 'enrollTEI' };
@@ -673,7 +673,7 @@ export function enrollTEI(data, params, options, callback) {
  */
 export function updateEnrollments(path, data, params, options, callback) {
   return state => {
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
 
     if (options) options.operationName = 'updateEnrollments';
     else {
@@ -698,9 +698,9 @@ export function updateEnrollments(path, data, params, options, callback) {
  */
 export function cancelEnrollment(enrollmentId, params, options, callback) {
   return state => {
-    enrollmentId = recursivelyExpandReferences(enrollmentId)(state);
+    enrollmentId = expandReferences(enrollmentId)(state);
 
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
 
     if (options) options.operationName = 'cancelEnrollment';
     else {
@@ -728,9 +728,9 @@ export function cancelEnrollment(enrollmentId, params, options, callback) {
  */
 export function completeEnrollment(enrollmentId, params, options, callback) {
   return state => {
-    enrollmentId = recursivelyExpandReferences(enrollmentId)(state);
+    enrollmentId = expandReferences(enrollmentId)(state);
 
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
 
     if (options) options.operationName = 'completeEnrollment';
     else {
@@ -758,7 +758,7 @@ export function completeEnrollment(enrollmentId, params, options, callback) {
  */
 export function getRelationships(params, options, callback) {
   return state => {
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
 
     if (options) options.operationName = 'getRelationships';
     else {
@@ -789,7 +789,7 @@ export function getRelationships(params, options, callback) {
  */
 export function getDataValues(params, options, callback) {
   return state => {
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
 
     if (options) options.operationName = 'getDataValues';
     else {
@@ -838,7 +838,7 @@ export function getDataValues(params, options, callback) {
  */
 export function createDataValues(data, options, params, callback) {
   return state => {
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
 
     if (options) options.operationName = 'createDataValues';
     else {
@@ -861,7 +861,7 @@ export function createDataValues(data, options, params, callback) {
  */
 export function generateDhis2UID(options, callback) {
   return state => {
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
     if (options) options.operationName = 'generateDhis2UID';
     else {
       options = { operationName: 'generateDhis2UID' };
@@ -994,7 +994,7 @@ export function discover(httpMethod, endpoint) {
  */
 export function getAnalytics(params, options, callback) {
   return state => {
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
 
     if (options) options.operationName = 'getAnalytics';
     else {
@@ -1021,9 +1021,9 @@ export function getAnalytics(params, options, callback) {
  */
 export function getResources(params, options, callback) {
   return state => {
-    params = recursivelyExpandReferences(params)(state);
+    params = expandReferences(params)(state);
 
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
 
     const operationName = 'getResources';
 
@@ -1103,11 +1103,11 @@ export function getResources(params, options, callback) {
  */
 export function getSchema(resourceType, params, options, callback) {
   return state => {
-    resourceType = recursivelyExpandReferences(resourceType)(state);
+    resourceType = expandReferences(resourceType)(state);
 
-    params = recursivelyExpandReferences(params)(state);
+    params = expandReferences(params)(state);
 
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
 
     const operationName = 'getSchema';
 
@@ -1181,11 +1181,11 @@ export function getSchema(resourceType, params, options, callback) {
  */
 export function getData(resourceType, params, options, callback) {
   return state => {
-    resourceType = recursivelyExpandReferences(resourceType)(state);
+    resourceType = expandReferences(resourceType)(state);
 
-    params = recursivelyExpandReferences(params)(state);
+    params = expandReferences(params)(state);
 
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
 
     const operationName = options?.operationName ?? 'getData';
 
@@ -1259,11 +1259,11 @@ export function getData(resourceType, params, options, callback) {
  */
 export function getMetadata(resources, params, options, callback) {
   return state => {
-    resources = recursivelyExpandReferences(resources)(state);
+    resources = expandReferences(resources)(state);
 
-    params = recursivelyExpandReferences(params)(state);
+    params = expandReferences(params)(state);
 
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
 
     const operationName = 'getMetadata';
 
@@ -1373,13 +1373,13 @@ export function getMetadata(resources, params, options, callback) {
  */
 export function create(resourceType, data, options, params, callback) {
   return state => {
-    resourceType = recursivelyExpandReferences(resourceType)(state);
+    resourceType = expandReferences(resourceType)(state);
 
-    const body = recursivelyExpandReferences(data)(state);
+    const body = expandReferences(data)(state);
 
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
 
-    params = recursivelyExpandReferences(params)(state);
+    params = expandReferences(params)(state);
 
     const operationName = options?.operationName ?? 'create';
 
@@ -1466,15 +1466,15 @@ export function create(resourceType, data, options, params, callback) {
  */
 export function update(resourceType, path, data, params, options, callback) {
   return state => {
-    resourceType = recursivelyExpandReferences(resourceType)(state);
+    resourceType = expandReferences(resourceType)(state);
 
-    path = recursivelyExpandReferences(path)(state);
+    path = expandReferences(path)(state);
 
-    const body = recursivelyExpandReferences(data)(state);
+    const body = expandReferences(data)(state);
 
-    params = recursivelyExpandReferences(params)(state);
+    params = expandReferences(params)(state);
 
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
 
     const { username, password, hostUrl } = state.configuration;
 
@@ -1553,15 +1553,15 @@ export function update(resourceType, path, data, params, options, callback) {
  */
 export function patch(resourceType, path, data, params, options, callback) {
   return state => {
-    resourceType = recursivelyExpandReferences(resourceType)(state);
+    resourceType = expandReferences(resourceType)(state);
 
-    path = recursivelyExpandReferences(path)(state);
+    path = expandReferences(path)(state);
 
-    const body = recursivelyExpandReferences(data)(state);
+    const body = expandReferences(data)(state);
 
-    params = recursivelyExpandReferences(params)(state);
+    params = expandReferences(params)(state);
 
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
 
     const operationName = options?.operationName ?? 'patch';
 
@@ -1641,15 +1641,15 @@ export function patch(resourceType, path, data, params, options, callback) {
  */
 export function del(resourceType, path, data, params, options, callback) {
   return state => {
-    resourceType = recursivelyExpandReferences(resourceType)(state);
+    resourceType = expandReferences(resourceType)(state);
 
-    path = recursivelyExpandReferences(path)(state);
+    path = expandReferences(path)(state);
 
-    const body = recursivelyExpandReferences(data)(state);
+    const body = expandReferences(data)(state);
 
-    params = recursivelyExpandReferences(params)(state);
+    params = expandReferences(params)(state);
 
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
 
     const operationName = options?.operationName ?? 'delete';
 
@@ -1747,15 +1747,15 @@ export function upsert(
   callback
 ) {
   return state => {
-    resourceType = recursivelyExpandReferences(resourceType)(state);
+    resourceType = expandReferences(resourceType)(state);
 
-    uniqueAttribute = recursivelyExpandReferences(uniqueAttribute)(state);
+    uniqueAttribute = expandReferences(uniqueAttribute)(state);
 
-    const body = recursivelyExpandReferences(data)(state);
+    const body = expandReferences(data)(state);
 
-    params = recursivelyExpandReferences(params)(state);
+    params = expandReferences(params)(state);
 
-    options = recursivelyExpandReferences(options)(state);
+    options = expandReferences(options)(state);
 
     const operationName = options?.operationName ?? 'upsert';
 
