@@ -17,9 +17,7 @@ import {
   applyFilter,
   parseFilter,
   logOperation,
-  COLORS,
   prettyJson,
-  ESCAPE,
 } from './Utils';
 
 /**
@@ -887,7 +885,7 @@ export function generateDhis2UID(options, callback) {
 export function discover(httpMethod, endpoint) {
   return state => {
     Log.info(
-      `Discovering query/import parameters for ${COLORS.FgGreen}${httpMethod}${ESCAPE} on ${COLORS.FgGreen}${endpoint}${ESCAPE}`
+      `Discovering query/import parameters for ${httpMethod} on ${endpoint}`
     );
     return axios
       .get(
@@ -949,9 +947,7 @@ export function discover(httpMethod, endpoint) {
       )
       .then(result => {
         Log.info(
-          `\t=======================================================================================\n\tQuery Parameters for ${
-            COLORS.FgGreen
-          }${httpMethod}${ESCAPE} on ${COLORS.FgGreen}${endpoint}${ESCAPE} [${
+          `\t=======================================================================================\n\tQuery Parameters for ${httpMethod} on ${endpoint} [${
             result.data.description ?? '<description_missing>'
           }]\n\t=======================================================================================`
         );
@@ -1081,7 +1077,7 @@ export function getResources(params, options, callback) {
       })
       .then(result => {
         Log.info(
-          `${COLORS.FgGreen}${operationName} succeeded${ESCAPE}. The result of this operation will be in ${operationName}state.data${ESCAPE} or in your ${operationName}callback${ESCAPE}.`
+          `${operationName} succeeded. The result of this operation will be in ${operationName} state.data or in your ${operationName} callback.`
         );
         if (callback) return callback(composeNextState(state, result.data));
         return composeNextState(state, result.data);
@@ -1153,7 +1149,7 @@ export function getSchema(resourceType, params, options, callback) {
       })
       .then(result => {
         Log.info(
-          `${COLORS.FgGreen}${operationName} succeeded${ESCAPE}. The result of this operation will be in ${operationName}state.data${ESCAPE} or in your ${operationName}callback${ESCAPE}.`
+          `${operationName} succeeded. The result of this operation will be in ${operationName} state.data or in your ${operationName} callback.`
         );
         if (callback) return callback(composeNextState(state, result.data));
         return composeNextState(state, result.data);
@@ -1235,7 +1231,7 @@ export function getData(resourceType, params, options, callback) {
       })
       .then(result => {
         Log.info(
-          `${COLORS.FgGreen}${operationName} succeeded${ESCAPE}. The result of this operation will be in ${operationName} ${COLORS.FgGreen}state.data${ESCAPE} or in your ${COLORS.FgGreen}callback${ESCAPE}.`
+          `${operationName} succeeded. The result of this operation will be in ${operationName} state.data or in your callback.`
         );
         if (callback) return callback(composeNextState(state, result.data));
         return composeNextState(state, result.data);
@@ -1325,7 +1321,7 @@ export function getMetadata(resources, params, options, callback) {
       })
       .then(result => {
         Log.info(
-          `${COLORS.FgGreen}${operationName} succeeded${ESCAPE}. The result of this operation will be in ${COLORS.FgGreen}${operationName} state.data${ESCAPE} or in your ${COLORS.FgGreen}callback${ESCAPE}.`
+          `${operationName} succeeded. The result of this operation will be in ${operationName} state.data or in your callback.`
         );
         if (callback) return callback(composeNextState(state, result.data));
         return composeNextState(state, result.data);
@@ -1424,15 +1420,11 @@ export function create(resourceType, data, options, params, callback) {
       })
       .then(result => {
         Log.info(
-          `${
-            COLORS.FgGreen
-          }${operationName} succeeded${ESCAPE}. Created ${resourceType}: ${
-            COLORS.FgGreen
-          }${
+          `${operationName} succeeded. Created ${resourceType}: ${
             result.data.response?.importSummaries
               ? result.data.response.importSummaries[0].href
               : result.data.response?.reference
-          }${ESCAPE}.\nSummary:\n${prettyJson(result.data)}`
+          }.\nSummary:\n${prettyJson(result.data)}`
         );
         if (callback) return callback(composeNextState(state, result.data));
         return composeNextState(state, result.data);
@@ -1520,9 +1512,7 @@ export function update(resourceType, path, data, params, options, callback) {
       })
       .then(result => {
         Log.info(
-          `${
-            COLORS.FgGreen
-          }${operationName} succeeded${ESCAPE}. Updated ${resourceType}.\nSummary:\n${prettyJson(
+          `${operationName} succeeded. Updated ${resourceType}.\nSummary:\n${prettyJson(
             result.data
           )}`
         );
@@ -1613,9 +1603,7 @@ export function patch(resourceType, path, data, params, options, callback) {
           statusText: result.statusText,
         };
         Log.info(
-          `${
-            COLORS.FgGreen
-          }${operationName} succeeded${ESCAPE}. Updated ${resourceType}.\nSummary:\n${prettyJson(
+          `${operationName} succeeded. Updated ${resourceType}.\nSummary:\n${prettyJson(
             resultObject
           )}`
         );
@@ -1697,9 +1685,7 @@ export function del(resourceType, path, data, params, options, callback) {
       })
       .then(result => {
         Log.info(
-          `${
-            COLORS.FgGreen
-          }${operationName} succeeded${ESCAPE}. DELETED ${resourceType}.\nSummary:\n${prettyJson(
+          `${operationName} succeeded. DELETED ${resourceType}.\nSummary:\n${prettyJson(
             result.data
           )}`
         );
@@ -1843,7 +1829,7 @@ export function upsert(
     };
 
     Log.info(
-      `Checking if a record exists that matches this filter: ${COLORS.FgGreen}attribute{ id: ${attributeId}, value: ${attributeValue} }\x1b[0m ...`
+      `Checking if a record exists that matches this filter: attribute{ id: ${attributeId}, value: ${attributeValue} } ...`
     );
     return Promise.all([
       getResouceName(),
@@ -1866,11 +1852,9 @@ export function upsert(
         //   );
         // }
         Log.info(
-          `${
-            COLORS.FgGreen
-          }Attribute has unique values${ESCAPE}. Proceeding to ${
-            COLORS.FgGreen
-          }${replace ? 'replace' : 'merge'}${ESCAPE} ...`
+          `Attribute has unique values. Proceeding to ${
+            replace ? 'replace' : 'merge'
+          } ...`
         );
 
         const row1 = recordsWithValue.data[resourceType][0];
@@ -1909,19 +1893,15 @@ export function upsert(
           })
           .then(result => {
             Log.info(
-              `${
-                COLORS.FgGreen
-              }${operationName} succeeded${ESCAPE}. Updated ${resourceName}: ${
-                COLORS.FgGreen
-              }${updateUrl}${ESCAPE}.\nSummary:\n${prettyJson(result.data)}`
+              `${operationName} succeeded. Updated ${resourceName}: ${updateUrl}.\nSummary:\n${prettyJson(
+                result.data
+              )}`
             );
             if (callback) return callback(composeNextState(state, result.data));
             return composeNextState(state, result.data);
           });
       } else if (recordsWithValueCount === 0) {
-        Log.info(
-          `${COLORS.FgGreen}Existing record not found${ESCAPE}, proceeding to ${COLORS.FgGreen}CREATE(POST)${ESCAPE} ...`
-        );
+        Log.info(`Existing record not found, proceeding to CREATE(POST) ...`);
 
         // We must delete the filter and ou params so the POST request is not interpreted as a GET request by the server
         queryParams.delete('filter');
@@ -1941,15 +1921,11 @@ export function upsert(
           })
           .then(result => {
             Log.info(
-              `${
-                COLORS.FgGreen
-              }${operationName} succeeded${ESCAPE}. Created ${resourceName}: ${
-                COLORS.FgGreen
-              }${
+              `${operationName} succeeded. Created ${resourceName}: ${
                 result.data.response.importSummaries
                   ? result.data.response.importSummaries[0].href
                   : result.data.response?.reference
-              }${ESCAPE}.\nSummary:\n${prettyJson(result.data)}`
+              }.\nSummary:\n${prettyJson(result.data)}`
             );
             if (callback) return callback(composeNextState(state, result.data));
             return composeNextState(state, result.data);

@@ -3,25 +3,25 @@ import { mapValues } from 'lodash/fp';
 import axios from 'axios';
 
 export function composeSuccessMessage(operation) {
-  return `${COLORS.FgGreen}${operation}${ESCAPE} succeeded. The body of this result will be available in ${COLORS.FgGreen}state.data${ESCAPE} or in your ${COLORS.FgGreen}callback${ESCAPE}.`;
+  return `${operation} succeeded. The body of this result will be available in state.data or in your callback.`;
 }
 
 export function warnExpectLargeResult(paramOrResourceType, endpointUrl) {
   if (!paramOrResourceType)
     Log.warn(
-      `\x1b[33m Missing params or resourceType. This may take a while\x1b[0m. This endpoint(\x1b[33m${endpointUrl}\x1b[0m) may return a large collection of records, since 'params' or 'resourceType' is not specified. We recommend you specify 'params' or 'resourceType' or use 'filter' parameter to limit the content of the result.`
+      ` Missing params or resourceType. This may take a while. This endpoint(${endpointUrl}) may return a large collection of records, since 'params' or 'resourceType' is not specified. We recommend you specify 'params' or 'resourceType' or use 'filter' parameter to limit the content of the result.`
     );
 }
 
 export function logWaitingForServer(url, params) {
-  console.info(`url ${COLORS.FgGreen}${url}\x1b[0m`);
+  console.info(`url ${url}`);
 
   console.info(
-    `params ${COLORS.FgGreen}${
+    `params ${
       typeof params === 'object' && !(params instanceof URLSearchParams)
         ? prettyJson(params)
         : params
-    }\x1b[0m`
+    }`
   );
 
   console.info(`Waiting for server response on ${url} ...`);
@@ -30,15 +30,15 @@ export function logWaitingForServer(url, params) {
 export function logApiVersion(apiVersion) {
   const message =
     apiVersion && apiVersion
-      ? `Using DHIS2 api version \x1b[33m${apiVersion}\x1b[0m`
-      : '\x1b[33m Attempting to use apiVersion without providing it in state.configuration or in options parameter\x1b[0m. You may encounter errors.\x1b[33m api_version_missing\x1b[0m.';
+      ? `Using DHIS2 api version ${apiVersion}`
+      : ' Attempting to use apiVersion without providing it in state.configuration or in options parameter. You may encounter errors. api_version_missing.';
 
   if (apiVersion) console.warn(message);
-  else console.warn(`Using\x1b[33m latest\x1b[0m version of DHIS2 api.`);
+  else console.warn(`Using latest version of DHIS2 api.`);
 }
 
 export function logOperation(operation) {
-  console.info(`Executing ${COLORS.FgGreen}${operation}\x1b[0m ...`);
+  console.info(`Executing ${operation} ...`);
 }
 
 export function buildUrl(path, hostUrl, apiVersion) {
@@ -115,36 +115,6 @@ export function getIndicesOf(string, regex) {
   return indexes;
 }
 
-export const ESCAPE = '\x1b[0m';
-
-export const COLORS = {
-  Reset: '\x1b[0m',
-  Bright: '\x1b[1m',
-  Dim: '\x1b[2m',
-  Underscore: '\x1b[4m',
-  Blink: '\x1b[5m',
-  Reverse: '\x1b[7m',
-  Hidden: '\x1b[8m',
-
-  FgBlack: '\x1b[30m',
-  FgRed: '\x1b[31m',
-  FgGreen: '\x1b[32m',
-  FgYellow: '\x1b[33m',
-  FgBlue: '\x1b[34m',
-  FgMagenta: '\x1b[35m',
-  FgCyan: '\x1b[36m',
-  FgWhite: '\x1b[37m',
-
-  BgBlack: '\x1b[40m',
-  BgRed: '\x1b[41m',
-  BgGreen: '\x1b[42m',
-  BgYellow: '\x1b[43m',
-  BgBlue: '\x1b[44m',
-  BgMagenta: '\x1b[45m',
-  BgCyan: '\x1b[46m',
-  BgWhite: '\x1b[47m',
-};
-
 export class Log {
   static #OPTIONS = {
     INFO: 'INFO',
@@ -158,25 +128,19 @@ export class Log {
     switch (prefix) {
       case Log.#OPTIONS.WARN:
         console.warn(
-          `${Log.#MAIN_TAG} ${
-            COLORS.FgYellow
-          }%s${ESCAPE} ${new Date()}\n ${message}`,
+          `${Log.#MAIN_TAG} %s ${new Date()}\n ${message}`,
           Log.#OPTIONS.WARN
         );
         break;
       case Log.#OPTIONS.ERROR:
         console.error(
-          `${Log.#MAIN_TAG} ${
-            COLORS.FgRed
-          }%s${ESCAPE} ${new Date()}\n ${message}`,
+          `${Log.#MAIN_TAG} %s ${new Date()}\n ${message}`,
           Log.#OPTIONS.ERROR
         );
         break;
       default:
         console.info(
-          `${Log.#MAIN_TAG} ${
-            COLORS.FgGreen
-          }%s${ESCAPE} ${new Date()}\n ${message}`,
+          `${Log.#MAIN_TAG} %s ${new Date()}\n ${message}`,
           Log.#OPTIONS.INFO
         );
     }
