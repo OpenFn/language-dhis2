@@ -1,3 +1,6 @@
+const demoVersion = '2.35';
+const apiVersion = '35';
+
 const fixtures = {
   event: {
     requestBody: {
@@ -55,8 +58,8 @@ export const upsertNewState = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/2.35.1',
-    apiVersion: 35,
+    hostUrl: `https://play.dhis2.org/${demoVersion}`,
+    apiVersion,
   },
   data: {
     orgUnit: 'TSyzvBiovKh',
@@ -90,8 +93,8 @@ export const upsertExistingState = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/2.35.1',
-    apiVersion: 35,
+    hostUrl: `https://play.dhis2.org/${demoVersion}`,
+    apiVersion,
   },
   data: {
     orgUnit: 'TSyzvBiovKh',
@@ -125,8 +128,8 @@ export const upsertNewTEIState = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/2.35.1',
-    apiVersion: 35,
+    hostUrl: `https://play.dhis2.org/${demoVersion}`,
+    apiVersion,
   },
   data: {
     orgUnit: 'TSyzvBiovKh',
@@ -160,8 +163,8 @@ export const upsertExistingTEIState = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/2.35.1',
-    apiVersion: 35,
+    hostUrl: `https://play.dhis2.org/${demoVersion}`,
+    apiVersion,
   },
   data: {
     orgUnit: 'TSyzvBiovKh',
@@ -206,8 +209,8 @@ export const createEventsState = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/2.35.1',
-    apiVersion: 35,
+    hostUrl: `https://play.dhis2.org/${demoVersion}`,
+    apiVersion,
   },
   data: {
     program: 'eBAyeGv0exc',
@@ -241,8 +244,8 @@ export const sendDataForMultipleEventsState = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/2.35.1',
-    apiVersion: 35,
+    hostUrl: `https://play.dhis2.org/${demoVersion}`,
+    apiVersion,
   },
   data: {
     events: [
@@ -296,8 +299,8 @@ export const createState = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/2.35.1',
-    apiVersion: 35,
+    hostUrl: `https://play.dhis2.org/${demoVersion}`,
+    apiVersion,
   },
   data: {
     program: 'eBAyeGv0exc',
@@ -331,8 +334,8 @@ export const createBulkUnrelatedDataValues = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/2.35.1',
-    apiVersion: 35,
+    hostUrl: `https://play.dhis2.org/${demoVersion}`,
+    apiVersion,
   },
   data: {
     dataValues: [
@@ -368,8 +371,8 @@ export const createRelatedDataValues = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/2.35.1',
-    apiVersion: 35,
+    hostUrl: `https://play.dhis2.org/${demoVersion}`,
+    apiVersion,
   },
   data: {
     dataSet: 'pBOMPrpg1QX',
@@ -397,8 +400,8 @@ export const updateState = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/2.35.1',
-    apiVersion: 35,
+    hostUrl: `https://play.dhis2.org/${demoVersion}`,
+    apiVersion,
   },
   data: {
     id: 'FTRrcoaog83',
@@ -414,8 +417,8 @@ export const patchState = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/2.35.1',
-    apiVersion: 35,
+    hostUrl: `https://play.dhis2.org/${demoVersion}`,
+    apiVersion,
   },
   data: {
     name: 'Patched Name ' + Date.now(),
@@ -426,8 +429,8 @@ export const delState = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/2.35.1',
-    apiVersion: 35,
+    hostUrl: `https://play.dhis2.org/${demoVersion}`,
+    apiVersion,
   },
   data: {
     orgUnit: 'TSyzvBiovKh',
@@ -462,8 +465,8 @@ export const getState = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/2.35.1',
-    apiVersion: 35,
+    hostUrl: `https://play.dhis2.org/${demoVersion}`,
+    apiVersion,
   },
 };
 
@@ -471,8 +474,8 @@ export const enrollTEIState = {
   configuration: {
     username: 'admin',
     password: 'district',
-    hostUrl: 'https://play.dhis2.org/2.35.1',
-    apiVersion: 35,
+    hostUrl: `https://play.dhis2.org/${demoVersion}`,
+    apiVersion,
   },
   data: {
     orgUnit: 'TSyzvBiovKh',
@@ -494,7 +497,7 @@ export const enrollTEIState = {
   },
 };
 
-export { fixtures };
+export { fixtures, demoVersion };
 
 export default [
   {

@@ -36,6 +36,7 @@ import {
   createEventsState,
   sendDataForMultipleEventsState,
   enrollTEIState,
+  demoVersion,
 } from './ClientFixtures';
 import { permissions, userRoles, personAttributes } from './SetupFixtures';
 import { result } from 'lodash';
@@ -91,6 +92,7 @@ describe('execute', () => {
 });
 
 describe('live adaptor testing', () => {
+  console.log(demoVersion);
   // before ALL tests run, we must re-configure the dhis2 environment
   before(function () {
     this.timeout(30000);
@@ -98,7 +100,7 @@ describe('live adaptor testing', () => {
       configuration: {
         username: 'admin',
         password: 'district',
-        hostUrl: 'https://play.dhis2.org/2.35.0',
+        hostUrl: `https://play.dhis2.org/${demoVersion}`,
       },
     };
 
@@ -145,7 +147,7 @@ describe('live adaptor testing', () => {
         configuration: {
           username: 'admin',
           password: 'district',
-          hostUrl: 'https://play.dhis2.org/2.35.0',
+          hostUrl: `https://play.dhis2.org/${demoVersion}`,
           apiVersion: 34,
         },
       };
@@ -162,7 +164,7 @@ describe('live adaptor testing', () => {
         configuration: {
           username: 'admin',
           password: 'district',
-          hostUrl: 'https://play.dhis2.org/2.35.0',
+          hostUrl: `https://play.dhis2.org/${demoVersion}`,
         },
       };
 
@@ -185,7 +187,7 @@ describe('live adaptor testing', () => {
         configuration: {
           username: 'admin',
           password: 'district',
-          hostUrl: 'https://play.dhis2.org/2.35.0',
+          hostUrl: `https://play.dhis2.org/${demoVersion}`,
         },
       };
 
