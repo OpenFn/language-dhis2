@@ -10,13 +10,17 @@
   "main": "lib/index.js",
   "scripts": {
     "test:watch": "mocha -w --require @babel/register",
-    "build": "make",
-    "test": "mocha --require @babel/register"
+    "build": "node_modules/.bin/babel src -d lib && npm run ast",
+    "test": "mocha --require @babel/register",
+    "ast": "simple-ast --adaptor ./src/Adaptor.js --output ast.json",
+    "postversion": "git push && git push --tags",
+    "version": "npm run build && git add -A lib ast.json"
   },
   "author": "Open Function Group",
   "license": "LGPLv3",
   "files": [
-    "lib/"
+    "lib/",
+    "ast.json"
   ],
   "dependencies": {
     "@openfn/language-common": "1.2.8",
@@ -34,6 +38,7 @@
     "@babel/preset-env": "^7.9.5",
     "@babel/preset-stage-0": "^7.8.3",
     "@babel/register": "^7.9.0",
+    "@openfn/simple-ast": "^0.3.0",
     "assertion-error": "^1.0.1",
     "chai": "^3.4.0",
     "chai-http": "^4.3.0",
@@ -42,5 +47,13 @@
     "mocha": "^7.1.1",
     "nock": "^13.0.5",
     "sinon": "^1.17.2"
-  }
+  },
+  "directories": {
+    "lib": "./lib"
+  },
+  "bundledDependencies": [
+    "@openfn/language-common",
+    "axios",
+    "lodash"
+  ]
 }
