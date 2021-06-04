@@ -14,17 +14,14 @@ export function warnExpectLargeResult(paramOrResourceType, endpointUrl) {
 }
 
 export function logWaitingForServer(url, params) {
-  console.info(`url ${url}`);
-
   console.info(
-    `params ${
-      typeof params === 'object' && !(params instanceof URLSearchParams)
-        ? prettyJson(params)
-        : params
-    }`
+    'Request params: ',
+    typeof params === 'object' && !(params instanceof URLSearchParams)
+      ? prettyJson(params)
+      : params
   );
 
-  console.info(`Waiting for server response on ${url} ...`);
+  console.info(`Waiting for response from ${url}`);
 }
 
 export function logApiVersion(apiVersion) {
