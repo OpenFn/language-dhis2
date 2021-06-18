@@ -103,14 +103,7 @@ axios.interceptors.response.use(
   },
   function (error) {
     Log.error(`${error?.message}`);
-    try {
-      console.log(JSON.stringify(error.response?.data?.response, null, 2));
-    } catch (err) {
-      /* Keep quiet! Just log the above error again */
-      console.log(error.response?.data?.response);
-    }
-    console.log(error.response?.data?.response);
-    return Promise.reject(error);
+    return Promise.reject(JSON.stringify(error.response.data,null,2));
   }
 );
 

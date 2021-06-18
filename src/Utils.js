@@ -1,5 +1,4 @@
 import { eq, filter, some, indexOf, lastIndexOf, trim } from 'lodash';
-import { mapValues } from 'lodash/fp';
 import axios from 'axios';
 
 export function composeSuccessMessage(operation) {
@@ -113,46 +112,16 @@ export function getIndicesOf(string, regex) {
 }
 
 export class Log {
-  static #OPTIONS = {
-    INFO: 'INFO',
-    WARN: 'WARN',
-    ERROR: 'ERROR',
-  };
-
-  static #MAIN_TAG = '@openfn';
-
-  static #printMessage(prefix, message) {
-    switch (prefix) {
-      case Log.#OPTIONS.WARN:
-        console.warn(
-          `${Log.#MAIN_TAG} %s ${new Date()}\n ${message}`,
-          Log.#OPTIONS.WARN
-        );
-        break;
-      case Log.#OPTIONS.ERROR:
-        console.error(
-          `${Log.#MAIN_TAG} %s ${new Date()}\n ${message}`,
-          Log.#OPTIONS.ERROR
-        );
-        break;
-      default:
-        console.info(
-          `${Log.#MAIN_TAG} %s ${new Date()}\n ${message}`,
-          Log.#OPTIONS.INFO
-        );
-    }
-  }
-
   static info(message) {
-    return Log.#printMessage(Log.#OPTIONS.INFO, message);
+    return console.info('(info)', new Date(), `\n${message}`);
   }
 
   static warn(message) {
-    return Log.#printMessage(Log.#OPTIONS.WARN, message);
+    return console.warn('⚠ WARNING', new Date(), `\n${message}`);
   }
 
   static error(message) {
-    return Log.#printMessage(Log.#OPTIONS.ERROR, message);
+    return console.error('✗ ERROR', new Date(), `\n${message}`);
   }
 }
 
