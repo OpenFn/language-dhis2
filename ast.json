@@ -3085,12 +3085,12 @@
   "exports": [],
   "common": [
     {
-      "name": "alterState",
+      "name": "fn",
       "params": [
         "func"
       ],
       "docs": {
-        "description": "Runs a function using state.",
+        "description": "Creates a custom step (or operation) for more flexible job writing.",
         "tags": [
           {
             "title": "public",
@@ -3099,7 +3099,7 @@
           },
           {
             "title": "example",
-            "description": "alterState(state => {\n  // do some things to state\n  return state;\n})"
+            "description": "fn(state => {\n  // do some things to state\n  return state;\n});"
           },
           {
             "title": "function",
@@ -3360,7 +3360,7 @@
     {
       "name": "fields",
       "params": [
-        null
+        "fields"
       ],
       "docs": {
         "description": "Zips key value pairs into an object.",
@@ -3380,6 +3380,15 @@
             "name": null
           },
           {
+            "title": "param",
+            "description": "a list of fields",
+            "type": {
+              "type": "NameExpression",
+              "name": "Fields"
+            },
+            "name": "fields"
+          },
+          {
             "title": "returns",
             "description": null,
             "type": {
@@ -3389,7 +3398,7 @@
           }
         ]
       },
-      "valid": false
+      "valid": true
     },
     {
       "name": "merge",
