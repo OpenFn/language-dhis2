@@ -103,7 +103,7 @@ axios.interceptors.response.use(
   },
   function (error) {
     Log.error(`${error?.message}`);
-    return Promise.reject(JSON.stringify(error.response.data,null,2));
+    return Promise.reject(JSON.stringify(error.response.data, null, 2));
   }
 );
 
@@ -1940,5 +1940,6 @@ export {
   dataValue,
   lastReferenceValue,
   alterState,
+  fn,
   http,
 } from '@openfn/language-common';
