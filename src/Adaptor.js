@@ -899,9 +899,8 @@ export function discover(httpMethod, endpoint) {
                     if (param.schema['$ref']) {
                       let schemaRefIndex =
                         param.schema['$ref'].lastIndexOf('/') + 1;
-                      let schemaRef = param.schema['$ref'].slice(
-                        schemaRefIndex
-                      );
+                      let schemaRef =
+                        param.schema['$ref'].slice(schemaRefIndex);
                       param.schema = tempData.components.schemas[schemaRef];
                     }
 
@@ -1926,6 +1925,21 @@ export function upsert(
       }
     });
   };
+}
+
+/**
+ * Gets an attribute value by its case-insensitive display name
+ * @public
+ * @example
+ * valByName(tei.attributes, 'first name')
+ * @function
+ * @param {Object} attributes - An array of tracked entity attributes
+ * @param {string} name - The display name to search for
+ * @returns {string}
+ */
+export function valByName(attr, name) {
+  return attr.find(a => a.displayName.toLowerCase() == name.toLowerCase())
+    ?.value;
 }
 
 export { attribute } from './Utils';
