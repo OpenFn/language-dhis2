@@ -3082,10 +3082,10 @@
       "valid": true
     },
     {
-      "name": "valByName",
+      "name": "attrVal",
       "params": [
-        "attr",
-        "name"
+        "tei",
+        "attributeName"
       ],
       "docs": {
         "description": "Gets an attribute value by its case-insensitive display name",
@@ -3106,21 +3106,21 @@
           },
           {
             "title": "param",
-            "description": "An array of tracked entity attributes",
+            "description": "A tracked entity instance (TEI) object",
             "type": {
               "type": "NameExpression",
               "name": "Object"
             },
-            "name": "attr"
+            "name": "tei"
           },
           {
             "title": "param",
-            "description": "The display name to search for",
+            "description": "The 'displayName' to search for in the TEI's attributes",
             "type": {
               "type": "NameExpression",
               "name": "string"
             },
-            "name": "name"
+            "name": "attributeName"
           },
           {
             "title": "returns",

@@ -899,8 +899,9 @@ export function discover(httpMethod, endpoint) {
                     if (param.schema['$ref']) {
                       let schemaRefIndex =
                         param.schema['$ref'].lastIndexOf('/') + 1;
-                      let schemaRef =
-                        param.schema['$ref'].slice(schemaRefIndex);
+                      let schemaRef = param.schema['$ref'].slice(
+                        schemaRefIndex
+                      );
                       param.schema = tempData.components.schemas[schemaRef];
                     }
 
@@ -1933,13 +1934,14 @@ export function upsert(
  * @example
  * valByName(tei.attributes, 'first name')
  * @function
- * @param {Object} attr - An array of tracked entity attributes
- * @param {string} name - The display name to search for
+ * @param {Object} tei - A tracked entity instance (TEI) object
+ * @param {string} attributeName - The 'displayName' to search for in the TEI's attributes
  * @returns {string}
  */
-export function valByName(attr, name) {
-  return attr.find(a => a.displayName.toLowerCase() == name.toLowerCase())
-    ?.value;
+export function attrVal(tei, attributeName) {
+  return tei?.attributes?.find(
+    a => a?.displayName.toLowerCase() == attributeName.toLowerCase()
+  )?.value;
 }
 
 export { attribute } from './Utils';
