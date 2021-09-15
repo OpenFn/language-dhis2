@@ -3111,7 +3111,7 @@
               "type": "NameExpression",
               "name": "Object"
             },
-            "name": "attributes"
+            "name": "attr"
           },
           {
             "title": "param",
@@ -3132,7 +3132,7 @@
           }
         ]
       },
-      "valid": false
+      "valid": true
     }
   ],
   "exports": [],
