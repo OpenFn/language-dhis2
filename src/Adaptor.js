@@ -1933,7 +1933,7 @@ export function upsert(
  * @example
  * valByName(tei.attributes, 'first name')
  * @function
- * @param {Object} attributes - An array of tracked entity attributes
+ * @param {Object} attr - An array of tracked entity attributes
  * @param {string} name - The display name to search for
  * @returns {string}
  */
