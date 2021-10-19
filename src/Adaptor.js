@@ -107,6 +107,13 @@ axios.interceptors.response.use(
   }
 );
 
+function expandAndSetOperation(options, state, operationName) {
+  return {
+    operationName,
+    ...expandReferences(options)(state),
+  };
+}
+
 /**
  * Get Tracked Entity Instance(s).
  * @public
@@ -125,14 +132,13 @@ axios.interceptors.response.use(
  */
 export function getTEIs(params, options, callback) {
   return state => {
-    options = expandReferences(options)(state);
-
-    if (options) options.operationName = 'getTEIs';
-    else {
-      options = { operationName: 'getTEIs' };
-    }
-
-    return getData('trackedEntityInstances', params, options, callback)(state);
+    const expandedOptions = expandAndSetOperation(options, state, 'getTEIs');
+    return getData(
+      'trackedEntityInstances',
+      params,
+      expandedOptions,
+      callback
+    )(state);
   };
 }
 
@@ -174,18 +180,14 @@ export function upsertTEI(uniqueAttributeId, data, options, callback) {
 
     const body = expandReferences(data)(state);
 
-    options = expandReferences(options)(state);
-
-    if (options) options.operationName = 'upsertTEI';
-    else {
-      options = { operationName: 'upsertTEI' };
-    }
+    const expandedOptions = expandAndSetOperation(options, state, 'upsertTEI');
 
     const { password, username, hostUrl } = state.configuration;
 
-    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
+    const apiVersion =
+      expandedOptions?.apiVersion ?? state.configuration.apiVersion;
 
-    const strict = options?.strict ?? true;
+    const strict = expandedOptions?.strict ?? true;
 
     const params = {
       ou: body.orgUnit,
@@ -257,7 +259,7 @@ export function upsertTEI(uniqueAttributeId, data, options, callback) {
         },
         body,
         params,
-        options,
+        expandedOptions,
         callback
       )(state);
     });
@@ -300,18 +302,12 @@ export function upsertTEI(uniqueAttributeId, data, options, callback) {
  */
 export function createTEI(data, params, options, callback) {
   return state => {
-    options = expandReferences(options)(state);
-
-    if (options) options.operationName = 'createTEI';
-    else {
-      options = { operationName: 'createTEI' };
-    }
-
+    const expandedOptions = expandAndSetOperation(options, state, 'createTEI');
     return create(
       'trackedEntityInstances',
       data,
       params,
-      options,
+      expandedOptions,
       callback
     )(state);
   };
@@ -354,17 +350,13 @@ export function createTEI(data, params, options, callback) {
  */
 export function updateTEI(path, data, params, options, callback) {
   return state => {
-    options = expandReferences(options)(state);
-    if (options) options.operationName = 'updateTEI';
-    else {
-      options = { operationName: 'updateTEI' };
-    }
+    const expandedOptions = expandAndSetOperation(options, state, 'updateTEI');
     return update(
       'trackedEntityInstances',
       path,
       data,
       params,
-      options,
+      expandedOptions,
       callback
     )(state);
   };
@@ -383,12 +375,8 @@ export function updateTEI(path, data, params, options, callback) {
  */
 export function getEvents(params, options, callback) {
   return state => {
-    options = {
-      ...expandReferences(options)(state),
-      operationName: 'getEvents',
-    };
-
-    return getData('events', params, options, callback)(state);
+    const expandedOptions = expandAndSetOperation(options, state, 'getEvents');
+    return getData('events', params, expandedOptions, callback)(state);
   };
 }
 
@@ -434,13 +422,12 @@ export function getEvents(params, options, callback) {
  */
 export function createEvents(data, params, options, callback) {
   return state => {
-    options = expandReferences(options)(state);
-
-    if (options) options.operationName = 'createEvents';
-    else {
-      options = { operationName: 'createEvents' };
-    }
-    return create('events', data, params, options, callback)(state);
+    const expandedOptions = expandAndSetOperation(
+      options,
+      state,
+      'createEvents'
+    );
+    return create('events', data, params, expandedOptions, callback)(state);
   };
 }
 
@@ -486,13 +473,19 @@ export function createEvents(data, params, options, callback) {
  */
 export function updateEvents(path, data, params, options, callback) {
   return state => {
-    options = expandReferences(options)(state);
-
-    if (options) options.operationName = 'updateEvents';
-    else {
-      options = { operationName: 'updateEvents' };
-    }
-    return update('events', path, data, params, options, callback)(state);
+    const expandedOptions = expandAndSetOperation(
+      options,
+      state,
+      'updateEvents'
+    );
+    return update(
+      'events',
+      path,
+      data,
+      params,
+      expandedOptions,
+      callback
+    )(state);
   };
 }
 
@@ -509,13 +502,12 @@ export function updateEvents(path, data, params, options, callback) {
  */
 export function getPrograms(params, options, callback) {
   return state => {
-    options = expandReferences(options)(state);
-
-    if (options) options.operationName = 'getPrograms';
-    else {
-      options = { operationName: 'getPrograms' };
-    }
-    return getData('programs', params, options, callback)(state);
+    const expandedOptions = expandAndSetOperation(
+      options,
+      state,
+      'getPrograms'
+    );
+    return getData('programs', params, expandedOptions, callback)(state);
   };
 }
 
@@ -533,13 +525,12 @@ export function getPrograms(params, options, callback) {
  */
 export function createPrograms(data, params, options, callback) {
   return state => {
-    options = expandReferences(options)(state);
-
-    if (options) options.operationName = 'createPrograms';
-    else {
-      options = { operationName: 'createPrograms' };
-    }
-    return create('programs', data, options, params, callback)(state);
+    const expandedOptions = expandAndSetOperation(
+      options,
+      state,
+      'createPrograms'
+    );
+    return create('programs', data, expandedOptions, params, callback)(state);
   };
 }
 
@@ -563,12 +554,19 @@ export function createPrograms(data, params, options, callback) {
  */
 export function updatePrograms(path, data, params, options, callback) {
   return state => {
-    options = expandReferences(options)(state);
-    if (options) options.operationName = 'updatePrograms';
-    else {
-      options = { operationName: 'updatePrograms' };
-    }
-    return update('programs', path, data, params, options, callback)(state);
+    const expandedOptions = expandAndSetOperation(
+      options,
+      state,
+      'updatePrograms'
+    );
+    return update(
+      'programs',
+      path,
+      data,
+      params,
+      expandedOptions,
+      callback
+    )(state);
   };
 }
 
@@ -590,13 +588,12 @@ export function updatePrograms(path, data, params, options, callback) {
  */
 export function getEnrollments(params, options, callback) {
   return state => {
-    options = expandReferences(options)(state);
-
-    if (options) options.operationName = 'getEnrollments';
-    else {
-      options = { operationName: 'getEnrollments' };
-    }
-    return getData('enrollments', params, options, callback)(state);
+    const expandedOptions = expandAndSetOperation(
+      options,
+      state,
+      'getEnrollments'
+    );
+    return getData('enrollments', params, expandedOptions, callback)(state);
   };
 }
 
@@ -634,12 +631,14 @@ export function getEnrollments(params, options, callback) {
  */
 export function enrollTEI(data, params, options, callback) {
   return state => {
-    options = expandReferences(options)(state);
-    if (options) options.operationName = 'enrollTEI';
-    else {
-      options = { operationName: 'enrollTEI' };
-    }
-    return create('enrollments', data, options, params, callback)(state);
+    const expandedOptions = expandAndSetOperation(options, state, 'enrollTEI');
+    return create(
+      'enrollments',
+      data,
+      expandedOptions,
+      params,
+      callback
+    )(state);
   };
 }
 
@@ -663,13 +662,19 @@ export function enrollTEI(data, params, options, callback) {
  */
 export function updateEnrollments(path, data, params, options, callback) {
   return state => {
-    options = expandReferences(options)(state);
-
-    if (options) options.operationName = 'updateEnrollments';
-    else {
-      options = { operationName: 'updateEnrollments' };
-    }
-    return update('enrollments', path, data, params, options, callback)(state);
+    const expandedOptions = expandAndSetOperation(
+      options,
+      state,
+      'updateEnrollments'
+    );
+    return update(
+      'enrollments',
+      path,
+      data,
+      params,
+      expandedOptions,
+      callback
+    )(state);
   };
 }
 
@@ -690,16 +695,22 @@ export function cancelEnrollment(enrollmentId, params, options, callback) {
   return state => {
     enrollmentId = expandReferences(enrollmentId)(state);
 
-    options = expandReferences(options)(state);
-
-    if (options) options.operationName = 'cancelEnrollment';
-    else {
-      options = { operationName: 'cancelEnrollment' };
-    }
-
     const path = `${enrollmentId}/cancelled`;
 
-    return update('enrollments', path, null, params, options, callback)(state);
+    const expandedOptions = expandAndSetOperation(
+      options,
+      state,
+      'cancelEnrollment'
+    );
+
+    return update(
+      'enrollments',
+      path,
+      null,
+      params,
+      expandedOptions,
+      callback
+    )(state);
   };
 }
 
@@ -720,16 +731,21 @@ export function completeEnrollment(enrollmentId, params, options, callback) {
   return state => {
     enrollmentId = expandReferences(enrollmentId)(state);
 
-    options = expandReferences(options)(state);
-
-    if (options) options.operationName = 'completeEnrollment';
-    else {
-      options = { operationName: 'completeEnrollment' };
-    }
-
     const path = `${enrollmentId}/completed`;
 
-    return update('enrollments', path, null, params, options, callback)(state);
+    const expandedOptions = expandAndSetOperation(
+      options,
+      state,
+      'enrollments'
+    );
+    return update(
+      'enrollments',
+      path,
+      null,
+      params,
+      expandedOptions,
+      callback
+    )(state);
   };
 }
 
@@ -748,14 +764,12 @@ export function completeEnrollment(enrollmentId, params, options, callback) {
  */
 export function getRelationships(params, options, callback) {
   return state => {
-    options = expandReferences(options)(state);
-
-    if (options) options.operationName = 'getRelationships';
-    else {
-      options = { operationName: 'getRelationships' };
-    }
-
-    return getData('relationships', params, options, callback)(state);
+    const expandedOptions = expandAndSetOperation(
+      options,
+      state,
+      'getRelationships'
+    );
+    return getData('relationships', params, expandedOptions, callback)(state);
   };
 }
 
@@ -779,14 +793,12 @@ export function getRelationships(params, options, callback) {
  */
 export function getDataValues(params, options, callback) {
   return state => {
-    options = expandReferences(options)(state);
-
-    if (options) options.operationName = 'getDataValues';
-    else {
-      options = { operationName: 'getDataValues' };
-    }
-
-    return getData('dataValueSets', params, options, callback)(state);
+    const expandedOptions = expandAndSetOperation(
+      options,
+      state,
+      'getDataValues'
+    );
+    return getData('dataValueSets', params, expandedOptions, callback)(state);
   };
 }
 
@@ -828,13 +840,18 @@ export function getDataValues(params, options, callback) {
  */
 export function createDataValues(data, options, params, callback) {
   return state => {
-    options = expandReferences(options)(state);
-
-    if (options) options.operationName = 'createDataValues';
-    else {
-      options = { operationName: 'createDataValues' };
-    }
-    return create('dataValueSets', data, options, params, callback)(state);
+    const expandedOptions = expandAndSetOperation(
+      options,
+      state,
+      'createDataValues'
+    );
+    return create(
+      'dataValueSets',
+      data,
+      expandedOptions,
+      params,
+      callback
+    )(state);
   };
 }
 
@@ -851,16 +868,16 @@ export function createDataValues(data, options, params, callback) {
  */
 export function generateDhis2UID(options, callback) {
   return state => {
-    options = expandReferences(options)(state);
-    if (options) options.operationName = 'generateDhis2UID';
-    else {
-      options = { operationName: 'generateDhis2UID' };
-    }
+    const expandedOptions = expandAndSetOperation(
+      options,
+      state,
+      'generateDhis2UID'
+    );
     const limit = { limit: options?.limit ?? 1 };
 
     delete options?.limit;
 
-    return getData('system/id', limit, options, callback)(state);
+    return getData('system/id', limit, expandedOptions, callback)(state);
   };
 }
 
@@ -981,13 +998,12 @@ export function discover(httpMethod, endpoint) {
  */
 export function getAnalytics(params, options, callback) {
   return state => {
-    options = expandReferences(options)(state);
-
-    if (options) options.operationName = 'getAnalytics';
-    else {
-      options = { operationName: 'getAnalytics' };
-    }
-    return getData(`analytics`, params, options, callback)(state);
+    const expandedOptions = expandAndSetOperation(
+      options,
+      state,
+      'getAnalytics'
+    );
+    return getData(`analytics`, params, expandedOptions, callback)(state);
   };
 }
 
