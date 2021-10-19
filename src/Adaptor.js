@@ -383,13 +383,12 @@ export function updateTEI(path, data, params, options, callback) {
  */
 export function getEvents(params, options, callback) {
   return state => {
-    options = expandReferences(options)(state);
+    options = {
+      ...expandReferences(options)(state),
+      operationName: 'getEvents',
+    };
 
-    if (options) options.operationName = 'getEvents';
-    else {
-      options = { operationName: 'getEvents' };
-    }
-    return getData('events', params, responseType, options, callback)(state);
+    return getData('events', params, options, callback)(state);
   };
 }
 
@@ -899,9 +898,8 @@ export function discover(httpMethod, endpoint) {
                     if (param.schema['$ref']) {
                       let schemaRefIndex =
                         param.schema['$ref'].lastIndexOf('/') + 1;
-                      let schemaRef = param.schema['$ref'].slice(
-                        schemaRefIndex
-                      );
+                      let schemaRef =
+                        param.schema['$ref'].slice(schemaRefIndex);
                       param.schema = tempData.components.schemas[schemaRef];
                     }
 
