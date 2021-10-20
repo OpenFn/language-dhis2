@@ -501,6 +501,106 @@
       "valid": true
     },
     {
+      "name": "createEvent",
+      "params": [
+        "data",
+        "params",
+        "options",
+        "callback"
+      ],
+      "docs": {
+        "description": "Create DHIS2 Events\n- You will need a `program` which can be looked up using the `getPrograms` operation, an `orgUnit` which can be looked up using the `getMetadata` operation and passing `{organisationUnits: true}` as `resources` param, and a list of `valid data element identifiers` which can be looked up using the `getMetadata` passing `{dataElements: true}` as `resources` param.\n- For events with registration, a `tracked entity instance identifier is required`\n- For sending `events` to `programs with multiple stages`, you will need to also include the `programStage` identifier, the identifiers for `programStages` can be found in the `programStages` resource via a call to `getMetadata` operation.",
+        "tags": [
+          {
+            "title": "public",
+            "description": null,
+            "type": null
+          },
+          {
+            "title": "function",
+            "description": null,
+            "name": null
+          },
+          {
+            "title": "param",
+            "description": "The payload containing new values",
+            "type": {
+              "type": "NameExpression",
+              "name": "Object"
+            },
+            "name": "data"
+          },
+          {
+            "title": "param",
+            "description": "Optional `import parameters` for events. E.g. `{dryRun: true, importStrategy: CREATE, filters:[]}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#events DHIS2 Event Import parameters documentation} or run `discover`. Defauls to `DHIS2 default import parameters`.",
+            "type": {
+              "type": "OptionalType",
+              "expression": {
+                "type": "NameExpression",
+                "name": "Object"
+              }
+            },
+            "name": "params"
+          },
+          {
+            "title": "param",
+            "description": "Optional `flags` for the behavior of the `createEvents` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`",
+            "type": {
+              "type": "OptionalType",
+              "expression": {
+                "type": "RecordType",
+                "fields": [
+                  {
+                    "type": "FieldType",
+                    "key": "apiVersion",
+                    "value": {
+                      "type": "NameExpression",
+                      "name": "number"
+                    }
+                  },
+                  {
+                    "type": "FieldType",
+                    "key": "responseType",
+                    "value": {
+                      "type": "NameExpression",
+                      "name": "string"
+                    }
+                  }
+                ]
+              }
+            },
+            "name": "options"
+          },
+          {
+            "title": "param",
+            "description": "Optional callback to handle the response",
+            "type": {
+              "type": "OptionalType",
+              "expression": {
+                "type": "NameExpression",
+                "name": "function"
+              }
+            },
+            "name": "callback"
+          },
+          {
+            "title": "returns",
+            "description": "state",
+            "type": {
+              "type": "NameExpression",
+              "name": "Operation"
+            }
+          },
+          {
+            "title": "example",
+            "description": "createEvents({\n  program: 'eBAyeGv0exc',\n  orgUnit: 'DiszpKrYNg8',\n  eventDate: date,\n  status: 'COMPLETED',\n  completedDate: date,\n  storedBy: 'admin',\n  coordinate: {\n    latitude: 59.8,\n    longitude: 10.9,\n  },\n  dataValues: [\n    {\n      dataElement: 'qrur9Dvnyt5',\n      value: '33',\n    },\n    {\n      dataElement: 'oZg33kd9taw',\n      value: 'Male',\n    },\n    {\n      dataElement: 'msodh3rEMJa',\n      value: date,\n    },\n  ],\n});",
+            "caption": "- Example `expression.js` of `createEvents` for a `single event` can look like this:"
+          }
+        ]
+      },
+      "valid": true
+    },
+    {
       "name": "createEvents",
       "params": [
         "data",
@@ -792,6 +892,106 @@
             "title": "example",
             "description": "getPrograms({ orgUnit: 'DiszpKrYNg8' , fields: '*' });",
             "caption": "- Query for `all programs` with a certain `organisation unit`"
+          }
+        ]
+      },
+      "valid": true
+    },
+    {
+      "name": "createProgram",
+      "params": [
+        "data",
+        "params",
+        "options",
+        "callback"
+      ],
+      "docs": {
+        "description": "Create a DHIS2 Tracker Program",
+        "tags": [
+          {
+            "title": "public",
+            "description": null,
+            "type": null
+          },
+          {
+            "title": "function",
+            "description": null,
+            "name": null
+          },
+          {
+            "title": "param",
+            "description": "The update data containing new values",
+            "type": {
+              "type": "NameExpression",
+              "name": "Object"
+            },
+            "name": "data"
+          },
+          {
+            "title": "param",
+            "description": "Optional `import` parameters for `createProgram`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`",
+            "type": {
+              "type": "OptionalType",
+              "expression": {
+                "type": "NameExpression",
+                "name": "Object"
+              }
+            },
+            "name": "params"
+          },
+          {
+            "title": "param",
+            "description": "Optional `flags` for the behavior of the `getPrograms` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`",
+            "type": {
+              "type": "OptionalType",
+              "expression": {
+                "type": "RecordType",
+                "fields": [
+                  {
+                    "type": "FieldType",
+                    "key": "apiVersion",
+                    "value": {
+                      "type": "NameExpression",
+                      "name": "number"
+                    }
+                  },
+                  {
+                    "type": "FieldType",
+                    "key": "responseType",
+                    "value": {
+                      "type": "NameExpression",
+                      "name": "string"
+                    }
+                  }
+                ]
+              }
+            },
+            "name": "options"
+          },
+          {
+            "title": "param",
+            "description": "Optional callback to handle the response",
+            "type": {
+              "type": "OptionalType",
+              "expression": {
+                "type": "NameExpression",
+                "name": "function"
+              }
+            },
+            "name": "callback"
+          },
+          {
+            "title": "returns",
+            "description": null,
+            "type": {
+              "type": "NameExpression",
+              "name": "Operation"
+            }
+          },
+          {
+            "title": "example",
+            "description": "createPrograms(state.data);",
+            "caption": "- Example `expression.js` of `createPrograms` for a `single program` can look like this:"
           }
         ]
       },
