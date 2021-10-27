@@ -381,7 +381,7 @@ export function getEvents(params, options, callback) {
 }
 
 /**
- * Create DHIS2 Events
+ * Create DHIS2 Event
  * - You will need a `program` which can be looked up using the `getPrograms` operation, an `orgUnit` which can be looked up using the `getMetadata` operation and passing `{organisationUnits: true}` as `resources` param, and a list of `valid data element identifiers` which can be looked up using the `getMetadata` passing `{dataElements: true}` as `resources` param.
  * - For events with registration, a `tracked entity instance identifier is required`
  * - For sending `events` to `programs with multiple stages`, you will need to also include the `programStage` identifier, the identifiers for `programStages` can be found in the `programStages` resource via a call to `getMetadata` operation.
@@ -392,8 +392,8 @@ export function getEvents(params, options, callback) {
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `createEvents` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation} state
- * @example <caption>- Example `expression.js` of `createEvents` for a `single event` can look like this:</caption>
- * createEvents({
+ * @example <caption>- Example `expression.js` of `createEvent` for a `single event` can look like this:</caption>
+ * createEvent({
  *   program: 'eBAyeGv0exc',
  *   orgUnit: 'DiszpKrYNg8',
  *   eventDate: date,
@@ -425,7 +425,7 @@ export function createEvent(data, params, options, callback) {
     const expandedOptions = expandAndSetOperation(
       options,
       state,
-      'createEvent'
+      'createEvents'
     );
     return create('events', data, params, expandedOptions, callback)(state);
   };
@@ -567,15 +567,15 @@ export function getPrograms(params, options, callback) {
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `getPrograms` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
- * @example <caption>- Example `expression.js` of `createPrograms` for a `single program` can look like this:</caption>
- * createPrograms(state.data);
+ * @example <caption>- Example `expression.js` of `createProgram` for a `single program` can look like this:</caption>
+ * createProgram(state.data);
  */
 export function createProgram(data, params, options, callback) {
   return state => {
     const expandedOptions = expandAndSetOperation(
       options,
       state,
-      'createProgram'
+      'createPrograms'
     );
     return create('programs', data, expandedOptions, params, callback)(state);
   };

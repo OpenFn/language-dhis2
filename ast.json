@@ -509,7 +509,7 @@
         "callback"
       ],
       "docs": {
-        "description": "Create DHIS2 Events\n- You will need a `program` which can be looked up using the `getPrograms` operation, an `orgUnit` which can be looked up using the `getMetadata` operation and passing `{organisationUnits: true}` as `resources` param, and a list of `valid data element identifiers` which can be looked up using the `getMetadata` passing `{dataElements: true}` as `resources` param.\n- For events with registration, a `tracked entity instance identifier is required`\n- For sending `events` to `programs with multiple stages`, you will need to also include the `programStage` identifier, the identifiers for `programStages` can be found in the `programStages` resource via a call to `getMetadata` operation.",
+        "description": "Create DHIS2 Event\n- You will need a `program` which can be looked up using the `getPrograms` operation, an `orgUnit` which can be looked up using the `getMetadata` operation and passing `{organisationUnits: true}` as `resources` param, and a list of `valid data element identifiers` which can be looked up using the `getMetadata` passing `{dataElements: true}` as `resources` param.\n- For events with registration, a `tracked entity instance identifier is required`\n- For sending `events` to `programs with multiple stages`, you will need to also include the `programStage` identifier, the identifiers for `programStages` can be found in the `programStages` resource via a call to `getMetadata` operation.",
         "tags": [
           {
             "title": "public",
@@ -593,8 +593,8 @@
           },
           {
             "title": "example",
-            "description": "createEvents({\n  program: 'eBAyeGv0exc',\n  orgUnit: 'DiszpKrYNg8',\n  eventDate: date,\n  status: 'COMPLETED',\n  completedDate: date,\n  storedBy: 'admin',\n  coordinate: {\n    latitude: 59.8,\n    longitude: 10.9,\n  },\n  dataValues: [\n    {\n      dataElement: 'qrur9Dvnyt5',\n      value: '33',\n    },\n    {\n      dataElement: 'oZg33kd9taw',\n      value: 'Male',\n    },\n    {\n      dataElement: 'msodh3rEMJa',\n      value: date,\n    },\n  ],\n});",
-            "caption": "- Example `expression.js` of `createEvents` for a `single event` can look like this:"
+            "description": "createEvent({\n  program: 'eBAyeGv0exc',\n  orgUnit: 'DiszpKrYNg8',\n  eventDate: date,\n  status: 'COMPLETED',\n  completedDate: date,\n  storedBy: 'admin',\n  coordinate: {\n    latitude: 59.8,\n    longitude: 10.9,\n  },\n  dataValues: [\n    {\n      dataElement: 'qrur9Dvnyt5',\n      value: '33',\n    },\n    {\n      dataElement: 'oZg33kd9taw',\n      value: 'Male',\n    },\n    {\n      dataElement: 'msodh3rEMJa',\n      value: date,\n    },\n  ],\n});",
+            "caption": "- Example `expression.js` of `createEvent` for a `single event` can look like this:"
           }
         ]
       },
@@ -990,8 +990,8 @@
           },
           {
             "title": "example",
-            "description": "createPrograms(state.data);",
-            "caption": "- Example `expression.js` of `createPrograms` for a `single program` can look like this:"
+            "description": "createProgram(state.data);",
+            "caption": "- Example `expression.js` of `createProgram` for a `single program` can look like this:"
           }
         ]
       },
