@@ -266,52 +266,77 @@ export function upsertTEI(uniqueAttributeId, data, options, callback) {
   };
 }
 
-/**
- * Create Tracked Entity Instance.
- * @public
- * @function
- * @param {Object} data - The update data containing new values.
- * @param {Object} [params] - Optional `import parameters` for a given a resource. E.g. `{dryRun: true, importStrategy: CREATE}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#import-parameters_1 DHIS2 Import parameters documentation} or run `discover`. Defauls to `DHIS2 default import parameters`.
- * @param {{apiVersion: number,responseType: string}} [options] - `Optional` options for `createTEI` operation. Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`.
- * @param {function} [callback] - Optional callback to handle the response.
- * @returns {Operation}
- * @example <caption>- Example `expression.js` of `createTEI`.</caption>
- * createTEI({
- *    orgUnit: 'TSyzvBiovKh',
- *    trackedEntityType: 'nEenWmSyUEp',
- *    attributes: [
- *       {
- *          attribute: 'lZGmxYbs97q',
- *          value: valUpsertTEI,
- *       },
- *       {
- *          attribute: 'w75KJ2mc4zz',
- *          value: 'Gigiwe',
- *       },
- *    ],
- *    enrollments: [
- *       {
- *          orgUnit: 'TSyzvBiovKh',
- *          program: 'fDd25txQckK',
- *          programState: 'lST1OZ5BDJ2',
- *          enrollmentDate: '2021-01-04',
- *          incidentDate: '2021-01-04',
- *       },
- *    ],
- * });
- */
-export function createTEI(data, params, options, callback) {
-  return state => {
-    const expandedOptions = expandAndSetOperation(options, state, 'createTEI');
-    return create(
-      'trackedEntityInstances',
-      data,
-      params,
-      expandedOptions,
-      callback
-    )(state);
-  };
-}
+// /**
+//  * Create Tracked Entity Instance.
+//  * @public
+//  * @function
+//  * @param {Object} data - The update data containing new values.
+//  * @param {Object} [params] - Optional `import parameters` for a given a resource. E.g. `{dryRun: true, importStrategy: CREATE}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#import-parameters_1 DHIS2 Import parameters documentation} or run `discover`. Defauls to `DHIS2 default import parameters`.
+//  * @param {{apiVersion: number,responseType: string}} [options] - `Optional` options for `createTEI` operation. Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`.
+//  * @param {function} [callback] - Optional callback to handle the response.
+//  * @returns {Operation}
+//  * @example <caption>- Example `expression.js` of `createTEI`.</caption>
+//  * createTEI({
+//  *    orgUnit: 'TSyzvBiovKh',
+//  *    trackedEntityType: 'nEenWmSyUEp',
+//  *    attributes: [
+//  *       {
+//  *          attribute: 'lZGmxYbs97q',
+//  *          value: valUpsertTEI,
+//  *       },
+//  *       {
+//  *          attribute: 'w75KJ2mc4zz',
+//  *          value: 'Gigiwe',
+//  *       },
+//  *    ],
+//  *    enrollments: [
+//  *       {
+//  *          orgUnit: 'TSyzvBiovKh',
+//  *          program: 'fDd25txQckK',
+//  *          programState: 'lST1OZ5BDJ2',
+//  *          enrollmentDate: '2021-01-04',
+//  *          incidentDate: '2021-01-04',
+//  *       },
+//  *    ],
+//  * });
+//  *
+//  * @example <caption>- Example 2 `expression.js` of `createTEI`.</caption>
+//  *  * createTEI({
+//  *    orgUnit: 'TSyzvBiovKh',
+//  *    trackedEntityType: 'nEenWmSyUEp',
+//  *    attributes: [
+//  *       {
+//  *          attribute: 'lZGmxYbs97q',
+//  *          value: valUpsertTEI,
+//  *       },
+//  *       {
+//  *          attribute: 'w75KJ2mc4zz',
+//  *          value: 'Gigiwe',
+//  *       },
+//  *    ],
+//  *    enrollments: [
+//  *       {
+//  *          orgUnit: 'TSyzvBiovKh',
+//  *          program: 'fDd25txQckK',
+//  *          programState: 'lST1OZ5BDJ2',
+//  *          enrollmentDate: '2021-01-04',
+//  *          incidentDate: '2021-01-04',
+//  *       },
+//  *    ],
+//  * });
+//  */
+// export function createTEI(data, params, options, callback) {
+//   return state => {
+//     const expandedOptions = expandAndSetOperation(options, state, 'createTEI');
+//     return create(
+//       'trackedEntityInstances',
+//       data,
+//       params,
+//       expandedOptions,
+//       callback
+//     )(state);
+//   };
+// }
 
 /**
  * Update a Tracked Entity Instance.
@@ -380,103 +405,63 @@ export function getEvents(params, options, callback) {
   };
 }
 
-/**
- * Create DHIS2 Event
- * - You will need a `program` which can be looked up using the `getPrograms` operation, an `orgUnit` which can be looked up using the `getMetadata` operation and passing `{organisationUnits: true}` as `resources` param, and a list of `valid data element identifiers` which can be looked up using the `getMetadata` passing `{dataElements: true}` as `resources` param.
- * - For events with registration, a `tracked entity instance identifier is required`
- * - For sending `events` to `programs with multiple stages`, you will need to also include the `programStage` identifier, the identifiers for `programStages` can be found in the `programStages` resource via a call to `getMetadata` operation.
- * @public
- * @function
- * @param {Object} data - The payload containing new values
- * @param {Object} [params] - Optional `import parameters` for events. E.g. `{dryRun: true, importStrategy: CREATE, filters:[]}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#events DHIS2 Event Import parameters documentation} or run `discover`. Defauls to `DHIS2 default import parameters`.
- * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `createEvents` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
- * @param {function} [callback] - Optional callback to handle the response
- * @returns {Operation} state
- * @example <caption>- Example `expression.js` of `createEvent` for a `single event` can look like this:</caption>
- * createEvent({
- *   program: 'eBAyeGv0exc',
- *   orgUnit: 'DiszpKrYNg8',
- *   eventDate: date,
- *   status: 'COMPLETED',
- *   completedDate: date,
- *   storedBy: 'admin',
- *   coordinate: {
- *     latitude: 59.8,
- *     longitude: 10.9,
- *   },
- *   dataValues: [
- *     {
- *       dataElement: 'qrur9Dvnyt5',
- *       value: '33',
- *     },
- *     {
- *       dataElement: 'oZg33kd9taw',
- *       value: 'Male',
- *     },
- *     {
- *       dataElement: 'msodh3rEMJa',
- *       value: date,
- *     },
- *   ],
- * });
- */
-export function createEvent(data, params, options, callback) {
-  return state => {
-    const expandedOptions = expandAndSetOperation(
-      options,
-      state,
-      'createEvents'
-    );
-    return create('events', data, params, expandedOptions, callback)(state);
-  };
-}
+// /**
+//  * Create DHIS2 Event
+//  * - You will need a `program` which can be looked up using the `getPrograms` operation, an `orgUnit` which can be looked up using the `getMetadata` operation and passing `{organisationUnits: true}` as `resources` param, and a list of `valid data element identifiers` which can be looked up using the `getMetadata` passing `{dataElements: true}` as `resources` param.
+//  * - For events with registration, a `tracked entity instance identifier is required`
+//  * - For sending `events` to `programs with multiple stages`, you will need to also include the `programStage` identifier, the identifiers for `programStages` can be found in the `programStages` resource via a call to `getMetadata` operation.
+//  * @public
+//  * @function
+//  * @param {Object} data - The payload containing new values
+//  * @param {Object} [params] - Optional `import parameters` for events. E.g. `{dryRun: true, importStrategy: CREATE, filters:[]}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#events DHIS2 Event Import parameters documentation} or run `discover`. Defauls to `DHIS2 default import parameters`.
+//  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `createEvents` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
+//  * @param {function} [callback] - Optional callback to handle the response
+//  * @returns {Operation} state
+//  * @example <caption>- Example `expression.js` of `createEvent` for a `single event` can look like this:</caption>
+//  * createEvent({
+//  *   program: 'eBAyeGv0exc',
+//  *   orgUnit: 'DiszpKrYNg8',
+//  *   eventDate: date,
+//  *   status: 'COMPLETED',
+//  *   completedDate: date,
+//  *   storedBy: 'admin',
+//  *   coordinate: {
+//  *     latitude: 59.8,
+//  *     longitude: 10.9,
+//  *   },
+//  *   dataValues: [
+//  *     {
+//  *       dataElement: 'qrur9Dvnyt5',
+//  *       value: '33',
+//  *     },
+//  *     {
+//  *       dataElement: 'oZg33kd9taw',
+//  *       value: 'Male',
+//  *     },
+//  *     {
+//  *       dataElement: 'msodh3rEMJa',
+//  *       value: date,
+//  *     },
+//  *   ],
+//  * });
+//  */
+// export function createEvent(data, params, options, callback) {
+//   return state => {
+//     const expandedOptions = expandAndSetOperation(
+//       options,
+//       state,
+//       'createEvents'
+//     );
+//     return create('events', data, params, expandedOptions, callback)(state);
+//   };
+// }
 
-/**
- * Create DHIS2 Events
- * - You will need a `program` which can be looked up using the `getPrograms` operation, an `orgUnit` which can be looked up using the `getMetadata` operation and passing `{organisationUnits: true}` as `resources` param, and a list of `valid data element identifiers` which can be looked up using the `getMetadata` passing `{dataElements: true}` as `resources` param.
- * - For events with registration, a `tracked entity instance identifier is required`
- * - For sending `events` to `programs with multiple stages`, you will need to also include the `programStage` identifier, the identifiers for `programStages` can be found in the `programStages` resource via a call to `getMetadata` operation.
- * @public
- * @function
- * @param {Object} data - The payload containing new values
- * @param {Object} [params] - Optional `import parameters` for events. E.g. `{dryRun: true, importStrategy: CREATE, filters:[]}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#events DHIS2 Event Import parameters documentation} or run `discover`. Defauls to `DHIS2 default import parameters`.
- * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `createEvents` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
- * @param {function} [callback] - Optional callback to handle the response
- * @returns {Operation} state
- * @example <caption>- Example `expression.js` of `createEvents` for a `single event` can look like this:</caption>
- * createEvents({
- *   program: 'eBAyeGv0exc',
- *   orgUnit: 'DiszpKrYNg8',
- *   eventDate: date,
- *   status: 'COMPLETED',
- *   completedDate: date,
- *   storedBy: 'admin',
- *   coordinate: {
- *     latitude: 59.8,
- *     longitude: 10.9,
- *   },
- *   dataValues: [
- *     {
- *       dataElement: 'qrur9Dvnyt5',
- *       value: '33',
- *     },
- *     {
- *       dataElement: 'oZg33kd9taw',
- *       value: 'Male',
- *     },
- *     {
- *       dataElement: 'msodh3rEMJa',
- *       value: date,
- *     },
- *   ],
- * });
- */
-export function createEvents(data, params, options, callback) {
-  console.warn(
-    'This function is deprecated, consider using createEvent(data, params, options, callback).'
-  );
-  return createEvent(data, params, options, callback);
-}
+// export function createEvents(data, params, options, callback) {
+//   console.warn(
+//     'This function is deprecated, consider using createEvent(data, params, options, callback).'
+//   );
+//   return createEvent(data, params, options, callback);
+// }
 
 /**
  * Update DHIS2 Event.
@@ -558,47 +543,47 @@ export function getPrograms(params, options, callback) {
   };
 }
 
-/**
- * Create a DHIS2 Tracker Program
- * @public
- * @function
- * @param {Object} data - The update data containing new values
- * @param {Object} [params] - Optional `import` parameters for `createProgram`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
- * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `getPrograms` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
- * @param {function} [callback] - Optional callback to handle the response
- * @returns {Operation}
- * @example <caption>- Example `expression.js` of `createProgram` for a `single program` can look like this:</caption>
- * createProgram(state.data);
- */
-export function createProgram(data, params, options, callback) {
-  return state => {
-    const expandedOptions = expandAndSetOperation(
-      options,
-      state,
-      'createPrograms'
-    );
-    return create('programs', data, expandedOptions, params, callback)(state);
-  };
-}
+// /**
+//  * Create a DHIS2 Tracker Program
+//  * @public
+//  * @function
+//  * @param {Object} data - The update data containing new values
+//  * @param {Object} [params] - Optional `import` parameters for `createProgram`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+//  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `getPrograms` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
+//  * @param {function} [callback] - Optional callback to handle the response
+//  * @returns {Operation}
+//  * @example <caption>- Example `expression.js` of `createProgram` for a `single program` can look like this:</caption>
+//  * createProgram(state.data);
+//  */
+// export function createProgram(data, params, options, callback) {
+//   return state => {
+//     const expandedOptions = expandAndSetOperation(
+//       options,
+//       state,
+//       'createPrograms'
+//     );
+//     return create('programs', data, expandedOptions, params, callback)(state);
+//   };
+// }
 
-/**
- * Create a DHIS2 Tracker Program
- * @public
- * @function
- * @param {Object} data - The update data containing new values
- * @param {Object} [params] - Optional `import` parameters for `createPrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
- * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `getPrograms` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
- * @param {function} [callback] - Optional callback to handle the response
- * @returns {Operation}
- * @example <caption>- Example `expression.js` of `createPrograms` for a `single program` can look like this:</caption>
- * createPrograms(state.data);
- */
-export function createPrograms(data, params, options, callback) {
-  console.warn(
-    'This function is deprecated, consider using createProgram(data, params, options, callback).'
-  );
-  return createProgram(data, params, options, callback);
-}
+// /**
+//  * Create a DHIS2 Tracker Program
+//  * @public
+//  * @function
+//  * @param {Object} data - The update data containing new values
+//  * @param {Object} [params] - Optional `import` parameters for `createPrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
+//  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `getPrograms` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
+//  * @param {function} [callback] - Optional callback to handle the response
+//  * @returns {Operation}
+//  * @example <caption>- Example `expression.js` of `createPrograms` for a `single program` can look like this:</caption>
+//  * createPrograms(state.data);
+//  */
+// export function createPrograms(data, params, options, callback) {
+//   console.warn(
+//     'This function is deprecated, consider using createProgram(data, params, options, callback).'
+//   );
+//   return createProgram(data, params, options, callback);
+// }
 
 /**
  * Update DHIS2 Tracker Programs
@@ -868,58 +853,58 @@ export function getDataValues(params, options, callback) {
   };
 }
 
-/**
- * Create DHIS2 Data Values
- * - This is used to send aggregated data to DHIS2
- * - A data value set represents a set of data values which have a relationship, usually from being captured off the same data entry form.
- * - To send a set of related data values sharing the same period and organisation unit, we need to identify the period, the data set, the org unit (facility) and the data elements for which to report.
- * - You can also use this operation to send large bulks of data values which don't necessarily are logically related.
- * - To send data values that are not linked to a `dataSet`, you do not need to specify the dataSet and completeDate attributes. Instead, you will specify the period and orgUnit attributes on the individual data value elements instead of on the outer data value set element. This will enable us to send data values for various periods and organisation units
- * @public
- * @function
- * @param {object} data - The `data values` to upload or create. See example shape.
- * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `createDataVaues` operation.
- * @param {object} [params] - Optional `import` parameters for `createDataValues`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`. Run `discover` or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#data-values DHIS2 Docs API} to learn about available data values import parameters.
- * @param {function} [callback] - Optional callback to handle the response
- * @returns {Operation}
- * @example <caption>- Example `expression.js` of `createDataValues`  for sending a set of related data values sharing the same period and organisation unit</caption>
- * createDataValues({
- *   dataSet: 'pBOMPrpg1QX',
- *   completeDate: '2014-02-03',
- *   period: '201401',
- *   orgUnit: 'DiszpKrYNg8',
- *   dataValues: [
- *     {
- *       dataElement: 'f7n9E0hX8qk',
- *       value: '1',
- *     },
- *     {
- *       dataElement: 'Ix2HsbDMLea',
- *       value: '2',
- *     },
- *     {
- *       dataElement: 'eY5ehpbEsB7',
- *       value: '3',
- *     },
- *   ],
- * });
- */
-export function createDataValues(data, options, params, callback) {
-  return state => {
-    const expandedOptions = expandAndSetOperation(
-      options,
-      state,
-      'createDataValues'
-    );
-    return create(
-      'dataValueSets',
-      data,
-      expandedOptions,
-      params,
-      callback
-    )(state);
-  };
-}
+// /**
+//  * Create DHIS2 Data Values
+//  * - This is used to send aggregated data to DHIS2
+//  * - A data value set represents a set of data values which have a relationship, usually from being captured off the same data entry form.
+//  * - To send a set of related data values sharing the same period and organisation unit, we need to identify the period, the data set, the org unit (facility) and the data elements for which to report.
+//  * - You can also use this operation to send large bulks of data values which don't necessarily are logically related.
+//  * - To send data values that are not linked to a `dataSet`, you do not need to specify the dataSet and completeDate attributes. Instead, you will specify the period and orgUnit attributes on the individual data value elements instead of on the outer data value set element. This will enable us to send data values for various periods and organisation units
+//  * @public
+//  * @function
+//  * @param {object} data - The `data values` to upload or create. See example shape.
+//  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `createDataVaues` operation.
+//  * @param {object} [params] - Optional `import` parameters for `createDataValues`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`. Run `discover` or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#data-values DHIS2 Docs API} to learn about available data values import parameters.
+//  * @param {function} [callback] - Optional callback to handle the response
+//  * @returns {Operation}
+//  * @example <caption>- Example `expression.js` of `createDataValues`  for sending a set of related data values sharing the same period and organisation unit</caption>
+//  * createDataValues({
+//  *   dataSet: 'pBOMPrpg1QX',
+//  *   completeDate: '2014-02-03',
+//  *   period: '201401',
+//  *   orgUnit: 'DiszpKrYNg8',
+//  *   dataValues: [
+//  *     {
+//  *       dataElement: 'f7n9E0hX8qk',
+//  *       value: '1',
+//  *     },
+//  *     {
+//  *       dataElement: 'Ix2HsbDMLea',
+//  *       value: '2',
+//  *     },
+//  *     {
+//  *       dataElement: 'eY5ehpbEsB7',
+//  *       value: '3',
+//  *     },
+//  *   ],
+//  * });
+//  */
+// export function createDataValues(data, options, params, callback) {
+//   return state => {
+//     const expandedOptions = expandAndSetOperation(
+//       options,
+//       state,
+//       'createDataValues'
+//     );
+//     return create(
+//       'dataValueSets',
+//       data,
+//       expandedOptions,
+//       params,
+//       callback
+//     )(state);
+//   };
+// }
 
 /**
  * Generate valid, random DHIS2 identifiers
@@ -981,8 +966,9 @@ export function discover(httpMethod, endpoint) {
                     if (param.schema['$ref']) {
                       let schemaRefIndex =
                         param.schema['$ref'].lastIndexOf('/') + 1;
-                      let schemaRef =
-                        param.schema['$ref'].slice(schemaRefIndex);
+                      let schemaRef = param.schema['$ref'].slice(
+                        schemaRefIndex
+                      );
                       param.schema = tempData.components.schemas[schemaRef];
                     }
 
@@ -1402,6 +1388,9 @@ export function getMetadata(resources, params, options, callback) {
   };
 }
 
+const isArray = variable => !!variable && variable.constructor === Array;
+const isObject = variable => !!variable && variable.constructor === Object;
+
 /**
  * create data. A generic helper method to create a record of any kind in DHIS2
  * @public
@@ -1412,7 +1401,7 @@ export function getMetadata(resources, params, options, callback) {
  * @param {Object} [params] - Optional `import parameters` for a given a resource. E.g. `{dryRun: true, importStrategy: CREATE}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 API documentation} or {@link discover}. Defauls to `DHIS2 default params` for a given resource type.
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
- * @example <caption>- Example `expression.js` of `create`</caption>
+ * @example <caption>- Example `expression.js` of `create` for a single event</caption>
  * create('events', {
  *   program: 'eBAyeGv0exc',
  *   orgUnit: 'DiszpKrYNg8',
@@ -1439,12 +1428,95 @@ export function getMetadata(resources, params, options, callback) {
  *     },
  *   ],
  * });
+ *
+ * * @example <caption>- Example `expression.js` of `create` for multiple `events`</caption>
+ * create('events', [{
+ *   program: 'eBAyeGv0exc',
+ *   orgUnit: 'DiszpKrYNg8',
+ *   eventDate: date,
+ *   status: 'COMPLETED',
+ *   completedDate: date,
+ *   storedBy: 'admin',
+ *   coordinate: {
+ *     latitude: 59.8,
+ *     longitude: 10.9,
+ *   },
+ *   dataValues: [
+ *     {
+ *       dataElement: 'qrur9Dvnyt5',
+ *       value: '33',
+ *     },
+ *     {
+ *       dataElement: 'oZg33kd9taw',
+ *       value: 'Male',
+ *     },
+ *     {
+ *       dataElement: 'msodh3rEMJa',
+ *       value: date,
+ *     },
+ *   ],
+ * }]);
+ *
+ * * @example <caption>- Example `expression.js` of `create` for multiple `trackedEntityInstances`</caption>
+ * create('trackedEntityInstances', [
+ *  {
+ *    orgUnit: 'TSyzvBiovKh',
+ *    trackedEntityType: 'nEenWmSyUEp',
+ *    attributes: [
+ *      {
+ *        attribute: 'w75KJ2mc4zz',
+ *        value: 'Gigiwe',
+ *      },
+ *    ],
+ *    enrollments: [
+ *      {
+ *        orgUnit: 'TSyzvBiovKh',
+ *        program: 'fDd25txQckK',
+ *        programState: 'lST1OZ5BDJ2',
+ *        enrollmentDate: '2021-01-04',
+ *        incidentDate: '2021-01-04',
+ *      },
+ *    ],
+ *  },
+ * ])
+ *
+ * * @example <caption>- Example `expression.js` of `create` for a single `trackedEntityInstances`</caption>
+ * create('trackedEntityInstances', {
+ *    orgUnit: 'TSyzvBiovKh',
+ *    trackedEntityType: 'nEenWmSyUEp',
+ *    attributes: [
+ *      {
+ *        attribute: 'w75KJ2mc4zz',
+ *        value: 'Gigiwe',
+ *      },
+ *    ],
+ *    enrollments: [
+ *      {
+ *        orgUnit: 'TSyzvBiovKh',
+ *        program: 'fDd25txQckK',
+ *        programState: 'lST1OZ5BDJ2',
+ *        enrollmentDate: '2021-01-04',
+ *        incidentDate: '2021-01-04',
+ *      },
+ *    ],
+ *  })
  */
 export function create(resourceType, data, options, params, callback) {
   return state => {
+    const data_ =
+      [
+        'events',
+        'programs',
+        'trackedEntityInstances',
+        'enrollments',
+        'dataValueSets',
+      ].includes(resourceType) && isArray(data)
+        ? { [resourceType]: data }
+        : data;
+
     resourceType = expandReferences(resourceType)(state);
 
-    const body = expandReferences(data)(state);
+    const body = expandReferences(data_)(state);
 
     options = expandReferences(options)(state);
 
@@ -1531,6 +1603,11 @@ export function create(resourceType, data, options, params, callback) {
  */
 export function update(resourceType, path, data, params, options, callback) {
   return state => {
+    if (!isObject(data)) {
+      console.log('Data must be an object');
+      return state;
+    }
+
     resourceType = expandReferences(resourceType)(state);
 
     path = expandReferences(path)(state);
