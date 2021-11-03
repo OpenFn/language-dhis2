@@ -1480,7 +1480,7 @@ const isObject = variable => !!variable && variable.constructor === Object;
  *  },
  * ])
  *
- * * @example <caption>- Example `expression.js` of `create` for a single `trackedEntityInstances`</caption>
+ * * @example <caption>- Example `expression.js` of `create` for a single `trackedEntityInstance`</caption>
  * create('trackedEntityInstances', {
  *    orgUnit: 'TSyzvBiovKh',
  *    trackedEntityType: 'nEenWmSyUEp',
@@ -1503,7 +1503,7 @@ const isObject = variable => !!variable && variable.constructor === Object;
  */
 export function create(resourceType, data, options, params, callback) {
   return state => {
-    const data_ =
+    const preparedData =
       [
         'events',
         'programs',
@@ -1516,7 +1516,7 @@ export function create(resourceType, data, options, params, callback) {
 
     resourceType = expandReferences(resourceType)(state);
 
-    const body = expandReferences(data_)(state);
+    const body = expandReferences(preparedData)(state);
 
     options = expandReferences(options)(state);
 
@@ -1604,7 +1604,7 @@ export function create(resourceType, data, options, params, callback) {
 export function update(resourceType, path, data, params, options, callback) {
   return state => {
     if (!isObject(data)) {
-      console.log('Data must be an object');
+      console.warn('Data must be an object');
       return state;
     }
 
