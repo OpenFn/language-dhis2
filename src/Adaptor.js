@@ -1429,127 +1429,53 @@ const isObject = variable => !!variable && variable.constructor === Object;
  *   ],
  * });
  *
- * * @example <caption>- Example `expression.js` of `create` for multiple `events`</caption>
- * create('events', [{
- *   program: 'eBAyeGv0exc',
- *   orgUnit: 'DiszpKrYNg8',
- *   eventDate: date,
- *   status: 'COMPLETED',
- *   completedDate: date,
- *   storedBy: 'admin',
- *   coordinate: {
- *     latitude: 59.8,
- *     longitude: 10.9,
- *   },
- *   dataValues: [
+ * @example <caption>- Example `expression.js` of `create` for a single `trackedEntityInstance`</caption>
+ * create('trackedEntityInstances', {
+ *   orgUnit: 'TSyzvBiovKh',
+ *   trackedEntityType: 'nEenWmSyUEp',
+ *   attributes: [
  *     {
- *       dataElement: 'qrur9Dvnyt5',
- *       value: '33',
- *     },
- *     {
- *       dataElement: 'oZg33kd9taw',
- *       value: 'Male',
- *     },
- *     {
- *       dataElement: 'msodh3rEMJa',
- *       value: date,
+ *       attribute: 'w75KJ2mc4zz',
+ *       value: 'Gigiwe',
  *     },
  *   ],
- * }]);
- *
- * * @example <caption>- Example `expression.js` of `create` for multiple `trackedEntityInstances`</caption>
- * create('trackedEntityInstances', [
- *  {
- *    orgUnit: 'TSyzvBiovKh',
- *    trackedEntityType: 'nEenWmSyUEp',
- *    attributes: [
- *      {
- *        attribute: 'w75KJ2mc4zz',
- *        value: 'Gigiwe',
- *      },
- *    ],
- *    enrollments: [
- *      {
- *        orgUnit: 'TSyzvBiovKh',
- *        program: 'fDd25txQckK',
- *        programState: 'lST1OZ5BDJ2',
- *        enrollmentDate: '2021-01-04',
- *        incidentDate: '2021-01-04',
- *      },
- *    ],
- *  },
- * ])
- *
- * * @example <caption>- Example `expression.js` of `create` for a single `trackedEntityInstance`</caption>
- * create('trackedEntityInstances', {
- *    orgUnit: 'TSyzvBiovKh',
- *    trackedEntityType: 'nEenWmSyUEp',
- *    attributes: [
- *      {
- *        attribute: 'w75KJ2mc4zz',
- *        value: 'Gigiwe',
- *      },
- *    ],
- *    enrollments: [
- *      {
- *        orgUnit: 'TSyzvBiovKh',
- *        program: 'fDd25txQckK',
- *        programState: 'lST1OZ5BDJ2',
- *        enrollmentDate: '2021-01-04',
- *        incidentDate: '2021-01-04',
- *      },
- *    ],
- *  })
+ *   enrollments: [
+ *     {
+ *       orgUnit: 'TSyzvBiovKh',
+ *       program: 'fDd25txQckK',
+ *       programState: 'lST1OZ5BDJ2',
+ *       enrollmentDate: '2021-01-04',
+ *       incidentDate: '2021-01-04',
+ *     },
+ *   ],
+ * })
  */
 export function create(resourceType, data, options, params, callback) {
   return state => {
-    const preparedData =
-      [
-        'events',
-        'programs',
-        'trackedEntityInstances',
-        'enrollments',
-        'dataValueSets',
-      ].includes(resourceType) && isArray(data)
-        ? { [resourceType]: data }
-        : data;
-
-    resourceType = expandReferences(resourceType)(state);
-
+    const preparedData = isArray(data) ? { [resourceType]: data } : data;
     const body = expandReferences(preparedData)(state);
 
-    options = expandReferences(options)(state);
+    const expandedResourceType = expandReferences(resourceType)(state);
+    const expandedOptions = expandReferences(options)(state);
+    const expandedParams = expandReferences(params)(state);
 
-    params = expandReferences(params)(state);
-
-    const operationName = options?.operationName ?? 'create';
-
+    const operationName = expandedOptions?.operationName ?? 'create';
     const { username, password, hostUrl } = state.configuration;
-
-    const responseType = options?.responseType ?? 'json';
-
-    const filters = params?.filters;
-
-    delete params?.filters;
-
-    let queryParams = new URLSearchParams(params);
-
-    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
-
-    const url = buildUrl('/' + resourceType, hostUrl, apiVersion);
-
+    const responseType = expandedOptions?.responseType ?? 'json';
+    delete expandedParams?.filters;
+    const queryParams = new URLSearchParams(expandedParams);
+    const apiVersion =
+      expandedOptions?.apiVersion ?? state.configuration.apiVersion;
+    const url = buildUrl('/' + expandedResourceType, hostUrl, apiVersion);
     const headers = {
       Accept: CONTENT_TYPES[responseType] ?? 'application/json',
       'Content-Type': 'application/json',
     };
 
     logOperation(operationName);
-
     logApiVersion(apiVersion);
-
     logWaitingForServer(url, queryParams);
-
-    warnExpectLargeResult(resourceType, url);
+    warnExpectLargeResult(expandedResourceType, url);
 
     return axios
       .request({
@@ -1565,7 +1491,7 @@ export function create(resourceType, data, options, params, callback) {
       })
       .then(result => {
         Log.info(
-          `${operationName} succeeded. Created ${resourceType}: ${
+          `${operationName} succeeded. Created ${expandedResourceType}: ${
             result.data.response?.importSummaries
               ? result.data.response.importSummaries[0].href
               : result.data.response?.reference
