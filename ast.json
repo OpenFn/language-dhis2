@@ -1,6 +1,124 @@
 {
   "operations": [
     {
+      "name": "create",
+      "params": [
+        "resourceType",
+        "data",
+        "options",
+        "params",
+        "callback"
+      ],
+      "docs": {
+        "description": "A generic helper method to create a record of any kind in DHIS2",
+        "tags": [
+          {
+            "title": "public",
+            "description": null,
+            "type": null
+          },
+          {
+            "title": "function",
+            "description": null,
+            "name": null
+          },
+          {
+            "title": "param",
+            "description": "Type of resource to create. E.g. `trackedEntityInstances`, `programs`, `events`, ...",
+            "type": {
+              "type": "NameExpression",
+              "name": "string"
+            },
+            "name": "resourceType"
+          },
+          {
+            "title": "param",
+            "description": "Data that will be used to create a given instance of resource. To create a single instance of a resource, `data` must be a javascript object, and to create multiple instances of a resources, `data` must be an array of javascript objects.",
+            "type": {
+              "type": "NameExpression",
+              "name": "Object"
+            },
+            "name": "data"
+          },
+          {
+            "title": "param",
+            "description": "Optional `options` to control the behavior of the `create` operation.` Defaults to `{operationName: 'create', apiVersion: null, responseType: 'json'}`",
+            "type": {
+              "type": "OptionalType",
+              "expression": {
+                "type": "NameExpression",
+                "name": "Object"
+              }
+            },
+            "name": "options"
+          },
+          {
+            "title": "param",
+            "description": "Optional `import parameters` for a given a resource. E.g. `{dryRun: true, importStrategy: CREATE}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 API documentation} or {@link discover}. Defauls to `DHIS2 default params` for a given resource type.",
+            "type": {
+              "type": "OptionalType",
+              "expression": {
+                "type": "NameExpression",
+                "name": "Object"
+              }
+            },
+            "name": "params"
+          },
+          {
+            "title": "param",
+            "description": "Optional callback to handle the response",
+            "type": {
+              "type": "OptionalType",
+              "expression": {
+                "type": "NameExpression",
+                "name": "function"
+              }
+            },
+            "name": "callback"
+          },
+          {
+            "title": "returns",
+            "description": null,
+            "type": {
+              "type": "NameExpression",
+              "name": "Operation"
+            }
+          },
+          {
+            "title": "example",
+            "description": "create('programs', {\n  name: 'name 20',\n  shortName: 'n20',\n  programType: 'WITHOUT_REGISTRATION',\n});",
+            "caption": "- Example 'expression.js` of `create` for a single program"
+          },
+          {
+            "title": "example",
+            "description": "create('events', {\n  program: 'eBAyeGv0exc',\n  orgUnit: 'DiszpKrYNg8',\n  status: 'COMPLETED',\n});",
+            "caption": "- Example `expression.js` of `create` for a single event"
+          },
+          {
+            "title": "example",
+            "description": "create('trackedEntityInstances', {\n  orgUnit: 'TSyzvBiovKh',\n  trackedEntityType: 'nEenWmSyUEp',\n  attributes: [\n    {\n      attribute: 'w75KJ2mc4zz',\n      value: 'Gigiwe',\n    },\n  ]\n});",
+            "caption": "- Example `expression.js` of `create` for a single `trackedEntityInstance`"
+          },
+          {
+            "title": "example",
+            "description": "create('dataValueSets', {\n  dataElement: 'f7n9E0hX8qk',\n  period: '201401',\n  orgUnit: 'DiszpKrYNg8',\n  value: '12',\n});",
+            "caption": "- Example `expression.js` of `create` for a single `dataValueSets`"
+          },
+          {
+            "title": "example",
+            "description": "create('dataValueSets', {\n  dataSet: 'pBOMPrpg1QX',\n  completeDate: '2014-02-03',\n  period: '201401',\n  orgUnit: 'DiszpKrYNg8',\n  dataValues: [\n    {\n      dataElement: 'f7n9E0hX8qk',\n      value: '1',\n    },\n    {\n      dataElement: 'Ix2HsbDMLea',\n      value: '2',\n    },\n    {\n      dataElement: 'eY5ehpbEsB7',\n      value: '3',\n    },\n  ],\n});",
+            "caption": "- Example `expression.js` of `create` for `dataValueSets` for sending a set of related data values sharing the same period and organisation unit"
+          },
+          {
+            "title": "example",
+            "description": "create('enrollments', {\n  trackedEntity: 'IeQfgUtGPq2',\n  orgUnit: 'TSyzvBiovKh',\n  enrollments: [\n    {\n      orgUnit: 'TSyzvBiovKh',\n      program: 'IpHINAT79UW',\n      enrollmentDate: '2013-09-17',\n      incidentDate: '2013-09-17',\n    },\n  ],\n});",
+            "caption": "- Example `expression.js` of `create` for a single `enrollment` of a `trackedEntityInstance` into a `program`"
+          }
+        ]
+      },
+      "valid": true
+    },
+    {
       "name": "getTEIs",
       "params": [
         "params",
@@ -789,106 +907,6 @@
             "title": "example",
             "description": "getEnrollments({\n  ou: 'O6uvpzGd5pu',\n  ouMode: 'DESCENDANTS',\n  program: 'ur1Edk5Oe2n',\n  fields: '*',\n});",
             "caption": "- To constrain the response to `enrollments` which are part of a `specific program` you can include a `program query parameter`"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "enrollTEI",
-      "params": [
-        "data",
-        "params",
-        "options",
-        "callback"
-      ],
-      "docs": {
-        "description": "Enroll a TEI into a program\n- Enrolling a tracked entity instance into a program\n- For enrolling `persons` into a `program`, you will need to first get the `identifier of the person` from the `trackedEntityInstances resource` via the `getTEIs` operation.\n- Then, you will need to get the `program identifier` from the `programs` resource via the `getPrograms` operation.",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "The enrollment data. See example {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#enrollment-management here }",
-            "type": {
-              "type": "NameExpression",
-              "name": "Object"
-            },
-            "name": "data"
-          },
-          {
-            "title": "param",
-            "description": "Optional `import` parameters for `createEnrollment`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "Optional `flags` for the behavior of the `enrollTEI` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Optional callback to handle the response",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "enrollTEI({\n   trackedEntity: 'tracked-entity-id',\n   orgUnit: 'org-unit-id',\n   attributes: [\n   {\n      attribute: 'attribute-id',\n      value: 'attribute-value',\n   },\n   ],\n   enrollments: [\n   {\n      orgUnit: 'org-unit-id',\n      program: 'program-id',\n      enrollmentDate: '2013-09-17',\n      incidentDate: '2013-09-17',\n   },\n   ],\n});",
-            "caption": "- Example `expression.js` of `createEnrollment` of a `person` into a `program` can look like this:"
           }
         ]
       },
@@ -2019,99 +2037,6 @@
             "title": "example",
             "description": "getMetadata(['dataElements', 'indicators'], {\n     filters: ['name:like:ANC'],\n});",
             "caption": "Example getting a list of `data elements` and `indicators` where `name` includes the word **ANC**"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "create",
-      "params": [
-        "resourceType",
-        "data",
-        "options",
-        "params",
-        "callback"
-      ],
-      "docs": {
-        "description": "create data. A generic helper method to create a record of any kind in DHIS2",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "Type of resource to create. E.g. `trackedEntityInstances`",
-            "type": {
-              "type": "NameExpression",
-              "name": "string"
-            },
-            "name": "resourceType"
-          },
-          {
-            "title": "param",
-            "description": "Data that will be used to create a given instance of resource",
-            "type": {
-              "type": "NameExpression",
-              "name": "Object"
-            },
-            "name": "data"
-          },
-          {
-            "title": "param",
-            "description": "Optional `options` to control the behavior of the `create` operation.` Defaults to `{operationName: 'create', apiVersion: null, responseType: 'json'}`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Optional `import parameters` for a given a resource. E.g. `{dryRun: true, importStrategy: CREATE}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 API documentation} or {@link discover}. Defauls to `DHIS2 default params` for a given resource type.",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "Optional callback to handle the response",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "create('events', {\n  program: 'eBAyeGv0exc',\n  orgUnit: 'DiszpKrYNg8',\n  eventDate: date,\n  status: 'COMPLETED',\n  completedDate: date,\n  storedBy: 'admin',\n  coordinate: {\n    latitude: 59.8,\n    longitude: 10.9,\n  },\n  dataValues: [\n    {\n      dataElement: 'qrur9Dvnyt5',\n      value: '33',\n    },\n    {\n      dataElement: 'oZg33kd9taw',\n      value: 'Male',\n    },\n    {\n      dataElement: 'msodh3rEMJa',\n      value: date,\n    },\n  ],\n});\n\n* @example <caption>- Example `expression.js` of `create` for multiple `events`</caption>\ncreate('events', [{\n  program: 'eBAyeGv0exc',\n  orgUnit: 'DiszpKrYNg8',\n  eventDate: date,\n  status: 'COMPLETED',\n  completedDate: date,\n  storedBy: 'admin',\n  coordinate: {\n    latitude: 59.8,\n    longitude: 10.9,\n  },\n  dataValues: [\n    {\n      dataElement: 'qrur9Dvnyt5',\n      value: '33',\n    },\n    {\n      dataElement: 'oZg33kd9taw',\n      value: 'Male',\n    },\n    {\n      dataElement: 'msodh3rEMJa',\n      value: date,\n    },\n  ],\n}]);\n\n* @example <caption>- Example `expression.js` of `create` for multiple `trackedEntityInstances`</caption>\ncreate('trackedEntityInstances', [\n {\n   orgUnit: 'TSyzvBiovKh',\n   trackedEntityType: 'nEenWmSyUEp',\n   attributes: [\n     {\n       attribute: 'w75KJ2mc4zz',\n       value: 'Gigiwe',\n     },\n   ],\n   enrollments: [\n     {\n       orgUnit: 'TSyzvBiovKh',\n       program: 'fDd25txQckK',\n       programState: 'lST1OZ5BDJ2',\n       enrollmentDate: '2021-01-04',\n       incidentDate: '2021-01-04',\n     },\n   ],\n },\n])\n\n* @example <caption>- Example `expression.js` of `create` for a single `trackedEntityInstance`</caption>\ncreate('trackedEntityInstances', {\n   orgUnit: 'TSyzvBiovKh',\n   trackedEntityType: 'nEenWmSyUEp',\n   attributes: [\n     {\n       attribute: 'w75KJ2mc4zz',\n       value: 'Gigiwe',\n     },\n   ],\n   enrollments: [\n     {\n       orgUnit: 'TSyzvBiovKh',\n       program: 'fDd25txQckK',\n       programState: 'lST1OZ5BDJ2',\n       enrollmentDate: '2021-01-04',\n       incidentDate: '2021-01-04',\n     },\n   ],\n })",
-            "caption": "- Example `expression.js` of `create` for a single event"
           }
         ]
       },
