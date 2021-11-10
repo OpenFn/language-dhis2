@@ -186,16 +186,11 @@ const isObject = variable => !!variable && variable.constructor === Object;
  *
  * @example <caption>- Example `expression.js` of `create` for a single `enrollment` of a `trackedEntityInstance` into a `program`</caption>
  * create('enrollments', {
- *   trackedEntity: 'IeQfgUtGPq2',
+ *   trackedEntityInstance: 'bmshzEacgxa',
  *   orgUnit: 'TSyzvBiovKh',
- *   enrollments: [
- *     {
- *       orgUnit: 'TSyzvBiovKh',
- *       program: 'IpHINAT79UW',
- *       enrollmentDate: '2013-09-17',
- *       incidentDate: '2013-09-17',
- *     },
- *   ],
+ *   program: 'gZBxv9Ujxg0',
+ *   enrollmentDate: '2013-09-17',
+ *   incidentDate: '2013-09-17',
  * });
  */
 export function create(resourceType, data, options, params, callback) {
@@ -205,8 +200,10 @@ export function create(resourceType, data, options, params, callback) {
       return state;
     }
 
-    const preparedData = isArray(data) ? { [resourceType]: data } : data;
-    const body = expandReferences(preparedData)(state);
+    const expandedData = expandReferences(data)(state);
+    const body = isArray(expandedData)
+      ? { [resourceType]: expandedData }
+      : expandedData;
 
     const expandedResourceType = expandReferences(resourceType)(state);
     const expandedOptions = expandReferences(options)(state);
@@ -229,14 +226,6 @@ export function create(resourceType, data, options, params, callback) {
     logApiVersion(apiVersion);
     logWaitingForServer(url, queryParams);
     warnExpectLargeResult(expandedResourceType, url);
-
-    console.log(
-      'debugging for taylor and elias',
-      url,
-      queryParams,
-      body,
-      headers
-    );
 
     return axios
       .request({

@@ -111,7 +111,7 @@
           },
           {
             "title": "example",
-            "description": "create('enrollments', {\n  trackedEntity: 'IeQfgUtGPq2',\n  orgUnit: 'TSyzvBiovKh',\n  enrollments: [\n    {\n      orgUnit: 'TSyzvBiovKh',\n      program: 'IpHINAT79UW',\n      enrollmentDate: '2013-09-17',\n      incidentDate: '2013-09-17',\n    },\n  ],\n});",
+            "description": "create('enrollments', {\n  trackedEntityInstance: 'bmshzEacgxa',\n  orgUnit: 'TSyzvBiovKh',\n  program: 'gZBxv9Ujxg0',\n  enrollmentDate: '2013-09-17',\n  incidentDate: '2013-09-17',\n});",
             "caption": "- Example `expression.js` of `create` for a single `enrollment` of a `trackedEntityInstance` into a `program`"
           }
         ]
