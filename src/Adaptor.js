@@ -257,6 +257,170 @@ export function create(resourceType, data, options, params, callback) {
 }
 
 /**
+ * Update data. A generic helper function to update a resource object of any type.
+ * Updating an object requires to send `all required fields` or the `full body`
+ * @public
+ * @function
+ * @param {string} resourceType - The type of resource to be updated. E.g. `dataElements`, `organisationUnits`, etc.
+ * @param {string} path - The `id` or `path` to the `object` to be updated. E.g. `FTRrcoaog83` or `FTRrcoaog83/{collection-name}/{object-id}`
+ * @param {Object} data - Data to update. It requires to send `all required fields` or the `full body`. If you want `partial updates`, use `patch` operation.
+ * @param {Object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
+ * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional options for update method. Defaults to `{operationName: 'update', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
+ * @param {function} [callback]  - Optional callback to handle the response
+ * @returns {Operation}
+ * @example <caption>- Example 'expression.js` of `update` for a single program</caption>
+ * update('programs', 'IpHINAT79UW', {
+ *   name: 'name 20',
+ *   shortName: 'n20',
+ *   programType: 'WITHOUT_REGISTRATION',
+ * });
+ *
+ * @example <caption>Example `expression.js` of `update` for a single `event`</caption>
+ * update('events', 'PVqUD2hvU4E', {
+ *   program: 'eBAyeGv0exc',
+ *   orgUnit: 'DiszpKrYNg8',
+ *   eventDate: date,
+ *   status: 'COMPLETED',
+ *   storedBy: 'admin',
+ *   coordinate: {
+ *     latitude: '59.8',
+ *     longitude: '10.9',
+ *   },
+ *   dataValues: [
+ *     {
+ *       dataElement: 'qrur9Dvnyt5',
+ *       value: '22',
+ *     },
+ *     {
+ *       dataElement: 'oZg33kd9taw',
+ *       value: 'Male',
+ *     },
+ *   ]
+ * });
+ *
+ * @example <caption>Example `expression.js` of `update` for a single `trackedEntityInstance`</caption>
+ * update('trackedEntityInstances', 'IeQfgUtGPq2', {
+ *   created: '2015-08-06T21:12:37.256',
+ *   orgUnit: 'TSyzvBiovKh',
+ *   createdAtClient: '2015-08-06T21:12:37.256',
+ *   trackedEntityInstance: 'IeQfgUtGPq2',
+ *   lastUpdated: '2015-08-06T21:12:37.257',
+ *   trackedEntityType: 'nEenWmSyUEp',
+ *   inactive: false,
+ *   deleted: false,
+ *   featureType: 'NONE',
+ *   programOwners: [
+ *     {
+ *       ownerOrgUnit: 'TSyzvBiovKh',
+ *       program: 'IpHINAT79UW',
+ *       trackedEntityInstance: 'IeQfgUtGPq2',
+ *     },
+ *   ],
+ *   enrollments: [],
+ *   relationships: [],
+ *   attributes: [
+ *     {
+ *       lastUpdated: '2016-01-12T00:00:00.000',
+ *       displayName: 'Last name',
+ *       created: '2016-01-12T00:00:00.000',
+ *       valueType: 'TEXT',
+ *       attribute: 'zDhUuAYrxNC',
+ *       value: 'Russell',
+ *     },
+ *     {
+ *       lastUpdated: '2016-01-12T00:00:00.000',
+ *       code: 'MMD_PER_NAM',
+ *       displayName: 'First name',
+ *       created: '2016-01-12T00:00:00.000',
+ *       valueType: 'TEXT',
+ *       attribute: 'w75KJ2mc4zz',
+ *       value: 'Catherine',
+ *     },
+ *   ],
+ * });
+ *
+ * @example <caption>- Example `expression.js` of `update` for a single `dataValueSet`</caption>
+ * update('dataValueSets', 'f7n9E0hX8qk', {
+ *   dataElement: 'f7n9E0hX8qk',
+ *   period: '201401',
+ *   orgUnit: 'DiszpKrYNg8',
+ *   value: '13',
+ * });
+ *
+ * @example <caption>- Example `expression.js` of `update` for a single `enrollment`</caption>
+ * update('enrollments', 'CmsHzercTBa' {
+ *   trackedEntityInstance: 'bmshzEacgxa',
+ *   orgUnit: 'TSyzvBiovKh',
+ *   program: 'gZBxv9Ujxg0',
+ *   enrollmentDate: '2013-10-17',
+ *   incidentDate: '2013-10-17',
+ * });
+ */
+export function update(resourceType, path, data, params, options, callback) {
+  return state => {
+    const expandedResourceType = expandReferences(resourceType)(state);
+    const expandedPath = expandReferences(path)(state);
+    const body = expandReferences(data)(state);
+    const expandedParams = expandReferences(params)(state);
+    const expandedOptions = expandReferences(options)(state);
+
+    const { username, password, hostUrl } = state.configuration;
+
+    const operationName = expandedOptions?.operationName ?? 'update';
+
+    const filters = expandedParams?.filters;
+    delete expandedParams?.filters;
+
+    let queryParams = new URLSearchParams(expandedParams);
+
+    filters?.map(f => queryParams.append('filter', f));
+
+    const apiVersion =
+      expandedOptions?.apiVersion ?? state.configuration.apiVersion;
+
+    const url = buildUrl(
+      '/' + expandedResourceType + '/' + expandedPath,
+      hostUrl,
+      apiVersion
+    );
+
+    const headers = {
+      Accept: CONTENT_TYPES[expandedResourceType] ?? 'application/json',
+    };
+
+    logOperation(operationName);
+
+    logApiVersion(apiVersion);
+
+    logWaitingForServer(url, queryParams);
+
+    warnExpectLargeResult(expandedResourceType, url);
+
+    return axios
+      .request({
+        method: 'PUT',
+        url,
+        auth: {
+          username,
+          password,
+        },
+        params: queryParams,
+        data: body,
+        headers,
+      })
+      .then(result => {
+        Log.info(
+          `${operationName} succeeded. Updated ${expandedResourceType}.\nSummary:\n${prettyJson(
+            result.data
+          )}`
+        );
+        if (callback) return callback(composeNextState(state, result.data));
+        return composeNextState(state, result.data);
+      });
+  };
+}
+
+/**
  * Get Tracked Entity Instance(s).
  * @public
  * @function
@@ -1253,101 +1417,6 @@ export function getMetadata(resources, params, options, callback) {
       .then(result => {
         Log.info(
           `${operationName} succeeded. The result of this operation will be in ${operationName} state.data or in your callback.`
-        );
-        if (callback) return callback(composeNextState(state, result.data));
-        return composeNextState(state, result.data);
-      });
-  };
-}
-
-/**
- * Update data. A generic helper function to update a resource object of any type.
- * - It requires to send `all required fields` or the `full body`
- * @public
- * @function
- * @param {string} resourceType - The type of resource to be updated. E.g. `dataElements`, `organisationUnits`, etc.
- * @param {string} path - The `id` or `path` to the `object` to be updated. E.g. `FTRrcoaog83` or `FTRrcoaog83/{collection-name}/{object-id}`
- * @param {Object} data - Data to update. It requires to send `all required fields` or the `full body`. If you want `partial updates`, use `patch` operation.
- * @param {Object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
- * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional options for update method. Defaults to `{operationName: 'update', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
- * @param {function} [callback]  - Optional callback to handle the response
- * @returns {Operation}
- * @example <caption>Example `updating` a `data element`</caption>
- * update('dataElements', 'FTRrcoaog83',
- * {
- *   displayName: 'New display name',
- *   aggregationType: 'SUM',
- *   domainType: 'AGGREGATE',
- *   valueType: 'NUMBER',
- *   name: 'Accute Flaccid Paralysis (Deaths < 5 yrs)',
- *   shortName: 'Accute Flaccid Paral (Deaths < 5 yrs)',
- * });
- *
- */
-export function update(resourceType, path, data, params, options, callback) {
-  return state => {
-    if (!isObject(data)) {
-      console.warn('Data must be an object');
-      return state;
-    }
-
-    resourceType = expandReferences(resourceType)(state);
-
-    path = expandReferences(path)(state);
-
-    const body = expandReferences(data)(state);
-
-    params = expandReferences(params)(state);
-
-    options = expandReferences(options)(state);
-
-    const { username, password, hostUrl } = state.configuration;
-
-    const operationName = options?.operationName ?? 'update';
-
-    const responseType = options?.responseType ?? 'json';
-
-    const filters = params?.filters;
-
-    delete params?.filters;
-
-    let queryParams = new URLSearchParams(params);
-
-    filters?.map(f => queryParams.append('filter', f));
-
-    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
-
-    const url = buildUrl('/' + resourceType + '/' + path, hostUrl, apiVersion);
-
-    const headers = {
-      Accept: CONTENT_TYPES[responseType] ?? 'application/json',
-    };
-
-    logOperation(operationName);
-
-    logApiVersion(apiVersion);
-
-    logWaitingForServer(url, queryParams);
-
-    warnExpectLargeResult(resourceType, url);
-
-    return axios
-      .request({
-        method: 'PUT',
-        url,
-        auth: {
-          username,
-          password,
-        },
-        params: queryParams,
-        data: body,
-        headers,
-      })
-      .then(result => {
-        Log.info(
-          `${operationName} succeeded. Updated ${resourceType}.\nSummary:\n${prettyJson(
-            result.data
-          )}`
         );
         if (callback) return callback(composeNextState(state, result.data));
         return composeNextState(state, result.data);

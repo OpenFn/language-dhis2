@@ -119,6 +119,154 @@
       "valid": true
     },
     {
+      "name": "update",
+      "params": [
+        "resourceType",
+        "path",
+        "data",
+        "params",
+        "options",
+        "callback"
+      ],
+      "docs": {
+        "description": "Update data. A generic helper function to update a resource object of any type.\nUpdating an object requires to send `all required fields` or the `full body`",
+        "tags": [
+          {
+            "title": "public",
+            "description": null,
+            "type": null
+          },
+          {
+            "title": "function",
+            "description": null,
+            "name": null
+          },
+          {
+            "title": "param",
+            "description": "The type of resource to be updated. E.g. `dataElements`, `organisationUnits`, etc.",
+            "type": {
+              "type": "NameExpression",
+              "name": "string"
+            },
+            "name": "resourceType"
+          },
+          {
+            "title": "param",
+            "description": "The `id` or `path` to the `object` to be updated. E.g. `FTRrcoaog83` or `FTRrcoaog83/{collection-name}/{object-id}`",
+            "type": {
+              "type": "NameExpression",
+              "name": "string"
+            },
+            "name": "path"
+          },
+          {
+            "title": "param",
+            "description": "Data to update. It requires to send `all required fields` or the `full body`. If you want `partial updates`, use `patch` operation.",
+            "type": {
+              "type": "NameExpression",
+              "name": "Object"
+            },
+            "name": "data"
+          },
+          {
+            "title": "param",
+            "description": "Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}",
+            "type": {
+              "type": "OptionalType",
+              "expression": {
+                "type": "NameExpression",
+                "name": "Object"
+              }
+            },
+            "name": "params"
+          },
+          {
+            "title": "param",
+            "description": "Optional options for update method. Defaults to `{operationName: 'update', apiVersion: state.configuration.apiVersion, responseType: 'json'}`",
+            "type": {
+              "type": "OptionalType",
+              "expression": {
+                "type": "RecordType",
+                "fields": [
+                  {
+                    "type": "FieldType",
+                    "key": "apiVersion",
+                    "value": {
+                      "type": "NameExpression",
+                      "name": "number"
+                    }
+                  },
+                  {
+                    "type": "FieldType",
+                    "key": "operationName",
+                    "value": {
+                      "type": "NameExpression",
+                      "name": "string"
+                    }
+                  },
+                  {
+                    "type": "FieldType",
+                    "key": "resourceType",
+                    "value": {
+                      "type": "NameExpression",
+                      "name": "string"
+                    }
+                  }
+                ]
+              }
+            },
+            "name": "options"
+          },
+          {
+            "title": "param",
+            "description": "Optional callback to handle the response",
+            "type": {
+              "type": "OptionalType",
+              "expression": {
+                "type": "NameExpression",
+                "name": "function"
+              }
+            },
+            "name": "callback"
+          },
+          {
+            "title": "returns",
+            "description": null,
+            "type": {
+              "type": "NameExpression",
+              "name": "Operation"
+            }
+          },
+          {
+            "title": "example",
+            "description": "update('programs', 'IpHINAT79UW', {\n  name: 'name 20',\n  shortName: 'n20',\n  programType: 'WITHOUT_REGISTRATION',\n});",
+            "caption": "- Example 'expression.js` of `update` for a single program"
+          },
+          {
+            "title": "example",
+            "description": "update('events', 'PVqUD2hvU4E', {\n  program: 'eBAyeGv0exc',\n  orgUnit: 'DiszpKrYNg8',\n  eventDate: date,\n  status: 'COMPLETED',\n  storedBy: 'admin',\n  coordinate: {\n    latitude: '59.8',\n    longitude: '10.9',\n  },\n  dataValues: [\n    {\n      dataElement: 'qrur9Dvnyt5',\n      value: '22',\n    },\n    {\n      dataElement: 'oZg33kd9taw',\n      value: 'Male',\n    },\n  ]\n});",
+            "caption": "Example `expression.js` of `update` for a single `event`"
+          },
+          {
+            "title": "example",
+            "description": "update('trackedEntityInstances', 'IeQfgUtGPq2', {\n  created: '2015-08-06T21:12:37.256',\n  orgUnit: 'TSyzvBiovKh',\n  createdAtClient: '2015-08-06T21:12:37.256',\n  trackedEntityInstance: 'IeQfgUtGPq2',\n  lastUpdated: '2015-08-06T21:12:37.257',\n  trackedEntityType: 'nEenWmSyUEp',\n  inactive: false,\n  deleted: false,\n  featureType: 'NONE',\n  programOwners: [\n    {\n      ownerOrgUnit: 'TSyzvBiovKh',\n      program: 'IpHINAT79UW',\n      trackedEntityInstance: 'IeQfgUtGPq2',\n    },\n  ],\n  enrollments: [],\n  relationships: [],\n  attributes: [\n    {\n      lastUpdated: '2016-01-12T00:00:00.000',\n      displayName: 'Last name',\n      created: '2016-01-12T00:00:00.000',\n      valueType: 'TEXT',\n      attribute: 'zDhUuAYrxNC',\n      value: 'Russell',\n    },\n    {\n      lastUpdated: '2016-01-12T00:00:00.000',\n      code: 'MMD_PER_NAM',\n      displayName: 'First name',\n      created: '2016-01-12T00:00:00.000',\n      valueType: 'TEXT',\n      attribute: 'w75KJ2mc4zz',\n      value: 'Catherine',\n    },\n  ],\n});",
+            "caption": "Example `expression.js` of `update` for a single `trackedEntityInstance`"
+          },
+          {
+            "title": "example",
+            "description": "update('dataValueSets', 'f7n9E0hX8qk', {\n  dataElement: 'f7n9E0hX8qk',\n  period: '201401',\n  orgUnit: 'DiszpKrYNg8',\n  value: '13',\n});",
+            "caption": "- Example `expression.js` of `update` for a single `dataValueSet`"
+          },
+          {
+            "title": "example",
+            "description": "update('enrollments', 'CmsHzercTBa' {\n  trackedEntityInstance: 'bmshzEacgxa',\n  orgUnit: 'TSyzvBiovKh',\n  program: 'gZBxv9Ujxg0',\n  enrollmentDate: '2013-10-17',\n  incidentDate: '2013-10-17',\n});",
+            "caption": "- Example `expression.js` of `update` for a single `enrollment`"
+          }
+        ]
+      },
+      "valid": true
+    },
+    {
       "name": "getTEIs",
       "params": [
         "params",
@@ -2037,134 +2185,6 @@
             "title": "example",
             "description": "getMetadata(['dataElements', 'indicators'], {\n     filters: ['name:like:ANC'],\n});",
             "caption": "Example getting a list of `data elements` and `indicators` where `name` includes the word **ANC**"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "update",
-      "params": [
-        "resourceType",
-        "path",
-        "data",
-        "params",
-        "options",
-        "callback"
-      ],
-      "docs": {
-        "description": "Update data. A generic helper function to update a resource object of any type.\n- It requires to send `all required fields` or the `full body`",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "The type of resource to be updated. E.g. `dataElements`, `organisationUnits`, etc.",
-            "type": {
-              "type": "NameExpression",
-              "name": "string"
-            },
-            "name": "resourceType"
-          },
-          {
-            "title": "param",
-            "description": "The `id` or `path` to the `object` to be updated. E.g. `FTRrcoaog83` or `FTRrcoaog83/{collection-name}/{object-id}`",
-            "type": {
-              "type": "NameExpression",
-              "name": "string"
-            },
-            "name": "path"
-          },
-          {
-            "title": "param",
-            "description": "Data to update. It requires to send `all required fields` or the `full body`. If you want `partial updates`, use `patch` operation.",
-            "type": {
-              "type": "NameExpression",
-              "name": "Object"
-            },
-            "name": "data"
-          },
-          {
-            "title": "param",
-            "description": "Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "Optional options for update method. Defaults to `{operationName: 'update', apiVersion: state.configuration.apiVersion, responseType: 'json'}`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "operationName",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "resourceType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Optional callback to handle the response",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "update('dataElements', 'FTRrcoaog83',\n{\n  displayName: 'New display name',\n  aggregationType: 'SUM',\n  domainType: 'AGGREGATE',\n  valueType: 'NUMBER',\n  name: 'Accute Flaccid Paralysis (Deaths < 5 yrs)',\n  shortName: 'Accute Flaccid Paral (Deaths < 5 yrs)',\n});",
-            "caption": "Example `updating` a `data element`"
           }
         ]
       },

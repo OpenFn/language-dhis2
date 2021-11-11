@@ -232,3 +232,7 @@ describe('create', () => {
     });
   });
 }).timeout(10000);
+
+describe('update', () => {
+  // test update here
+}).timeout(10000);
