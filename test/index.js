@@ -283,4 +283,37 @@ describe('update', () => {
       expect(state.data.httpStatusCode).to.eq(200);
     });
   });
+
+  it('should update a tracked entity instance', () => {
+    const state = { ...initialState };
+    const tei = {
+      orgUnit: 'TSyzvBiovKh',
+      trackedEntityType: 'nEenWmSyUEp',
+      attributes: [
+        {
+          lastUpdated: '2016-01-12T00:00:00.000',
+          displayName: 'Last name',
+          created: '2016-01-12T00:00:00.000',
+          valueType: 'TEXT',
+          attribute: 'zDhUuAYrxNC',
+          value: 'BA',
+        },
+        {
+          lastUpdated: '2016-01-12T00:00:00.000',
+          code: 'MMD_PER_NAM',
+          displayName: 'First name',
+          created: '2016-01-12T00:00:00.000',
+          valueType: 'TEXT',
+          attribute: 'w75KJ2mc4zz',
+          value: 'Elias W.',
+        },
+      ],
+    };
+    return execute(update('trackedEntityInstances', 'IeQfgUtGPq2', tei))(
+      state
+    ).then(state => {
+      expect(state.data.status).to.eq('OK');
+      expect(state.data.httpStatusCode).to.eq(200);
+    });
+  });
 }).timeout(10000);

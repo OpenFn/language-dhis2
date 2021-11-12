@@ -269,33 +269,19 @@ export function create(resourceType, data, options, params, callback) {
  * @param {function} [callback]  - Optional callback to handle the response
  * @returns {Operation}
  * @example <caption>- Example 'expression.js` of `update` for a single program</caption>
- * update('programs', 'IpHINAT79UW', {
- *   name: 'name 20',
- *   shortName: 'n20',
+ * update('programs', 'qAZJCrNJK8H', {
+ *   name: '14e1aa02c3f0a31618e096f2c6d03bed',
+ *   shortName: '14e1aa02',
  *   programType: 'WITHOUT_REGISTRATION',
  * });
  *
  * @example <caption>Example `expression.js` of `update` for a single `event`</caption>
  * update('events', 'PVqUD2hvU4E', {
  *   program: 'eBAyeGv0exc',
- *   orgUnit: 'DiszpKrYNg8',
- *   eventDate: date,
+ *   orgUnit: 'Ngelehun CHC',
  *   status: 'COMPLETED',
  *   storedBy: 'admin',
- *   coordinate: {
- *     latitude: '59.8',
- *     longitude: '10.9',
- *   },
- *   dataValues: [
- *     {
- *       dataElement: 'qrur9Dvnyt5',
- *       value: '22',
- *     },
- *     {
- *       dataElement: 'oZg33kd9taw',
- *       value: 'Male',
- *     },
- *   ]
+ *   dataValues: [],
  * });
  *
  * @example <caption>Example `expression.js` of `update` for a single `trackedEntityInstance`</caption>
