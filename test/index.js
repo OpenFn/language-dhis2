@@ -1,6 +1,7 @@
 import { expect } from 'chai';
 import crypto from 'crypto';
 import { execute, create } from '../lib/Adaptor';
+import { update } from '../src/Adaptor';
 
 describe('create', () => {
   const initialState = {
@@ -234,5 +235,33 @@ describe('create', () => {
 }).timeout(10000);
 
 describe('update', () => {
-  // test update here
+  const initialState = {
+    data: {},
+    configuration: {
+      username: 'admin',
+      password: 'district',
+      hostUrl: 'https://play.dhis2.org/2.36.4',
+    },
+  };
+  it('should update an event', () => {
+    const state = {
+      ...initialState,
+      data: {
+        event: {
+          program: 'eBAyeGv0exc',
+          orgUnit: 'Ngelehun CHC',
+          // eventDate: date,
+          status: 'COMPLETED',
+          storedBy: 'admin',
+          dataValues: [],
+        },
+      },
+    };
+    return execute(update('events', 'eI3vHJXBkjB', state => state.data.event))(
+      state
+    ).then(state => {
+      expect(state.data.status).to.eq('OK');
+      expect(state.data.httpStatusCode).to.eq(200);
+    });
+  });
 }).timeout(10000);
