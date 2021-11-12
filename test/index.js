@@ -243,6 +243,7 @@ describe('update', () => {
       hostUrl: 'https://play.dhis2.org/2.36.4',
     },
   };
+
   it('should update an event', () => {
     const state = {
       ...initialState,
@@ -250,7 +251,6 @@ describe('update', () => {
         event: {
           program: 'eBAyeGv0exc',
           orgUnit: 'Ngelehun CHC',
-          // eventDate: date,
           status: 'COMPLETED',
           storedBy: 'admin',
           dataValues: [],
@@ -258,6 +258,25 @@ describe('update', () => {
       },
     };
     return execute(update('events', 'eI3vHJXBkjB', state => state.data.event))(
+      state
+    ).then(state => {
+      expect(state.data.status).to.eq('OK');
+      expect(state.data.httpStatusCode).to.eq(200);
+    });
+  });
+
+  it('should update a program', () => {
+    const state = {
+      ...initialState,
+      data: {
+        program: {
+          name: '14e1aa02c3f0a31618e096f2c6d03bed',
+          shortName: '14e1aa02',
+          programType: 'WITHOUT_REGISTRATION',
+        },
+      },
+    };
+    return execute(update('programs', 'qAZJCrNJK8H', state.data.program))(
       state
     ).then(state => {
       expect(state.data.status).to.eq('OK');
