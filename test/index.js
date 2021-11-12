@@ -284,7 +284,7 @@ describe('update', () => {
     });
   });
 
-  it('should update a tracked entity instance', () => {
+  it('should update a trackedEntityInstance', () => {
     const state = { ...initialState };
     const tei = {
       orgUnit: 'TSyzvBiovKh',
@@ -310,6 +310,25 @@ describe('update', () => {
       ],
     };
     return execute(update('trackedEntityInstances', 'IeQfgUtGPq2', tei))(
+      state
+    ).then(state => {
+      expect(state.data.status).to.eq('OK');
+      expect(state.data.httpStatusCode).to.eq(200);
+    });
+  });
+
+  it('should update an enrollment', () => {
+    const state = {
+      ...initialState,
+      data: {
+        enrollment: {
+          orgUnit: 'r93q83kZoR9',
+          program: 'ur1Edk5Oe2n',
+          trackedEntityInstance: 'VY2qN1IMbsj',
+        },
+      },
+    };
+    return execute(update('enrollments', 'EPfJyI5UCu6', state.data.enrollment))(
       state
     ).then(state => {
       expect(state.data.status).to.eq('OK');
