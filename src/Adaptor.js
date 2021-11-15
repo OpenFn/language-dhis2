@@ -559,55 +559,6 @@ export function upsertTEI(uniqueAttributeId, data, options, callback) {
 }
 
 /**
- * Update a Tracked Entity Instance.
- * @public
- * @function
- * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`).
- * @param {Object} data - The update data containing new values.
- * @param {Object} [params] - Optional `import parameters` for a given a resource. E.g. `{dryRun: true, importStrategy: CREATE, filters:[]}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#import-parameters_1 DHIS2 Import parameters documentation} or run `discover`. Defauls to `DHIS2 default import parameters`.
- * @param {{apiVersion: number,responseType: string}} [options] - `Optional` options for `updateTEI` operation. Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`.
- * @param {function} [callback] - Optional callback to handle the response.
- * @returns {Operation}
- * @example <caption>- Example `expression.js` of `updateTEI`.</caption>
- * updateTEI('PVqUD2hvU4E', {
- *    orgUnit: 'TSyzvBiovKh',
- *    trackedEntityType: 'nEenWmSyUEp',
- *    attributes: [
- *       {
- *          attribute: 'lZGmxYbs97q',
- *          value: valUpsertTEI,
- *       },
- *       {
- *          attribute: 'w75KJ2mc4zz',
- *          value: 'Gigiwe',
- *       },
- *    ],
- *    enrollments: [
- *       {
- *          orgUnit: 'TSyzvBiovKh',
- *          program: 'fDd25txQckK',
- *          programState: 'lST1OZ5BDJ2',
- *          enrollmentDate: '2021-01-04',
- *          incidentDate: '2021-01-04',
- *       },
- *    ],
- * });
- */
-export function updateTEI(path, data, params, options, callback) {
-  return state => {
-    const expandedOptions = expandAndSetOperation(options, state, 'updateTEI');
-    return update(
-      'trackedEntityInstances',
-      path,
-      data,
-      params,
-      expandedOptions,
-      callback
-    )(state);
-  };
-}
-
-/**
  * Get annonymous events or tracker events.
  * @public
  * @function
@@ -622,64 +573,6 @@ export function getEvents(params, options, callback) {
   return state => {
     const expandedOptions = expandAndSetOperation(options, state, 'getEvents');
     return getData('events', params, expandedOptions, callback)(state);
-  };
-}
-
-/**
- * Update DHIS2 Event.
- * - To update an existing event, the format of the payload is the same as that of `creating an event` via `createEvents` operations
- * - But you should supply the `identifier` of the object you are updating
- * - The payload has to contain `all`, even `non-modified`, `attributes`.
- * - Attributes that were present before and are not present in the current payload any more will be removed by DHIS2.
- * - If you do not want this behavior, please use `upsert` operation to upsert your events.
- * @public
- * @function
- * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
- * @param {Object} data - The update data containing new values
- * @param {Object} [params] - Optional `import` parameters for `updateEvents`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
- * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `updateEvents` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
- * @param {function} [callback] - Optional callback to handle the response
- * @returns {Operation}
- * @example <caption>- Example `expression.js` of `updateEvents`</caption>
- * updateEvents('PVqUD2hvU4E', { events: [
- *  {
- *    program: 'eBAyeGv0exc',
- *    orgUnit: 'DiszpKrYNg8',
- *    eventDate: date,
- *    status: 'COMPLETED',
- *    storedBy: 'admin',
- *    coordinate: {
- *      latitude: '59.8',
- *      longitude: '10.9',
- *    },
- *    dataValues: [
- *      {
- *        dataElement: 'qrur9Dvnyt5',
- *        value: '22',
- *      },
- *      {
- *        dataElement: 'oZg33kd9taw',
- *        value: 'Male',
- *      },
- *    ],
- *  }]
- * });
- */
-export function updateEvents(path, data, params, options, callback) {
-  return state => {
-    const expandedOptions = expandAndSetOperation(
-      options,
-      state,
-      'updateEvents'
-    );
-    return update(
-      'events',
-      path,
-      data,
-      params,
-      expandedOptions,
-      callback
-    )(state);
   };
 }
 
@@ -702,42 +595,6 @@ export function getPrograms(params, options, callback) {
       'getPrograms'
     );
     return getData('programs', params, expandedOptions, callback)(state);
-  };
-}
-
-/**
- * Update DHIS2 Tracker Programs
- * - To update an existing program, the format of the payload is the same as that of `creating an event` via `createEvents` operations
- * - But  you should supply the `identifier` of the object you are updating
- * - The payload has to contain `all`, even `non-modified`, `attributes`.
- * - Attributes that were present before and are not present in the current payload any more will be removed by DHIS2.
- * - If you do not want this behavior, please use `upsert` operation to upsert your events.
- * @public
- * @function
- * @param {string} path - Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)
- * @param {Object} data - The update data containing new values
- * @param {Object} [params] - Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`
- * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `getPrograms` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
- * @param {function} [callback] - Optional callback to handle the response
- * @returns {Operation}
- * @example <caption>- Example `expression.js` of `updatePrograms`</caption>
- * updatePrograms('PVqUD2hvU4E', state.data);
- */
-export function updatePrograms(path, data, params, options, callback) {
-  return state => {
-    const expandedOptions = expandAndSetOperation(
-      options,
-      state,
-      'updatePrograms'
-    );
-    return update(
-      'programs',
-      path,
-      data,
-      params,
-      expandedOptions,
-      callback
-    )(state);
   };
 }
 
