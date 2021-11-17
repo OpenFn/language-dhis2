@@ -86,12 +86,12 @@
           },
           {
             "title": "example",
-            "description": "create('programs', {\n  name: 'name 20',\n  shortName: 'n20',\n  programType: 'WITHOUT_REGISTRATION',\n});",
+            "description": "create('programs', {\n  name: 'name 20',\n  shortName: 'n20',\n  programType: 'WITHOUT_REGISTRATION',\n});\n\nNB: `name` and `shortName` must be unique.",
             "caption": "- Example 'expression.js` of `create` for a single program"
           },
           {
             "title": "example",
-            "description": "create('events', {\n  program: 'eBAyeGv0exc',\n  orgUnit: 'DiszpKrYNg8',\n  status: 'COMPLETED',\n});",
+            "description": "NB: Add NB\ncreate('events', {\n  program: 'eBAyeGv0exc',\n  orgUnit: 'DiszpKrYNg8',\n  status: 'COMPLETED',\n});",
             "caption": "- Example `expression.js` of `create` for a single event"
           },
           {
