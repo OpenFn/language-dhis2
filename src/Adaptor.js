@@ -116,6 +116,10 @@ function expandAndSetOperation(options, state, operationName) {
 }
 
 const isArray = variable => !!variable && variable.constructor === Array;
+export function nestArray(data, key) {
+  const body = isArray(data) ? { [key]: data } : data;
+  return body;
+}
 const isObject = variable => !!variable && variable.constructor === Object;
 
 /**
@@ -205,9 +209,7 @@ export function create(resourceType, data, options, params, callback) {
     }
 
     const expandedData = expandReferences(data)(state);
-    const body = isArray(expandedData)
-      ? { [resourceType]: expandedData }
-      : expandedData;
+    const body = nestArray(expandedData, resourceType);
 
     const expandedResourceType = expandReferences(resourceType)(state);
     const expandedOptions = expandReferences(options)(state);
