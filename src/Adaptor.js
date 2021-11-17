@@ -102,8 +102,9 @@ axios.interceptors.response.use(
     return response;
   },
   function (error) {
+    console.log(error);
     Log.error(`${error?.message}`);
-    return Promise.reject(JSON.stringify(error.response.data, null, 2));
+    return Promise.reject(error);
   }
 );
 
@@ -230,6 +231,8 @@ export function create(resourceType, data, options, params, callback) {
     logWaitingForServer(url, queryParams);
     warnExpectLargeResult(expandedResourceType, url);
 
+    console.log('hello?');
+
     return axios
       .request({
         method: 'POST',
@@ -252,9 +255,6 @@ export function create(resourceType, data, options, params, callback) {
         );
         if (callback) return callback(composeNextState(state, result.data));
         return composeNextState(state, result.data);
-      })
-      .catch(error => {
-        console.error('ERROR', error);
       });
   };
 }
