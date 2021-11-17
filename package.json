@@ -9,9 +9,9 @@
   },
   "main": "lib/index.js",
   "scripts": {
-    "test:watch": "mocha -w --require @babel/register",
+    "test:watch": "mocha -w --require @babel/register test/index.js",
     "build": "node_modules/.bin/babel src -d lib && npm run ast",
-    "test": "mocha --require @babel/register",
+    "test": "mocha --require @babel/register test/index.js",
     "ast": "simple-ast --adaptor ./src/Adaptor.js --output ast.json",
     "postversion": "git push && git push --tags",
     "version": "npm run build && git add -A lib ast.json"

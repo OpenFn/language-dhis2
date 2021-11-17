@@ -1,20 +1,8 @@
-/**
- * define mock servers in place they are used
- */
-
 import { expect } from 'chai';
-import crypto from 'crypto';
 import { execute, create, update, nestArray } from '../lib/Adaptor';
+import { dataValue } from '@openfn/language-common';
 import { buildUrl } from '../lib/Utils';
 import nock from 'nock';
-
-function clientReq(method, resourceType, state, body) {
-  return execute(method(resourceType, body))(state).then(nextState => {
-    const { data, references } = nextState;
-    expect(data).to.eql({ httpStatus: 'OK', message: 'the response' });
-    expect(references).to.eql([{ a: 1 }]);
-  });
-}
 
 const testServer = nock('https://play.dhis2.org/2.36.4');
 
@@ -67,120 +55,94 @@ describe('execute', () => {
 });
 
 describe('CREATE', () => {
-  before(done => {
+  const state = {
+    configuration: {
+      username: 'admin',
+      password: 'district',
+      hostUrl: 'https://play.dhis2.org/2.36.4',
+    },
+    data: {
+      program: 'program1',
+      orgUnit: 'org50',
+      status: 'COMPLETED',
+      date: '02-02-20',
+    },
+  };
+
+  it('should make an authenticated POST to the right url', async () => {
     testServer
       .post('/api/events', {
-        events: [
-          {
-            program: 'program',
-            orgUnit: 'orgunit',
-            status: 'COMPLETED',
-            date: '02-02-20',
-          },
-          {
-            program: 'program2',
-            orgUnit: 'orgunit2',
-            status: 'COMPLETED',
-            date: '03-02-20',
-          },
-        ],
+        program: 'program1',
+        orgUnit: 'org50',
+        status: 'COMPLETED',
+        date: '02-02-20',
+      })
+      .times(2)
+      .matchHeader('authorization', 'Basic YWRtaW46ZGlzdHJpY3Q=')
+      .reply(200, {
+        httpStatus: 'OK',
+        message: 'the response',
+      });
+
+    const response = await execute(create('events', state => state.data))(
+      state
+    );
+    expect(response.data).to.eql({ httpStatus: 'OK', message: 'the response' });
+  });
+
+  it('should recursively expand references', async () => {
+    testServer
+      .post('/api/events', {
+        program: 'abc',
+        orgUnit: 'org50',
       })
       .reply(200, {
         httpStatus: 'OK',
         message: 'the response',
       });
-    done();
-  });
-
-  it('should make a POST to the right url', async () => {
-    testServer.post('/api/events').reply(200, {
-      httpStatus: 'OK',
-      message: 'the response',
-    });
-    const state = {
-      configuration: {
-        username: 'admin',
-        password: 'district',
-        hostUrl: 'https://play.dhis2.org/2.36.4',
-      },
-      data: {
-        event: {
-          program: 'program1',
-          orgUnit: 'orgunit',
-          status: 'COMPLETED',
-          date: '02-02-20',
-        },
-      },
-    };
 
     const response = await execute(
-      create('events', state => {
-        console.log('state in execute tests', state);
-        return state.data.event;
-      })
+      create('events', { program: 'abc', orgUnit: state => state.data.orgUnit })
+    )(state);
+    expect(response.data).to.eql({ httpStatus: 'OK', message: 'the response' });
+  });
+});
+
+describe('UPDATE', () => {
+  const state = {
+    configuration: {
+      username: 'admin',
+      password: 'district',
+      hostUrl: 'https://play.dhis2.org/2.36.4',
+    },
+    data: {
+      program: 'program',
+      orgUnit: 'orgunit',
+      status: 'COMPLETED',
+      currentDate: '02-02-20',
+    },
+  };
+
+  it('should make an authenticated PUT to the right url', async () => {
+    testServer
+      .put('/api/events/qAZJCrNJK8H')
+      .matchHeader('authorization', 'Basic YWRtaW46ZGlzdHJpY3Q=')
+      .reply(200, {
+        httpStatus: 'OK',
+        message: 'the response',
+      });
+
+    const response = await execute(
+      update('events', 'qAZJCrNJK8H', state => ({ ...state.data, date: state.data.currentDate }))
     )(state);
     expect(response.data).to.eql({ httpStatus: 'OK', message: 'the response' });
   });
 
-  it('when an array is passed it gets nested inside that "entity" key', async () => {
-    const state = {
-      configuration: {
-        username: 'admin',
-        password: 'district',
-        hostUrl: 'https://play.dhis2.org/2.36.4',
-      },
-      data: {
-        events: [
-          {
-            program: 'program',
-            orgUnit: 'orgunit',
-            status: 'COMPLETED',
-            date: '02-02-20',
-          },
-          {
-            program: 'program2',
-            orgUnit: 'orgunit2',
-            status: 'COMPLETED',
-            date: '03-02-20',
-          },
-        ],
-      },
-    };
-
-    const response = await execute(create('events', state.data.events))(state);
-    expect(Object.keys(response.references[0])[0]).to.eql('events');
-  });
-
-  it("when an object is passed it doesn't get nested", async () => {
-    const state = {
-      configuration: {
-        username: 'admin',
-        password: 'district',
-        hostUrl: 'https://play.dhis2.org/2.36.4',
-      },
-      data: {
-        event: {
-          program: 'program',
-          orgUnit: 'orgunit',
-          status: 'COMPLETED',
-          date: '02-02-20',
-        },
-      },
-    };
-
-    const response = await execute(create('events', state.data.event))(state);
-    console.log('RESPONSE', response);
-    expect(Array.isArray(response.references[0])).to.eq(false);
-  });
-});
-
-describe.only('UPDATE', () => {
-  it.only('should make a PUT to the right url', async () => {
+  it('should recursively expand refs', async () => {
     testServer
       .put('/api/events/qAZJCrNJK8H', {
         program: 'program',
-        orgUnit: 'orgunit',
-        status: 'COMPLETED',
+        orgUnit: 'hardcoded',
         date: '02-02-20',
       })
       .reply(200, {
@@ -188,26 +150,11 @@ describe.only('UPDATE', () => {
         message: 'the response',
       });
 
-    const state = {
-      configuration: {
-        username: 'admin',
-        password: 'district',
-        hostUrl: 'https://play.dhis2.org/2.36.4',
-      },
-      data: {
-        event: {
-          program: 'program1',
-          orgUnit: 'orgunit',
-          status: 'COMPLETED',
-          date: '02-02-20',
-        },
-      },
-    };
-
     const response = await execute(
-      update('events', 'qAZJCrNJK8H', state => {
-        console.log('state in execute tests', state);
-        return state.data.event;
+      update('events', 'qAZJCrNJK8H', {
+        program: dataValue('program'),
+        orgUnit: 'hardcoded',
+        date: state => state.data.currentDate
       })
     )(state);
     expect(response.data).to.eql({ httpStatus: 'OK', message: 'the response' });
@@ -220,7 +167,7 @@ describe('buildUrl', () => {
       configuration: {
         username: 'admin',
         password: 'district',
-        hostUrl: 'https://play.dhis2.org/2.36.4',
+        hostUrl: 'https://dhis2.moh.gov',
         apiVersion: '2.36.4',
       },
     };
@@ -231,15 +178,7 @@ describe('buildUrl', () => {
       state.configuration.apiVersion
     );
 
-    expect(url).to.eql('https://play.dhis2.org/2.36.4/api/2.36.4/events');
-
-    // const url = buildUrl(
-    //   '/' + 'events' + 'qAZJCrNJK8H',
-    //   state.configuration.hostUrl,
-    //   state.configuration.apiVersion
-    // );
-
-    // expect(url).to.eql('https://play.dhis2.org/2.36.4/api/2.36.4/events/qAZJCrNJK8H');
+    expect(url).to.eql('https://dhis2.moh.gov/api/2.36.4/events');
   });
 });
 
@@ -252,14 +191,12 @@ describe('nestArray', () => {
         hostUrl: 'https://play.dhis2.org/2.36.4',
         apiVersion: '2.36.4',
       },
-      data: {
-        events: [{}],
-      },
+      data: [{ a: 1 }],
     };
 
-    const body = nestArray(state.data.events, 'events');
+    const body = nestArray(state.data, 'events');
 
-    expect(body).to.eql({ events: [{}] });
+    expect(body).to.eql({ events: [{ a: 1 }] });
   });
 
   it("when an object is passed it doesn't get nested", async () => {
@@ -269,13 +206,11 @@ describe('nestArray', () => {
         password: 'district',
         hostUrl: 'https://play.dhis2.org/2.36.4',
       },
-      data: {
-        event: {},
-      },
+      data: { b: 2 },
     };
 
-    const body = nestArray(state.data.event, 'events');
+    const body = nestArray(state.data, 'events');
 
-    expect(body).to.eql({});
+    expect(body).to.eql({ b: 2 });
   });
 });
