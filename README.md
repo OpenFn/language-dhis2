@@ -38,7 +38,7 @@ fetchAnalytics({
     outputIdScheme: 'UID',
   },
 });
-````
+```
 
 ## Tracked Entity API
 
@@ -174,4 +174,22 @@ Clone the repo, run `npm install`.
 
 Run tests using `npm run test` or `npm run test:watch`
 
-Build the project using `make`.
+NB: There is two types of tests: unit tests and integration tests.
+
+- Unit tests allows to test the functionalities of the adaptor helper functions such as:
+
+  > does `create` use `http post` method to perform requsts to the API ?
+
+  To run unit tests just execute `npm run test` (they're the default tests).
+
+  Anytime a new functionality is added to the helper functions, more unit tests needs to be added.
+
+- Integration tests allow to test the end-to-end behavior of the helper functions and also to test the examples (snippet of code) we provide in the documentation. For example with integration tests we answer the following question:
+
+  > does `create('events', eventPayload)(state)` actually create a new event in the DHIS 2 API ?
+
+  To run integration tests, just execute `npm run test tests/integration.js`. These tests use network I/O so their timing is unpredictable. Consider setting the right timeout for the test to work.
+
+  Anytime a new example is added in the documentation of a helper function, a new integration test should be done.
+
+Build the project using `npm run build`.
