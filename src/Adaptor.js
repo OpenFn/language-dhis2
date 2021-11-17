@@ -135,7 +135,10 @@ const isObject = variable => !!variable && variable.constructor === Object;
  *   programType: 'WITHOUT_REGISTRATION',
  * });
  *
+ * NB: `name` and `shortName` must be unique.
+ *
  * @example <caption>- Example `expression.js` of `create` for a single event</caption>
+ * NB: Add NB
  * create('events', {
  *   program: 'eBAyeGv0exc',
  *   orgUnit: 'DiszpKrYNg8',
