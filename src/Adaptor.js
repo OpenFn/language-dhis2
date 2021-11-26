@@ -133,21 +133,21 @@ const isObject = variable => !!variable && variable.constructor === Object;
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
  *
- * @example <caption>a single `program`</caption>
+ * @example <caption>a single program</caption>
  * create('programs', {
  *   name: 'name 20',
  *   shortName: 'n20',
  *   programType: 'WITHOUT_REGISTRATION',
  * });
  *
- * @example <caption>a single `event`</caption>
+ * @example <caption>a single event</caption>
  * create('events', {
  *   program: 'eBAyeGv0exc',
  *   orgUnit: 'DiszpKrYNg8',
  *   status: 'COMPLETED',
  * });
  *
- * @example <caption>a single `trackedEntityInstance`</caption>
+ * @example <caption>a single trackedEntityInstance</caption>
  * create('trackedEntityInstances', {
  *   orgUnit: 'TSyzvBiovKh',
  *   trackedEntityType: 'nEenWmSyUEp',
@@ -159,7 +159,7 @@ const isObject = variable => !!variable && variable.constructor === Object;
  *   ]
  * });
  *
- * @example <caption>a single `dataValueSet`</caption>
+ * @example <caption>a single dataValueSet</caption>
  * create('dataValueSets', {
  *   dataElement: 'f7n9E0hX8qk',
  *   period: '201401',
@@ -167,7 +167,7 @@ const isObject = variable => !!variable && variable.constructor === Object;
  *   value: '12',
  * });
  *
- * @example <caption>a single `dataValueSet` with `dataValues`</caption>
+ * @example <caption>a single dataValueSet with dataValues</caption>
  * create('dataValueSets', {
  *   dataSet: 'pBOMPrpg1QX',
  *   completeDate: '2014-02-03',
@@ -189,7 +189,7 @@ const isObject = variable => !!variable && variable.constructor === Object;
  *   ],
  * });
  *
- * @example <caption>a single `enrollment`</caption>
+ * @example <caption>a single enrollment</caption>
  * create('enrollments', {
  *   trackedEntityInstance: 'bmshzEacgxa',
  *   orgUnit: 'TSyzvBiovKh',
@@ -215,7 +215,9 @@ export function create(resourceType, data, options, params, callback) {
     const operationName = expandedOptions?.operationName ?? 'create';
     const { username, password, hostUrl } = state.configuration;
     const responseType = expandedOptions?.responseType ?? 'json';
+
     delete expandedParams?.filters;
+
     const queryParams = new URLSearchParams(expandedParams);
     const apiVersion =
       expandedOptions?.apiVersion ?? state.configuration.apiVersion;
@@ -229,8 +231,6 @@ export function create(resourceType, data, options, params, callback) {
     logApiVersion(apiVersion);
     logWaitingForServer(url, queryParams);
     warnExpectLargeResult(expandedResourceType, url);
-
-    console.log('hello?');
 
     return axios
       .request({
@@ -277,7 +277,7 @@ export function create(resourceType, data, options, params, callback) {
  *   programType: 'WITHOUT_REGISTRATION',
  * });
  *
- * @example <caption>a single `event`</caption>
+ * @example <caption>a single event</caption>
  * update('events', 'PVqUD2hvU4E', {
  *   program: 'eBAyeGv0exc',
  *   orgUnit: 'Ngelehun CHC',
@@ -286,7 +286,7 @@ export function create(resourceType, data, options, params, callback) {
  *   dataValues: [],
  * });
  *
- * @example <caption>a single `trackedEntityInstance`</caption>
+ * @example <caption>a single trackedEntityInstance</caption>
  * update('trackedEntityInstances', 'IeQfgUtGPq2', {
  *   created: '2015-08-06T21:12:37.256',
  *   orgUnit: 'TSyzvBiovKh',
@@ -327,7 +327,7 @@ export function create(resourceType, data, options, params, callback) {
  *   ],
  * });
  *
- * @example <caption>a single `dataValueSet`</caption>
+ * @example <caption>a single dataValueSet</caption>
  * update('dataValueSets', 'f7n9E0hX8qk', {
  *   dataElement: 'f7n9E0hX8qk',
  *   period: '201401',
@@ -335,7 +335,7 @@ export function create(resourceType, data, options, params, callback) {
  *   value: '13',
  * });
  *
- * @example <caption>a single `enrollment`</caption>
+ * @example <caption>a single enrollment</caption>
  * update('enrollments', 'CmsHzercTBa' {
  *   trackedEntityInstance: 'bmshzEacgxa',
  *   orgUnit: 'TSyzvBiovKh',
@@ -355,8 +355,8 @@ export function update(resourceType, path, data, params, options, callback) {
     const { username, password, hostUrl } = state.configuration;
 
     const operationName = expandedOptions?.operationName ?? 'update';
-
     const filters = expandedParams?.filters;
+
     delete expandedParams?.filters;
 
     let queryParams = new URLSearchParams(expandedParams);
@@ -377,11 +377,8 @@ export function update(resourceType, path, data, params, options, callback) {
     };
 
     logOperation(operationName);
-
     logApiVersion(apiVersion);
-
     logWaitingForServer(url, queryParams);
-
     warnExpectLargeResult(expandedResourceType, url);
 
     return axios
