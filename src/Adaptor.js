@@ -270,7 +270,7 @@ export function create(resourceType, data, options, params, callback) {
  * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional options for update method. Defaults to `{operationName: 'update', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
  * @param {function} [callback]  - Optional callback to handle the response
  * @returns {Operation}
- * @example <caption>-a single program</caption>
+ * @example <caption>a single program</caption>
  * update('programs', 'qAZJCrNJK8H', {
  *   name: '14e1aa02c3f0a31618e096f2c6d03bed',
  *   shortName: '14e1aa02',
@@ -416,7 +416,7 @@ export function update(resourceType, path, data, params, options, callback) {
  * @param {{apiVersion: number,responseType: string}} [options] - `Optional` options for `getTEIs` operation. Defaults to `{apiVersion: state.configuration.apiVersion, responseType: 'json'}`.
  * @param {function} [callback] - Optional callback to handle the response.
  * @returns {Operation}
- * @example <caption>- Example `getTEIs` `expression.js` for fetching a `single` `Tracked Entity Instance` with all the fields included.</caption>
+ * @example <caption>Example `getTEIs` `expression.js` for fetching a `single` `Tracked Entity Instance` with all the fields included.</caption>
  * getTEIs({
  *   fields: '*',
  *   ou: 'CMqUILyVnBL',
@@ -448,7 +448,7 @@ export function getTEIs(params, options, callback) {
  * @param {function} [callback] - Optional `callback` to handle the response.
  * @throws {RangeError} - Throws `RangeError` when `uniqueAttributeId` is `invalid` or `not unique`.
  * @returns {Operation}
- * @example <caption>- Example `expression.js` for upserting a tracked entity instance on attribute with Id `lZGmxYbs97q`.</caption>
+ * @example <caption>Example `expression.js` for upserting a tracked entity instance on attribute with Id `lZGmxYbs97q`.</caption>
  * upsertTEI('lZGmxYbs97q', {
  *   orgUnit: 'TSyzvBiovKh',
  *   trackedEntityType: 'nEenWmSyUEp',
@@ -568,7 +568,7 @@ export function upsertTEI(uniqueAttributeId, data, options, callback) {
  * @param {{apiVersion: number,responseType: string}} [options] - `Optional` options for `getEvents` operation. Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`.
  * @param {function} [callback] - Optional callback to handle the response.
  * @returns {Operation}
- * @example <caption>- Query for `all events` with `children` of a certain `organisation unit`</caption>
+ * @example <caption>Query for `all events` with `children` of a certain `organisation unit`</caption>
  * getEvents({ orgUnit: 'YuQRtpLP10I', ouMode: 'CHILDREN' });
  */
 export function getEvents(params, options, callback) {
@@ -586,7 +586,7 @@ export function getEvents(params, options, callback) {
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `getPrograms` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
- * @example <caption>- Query for `all programs` with a certain `organisation unit`</caption>
+ * @example <caption>Query for `all programs` with a certain `organisation unit`</caption>
  * getPrograms({ orgUnit: 'DiszpKrYNg8' , fields: '*' });
  */
 export function getPrograms(params, options, callback) {
@@ -608,7 +608,7 @@ export function getPrograms(params, options, callback) {
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `getEnrollments` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
- * @example <caption>- To constrain the response to `enrollments` which are part of a `specific program` you can include a `program query parameter`</caption>
+ * @example <caption>To constrain the response to `enrollments` which are part of a `specific program` you can include a `program query parameter`</caption>
  * getEnrollments({
  *   ou: 'O6uvpzGd5pu',
  *   ouMode: 'DESCENDANTS',
@@ -642,7 +642,7 @@ export function getEnrollments(params, options, callback) {
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `updateEnrollments` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
- * @example <caption>- Example `expression.js` of `updateEnromments`</caption>
+ * @example <caption>Example `expression.js` of `updateEnromments`</caption>
  * updateEnrollments('PVqUD2hvU4E', state.data);
  */
 export function updateEnrollments(path, data, params, options, callback) {
@@ -673,7 +673,7 @@ export function updateEnrollments(path, data, params, options, callback) {
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `cancelEnrollment` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
- * @example <caption>- Example `expression.js` of `cancelEnrollment`</caption>
+ * @example <caption>Example `expression.js` of `cancelEnrollment`</caption>
  * cancelEnrollments('PVqUD2hvU4E');
  */
 export function cancelEnrollment(enrollmentId, params, options, callback) {
@@ -709,7 +709,7 @@ export function cancelEnrollment(enrollmentId, params, options, callback) {
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `completeEnrollment` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
- * @example <caption>- Example `expression.js` of `completeEnrollment`</caption>
+ * @example <caption>Example `expression.js` of `completeEnrollment`</caption>
  * completeEnrollment('PVqUD2hvU4E');
  */
 export function completeEnrollment(enrollmentId, params, options, callback) {
@@ -744,7 +744,7 @@ export function completeEnrollment(enrollmentId, params, options, callback) {
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `getRelationships` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
- * @example <caption>- A query for `all relationships` associated with a `specific tracked entity instance` can look like this:</caption>
+ * @example <caption>A query for `all relationships` associated with a `specific tracked entity instance` can look like this:</caption>
  * getRelationships({ tei: 'F8yKM85NbxW', fields: '*' });
  */
 export function getRelationships(params, options, callback) {
@@ -768,7 +768,7 @@ export function getRelationships(params, options, callback) {
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `options` for `getDataValues` operation. Defaults to `{apiVersion: state.configuration.apiVersion, responseType: 'json'}`
  * @param {function} [callback] - Optional `callback` to handle the response
  * @returns {Operation}
- * @example <caption>- Example getting **two** `data values` associated with a specific `orgUnit`, `dataSet`, and `period `</caption>
+ * @example <caption>Example getting **two** `data values` associated with a specific `orgUnit`, `dataSet`, and `period `</caption>
  * getDataValues({
  *   orgUnit: 'DiszpKrYNg8',
  *   period: '202010',
@@ -1454,7 +1454,7 @@ export function del(resourceType, path, data, params, options, callback) {
  * @param {function} [callback] - Optional callback to handle the response
  * @throws {RangeError} - Throws range error
  * @returns {Operation}
- * @example <caption>- Example `expression.js` of upsert</caption>
+ * @example <caption>Example `expression.js` of upsert</caption>
  * upsert(
  *    'trackedEntityInstances',
  *    {

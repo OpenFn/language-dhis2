@@ -198,7 +198,7 @@ For example with integration tests we answer the following question:
 > Does `create('events', eventPayload)` actually create a new event in a live
 > DHIS2 system?
 
-To run integration tests, execute `npm run test test/integration.js`. These
+To run integration tests, execute `npm run integration-test`. These
 tests use network I/O and a public connection to a DHIS2 "play" server so their
 timing and performance is unpredictable. Consider adding an increased timeout,
 and modifying the orgUnit, program, etc., IDs set in `globalState`.
