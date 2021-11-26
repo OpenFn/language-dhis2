@@ -123,7 +123,7 @@ export function nestArray(data, key) {
 const isObject = variable => !!variable && variable.constructor === Object;
 
 /**
- * A generic helper method to create a record of any kind in DHIS2
+ * Create a record
  * @public
  * @function
  * @param {string} resourceType - Type of resource to create. E.g. `trackedEntityInstances`, `programs`, `events`, ...
@@ -133,21 +133,21 @@ const isObject = variable => !!variable && variable.constructor === Object;
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
  *
- * @example <caption>-a single `program`</caption>
+ * @example <caption>a single `program`</caption>
  * create('programs', {
  *   name: 'name 20',
  *   shortName: 'n20',
  *   programType: 'WITHOUT_REGISTRATION',
  * });
  *
- * @example <caption>-a single `event`</caption>
+ * @example <caption>a single `event`</caption>
  * create('events', {
  *   program: 'eBAyeGv0exc',
  *   orgUnit: 'DiszpKrYNg8',
  *   status: 'COMPLETED',
  * });
  *
- * @example <caption>-a single `trackedEntityInstance`</caption>
+ * @example <caption>a single `trackedEntityInstance`</caption>
  * create('trackedEntityInstances', {
  *   orgUnit: 'TSyzvBiovKh',
  *   trackedEntityType: 'nEenWmSyUEp',
@@ -159,7 +159,7 @@ const isObject = variable => !!variable && variable.constructor === Object;
  *   ]
  * });
  *
- * @example <caption>-a single `dataValueSet`</caption>
+ * @example <caption>a single `dataValueSet`</caption>
  * create('dataValueSets', {
  *   dataElement: 'f7n9E0hX8qk',
  *   period: '201401',
@@ -167,7 +167,7 @@ const isObject = variable => !!variable && variable.constructor === Object;
  *   value: '12',
  * });
  *
- * @example <caption>-a single `dataValueSet` with `dataValues`</caption>
+ * @example <caption>a single `dataValueSet` with `dataValues`</caption>
  * create('dataValueSets', {
  *   dataSet: 'pBOMPrpg1QX',
  *   completeDate: '2014-02-03',
@@ -189,7 +189,7 @@ const isObject = variable => !!variable && variable.constructor === Object;
  *   ],
  * });
  *
- * @example <caption>-a single `enrollment`</caption>
+ * @example <caption>a single `enrollment`</caption>
  * create('enrollments', {
  *   trackedEntityInstance: 'bmshzEacgxa',
  *   orgUnit: 'TSyzvBiovKh',
@@ -327,7 +327,7 @@ export function create(resourceType, data, options, params, callback) {
  *   ],
  * });
  *
- * @example <caption>-a single `dataValueSet`</caption>
+ * @example <caption>a single `dataValueSet`</caption>
  * update('dataValueSets', 'f7n9E0hX8qk', {
  *   dataElement: 'f7n9E0hX8qk',
  *   period: '201401',
@@ -335,7 +335,7 @@ export function create(resourceType, data, options, params, callback) {
  *   value: '13',
  * });
  *
- * @example <caption>-a single `enrollment`</caption>
+ * @example <caption>a single `enrollment`</caption>
  * update('enrollments', 'CmsHzercTBa' {
  *   trackedEntityInstance: 'bmshzEacgxa',
  *   orgUnit: 'TSyzvBiovKh',

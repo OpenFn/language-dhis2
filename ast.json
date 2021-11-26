@@ -10,7 +10,7 @@
         "callback"
       ],
       "docs": {
-        "description": "A generic helper method to create a record of any kind in DHIS2",
+        "description": "Create a record",
         "tags": [
           {
             "title": "public",
@@ -87,32 +87,32 @@
           {
             "title": "example",
             "description": "create('programs', {\n  name: 'name 20',\n  shortName: 'n20',\n  programType: 'WITHOUT_REGISTRATION',\n});",
-            "caption": "-a single `program`"
+            "caption": "a single `program`"
           },
           {
             "title": "example",
             "description": "create('events', {\n  program: 'eBAyeGv0exc',\n  orgUnit: 'DiszpKrYNg8',\n  status: 'COMPLETED',\n});",
-            "caption": "-a single `event`"
+            "caption": "a single `event`"
           },
           {
             "title": "example",
             "description": "create('trackedEntityInstances', {\n  orgUnit: 'TSyzvBiovKh',\n  trackedEntityType: 'nEenWmSyUEp',\n  attributes: [\n    {\n      attribute: 'w75KJ2mc4zz',\n      value: 'Gigiwe',\n    },\n  ]\n});",
-            "caption": "-a single `trackedEntityInstance`"
+            "caption": "a single `trackedEntityInstance`"
           },
           {
             "title": "example",
             "description": "create('dataValueSets', {\n  dataElement: 'f7n9E0hX8qk',\n  period: '201401',\n  orgUnit: 'DiszpKrYNg8',\n  value: '12',\n});",
-            "caption": "-a single `dataValueSet`"
+            "caption": "a single `dataValueSet`"
           },
           {
             "title": "example",
             "description": "create('dataValueSets', {\n  dataSet: 'pBOMPrpg1QX',\n  completeDate: '2014-02-03',\n  period: '201401',\n  orgUnit: 'DiszpKrYNg8',\n  dataValues: [\n    {\n      dataElement: 'f7n9E0hX8qk',\n      value: '1',\n    },\n    {\n      dataElement: 'Ix2HsbDMLea',\n      value: '2',\n    },\n    {\n      dataElement: 'eY5ehpbEsB7',\n      value: '3',\n    },\n  ],\n});",
-            "caption": "-a single `dataValueSet` with `dataValues`"
+            "caption": "a single `dataValueSet` with `dataValues`"
           },
           {
             "title": "example",
             "description": "create('enrollments', {\n  trackedEntityInstance: 'bmshzEacgxa',\n  orgUnit: 'TSyzvBiovKh',\n  program: 'gZBxv9Ujxg0',\n  enrollmentDate: '2013-09-17',\n  incidentDate: '2013-09-17',\n});",
-            "caption": "-a single `enrollment`"
+            "caption": "a single `enrollment`"
           }
         ]
       },
@@ -255,12 +255,12 @@
           {
             "title": "example",
             "description": "update('dataValueSets', 'f7n9E0hX8qk', {\n  dataElement: 'f7n9E0hX8qk',\n  period: '201401',\n  orgUnit: 'DiszpKrYNg8',\n  value: '13',\n});",
-            "caption": "-a single `dataValueSet`"
+            "caption": "a single `dataValueSet`"
           },
           {
             "title": "example",
             "description": "update('enrollments', 'CmsHzercTBa' {\n  trackedEntityInstance: 'bmshzEacgxa',\n  orgUnit: 'TSyzvBiovKh',\n  program: 'gZBxv9Ujxg0',\n  enrollmentDate: '2013-10-17',\n  incidentDate: '2013-10-17',\n});",
-            "caption": "-a single `enrollment`"
+            "caption": "a single `enrollment`"
           }
         ]
       },
