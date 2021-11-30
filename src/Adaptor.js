@@ -116,11 +116,18 @@ function expandAndSetOperation(options, state, operationName) {
 }
 
 const isArray = variable => !!variable && variable.constructor === Array;
+
 export function nestArray(data, key) {
   const body = isArray(data) ? { [key]: data } : data;
   return body;
 }
-const isObject = variable => !!variable && variable.constructor === Object;
+
+function log(operationName, apiVersion, url, resourceType) {
+  logOperation(operationName);
+  logApiVersion(apiVersion);
+  logWaitingForServer(url);
+  warnExpectLargeResult(resourceType, url);
+}
 
 /**
  * A generic helper method to create a record of any kind in DHIS2
@@ -128,26 +135,25 @@ const isObject = variable => !!variable && variable.constructor === Object;
  * @function
  * @param {string} resourceType - Type of resource to create. E.g. `trackedEntityInstances`, `programs`, `events`, ...
  * @param {Object} data - Data that will be used to create a given instance of resource. To create a single instance of a resource, `data` must be a javascript object, and to create multiple instances of a resources, `data` must be an array of javascript objects.
- * @param {Object} [options] - Optional `options` to control the behavior of the `create` operation.` Defaults to `{operationName: 'create', apiVersion: null, responseType: 'json'}`
- * @param {Object} [params] - Optional `import parameters` for a given a resource. E.g. `{dryRun: true, importStrategy: CREATE}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 API documentation} or {@link discover}. Defauls to `DHIS2 default params` for a given resource type.
+ * @param {Object} [options] - Optional `options` to control the behavior of the `create` operation and to pass `import parameters` E.g. `{dryRun: true, importStrategy: CREATE}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 API documentation} or {@link discover}..` Defaults to `{operationName: 'create', apiVersion: null, responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
  *
- * @example <caption>-a single `program`</caption>
+ * @example <caption>-a `program`</caption>
  * create('programs', {
  *   name: 'name 20',
  *   shortName: 'n20',
  *   programType: 'WITHOUT_REGISTRATION',
  * });
  *
- * @example <caption>-a single `event`</caption>
+ * @example <caption>-an `event`</caption>
  * create('events', {
  *   program: 'eBAyeGv0exc',
  *   orgUnit: 'DiszpKrYNg8',
  *   status: 'COMPLETED',
  * });
  *
- * @example <caption>-a single `trackedEntityInstance`</caption>
+ * @example <caption>-a `trackedEntityInstance`</caption>
  * create('trackedEntityInstances', {
  *   orgUnit: 'TSyzvBiovKh',
  *   trackedEntityType: 'nEenWmSyUEp',
@@ -159,7 +165,43 @@ const isObject = variable => !!variable && variable.constructor === Object;
  *   ]
  * });
  *
- * @example <caption>-a single `dataValueSet`</caption>
+ * @example <caption>-a `dataSet`</caption>
+ * create('dataSets', { name: 'OpenFN Data Set', periodType: 'Monthly' });
+ *
+ * @example <caption>-a `dataSetNotification`</caption>
+ * create('dataSetNotificationTemplates', {
+ *   dataSetNotificationTrigger: 'DATA_SET_COMPLETION',
+ *   notificationRecipient: 'ORGANISATION_UNIT_CONTACT',
+ *   name: 'Notification',
+ *   messageTemplate: 'Hello',
+ *   deliveryChannels: ['SMS'],
+ *   dataSets: [],
+ * });
+ *
+ * @example <caption>-a `dataElement`</caption>
+ * create('dataElements', {
+ *   aggregationType: 'SUM',
+ *   domainType: 'AGGREGATE',
+ *   valueType: 'NUMBER',
+ *   name: 'Paracetamol',
+ *   shortName: 'Para',
+ * });
+ *
+ * @example <caption>-a `dataElementGroup`</caption>
+ * create('dataElementGroups', {
+ *   name: 'Data Element Group 1',
+ *   dataElements: [],
+ * });
+ *
+ * @example <caption>-a `dataElementGroupSet`</caption>
+ * create('dataElementGroupSets', {
+ *   name: 'Data Element Group Set 4',
+ *   dataDimension: true,
+ *   shortName: 'DEGS4',
+ *   dataElementGroups: [],
+ * });
+ *
+ * @example <caption>-a `dataValueSet`</caption>
  * create('dataValueSets', {
  *   dataElement: 'f7n9E0hX8qk',
  *   period: '201401',
@@ -167,7 +209,7 @@ const isObject = variable => !!variable && variable.constructor === Object;
  *   value: '12',
  * });
  *
- * @example <caption>-a single `dataValueSet` with `dataValues`</caption>
+ * @example <caption>-a `dataValueSet` with related `dataValues`</caption>
  * create('dataValueSets', {
  *   dataSet: 'pBOMPrpg1QX',
  *   completeDate: '2014-02-03',
@@ -189,7 +231,7 @@ const isObject = variable => !!variable && variable.constructor === Object;
  *   ],
  * });
  *
- * @example <caption>-a single `enrollment`</caption>
+ * @example <caption>-an `enrollment`</caption>
  * create('enrollments', {
  *   trackedEntityInstance: 'bmshzEacgxa',
  *   orgUnit: 'TSyzvBiovKh',
@@ -198,39 +240,40 @@ const isObject = variable => !!variable && variable.constructor === Object;
  *   incidentDate: '2013-09-17',
  * });
  */
-export function create(resourceType, data, options, params, callback) {
+export function create(resourceType, data, options, callback) {
   return state => {
     if (isArray(data) && resourceType === 'programs') {
       Log.warn("DHIS2 doesn't allow creation of multiple programs at once.");
       return state;
     }
 
-    const expandedData = expandReferences(data)(state);
-    const body = nestArray(expandedData, resourceType);
+    const expanded = expandReferences({
+      data,
+      resourceType,
+      options,
+    })(state);
 
-    const expandedResourceType = expandReferences(resourceType)(state);
-    const expandedOptions = expandReferences(options)(state);
-    const expandedParams = expandReferences(params)(state);
+    const body = nestArray(expanded.data, expanded.resourceType);
 
-    const operationName = expandedOptions?.operationName ?? 'create';
-    const { username, password, hostUrl } = state.configuration;
-    const responseType = expandedOptions?.responseType ?? 'json';
-    delete expandedParams?.filters;
-    const queryParams = new URLSearchParams(expandedParams);
+    const operationName = expanded.options?.operationName ?? 'create';
+    const responseType = expanded.options?.responseType ?? 'json';
     const apiVersion =
-      expandedOptions?.apiVersion ?? state.configuration.apiVersion;
-    const url = buildUrl('/' + expandedResourceType, hostUrl, apiVersion);
+      expanded.options?.apiVersion ?? state.configuration.apiVersion;
+
+    const { username, password, hostUrl } = state.configuration;
+    const url = buildUrl('/' + expanded.resourceType, hostUrl, apiVersion);
+
+    if (!CONTENT_TYPES.hasOwnProperty(responseType)) {
+      Log.warn(`DHIS2 doesn't support ${responseType} response type`);
+      return state;
+    }
+
     const headers = {
-      Accept: CONTENT_TYPES[responseType] ?? 'application/json',
+      Accept: CONTENT_TYPES[responseType],
       'Content-Type': 'application/json',
     };
 
-    logOperation(operationName);
-    logApiVersion(apiVersion);
-    logWaitingForServer(url, queryParams);
-    warnExpectLargeResult(expandedResourceType, url);
-
-    console.log('hello?');
+    log(operationName, apiVersion, url, expanded.resourceType);
 
     return axios
       .request({
@@ -240,17 +283,17 @@ export function create(resourceType, data, options, params, callback) {
           username,
           password,
         },
-        params: queryParams,
         data: body,
         headers,
       })
       .then(result => {
+        const reference = result.data.response?.importSummaries
+          ? result.data.response.importSummaries[0].href
+          : result.data.response?.reference;
         Log.info(
-          `${operationName} succeeded. Created ${expandedResourceType}: ${
-            result.data.response?.importSummaries
-              ? result.data.response.importSummaries[0].href
-              : result.data.response?.reference
-          }.\nSummary:\n${prettyJson(result.data)}`
+          `${operationName} succeeded. Created ${
+            expanded.resourceType
+          }: ${reference}.\nSummary:\n${prettyJson(result.data)}`
         );
         if (callback) return callback(composeNextState(state, result.data));
         return composeNextState(state, result.data);
@@ -266,18 +309,17 @@ export function create(resourceType, data, options, params, callback) {
  * @param {string} resourceType - The type of resource to be updated. E.g. `dataElements`, `organisationUnits`, etc.
  * @param {string} path - The `id` or `path` to the `object` to be updated. E.g. `FTRrcoaog83` or `FTRrcoaog83/{collection-name}/{object-id}`
  * @param {Object} data - Data to update. It requires to send `all required fields` or the `full body`. If you want `partial updates`, use `patch` operation.
- * @param {Object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
  * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional options for update method. Defaults to `{operationName: 'update', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
  * @param {function} [callback]  - Optional callback to handle the response
  * @returns {Operation}
- * @example <caption>-a single program</caption>
+ * @example <caption>-a program</caption>
  * update('programs', 'qAZJCrNJK8H', {
  *   name: '14e1aa02c3f0a31618e096f2c6d03bed',
  *   shortName: '14e1aa02',
  *   programType: 'WITHOUT_REGISTRATION',
  * });
  *
- * @example <caption>a single `event`</caption>
+ * @example <caption>an `event`</caption>
  * update('events', 'PVqUD2hvU4E', {
  *   program: 'eBAyeGv0exc',
  *   orgUnit: 'Ngelehun CHC',
@@ -286,7 +328,7 @@ export function create(resourceType, data, options, params, callback) {
  *   dataValues: [],
  * });
  *
- * @example <caption>a single `trackedEntityInstance`</caption>
+ * @example <caption>a `trackedEntityInstance`</caption>
  * update('trackedEntityInstances', 'IeQfgUtGPq2', {
  *   created: '2015-08-06T21:12:37.256',
  *   orgUnit: 'TSyzvBiovKh',
@@ -327,12 +369,70 @@ export function create(resourceType, data, options, params, callback) {
  *   ],
  * });
  *
- * @example <caption>-a single `dataValueSet`</caption>
- * update('dataValueSets', 'f7n9E0hX8qk', {
+ * @example <caption>-a `dataSet`</caption>
+ * update('dataSets', 'lyLU2wR22tC', { name: 'OpenFN Data Set', periodType: 'Weekly' });
+ *
+ * @example <caption>-a `dataSetNotification`</caption>
+ * update('dataSetNotificationTemplates', 'VbQBwdm1wVP', {
+ *   dataSetNotificationTrigger: 'DATA_SET_COMPLETION',
+ *   notificationRecipient: 'ORGANISATION_UNIT_CONTACT',
+ *   name: 'Notification',
+ *   messageTemplate: 'Hello Updated,
+ *   deliveryChannels: ['SMS'],
+ *   dataSets: [],
+ * });
+ *
+ * @example <caption>-a `dataElement`</caption>
+ * update('dataElements', 'FTRrcoaog83', {
+ *   aggregationType: 'SUM',
+ *   domainType: 'AGGREGATE',
+ *   valueType: 'NUMBER',
+ *   name: 'Paracetamol',
+ *   shortName: 'Para',
+ * });
+ *
+ * @example <caption>-a `dataElementGroup`</caption>
+ * update('dataElementGroups', 'QrprHT61XFk', {
+ *   name: 'Data Element Group 1',
+ *   dataElements: [],
+ * });
+ *
+ * @example <caption>-a `dataElementGroupSet`</caption>
+ * update('dataElementGroupSets', 'VxWloRvAze8', {
+ *   name: 'Data Element Group Set 4',
+ *   dataDimension: true,
+ *   shortName: 'DEGS4',
+ *   dataElementGroups: [],
+ * });
+ *
+ * @example <caption>-a `dataValueSet`</caption>
+ * update('dataValueSets', 'AsQj6cDsUq4', {
  *   dataElement: 'f7n9E0hX8qk',
  *   period: '201401',
  *   orgUnit: 'DiszpKrYNg8',
- *   value: '13',
+ *   value: '12',
+ * });
+ *
+ * @example <caption>-a `dataValueSet` with related `dataValues`</caption>
+ * update('dataValueSets', 'Ix2HsbDMLea', {
+ *   dataSet: 'pBOMPrpg1QX',
+ *   completeDate: '2014-02-03',
+ *   period: '201401',
+ *   orgUnit: 'DiszpKrYNg8',
+ *   dataValues: [
+ *     {
+ *       dataElement: 'f7n9E0hX8qk',
+ *       value: '1',
+ *     },
+ *     {
+ *       dataElement: 'Ix2HsbDMLea',
+ *       value: '2',
+ *     },
+ *     {
+ *       dataElement: 'eY5ehpbEsB7',
+ *       value: '3',
+ *     },
+ *   ],
  * });
  *
  * @example <caption>-a single `enrollment`</caption>
@@ -344,45 +444,32 @@ export function create(resourceType, data, options, params, callback) {
  *   incidentDate: '2013-10-17',
  * });
  */
-export function update(resourceType, path, data, params, options, callback) {
+export function update(resourceType, path, data, options, callback) {
   return state => {
-    const expandedResourceType = expandReferences(resourceType)(state);
-    const expandedPath = expandReferences(path)(state);
-    const body = expandReferences(data)(state);
-    const expandedParams = expandReferences(params)(state);
-    const expandedOptions = expandReferences(options)(state);
+    const expanded = expandReferences({ resourceType, path, data, options })(
+      state
+    );
 
     const { username, password, hostUrl } = state.configuration;
-
-    const operationName = expandedOptions?.operationName ?? 'update';
-
-    const filters = expandedParams?.filters;
-    delete expandedParams?.filters;
-
-    let queryParams = new URLSearchParams(expandedParams);
-
-    filters?.map(f => queryParams.append('filter', f));
-
+    const operationName = expanded.options?.operationName ?? 'update';
+    const responseType = expanded.options?.responseType ?? 'json';
     const apiVersion =
-      expandedOptions?.apiVersion ?? state.configuration.apiVersion;
-
+      expanded.options?.apiVersion ?? state.configuration.apiVersion;
     const url = buildUrl(
-      '/' + expandedResourceType + '/' + expandedPath,
+      '/' + expanded.resourceType + '/' + expanded.path,
       hostUrl,
       apiVersion
     );
 
+    if (!CONTENT_TYPES.hasOwnProperty(responseType)) {
+      Log.warn(`DHIS2 doesn't support ${responseType} response type`);
+      return state;
+    }
     const headers = {
-      Accept: CONTENT_TYPES[expandedResourceType] ?? 'application/json',
+      Accept: CONTENT_TYPES[responseType],
     };
 
-    logOperation(operationName);
-
-    logApiVersion(apiVersion);
-
-    logWaitingForServer(url, queryParams);
-
-    warnExpectLargeResult(expandedResourceType, url);
+    log(operationName, apiVersion, url, expanded.resourceType);
 
     return axios
       .request({
@@ -392,15 +479,14 @@ export function update(resourceType, path, data, params, options, callback) {
           username,
           password,
         },
-        params: queryParams,
-        data: body,
+        data: expanded.data,
         headers,
       })
       .then(result => {
         Log.info(
-          `${operationName} succeeded. Updated ${expandedResourceType}.\nSummary:\n${prettyJson(
-            result.data
-          )}`
+          `${operationName} succeeded. Updated ${
+            expanded.resourceType
+          }.\nSummary:\n${prettyJson(result.data)}`
         );
         if (callback) return callback(composeNextState(state, result.data));
         return composeNextState(state, result.data);
