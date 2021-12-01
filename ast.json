@@ -88,7 +88,7 @@
           },
           {
             "title": "example",
-            "description": "create('dataSets', { name: 'OpenFN Data Set', periodType: 'Monthly' });",
+            "description": "create('dataSets', { name: 'OpenFn Data Set', periodType: 'Monthly' });",
             "caption": "-a `dataSet`"
           },
           {
