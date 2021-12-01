@@ -117,15 +117,14 @@ function expandAndSetOperation(options, state, operationName) {
 
 const isArray = variable => !!variable && variable.constructor === Array;
 
-export function nestArray(data, key) {
-  const body = isArray(data) ? { [key]: data } : data;
-  return body;
+export function prepareData(data, key) {
+  return isArray(data) ? { [key]: data } : data;
 }
 
-function log(operationName, apiVersion, url, resourceType) {
+function log(operationName, apiVersion, url, resourceType, params) {
   logOperation(operationName);
   logApiVersion(apiVersion);
-  logWaitingForServer(url);
+  logWaitingForServer(url, params);
   warnExpectLargeResult(resourceType, url);
 }
 
@@ -166,7 +165,7 @@ function log(operationName, apiVersion, url, resourceType) {
  * });
  *
  * @example <caption>-a `dataSet`</caption>
- * create('dataSets', { name: 'OpenFN Data Set', periodType: 'Monthly' });
+ * create('dataSets', { name: 'OpenFn Data Set', periodType: 'Monthly' });
  *
  * @example <caption>-a `dataSetNotification`</caption>
  * create('dataSetNotificationTemplates', {
@@ -241,39 +240,18 @@ function log(operationName, apiVersion, url, resourceType) {
  * });
  */
 export function create(resourceType, data, options, callback) {
+  const initialParams = { resourceType, data, options, callback };
   return state => {
-    if (isArray(data) && resourceType === 'programs') {
-      Log.warn("DHIS2 doesn't allow creation of multiple programs at once.");
-      return state;
-    }
+    const { resourceType, data, options } = expandReferences(initialParams)(
+      state
+    );
 
-    const expanded = expandReferences({
-      data,
-      resourceType,
-      options,
-    })(state);
-
-    const body = nestArray(expanded.data, expanded.resourceType);
-
-    const operationName = expanded.options?.operationName ?? 'create';
-    const responseType = expanded.options?.responseType ?? 'json';
-    const apiVersion =
-      expanded.options?.apiVersion ?? state.configuration.apiVersion;
-
+    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
     const { username, password, hostUrl } = state.configuration;
-    const url = buildUrl('/' + expanded.resourceType, hostUrl, apiVersion);
+    const url = buildUrl('/' + resourceType, hostUrl, apiVersion);
+    const urlParams = new URLSearchParams(options?.params);
 
-    if (!CONTENT_TYPES.hasOwnProperty(responseType)) {
-      Log.warn(`DHIS2 doesn't support ${responseType} response type`);
-      return state;
-    }
-
-    const headers = {
-      Accept: CONTENT_TYPES[responseType],
-      'Content-Type': 'application/json',
-    };
-
-    log(operationName, apiVersion, url, expanded.resourceType);
+    log('create', apiVersion, url, resourceType, urlParams);
 
     return axios
       .request({
@@ -283,20 +261,23 @@ export function create(resourceType, data, options, callback) {
           username,
           password,
         },
-        data: body,
-        headers,
+        data: prepareData(data, resourceType),
+        params: urlParams,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       })
       .then(result => {
-        const reference = result.data.response?.importSummaries
-          ? result.data.response.importSummaries[0].href
-          : result.data.response?.reference;
         Log.info(
-          `${operationName} succeeded. Created ${
-            expanded.resourceType
-          }: ${reference}.\nSummary:\n${prettyJson(result.data)}`
+          `\nOperation succeeded. Created ${resourceType}: ${
+            result.headers.location
+          }.\n\nSummary:\n${prettyJson(result.data)}\n`
         );
         if (callback) return callback(composeNextState(state, result.data));
         return composeNextState(state, result.data);
+      })
+      .catch(error => {
+        throw error;
       });
   };
 }
