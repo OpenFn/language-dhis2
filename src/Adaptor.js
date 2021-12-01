@@ -129,7 +129,7 @@ function log(operationName, apiVersion, url, resourceType, params) {
 }
 
 /**
- * A generic helper method to create a record of any kind in DHIS2
+ * Create a record
  * @public
  * @function
  * @param {string} resourceType - Type of resource to create. E.g. `trackedEntityInstances`, `programs`, `events`, ...
@@ -138,21 +138,33 @@ function log(operationName, apiVersion, url, resourceType, params) {
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
  *
+<<<<<<< HEAD
  * @example <caption>-a `program`</caption>
+=======
+ * @example <caption>a single program</caption>
+>>>>>>> 202acd82a0193a4de22ea03e724d541c54f21525
  * create('programs', {
  *   name: 'name 20',
  *   shortName: 'n20',
  *   programType: 'WITHOUT_REGISTRATION',
  * });
  *
+<<<<<<< HEAD
  * @example <caption>-an `event`</caption>
+=======
+ * @example <caption>a single event</caption>
+>>>>>>> 202acd82a0193a4de22ea03e724d541c54f21525
  * create('events', {
  *   program: 'eBAyeGv0exc',
  *   orgUnit: 'DiszpKrYNg8',
  *   status: 'COMPLETED',
  * });
  *
+<<<<<<< HEAD
  * @example <caption>-a `trackedEntityInstance`</caption>
+=======
+ * @example <caption>a single trackedEntityInstance</caption>
+>>>>>>> 202acd82a0193a4de22ea03e724d541c54f21525
  * create('trackedEntityInstances', {
  *   orgUnit: 'TSyzvBiovKh',
  *   trackedEntityType: 'nEenWmSyUEp',
@@ -164,6 +176,7 @@ function log(operationName, apiVersion, url, resourceType, params) {
  *   ]
  * });
  *
+<<<<<<< HEAD
  * @example <caption>-a `dataSet`</caption>
  * create('dataSets', { name: 'OpenFn Data Set', periodType: 'Monthly' });
  *
@@ -201,6 +214,9 @@ function log(operationName, apiVersion, url, resourceType, params) {
  * });
  *
  * @example <caption>-a `dataValueSet`</caption>
+=======
+ * @example <caption>a single dataValueSet</caption>
+>>>>>>> 202acd82a0193a4de22ea03e724d541c54f21525
  * create('dataValueSets', {
  *   dataElement: 'f7n9E0hX8qk',
  *   period: '201401',
@@ -208,7 +224,11 @@ function log(operationName, apiVersion, url, resourceType, params) {
  *   value: '12',
  * });
  *
+<<<<<<< HEAD
  * @example <caption>-a `dataValueSet` with related `dataValues`</caption>
+=======
+ * @example <caption>a single dataValueSet with dataValues</caption>
+>>>>>>> 202acd82a0193a4de22ea03e724d541c54f21525
  * create('dataValueSets', {
  *   dataSet: 'pBOMPrpg1QX',
  *   completeDate: '2014-02-03',
@@ -416,7 +436,7 @@ export function create(resourceType, data, options, callback) {
  *   ],
  * });
  *
- * @example <caption>-a single `enrollment`</caption>
+ * @example <caption>a single enrollment</caption>
  * update('enrollments', 'CmsHzercTBa' {
  *   trackedEntityInstance: 'bmshzEacgxa',
  *   orgUnit: 'TSyzvBiovKh',
@@ -483,7 +503,7 @@ export function update(resourceType, path, data, options, callback) {
  * @param {{apiVersion: number,responseType: string}} [options] - `Optional` options for `getTEIs` operation. Defaults to `{apiVersion: state.configuration.apiVersion, responseType: 'json'}`.
  * @param {function} [callback] - Optional callback to handle the response.
  * @returns {Operation}
- * @example <caption>- Example `getTEIs` `expression.js` for fetching a `single` `Tracked Entity Instance` with all the fields included.</caption>
+ * @example <caption>Example `getTEIs` `expression.js` for fetching a `single` `Tracked Entity Instance` with all the fields included.</caption>
  * getTEIs({
  *   fields: '*',
  *   ou: 'CMqUILyVnBL',
@@ -515,7 +535,7 @@ export function getTEIs(params, options, callback) {
  * @param {function} [callback] - Optional `callback` to handle the response.
  * @throws {RangeError} - Throws `RangeError` when `uniqueAttributeId` is `invalid` or `not unique`.
  * @returns {Operation}
- * @example <caption>- Example `expression.js` for upserting a tracked entity instance on attribute with Id `lZGmxYbs97q`.</caption>
+ * @example <caption>Example `expression.js` for upserting a tracked entity instance on attribute with Id `lZGmxYbs97q`.</caption>
  * upsertTEI('lZGmxYbs97q', {
  *   orgUnit: 'TSyzvBiovKh',
  *   trackedEntityType: 'nEenWmSyUEp',
@@ -635,7 +655,7 @@ export function upsertTEI(uniqueAttributeId, data, options, callback) {
  * @param {{apiVersion: number,responseType: string}} [options] - `Optional` options for `getEvents` operation. Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`.
  * @param {function} [callback] - Optional callback to handle the response.
  * @returns {Operation}
- * @example <caption>- Query for `all events` with `children` of a certain `organisation unit`</caption>
+ * @example <caption>Query for `all events` with `children` of a certain `organisation unit`</caption>
  * getEvents({ orgUnit: 'YuQRtpLP10I', ouMode: 'CHILDREN' });
  */
 export function getEvents(params, options, callback) {
@@ -653,7 +673,7 @@ export function getEvents(params, options, callback) {
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `getPrograms` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
- * @example <caption>- Query for `all programs` with a certain `organisation unit`</caption>
+ * @example <caption>Query for `all programs` with a certain `organisation unit`</caption>
  * getPrograms({ orgUnit: 'DiszpKrYNg8' , fields: '*' });
  */
 export function getPrograms(params, options, callback) {
@@ -675,7 +695,7 @@ export function getPrograms(params, options, callback) {
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `getEnrollments` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
- * @example <caption>- To constrain the response to `enrollments` which are part of a `specific program` you can include a `program query parameter`</caption>
+ * @example <caption>To constrain the response to `enrollments` which are part of a `specific program` you can include a `program query parameter`</caption>
  * getEnrollments({
  *   ou: 'O6uvpzGd5pu',
  *   ouMode: 'DESCENDANTS',
@@ -709,7 +729,7 @@ export function getEnrollments(params, options, callback) {
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `updateEnrollments` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
- * @example <caption>- Example `expression.js` of `updateEnromments`</caption>
+ * @example <caption>Example `expression.js` of `updateEnromments`</caption>
  * updateEnrollments('PVqUD2hvU4E', state.data);
  */
 export function updateEnrollments(path, data, params, options, callback) {
@@ -740,7 +760,7 @@ export function updateEnrollments(path, data, params, options, callback) {
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `cancelEnrollment` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
- * @example <caption>- Example `expression.js` of `cancelEnrollment`</caption>
+ * @example <caption>Example `expression.js` of `cancelEnrollment`</caption>
  * cancelEnrollments('PVqUD2hvU4E');
  */
 export function cancelEnrollment(enrollmentId, params, options, callback) {
@@ -776,7 +796,7 @@ export function cancelEnrollment(enrollmentId, params, options, callback) {
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `completeEnrollment` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
- * @example <caption>- Example `expression.js` of `completeEnrollment`</caption>
+ * @example <caption>Example `expression.js` of `completeEnrollment`</caption>
  * completeEnrollment('PVqUD2hvU4E');
  */
 export function completeEnrollment(enrollmentId, params, options, callback) {
@@ -811,7 +831,7 @@ export function completeEnrollment(enrollmentId, params, options, callback) {
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `flags` for the behavior of the `getRelationships` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
- * @example <caption>- A query for `all relationships` associated with a `specific tracked entity instance` can look like this:</caption>
+ * @example <caption>A query for `all relationships` associated with a `specific tracked entity instance` can look like this:</caption>
  * getRelationships({ tei: 'F8yKM85NbxW', fields: '*' });
  */
 export function getRelationships(params, options, callback) {
@@ -835,7 +855,7 @@ export function getRelationships(params, options, callback) {
  * @param {{apiVersion: number,responseType: string}} [options] - Optional `options` for `getDataValues` operation. Defaults to `{apiVersion: state.configuration.apiVersion, responseType: 'json'}`
  * @param {function} [callback] - Optional `callback` to handle the response
  * @returns {Operation}
- * @example <caption>- Example getting **two** `data values` associated with a specific `orgUnit`, `dataSet`, and `period `</caption>
+ * @example <caption>Example getting **two** `data values` associated with a specific `orgUnit`, `dataSet`, and `period `</caption>
  * getDataValues({
  *   orgUnit: 'DiszpKrYNg8',
  *   period: '202010',
@@ -1521,7 +1541,7 @@ export function del(resourceType, path, data, params, options, callback) {
  * @param {function} [callback] - Optional callback to handle the response
  * @throws {RangeError} - Throws range error
  * @returns {Operation}
- * @example <caption>- Example `expression.js` of upsert</caption>
+ * @example <caption>Example `expression.js` of upsert</caption>
  * upsert(
  *    'trackedEntityInstances',
  *    {

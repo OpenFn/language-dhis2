@@ -9,7 +9,7 @@
         "callback"
       ],
       "docs": {
-        "description": "A generic helper method to create a record of any kind in DHIS2",
+        "description": "Create a record",
         "tags": [
           {
             "title": "public",
@@ -289,7 +289,7 @@
           {
             "title": "example",
             "description": "update('enrollments', 'CmsHzercTBa' {\n  trackedEntityInstance: 'bmshzEacgxa',\n  orgUnit: 'TSyzvBiovKh',\n  program: 'gZBxv9Ujxg0',\n  enrollmentDate: '2013-10-17',\n  incidentDate: '2013-10-17',\n});",
-            "caption": "-a single `enrollment`"
+            "caption": "a single enrollment"
           }
         ]
       },
@@ -379,7 +379,7 @@
           {
             "title": "example",
             "description": "getTEIs({\n  fields: '*',\n  ou: 'CMqUILyVnBL',\n  trackedEntityInstance: 'HNTA9qD6EEG',\n  skipPaging: true,\n});",
-            "caption": "- Example `getTEIs` `expression.js` for fetching a `single` `Tracked Entity Instance` with all the fields included."
+            "caption": "Example `getTEIs` `expression.js` for fetching a `single` `Tracked Entity Instance` with all the fields included."
           }
         ]
       },
@@ -492,7 +492,7 @@
           {
             "title": "example",
             "description": "upsertTEI('lZGmxYbs97q', {\n  orgUnit: 'TSyzvBiovKh',\n  trackedEntityType: 'nEenWmSyUEp',\n  attributes: [\n    {\n      attribute: 'lZGmxYbs97q',\n      value: '77790012',\n    },\n    {\n      attribute: 'w75KJ2mc4zz',\n      value: 'Gigiwe',\n    },\n    {\n      attribute: 'zDhUuAYrxNC',\n      value: 'Mwanza',\n    },\n  ],\n});",
-            "caption": "- Example `expression.js` for upserting a tracked entity instance on attribute with Id `lZGmxYbs97q`."
+            "caption": "Example `expression.js` for upserting a tracked entity instance on attribute with Id `lZGmxYbs97q`."
           }
         ]
       },
@@ -579,7 +579,7 @@
           {
             "title": "example",
             "description": "getEvents({ orgUnit: 'YuQRtpLP10I', ouMode: 'CHILDREN' });",
-            "caption": "- Query for `all events` with `children` of a certain `organisation unit`"
+            "caption": "Query for `all events` with `children` of a certain `organisation unit`"
           }
         ]
       },
@@ -666,7 +666,7 @@
           {
             "title": "example",
             "description": "getPrograms({ orgUnit: 'DiszpKrYNg8' , fields: '*' });",
-            "caption": "- Query for `all programs` with a certain `organisation unit`"
+            "caption": "Query for `all programs` with a certain `organisation unit`"
           }
         ]
       },
@@ -753,7 +753,7 @@
           {
             "title": "example",
             "description": "getEnrollments({\n  ou: 'O6uvpzGd5pu',\n  ouMode: 'DESCENDANTS',\n  program: 'ur1Edk5Oe2n',\n  fields: '*',\n});",
-            "caption": "- To constrain the response to `enrollments` which are part of a `specific program` you can include a `program query parameter`"
+            "caption": "To constrain the response to `enrollments` which are part of a `specific program` you can include a `program query parameter`"
           }
         ]
       },
@@ -863,7 +863,7 @@
           {
             "title": "example",
             "description": "updateEnrollments('PVqUD2hvU4E', state.data);",
-            "caption": "- Example `expression.js` of `updateEnromments`"
+            "caption": "Example `expression.js` of `updateEnromments`"
           }
         ]
       },
@@ -963,7 +963,7 @@
           {
             "title": "example",
             "description": "cancelEnrollments('PVqUD2hvU4E');",
-            "caption": "- Example `expression.js` of `cancelEnrollment`"
+            "caption": "Example `expression.js` of `cancelEnrollment`"
           }
         ]
       },
@@ -1063,7 +1063,7 @@
           {
             "title": "example",
             "description": "completeEnrollment('PVqUD2hvU4E');",
-            "caption": "- Example `expression.js` of `completeEnrollment`"
+            "caption": "Example `expression.js` of `completeEnrollment`"
           }
         ]
       },
@@ -1150,7 +1150,7 @@
           {
             "title": "example",
             "description": "getRelationships({ tei: 'F8yKM85NbxW', fields: '*' });",
-            "caption": "- A query for `all relationships` associated with a `specific tracked entity instance` can look like this:"
+            "caption": "A query for `all relationships` associated with a `specific tracked entity instance` can look like this:"
           }
         ]
       },
@@ -1237,7 +1237,7 @@
           {
             "title": "example",
             "description": "getDataValues({\n  orgUnit: 'DiszpKrYNg8',\n  period: '202010',\n  dataSet: 'pBOMPrpg1QX',\n  limit: 2,\n});",
-            "caption": "- Example getting **two** `data values` associated with a specific `orgUnit`, `dataSet`, and `period `"
+            "caption": "Example getting **two** `data values` associated with a specific `orgUnit`, `dataSet`, and `period `"
           }
         ]
       },
@@ -2303,7 +2303,7 @@
           {
             "title": "example",
             "description": "upsert(\n   'trackedEntityInstances',\n   {\n      attributeId: 'lZGmxYbs97q',\n         attributeValue: state =>\n            state.data.attributes.find(obj => obj.attribute === 'lZGmxYbs97q')\n            .value,\n   },\n   state.data,\n   { ou: 'TSyzvBiovKh' }\n);",
-            "caption": "- Example `expression.js` of upsert"
+            "caption": "Example `expression.js` of upsert"
           },
           {
             "title": "todo",
