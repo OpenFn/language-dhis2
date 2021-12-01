@@ -138,33 +138,21 @@ function log(operationName, apiVersion, url, resourceType, params) {
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
  *
-<<<<<<< HEAD
  * @example <caption>-a `program`</caption>
-=======
- * @example <caption>a single program</caption>
->>>>>>> 202acd82a0193a4de22ea03e724d541c54f21525
  * create('programs', {
  *   name: 'name 20',
  *   shortName: 'n20',
  *   programType: 'WITHOUT_REGISTRATION',
  * });
  *
-<<<<<<< HEAD
  * @example <caption>-an `event`</caption>
-=======
- * @example <caption>a single event</caption>
->>>>>>> 202acd82a0193a4de22ea03e724d541c54f21525
  * create('events', {
  *   program: 'eBAyeGv0exc',
  *   orgUnit: 'DiszpKrYNg8',
  *   status: 'COMPLETED',
  * });
  *
-<<<<<<< HEAD
  * @example <caption>-a `trackedEntityInstance`</caption>
-=======
- * @example <caption>a single trackedEntityInstance</caption>
->>>>>>> 202acd82a0193a4de22ea03e724d541c54f21525
  * create('trackedEntityInstances', {
  *   orgUnit: 'TSyzvBiovKh',
  *   trackedEntityType: 'nEenWmSyUEp',
@@ -176,7 +164,6 @@ function log(operationName, apiVersion, url, resourceType, params) {
  *   ]
  * });
  *
-<<<<<<< HEAD
  * @example <caption>-a `dataSet`</caption>
  * create('dataSets', { name: 'OpenFn Data Set', periodType: 'Monthly' });
  *
@@ -214,9 +201,6 @@ function log(operationName, apiVersion, url, resourceType, params) {
  * });
  *
  * @example <caption>-a `dataValueSet`</caption>
-=======
- * @example <caption>a single dataValueSet</caption>
->>>>>>> 202acd82a0193a4de22ea03e724d541c54f21525
  * create('dataValueSets', {
  *   dataElement: 'f7n9E0hX8qk',
  *   period: '201401',
@@ -224,11 +208,7 @@ function log(operationName, apiVersion, url, resourceType, params) {
  *   value: '12',
  * });
  *
-<<<<<<< HEAD
  * @example <caption>-a `dataValueSet` with related `dataValues`</caption>
-=======
- * @example <caption>a single dataValueSet with dataValues</caption>
->>>>>>> 202acd82a0193a4de22ea03e724d541c54f21525
  * create('dataValueSets', {
  *   dataSet: 'pBOMPrpg1QX',
  *   completeDate: '2014-02-03',
