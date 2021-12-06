@@ -19,6 +19,7 @@ import {
   logOperation,
   prettyJson,
 } from './Utils';
+import { post, put } from './Client';
 
 /**
  * Execute a sequence of operations.
@@ -117,7 +118,7 @@ function expandAndSetOperation(options, state, operationName) {
 
 const isArray = variable => !!variable && variable.constructor === Array;
 
-export function prepareData(data, key) {
+export function nestArray(data, key) {
   return isArray(data) ? { [key]: data } : data;
 }
 
@@ -126,6 +127,54 @@ function log(operationName, apiVersion, url, resourceType, params) {
   logApiVersion(apiVersion);
   logWaitingForServer(url, params);
   warnExpectLargeResult(resourceType, url);
+}
+
+function extractValuesForAxios(operationName, values) {
+  return state => {
+    const apiVersion =
+      values.options?.apiVersion ?? state.configuration.apiVersion;
+    const { username, password, hostUrl } = state.configuration;
+    const auth = { username, password };
+
+    let urlString = '/' + values.resourceType;
+    if (operationName === 'update') {
+      urlString += '/' + values.path;
+    }
+    const url = buildUrl(urlString, hostUrl, apiVersion);
+
+    const urlParams = new URLSearchParams(values.options?.params);
+
+    return {
+      resourceType: values.resourceType,
+      data: values.data,
+      apiVersion,
+      auth,
+      url,
+      urlParams,
+      callback: values.callback,
+    };
+  };
+}
+
+function expandExtractAndLog(operationName, initialParams) {
+  return state => {
+    const {
+      resourceType,
+      data,
+      apiVersion,
+      auth,
+      url,
+      urlParams,
+      callback,
+    } = extractValuesForAxios(
+      operationName,
+      expandReferences(initialParams)(state)
+    )(state);
+
+    log(operationName, apiVersion, url, resourceType, urlParams);
+
+    return { url, data, resourceType, auth, urlParams, callback };
+  };
 }
 
 /**
@@ -242,31 +291,19 @@ function log(operationName, apiVersion, url, resourceType, params) {
 export function create(resourceType, data, options, callback) {
   const initialParams = { resourceType, data, options, callback };
   return state => {
-    const { resourceType, data, options } = expandReferences(initialParams)(
-      state
-    );
+    const {
+      url,
+      data,
+      resourceType,
+      auth,
+      urlParams,
+      callback,
+    } = expandExtractAndLog('create', initialParams)(state);
 
-    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
-    const { username, password, hostUrl } = state.configuration;
-    const url = buildUrl('/' + resourceType, hostUrl, apiVersion);
-    const urlParams = new URLSearchParams(options?.params);
-
-    log('create', apiVersion, url, resourceType, urlParams);
-
-    return axios
-      .request({
-        method: 'POST',
-        url,
-        auth: {
-          username,
-          password,
-        },
-        data: prepareData(data, resourceType),
-        params: urlParams,
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
+    return post(url, nestArray(data, resourceType), {
+      auth,
+      params: urlParams,
+    })
       .then(result => {
         Log.info(
           `\nOperation succeeded. Created ${resourceType}: ${
@@ -426,51 +463,25 @@ export function create(resourceType, data, options, callback) {
  * });
  */
 export function update(resourceType, path, data, options, callback) {
+  const initialParams = { resourceType, path, data, options, callback };
   return state => {
-    const expanded = expandReferences({ resourceType, path, data, options })(
-      state
-    );
+    const { url, data, resourceType, auth, _, callback } = expandExtractAndLog(
+      'update',
+      initialParams
+    )(state);
 
-    const { username, password, hostUrl } = state.configuration;
-    const operationName = expanded.options?.operationName ?? 'update';
-    const responseType = expanded.options?.responseType ?? 'json';
-    const apiVersion =
-      expanded.options?.apiVersion ?? state.configuration.apiVersion;
-    const url = buildUrl(
-      '/' + expanded.resourceType + '/' + expanded.path,
-      hostUrl,
-      apiVersion
-    );
-
-    if (!CONTENT_TYPES.hasOwnProperty(responseType)) {
-      Log.warn(`DHIS2 doesn't support ${responseType} response type`);
-      return state;
-    }
-    const headers = {
-      Accept: CONTENT_TYPES[responseType],
-    };
-
-    log(operationName, apiVersion, url, expanded.resourceType);
-
-    return axios
-      .request({
-        method: 'PUT',
-        url,
-        auth: {
-          username,
-          password,
-        },
-        data: expanded.data,
-        headers,
-      })
+    return put(url, data, { auth })
       .then(result => {
         Log.info(
-          `${operationName} succeeded. Updated ${
-            expanded.resourceType
-          }.\nSummary:\n${prettyJson(result.data)}`
+          `\nOperation succeeded. Updated ${resourceType}.\n\nSummary:\n${prettyJson(
+            result.data
+          )}\n`
         );
         if (callback) return callback(composeNextState(state, result.data));
         return composeNextState(state, result.data);
+      })
+      .catch(error => {
+        throw error;
       });
   };
 }
