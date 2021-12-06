@@ -18,6 +18,9 @@ import {
   parseFilter,
   logOperation,
   prettyJson,
+  expandExtractAndLog,
+  nestArray,
+  expandAndSetOperation,
 } from './Utils';
 import { post, put } from './Client';
 
@@ -108,74 +111,6 @@ axios.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-function expandAndSetOperation(options, state, operationName) {
-  return {
-    operationName,
-    ...expandReferences(options)(state),
-  };
-}
-
-const isArray = variable => !!variable && variable.constructor === Array;
-
-export function nestArray(data, key) {
-  return isArray(data) ? { [key]: data } : data;
-}
-
-function log(operationName, apiVersion, url, resourceType, params) {
-  logOperation(operationName);
-  logApiVersion(apiVersion);
-  logWaitingForServer(url, params);
-  warnExpectLargeResult(resourceType, url);
-}
-
-function extractValuesForAxios(operationName, values) {
-  return state => {
-    const apiVersion =
-      values.options?.apiVersion ?? state.configuration.apiVersion;
-    const { username, password, hostUrl } = state.configuration;
-    const auth = { username, password };
-
-    let urlString = '/' + values.resourceType;
-    if (operationName === 'update') {
-      urlString += '/' + values.path;
-    }
-    const url = buildUrl(urlString, hostUrl, apiVersion);
-
-    const urlParams = new URLSearchParams(values.options?.params);
-
-    return {
-      resourceType: values.resourceType,
-      data: values.data,
-      apiVersion,
-      auth,
-      url,
-      urlParams,
-      callback: values.callback,
-    };
-  };
-}
-
-function expandExtractAndLog(operationName, initialParams) {
-  return state => {
-    const {
-      resourceType,
-      data,
-      apiVersion,
-      auth,
-      url,
-      urlParams,
-      callback,
-    } = extractValuesForAxios(
-      operationName,
-      expandReferences(initialParams)(state)
-    )(state);
-
-    log(operationName, apiVersion, url, resourceType, urlParams);
-
-    return { url, data, resourceType, auth, urlParams, callback };
-  };
-}
 
 /**
  * Create a record

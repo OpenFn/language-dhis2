@@ -1,5 +1,6 @@
 import { eq, filter, some, indexOf, lastIndexOf, trim } from 'lodash';
 import axios from 'axios';
+import { expandReferences } from '@openfn/language-common';
 
 export function composeSuccessMessage(operation) {
   return `${operation} succeeded. The body of this result will be available in state.data or in your callback.`;
@@ -170,6 +171,74 @@ export function parseFilter(filterExpression) {
     ? (filterTokens[1] = dhis2OperatorMap[filterTokens[1] ?? null])
     : null;
   return filterTokens;
+}
+
+export function expandAndSetOperation(options, state, operationName) {
+  return {
+    operationName,
+    ...expandReferences(options)(state),
+  };
+}
+
+const isArray = variable => !!variable && variable.constructor === Array;
+
+export function nestArray(data, key) {
+  return isArray(data) ? { [key]: data } : data;
+}
+
+function log(operationName, apiVersion, url, resourceType, params) {
+  logOperation(operationName);
+  logApiVersion(apiVersion);
+  logWaitingForServer(url, params);
+  warnExpectLargeResult(resourceType, url);
+}
+
+function extractValuesForAxios(operationName, values) {
+  return state => {
+    const apiVersion =
+      values.options?.apiVersion ?? state.configuration.apiVersion;
+    const { username, password, hostUrl } = state.configuration;
+    const auth = { username, password };
+
+    let urlString = '/' + values.resourceType;
+    if (operationName === 'update') {
+      urlString += '/' + values.path;
+    }
+    const url = buildUrl(urlString, hostUrl, apiVersion);
+
+    const urlParams = new URLSearchParams(values.options?.params);
+
+    return {
+      resourceType: values.resourceType,
+      data: values.data,
+      apiVersion,
+      auth,
+      url,
+      urlParams,
+      callback: values.callback,
+    };
+  };
+}
+
+export function expandExtractAndLog(operationName, initialParams) {
+  return state => {
+    const {
+      resourceType,
+      data,
+      apiVersion,
+      auth,
+      url,
+      urlParams,
+      callback,
+    } = extractValuesForAxios(
+      operationName,
+      expandReferences(initialParams)(state)
+    )(state);
+
+    log(operationName, apiVersion, url, resourceType, urlParams);
+
+    return { url, data, resourceType, auth, urlParams, callback };
+  };
 }
 
 export const CONTENT_TYPES = {

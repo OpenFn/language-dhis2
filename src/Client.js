@@ -1,9 +1,6 @@
 import axios from 'axios';
 
 export function post(url, data, configs) {
-  console.log('URL', url);
-  console.log('DATA', data);
-  console.log('CONFIGS', configs);
   return axios.request({
     method: 'POST',
     url,
