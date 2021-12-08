@@ -1,5 +1,6 @@
 import { eq, filter, some, indexOf, lastIndexOf, trim } from 'lodash';
 import axios from 'axios';
+import { expandReferences } from '@openfn/language-common';
 
 export function composeSuccessMessage(operation) {
   return `${operation} succeeded. The body of this result will be available in state.data or in your callback.`;
@@ -13,12 +14,14 @@ export function warnExpectLargeResult(paramOrResourceType, endpointUrl) {
 }
 
 export function logWaitingForServer(url, params) {
-  console.info(
-    'Request params: ',
-    typeof params === 'object' && !(params instanceof URLSearchParams)
-      ? prettyJson(params)
-      : params
-  );
+  if (params) {
+    console.info(
+      'Request params: ',
+      typeof params === 'object' && !(params instanceof URLSearchParams)
+        ? prettyJson(params)
+        : params
+    );
+  }
 
   console.info(`Waiting for response from ${url}`);
 }
@@ -168,6 +171,89 @@ export function parseFilter(filterExpression) {
     ? (filterTokens[1] = dhis2OperatorMap[filterTokens[1] ?? null])
     : null;
   return filterTokens;
+}
+
+export function expandAndSetOperation(options, state, operationName) {
+  return {
+    operationName,
+    ...expandReferences(options)(state),
+  };
+}
+
+const isArray = variable => !!variable && variable.constructor === Array;
+
+export function nestArray(data, key) {
+  return isArray(data) ? { [key]: data } : data;
+}
+
+function log(operationName, apiVersion, url, resourceType, params) {
+  logOperation(operationName);
+  logApiVersion(apiVersion);
+  logWaitingForServer(url, params);
+  warnExpectLargeResult(resourceType, url);
+}
+
+function extractValuesForAxios(operationName, values) {
+  return state => {
+    const apiVersion =
+      values.options?.apiVersion ?? state.configuration.apiVersion;
+    const { username, password, hostUrl } = state.configuration;
+    const auth = { username, password };
+
+    let urlString = '/' + values.resourceType;
+    if (operationName === 'update') {
+      urlString += '/' + values.path;
+    }
+    const url = buildUrl(urlString, hostUrl, apiVersion);
+
+    let urlParams = null;
+    if (operationName === 'get' || operationName === 'upsert') {
+      const filters = values.options?.params?.filters;
+      const dimensions = values.options?.params?.dimensions;
+      delete values.options?.params?.filters;
+      delete values.options?.params?.dimensions;
+      urlParams = new URLSearchParams(values.options?.params);
+      filters?.map(f => urlParams.append('filter', f));
+      dimensions?.map(d => urlParams.append('dimension', d));
+    }
+
+    const resourceType = values.resourceType;
+    const data = values.data;
+    const callback = values.callback;
+
+    const extractedValues = {
+      resourceType,
+      data,
+      apiVersion,
+      auth,
+      url,
+      urlParams,
+      callback,
+    };
+
+    return extractedValues;
+  };
+}
+
+export function expandExtractAndLog(operationName, initialParams) {
+  return state => {
+    const {
+      resourceType,
+      data,
+      apiVersion,
+      auth,
+      url,
+      urlParams,
+      callback,
+    } = extractValuesForAxios(
+      operationName,
+      expandReferences(initialParams)(state)
+    )(state);
+
+    log(operationName, apiVersion, url, resourceType, urlParams);
+
+    return { url, data, resourceType, auth, urlParams, callback };
+  };
 }
 
 export const CONTENT_TYPES = {
