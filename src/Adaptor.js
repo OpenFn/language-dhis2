@@ -129,7 +129,7 @@ function log(operationName, apiVersion, url, resourceType, params) {
 }
 
 /**
- * A generic helper method to create a record of any kind in DHIS2
+ * Create a record
  * @public
  * @function
  * @param {string} resourceType - Type of resource to create. E.g. `trackedEntityInstances`, `programs`, `events`, ...
@@ -416,7 +416,7 @@ export function create(resourceType, data, options, callback) {
  *   ],
  * });
  *
- * @example <caption>-a single `enrollment`</caption>
+ * @example <caption>a single `enrollment`</caption>
  * update('enrollments', 'CmsHzercTBa' {
  *   trackedEntityInstance: 'bmshzEacgxa',
  *   orgUnit: 'TSyzvBiovKh',

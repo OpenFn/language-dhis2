@@ -9,7 +9,7 @@
         "callback"
       ],
       "docs": {
-        "description": "A generic helper method to create a record of any kind in DHIS2",
+        "description": "Create a record",
         "tags": [
           {
             "title": "public",
@@ -289,7 +289,7 @@
           {
             "title": "example",
             "description": "update('enrollments', 'CmsHzercTBa' {\n  trackedEntityInstance: 'bmshzEacgxa',\n  orgUnit: 'TSyzvBiovKh',\n  program: 'gZBxv9Ujxg0',\n  enrollmentDate: '2013-10-17',\n  incidentDate: '2013-10-17',\n});",
-            "caption": "-a single `enrollment`"
+            "caption": "a single `enrollment`"
           }
         ]
       },
