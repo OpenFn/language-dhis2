@@ -9,7 +9,7 @@
   },
 
   "containerEnv": {
-    "GH_TOKEN": "${localEnv:GH_TOKEN}",
+    "GH_TOKEN": "${localEnv:GH_TOKEN}"
   },
 
   "mounts": [

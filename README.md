@@ -1,7 +1,7 @@
 # Language DHIS2 [![Build Status](https://travis-ci.org/OpenFn/language-dhis2.svg?branch=main)](https://travis-ci.org/OpenFn/language-dhis2)
 
-Language Pack for building expressions and operations for working with
-the [DHIS2 API](http://dhis2.github.io/dhis2-docs/master/en/developer/html/dhis2_developer_manual.html).
+Language Pack for building expressions and operations for working with the
+[DHIS2 API](http://dhis2.github.io/dhis2-docs/master/en/developer/html/dhis2_developer_manual.html).
 
 ## Documentation
 
@@ -38,7 +38,7 @@ fetchAnalytics({
     outputIdScheme: 'UID',
   },
 });
-````
+```
 
 ## Tracked Entity API
 
@@ -174,4 +174,38 @@ Clone the repo, run `npm install`.
 
 Run tests using `npm run test` or `npm run test:watch`
 
-Build the project using `make`.
+NB: There are two types of tests: unit tests and integration tests.
+
+### Unit Tests
+
+Unit tests allows to test the functionalities of the adaptor helper functions
+such as:
+
+> Does `create('events', payload)` perform a post request to the correct DHIS2
+> API?
+
+To run unit tests execute `npm run test` (they're the default tests).
+
+Anytime a new functionality is added to the helper functions, more unit tests
+needs to be added.
+
+### End-to-end integration tests
+
+Integration tests allow to test the end-to-end behavior of the helper functions
+and also to test the examples (snippet of code) we provide in the documentation.
+For example with integration tests we answer the following question:
+
+> Does `create('events', eventPayload)` actually create a new event in a live
+> DHIS2 system?
+
+To run integration tests, execute `npm run integration-test`. These
+tests use network I/O and a public connection to a DHIS2 "play" server so their
+timing and performance is unpredictable. Consider adding an increased timeout,
+and modifying the orgUnit, program, etc., IDs set in `globalState`.
+
+Anytime a new example is added in the documentation of a helper function, a new
+integration test should be done.
+
+### Build
+
+Build the project using `npm run build`.
