@@ -416,7 +416,7 @@ export function create(resourceType, data, options, callback) {
  *   ],
  * });
  *
- * @example <caption>a single `enrollment`</caption>
+ * @example <caption>a single enrollment</caption>
  * update('enrollments', 'CmsHzercTBa' {
  *   trackedEntityInstance: 'bmshzEacgxa',
  *   orgUnit: 'TSyzvBiovKh',
