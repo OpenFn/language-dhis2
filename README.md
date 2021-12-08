@@ -191,8 +191,9 @@ needs to be added.
 
 ### End-to-end integration tests
 
-Integration tests allow to test the end-to-end behavior of the helper functions
-and also to test the examples (snippet of code) we provide in the documentation.
+Integration tests allow us to test the end-to-end behavior of the helper functions
+and also to test the examples we provide via inline documentation.
+
 For example with integration tests we answer the following question:
 
 > Does `create('events', eventPayload)` actually create a new event in a live
