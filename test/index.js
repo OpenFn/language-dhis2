@@ -1,7 +1,7 @@
 import { expect } from 'chai';
-import { execute, create, update, nestArray } from '../lib/Adaptor';
+import { execute, create, update } from '../lib/Adaptor';
 import { dataValue } from '@openfn/language-common';
-import { buildUrl } from '../lib/Utils';
+import { buildUrl, nestArray } from '../lib/Utils';
 import nock from 'nock';
 
 const testServer = nock('https://play.dhis2.org/2.36.4');
@@ -133,7 +133,10 @@ describe('UPDATE', () => {
       });
 
     const response = await execute(
-      update('events', 'qAZJCrNJK8H', state => ({ ...state.data, date: state.data.currentDate }))
+      update('events', 'qAZJCrNJK8H', state => ({
+        ...state.data,
+        date: state.data.currentDate,
+      }))
     )(state);
     expect(response.data).to.eql({ httpStatus: 'OK', message: 'the response' });
   });
@@ -154,7 +157,7 @@ describe('UPDATE', () => {
       update('events', 'qAZJCrNJK8H', {
         program: dataValue('program'),
         orgUnit: 'hardcoded',
-        date: state => state.data.currentDate
+        date: state => state.data.currentDate,
       })
     )(state);
     expect(response.data).to.eql({ httpStatus: 'OK', message: 'the response' });

@@ -206,17 +206,32 @@ function extractValuesForAxios(operationName, values) {
     }
     const url = buildUrl(urlString, hostUrl, apiVersion);
 
-    const urlParams = new URLSearchParams(values.options?.params);
+    let urlParams = null;
+    if (operationName === 'get' || operationName === 'upsert') {
+      const filters = values.options?.params?.filters;
+      const dimensions = values.options?.params?.dimensions;
+      delete values.options?.params?.filters;
+      delete values.options?.params?.dimensions;
+      urlParams = new URLSearchParams(values.options?.params);
+      filters?.map(f => urlParams.append('filter', f));
+      dimensions?.map(d => urlParams.append('dimension', d));
+    }
 
-    return {
-      resourceType: values.resourceType,
-      data: values.data,
+    const resourceType = values.resourceType;
+    const data = values.data;
+    const callback = values.callback;
+
+    const extractedValues = {
+      resourceType,
+      data,
       apiVersion,
       auth,
       url,
       urlParams,
-      callback: values.callback,
+      callback,
     };
+
+    return extractedValues;
   };
 }
 

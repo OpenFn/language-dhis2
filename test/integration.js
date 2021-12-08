@@ -1,6 +1,7 @@
 const { expect } = require('chai');
-const { create, execute, getData, update } = require('../src/Adaptor');
+const { create, execute, get, update } = require('../src/Adaptor');
 const crypto = require('crypto');
+const { upsert } = require('../lib/Adaptor');
 
 const getRandomOrganisationUnitPayload = user => {
   const name = crypto.randomBytes(16).toString('hex');
@@ -63,11 +64,8 @@ describe('create', () => {
     const state = {
       ...globalState,
       data: {
-        program: globalState.program,
-        orgUnit: globalState.organisationUnit,
-        programStage: globalState.programStage,
-        trackedEntityInstance: globalState.trackedEntityInstance,
-        eventDate: new Date().toISOString().split('T')[0],
+        program: 'eBAyeGv0exc',
+        orgUnit: 'DiszpKrYNg8',
         status: 'COMPLETED',
       },
     };
@@ -164,23 +162,23 @@ describe('create', () => {
     expect({ status: response.data.status }).to.eql({ status: 'SUCCESS' });
   });
 
-  it('should create a single enrollment of a trackedEntityInstance into a given program', async () => {
-    const state = {
-      ...globalState,
-      data: {
-        trackedEntityInstance: globalState.trackedEntityInstance,
-        orgUnit: globalState.organisationUnit,
-        program: globalState.program,
-        enrollmentDate: new Date().toISOString().split('T')[0],
-        incidentDate: new Date().toISOString().split('T')[0],
-      },
-    };
+  // it('should create a single enrollment of a trackedEntityInstance into a given program', async () => {
+  //   const state = {
+  //     ...globalState,
+  //     data: {
+  //       trackedEntityInstance: globalState.trackedEntityInstance,
+  //       orgUnit: globalState.organisationUnit,
+  //       program: globalState.program,
+  //       enrollmentDate: new Date().toISOString().split('T')[0],
+  //       incidentDate: new Date().toISOString().split('T')[0],
+  //     },
+  //   };
 
-    const response = await execute(create('enrollments', state => state.data))(
-      state
-    );
-    expect({ status: response.data.status }).to.eql({ status: 'SUCCESS' });
-  });
+  //   const response = await execute(create('enrollments', state => state.data))(
+  //     state
+  //   );
+  //   expect({ status: response.data.status }).to.eql({ status: 'SUCCESS' });
+  // });
 });
 
 describe('update', () => {
@@ -211,8 +209,10 @@ describe('update', () => {
   it('should update a single event', async () => {
     const state = {
       ...globalState,
+      event: 'OZ3mVgaIAqw',
       data: {
-        eventDate: new Date().toISOString().split('T')[0],
+        program: 'eBAyeGv0exc',
+        orgUnit: 'DiszpKrYNg8',
         status: 'COMPLETED',
       },
     };
@@ -321,26 +321,164 @@ describe('update', () => {
     )(state);
     expect({ status: response.data.status }).to.eql({ status: 'SUCCESS' });
   });
+});
 
-  it('should update a single enrollment of a trackedEntityInstance into a given program', async () => {
-    const state = {
-      ...globalState,
-      data: {
-        trackedEntityInstance: globalState.trackedEntityInstance,
-        orgUnit: globalState.organisationUnit,
-        program: globalState.program,
-        enrollmentDate: new Date().toISOString().split('T')[0],
-        incidentDate: new Date().toISOString().split('T')[0],
-      },
-    };
+describe('get', () => {
+  const state = {
+    configuration: {
+      username: 'admin',
+      password: 'district',
+      hostUrl: 'https://play.dhis2.org/2.36.4',
+    },
+    data: {},
+  };
 
+  it('should get trackedEntityInstances matching the URL parameters specified', async () => {
     const response = await execute(
-      update(
-        'enrollments',
-        state => state.enrollment,
-        state => state.data
+      get('trackedEntityInstances', {
+        params: {
+          fields: '*',
+          ou: 'DiszpKrYNg8',
+          entityType: 'nEenWmSyUEp',
+          trackedEntityInstance: 'dNpxRu1mWG5',
+        },
+      })
+    )(state);
+    expect(response.data.trackedEntityInstances.length).to.gte(1);
+  });
+
+  it('should get all programs in the organisation unit TSyzvBiovKh', async () => {
+    const response = await execute(
+      get('programs', {
+        params: { orgUnit: 'TSyzvBiovKh', fields: '*' },
+      })
+    )(state);
+    expect(response.data.programs.length).to.gte(1);
+  });
+});
+
+describe('upsert', () => {
+  const state = {
+    configuration: {
+      username: 'admin',
+      password: 'district',
+      hostUrl: 'https://play.dhis2.org/2.36.4',
+    },
+    data: {},
+  };
+
+  it('should upsert a trackedEntityInstance matching the URL parameters', async () => {
+    const response = await execute(
+      upsert(
+        'trackedEntityInstances',
+        {
+          created: '2019-08-21T13:27:51.119',
+          orgUnit: 'DiszpKrYNg8',
+          createdAtClient: '2019-03-19T01:11:03.924',
+          trackedEntityInstance: 'dNpxRu1mWG5',
+          lastUpdated: '2019-09-27T00:02:11.604',
+          trackedEntityType: 'We9I19a3vO1',
+          lastUpdatedAtClient: '2019-03-19T01:11:03.924',
+          coordinates:
+            '[[[-11.8049,8.3374],[-11.8032,8.3436],[-11.8076,8.3441],[-11.8096,8.3387],[-11.8049,8.3374]]]',
+          inactive: false,
+          deleted: false,
+          featureType: 'POLYGON',
+          geometry: {
+            type: 'Polygon',
+            coordinates: [
+              [
+                [-11.8049, 8.3374],
+                [-11.8032, 8.3436],
+                [-11.8076, 8.3441],
+                [-11.8096, 8.3387],
+                [-11.8049, 8.3374],
+              ],
+            ],
+          },
+          programOwners: [
+            {
+              ownerOrgUnit: 'DiszpKrYNg8',
+              program: 'M3xtLkYBlKI',
+              trackedEntityInstance: 'dNpxRu1mWG5',
+            },
+          ],
+          enrollments: [],
+          relationships: [
+            {
+              lastUpdated: '2019-08-21T00:00:00.000',
+              created: '2019-08-21T00:00:00.000',
+              relationshipName: 'Focus to Case',
+              bidirectional: false,
+              relationshipType: 'Mv8R4MPcNcX',
+              relationship: 'EDfZpCLcEVN',
+              from: {
+                trackedEntityInstance: {
+                  trackedEntityInstance: 'dNpxRu1mWG5',
+                  programOwners: [],
+                },
+              },
+              to: {
+                trackedEntityInstance: {
+                  trackedEntityInstance: 'Fbru4rg4dYV',
+                  programOwners: [],
+                },
+              },
+            },
+            {
+              lastUpdated: '2019-08-21T00:00:00.000',
+              created: '2019-08-21T00:00:00.000',
+              relationshipName: 'Focus to Case',
+              bidirectional: false,
+              relationshipType: 'Mv8R4MPcNcX',
+              relationship: 'z4ItJx8ul3Z',
+              from: {
+                trackedEntityInstance: {
+                  trackedEntityInstance: 'dNpxRu1mWG5',
+                  programOwners: [],
+                },
+              },
+              to: {
+                trackedEntityInstance: {
+                  trackedEntityInstance: 'RHA9RWNvAnC',
+                  programOwners: [],
+                },
+              },
+            },
+            {
+              lastUpdated: '2019-08-21T00:00:00.000',
+              created: '2019-08-21T00:00:00.000',
+              relationshipName: 'Focus to Case',
+              bidirectional: false,
+              relationshipType: 'Mv8R4MPcNcX',
+              relationship: 'XIfv95ZiM4H',
+              from: {
+                trackedEntityInstance: {
+                  trackedEntityInstance: 'dNpxRu1mWG5',
+                  programOwners: [],
+                },
+              },
+              to: {
+                trackedEntityInstance: {
+                  trackedEntityInstance: 'jZRaFaYkAtE',
+                  programOwners: [],
+                },
+              },
+            },
+          ],
+          attributes: [],
+        },
+        {
+          params: {
+            fields: '*',
+            ou: 'DiszpKrYNg8',
+            entityType: 'nEenWmSyUEp',
+            trackedEntityInstance: 'dNpxRu1mWG5',
+          },
+        }
       )
     )(state);
-    expect({ status: response.data.status }).to.eql({ status: 'SUCCESS' });
+    expect(response.data.httpStatusCode).to.eq(200);
+    expect(response.data.httpStatus).to.eq('OK');
   });
 });
