@@ -106,7 +106,6 @@ axios.interceptors.response.use(
     return response;
   },
   function (error) {
-    console.log(error);
     Log.error(`${error?.message}`);
     return Promise.reject(error);
   }
