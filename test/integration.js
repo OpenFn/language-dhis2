@@ -248,7 +248,7 @@ describe('update', () => {
         ],
       },
     };
-    console.log(state);
+
     const response = await execute(
       update(
         'trackedEntityInstances',
@@ -256,6 +256,7 @@ describe('update', () => {
         state => state.data
       )
     )(state);
+
     expect({
       httpStatus: response.data.httpStatus,
       httpStatusCode: response.data.httpStatusCode,
