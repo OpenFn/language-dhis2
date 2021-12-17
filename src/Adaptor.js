@@ -6,21 +6,15 @@ import {
   expandReferences,
 } from '@openfn/language-common';
 import { indexOf } from 'lodash';
-
 import {
-  Log,
-  warnExpectLargeResult,
-  logWaitingForServer,
   buildUrl,
-  logApiVersion,
+  buildUrlParams,
   CONTENT_TYPES,
-  applyFilter,
-  parseFilter,
-  logOperation,
-  prettyJson,
-  expandExtractAndLog,
+  generateUrl,
+  handleResponse,
+  Log,
   nestArray,
-  expandAndSetOperation,
+  prettyJson,
 } from './Utils';
 import { request } from './Client';
 
@@ -71,6 +65,8 @@ function configMigrationHelper(state) {
   return state;
 }
 
+// NOTE: In order to prevent unintended exposure of authentication information
+// in the logs, we make use of an axios interceptor.
 axios.interceptors.response.use(
   function (response) {
     const contentType = response.headers['content-type']?.split(';')[0];
@@ -83,7 +79,7 @@ axios.interceptors.response.use(
       if (indexOf(acceptHeaders, contentType) === -1) {
         const newError = {
           status: 404,
-          message: 'Unexpected content,returned',
+          message: 'Unexpected content returned',
           responseData: response.data,
         };
 
@@ -100,14 +96,25 @@ axios.interceptors.response.use(
       try {
         response = { ...response, data: JSON.parse(response.data) };
       } catch (error) {
-        /* Keep quiet */
+        Log.warn('Non-JSON response detected, unable to parse.');
       }
     }
     return response;
   },
   function (error) {
-    Log.error(`${error?.message}`);
-    return Promise.reject(error);
+    try {
+      const details = error.toJSON();
+      if (details?.config?.auth) details.config.auth = '--REDACTED--';
+      if (details?.config?.data) details.config.data = '--REDACTED--';
+
+      Log.error(details.message);
+      return Promise.reject(details);
+    } catch (e) {
+      // TODO: @Elias, why does this error sometimes already appear to be JSONified?
+      // console.log(e) // "not JSONABLE TypeError: error.toJSON is not a function"
+      Log.error(error.message);
+      return Promise.reject(error);
+    }
   }
 );
 
@@ -223,36 +230,23 @@ axios.interceptors.response.use(
  * });
  */
 export function create(resourceType, data, options, callback) {
-  const initialParams = { resourceType, data, options, callback };
   return state => {
-    const {
-      url,
-      data,
-      resourceType,
-      auth,
-      urlParams,
-      callback,
-    } = expandExtractAndLog('create', initialParams)(state);
+    console.log(`Preparing create operation...`);
 
-    return request({
+    resourceType = expandReferences(resourceType)(state);
+    data = expandReferences(data)(state);
+    options = expandReferences(options)(state);
+
+    const { configuration } = state;
+
+    return request(configuration, {
       method: 'post',
-      url,
+      url: generateUrl(configuration, options, resourceType),
       data: nestArray(data, resourceType),
-      options: {
-        auth,
-        params: urlParams,
-      },
-    })
-      .then(result => {
-        Log.info(
-          `\nOperation succeeded. Created ${resourceType}: ${result.headers.location}.\n`
-        );
-        if (callback) return callback(composeNextState(state, result.data));
-        return composeNextState(state, result.data);
-      })
-      .catch(error => {
-        throw error;
-      });
+    }).then(result => {
+      Log.success(`Created ${resourceType}: ${result.headers.location}`);
+      return handleResponse(result, state, callback);
+    });
   };
 }
 
@@ -400,22 +394,25 @@ export function create(resourceType, data, options, callback) {
  * });
  */
 export function update(resourceType, path, data, options, callback) {
-  const initialParams = { resourceType, path, data, options, callback };
   return state => {
-    const { url, data, resourceType, auth, _, callback } = expandExtractAndLog(
-      'update',
-      initialParams
-    )(state);
+    console.log(`Preparing update operation...`);
 
-    return request({ method: 'put', url, data, options: { auth } })
-      .then(result => {
-        Log.info(`\nOperation succeeded. Updated ${resourceType} ${path}.\n`);
-        if (callback) return callback(composeNextState(state, result.data));
-        return composeNextState(state, result.data);
-      })
-      .catch(error => {
-        throw error;
-      });
+    resourceType = expandReferences(resourceType)(state);
+    path = expandReferences(path)(state);
+    data = expandReferences(data)(state);
+    options = expandReferences(options)(state);
+
+    const { configuration } = state;
+
+    return request(configuration, {
+      method: 'put',
+      url: `${generateUrl(configuration, options, resourceType)}/${path}`,
+      // TODO: @Elias, why no "nestArray" here?
+      data,
+    }).then(result => {
+      Log.success(`Updated ${resourceType} at ${path}`);
+      return handleResponse(result, state, callback);
+    });
   };
 }
 
@@ -436,33 +433,28 @@ export function update(resourceType, path, data, options, callback) {
  *    trackedEntityInstance: 'dNpxRu1mWG5',
  * });
  */
+// TODO: @Elias, I'm not sure "options" is the right name for the second arg here.
+// Isn't this more like the filters that you're using to find the right resources?
 export function get(resourceType, options, callback) {
-  const initialParams = { resourceType, options, callback };
   return state => {
-    const {
-      url: url,
-      _data,
-      _resourceType,
-      auth,
-      urlParams,
-      callback,
-    } = expandExtractAndLog('get', initialParams)(state);
+    console.log(`Preparing get operation...`);
 
-    return request({
+    resourceType = expandReferences(resourceType)(state);
+    options = expandReferences(options)(state);
+
+    const { configuration } = state;
+
+    return request(configuration, {
       method: 'get',
-      url,
-      options: { auth, params: urlParams, responseType: 'json' },
-    })
-      .then(result => {
-        Log.info(
-          `\nOperation succeeded. Retrieved ${result.data[resourceType].length} ${resourceType}.\n`
-        );
-        if (callback) return callback(composeNextState(state, result.data));
-        return composeNextState(state, result.data);
-      })
-      .catch(error => {
-        throw error;
-      });
+      url: generateUrl(configuration, options, resourceType),
+      params: buildUrlParams(options),
+      responseType: 'json',
+    }).then(result => {
+      Log.success(
+        `Retrieved ${result.data[resourceType].length} ${resourceType}.`
+      );
+      return handleResponse(result, state, callback);
+    });
   };
 }
 
@@ -495,30 +487,28 @@ export function get(resourceType, options, callback) {
  */
 export function upsert(resourceType, data, options, callback) {
   return state => {
+    console.log(`Preparing upsert via 'get' then 'create' OR 'update'...`);
+
     return get(
       resourceType,
       options
-    )(state)
-      .then(res => {
-        const resources = res.data[resourceType];
-        if (resources.length > 1) {
-          throw new RangeError(
-            `Cannot upsert on Non-unique attribute. The operation found more than one records for your request.`
-          );
-        } else if (resources.length <= 0) {
-          return create(resourceType, data, options, callback)(state);
-        } else {
-          const pathName =
-            resourceType === 'trackedEntityInstances'
-              ? 'trackedEntityInstance'
-              : 'id';
-          const path = resources[0][pathName];
-          return update(resourceType, path, data, options, callback)(state);
-        }
-      })
-      .catch(err => {
-        throw err;
-      });
+    )(state).then(resp => {
+      const resources = resp.data[resourceType];
+      if (resources.length > 1) {
+        throw new RangeError(
+          `Cannot upsert on Non-unique attribute. The operation found more than one records for your request.`
+        );
+      } else if (resources.length <= 0) {
+        return create(resourceType, data, options, callback)(state);
+      } else {
+        const pathName =
+          resourceType === 'trackedEntityInstances'
+            ? 'trackedEntityInstance'
+            : 'id';
+        const path = resources[0][pathName];
+        return update(resourceType, path, data, options, callback)(state);
+      }
+    });
   };
 }
 
@@ -534,7 +524,7 @@ export function upsert(resourceType, data, options, callback) {
  */
 export function discover(httpMethod, endpoint) {
   return state => {
-    Log.info(
+    console.log(
       `Discovering query/import parameters for ${httpMethod} on ${endpoint}`
     );
     return axios
@@ -596,7 +586,7 @@ export function discover(httpMethod, endpoint) {
         }
       )
       .then(result => {
-        Log.info(
+        console.log(
           `\t=======================================================================================\n\tQuery Parameters for ${httpMethod} on ${endpoint} [${
             result.data.description ?? '<description_missing>'
           }]\n\t=======================================================================================`
@@ -636,6 +626,7 @@ export function discover(httpMethod, endpoint) {
  *   name: 'New Name',
  * });
  */
+// TODO: @Elias, can this be deleted in favor of update? How does DHIS2 handle PATCH vs PUT?
 export function patch(resourceType, path, data, params, options, callback) {
   return state => {
     resourceType = expandReferences(resourceType)(state);
@@ -672,14 +663,6 @@ export function patch(resourceType, path, data, params, options, callback) {
       Accept: CONTENT_TYPES[responseType] ?? 'application/json',
     };
 
-    logOperation(operationName);
-
-    logApiVersion(apiVersion);
-
-    logWaitingForServer(url, queryParams);
-
-    warnExpectLargeResult(resourceType, url);
-
     return axios
       .request({
         method: 'PATCH',
@@ -697,7 +680,7 @@ export function patch(resourceType, path, data, params, options, callback) {
           status: result.status,
           statusText: result.statusText,
         };
-        Log.info(
+        Log.success(
           `${operationName} succeeded. Updated ${resourceType}.\nSummary:\n${prettyJson(
             resultObject
           )}`
@@ -722,6 +705,7 @@ export function patch(resourceType, path, data, params, options, callback) {
  * @example <caption>Example`deleting` a `tracked entity instance`</caption>
  * del('trackedEntityInstances', 'LcRd6Nyaq7T');
  */
+// TODO: @Elias, can this be implemented using the same pattern as update but without data?
 export function del(resourceType, path, data, params, options, callback) {
   return state => {
     resourceType = expandReferences(resourceType)(state);
@@ -758,14 +742,6 @@ export function del(resourceType, path, data, params, options, callback) {
 
     const url = buildUrl('/' + resourceType + '/' + path, hostUrl, apiVersion);
 
-    logOperation(operationName);
-
-    logApiVersion(apiVersion);
-
-    logWaitingForServer(url, queryParams);
-
-    warnExpectLargeResult(resourceType, url);
-
     return axios
       .request({
         method: 'DELETE',
@@ -779,7 +755,7 @@ export function del(resourceType, path, data, params, options, callback) {
         headers,
       })
       .then(result => {
-        Log.info(
+        Log.success(
           `${operationName} succeeded. DELETED ${resourceType}.\nSummary:\n${prettyJson(
             result.data
           )}`
@@ -806,7 +782,12 @@ export function attrVal(tei, attributeName) {
   )?.value;
 }
 
-export { attribute } from './Utils';
+export function attribute(attributeId, attributeValue) {
+  return {
+    attribute: attributeId,
+    value: attributeValue,
+  };
+}
 
 export {
   field,

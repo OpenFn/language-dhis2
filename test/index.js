@@ -84,9 +84,8 @@ describe('CREATE', () => {
         message: 'the response',
       });
 
-    const response = await execute(create('events', state => state.data))(
-      state
-    );
+    const response = await execute(create('events', state.data))(state);
+
     expect(response.data).to.eql({ httpStatus: 'OK', message: 'the response' });
   });
 

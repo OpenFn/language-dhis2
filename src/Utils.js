@@ -1,260 +1,6 @@
-import { eq, filter, some, indexOf, lastIndexOf, trim } from 'lodash';
 import axios from 'axios';
-import { expandReferences } from '@openfn/language-common';
-
-export function composeSuccessMessage(operation) {
-  return `${operation} succeeded. The body of this result will be available in state.data or in your callback.`;
-}
-
-export function warnExpectLargeResult(paramOrResourceType, endpointUrl) {
-  if (!paramOrResourceType)
-    Log.warn(
-      ` Missing params or resourceType. This may take a while. This endpoint(${endpointUrl}) may return a large collection of records, since 'params' or 'resourceType' is not specified. We recommend you specify 'params' or 'resourceType' or use 'filter' parameter to limit the content of the result.`
-    );
-}
-
-export function logWaitingForServer(url, params) {
-  if (params) {
-    console.info(
-      'Request params: ',
-      typeof params === 'object' && !(params instanceof URLSearchParams)
-        ? prettyJson(params)
-        : params
-    );
-  }
-
-  console.info(`Waiting for response from ${url}`);
-}
-
-export function logApiVersion(apiVersion) {
-  const message =
-    apiVersion && apiVersion
-      ? `Using DHIS2 api version ${apiVersion}`
-      : ' Attempting to use apiVersion without providing it in state.configuration or in options parameter. You may encounter errors. api_version_missing.';
-
-  if (apiVersion) console.warn(message);
-  else console.warn(`Using latest version of DHIS2 api.`);
-}
-
-export function logOperation(operation) {
-  console.info(`Executing ${operation} ...`);
-}
-
-export function buildUrl(path, hostUrl, apiVersion) {
-  const pathSuffix = apiVersion ? `/${apiVersion}${path}` : `${path}`;
-  const url = hostUrl + '/api' + pathSuffix;
-
-  return url;
-}
-
-export function attribute(attributeId, attributeValue) {
-  return {
-    attribute: attributeId,
-    value: attributeValue,
-  };
-}
-
-export function requestHttpHead(endpointUrl, { username, password }) {
-  return axios
-    .request({
-      method: 'HEAD',
-      url: endpointUrl,
-      auth: {
-        username,
-        password,
-      },
-    })
-    .then(result => result.headers['content-length']);
-}
-
-export function validateMetadataPayload(payload, resourceType) {
-  return axios
-    .request({
-      method: 'POST',
-      url: `https://play.dhis2.org/dev/api/schemas/${resourceType}`,
-      auth: {
-        username: 'admin',
-        password: 'distict',
-      },
-      data: payload,
-    })
-    .then(result => result.data);
-}
-
-export function handleResponse(result, state, callback) {
-  if (callback) return callback(composeNextState(state, result));
-
-  return composeNextState(state, result);
-}
-
-export function prettyJson(data) {
-  return JSON.stringify(data, null, 2);
-}
-
-export function getIndicesOf(string, regex) {
-  var match,
-    indexes = {};
-
-  regex = new RegExp(regex);
-
-  while ((match = regex.exec(string))) {
-    let schemaRef;
-    if (!indexes[match[0]]) {
-      indexes[match[0]] = {};
-    }
-    let hrefString = string.slice(
-      match.index,
-      indexOf(string, '}', match.index) - 1
-    );
-    let lastIndex = lastIndexOf(hrefString, '/') + 1;
-    schemaRef = trim(hrefString.slice(lastIndex));
-    indexes[match[0]][match.index] = schemaRef;
-  }
-
-  return indexes;
-}
-
-export class Log {
-  static info(message) {
-    return console.info('(info)', new Date(), `\n${message}`);
-  }
-
-  static warn(message) {
-    return console.warn('⚠ WARNING', new Date(), `\n${message}`);
-  }
-
-  static error(message) {
-    return console.error('✗ ERROR', new Date(), `\n${message}`);
-  }
-}
-
-export function isLike(string, words) {
-  const wordsArrary = words?.match(/([^\W]+[^\s,]*)/)?.splice(0, 1);
-  const isFound = word => RegExp(word, 'i')?.test(string);
-  return some(wordsArrary, isFound);
-}
-
-export const dhis2OperatorMap = {
-  eq: eq,
-  like: isLike,
-};
-
-export function applyFilter(
-  arrObject,
-  targetProperty,
-  operator,
-  valueToCompareWith
-) {
-  if (targetProperty && operator && valueToCompareWith) {
-    try {
-      return filter(arrObject, obj =>
-        Reflect.apply(operator, obj, [obj[targetProperty], valueToCompareWith])
-      );
-    } catch (error) {
-      Log.warn(
-        `Returned unfiltered data. Failed to apply custom filter(${prettyJson({
-          targetProperty: targetProperty ?? null,
-          operator: operator ?? null,
-          value: valueToCompareWith ?? null,
-        })}) on this collection. The operator you supplied maybe unsupported on this resource at the moment.`
-      );
-      return arrObject;
-    }
-  }
-  Log.info(`No filters applied, returned all records on this resource.`);
-  return arrObject;
-}
-
-export function parseFilter(filterExpression) {
-  const filterTokens = filterExpression?.split(':');
-  filterTokens
-    ? (filterTokens[1] = dhis2OperatorMap[filterTokens[1] ?? null])
-    : null;
-  return filterTokens;
-}
-
-export function expandAndSetOperation(options, state, operationName) {
-  return {
-    operationName,
-    ...expandReferences(options)(state),
-  };
-}
-
-const isArray = variable => !!variable && variable.constructor === Array;
-
-export function nestArray(data, key) {
-  return isArray(data) ? { [key]: data } : data;
-}
-
-function log(operationName, apiVersion, url, resourceType, params) {
-  logOperation(operationName);
-  logApiVersion(apiVersion);
-  logWaitingForServer(url, params);
-  warnExpectLargeResult(resourceType, url);
-}
-
-function extractValuesForAxios(operationName, values) {
-  return state => {
-    const apiVersion =
-      values.options?.apiVersion ?? state.configuration.apiVersion;
-    const { username, password, hostUrl } = state.configuration;
-    const auth = { username, password };
-
-    let urlString = '/' + values.resourceType;
-    if (operationName === 'update') {
-      urlString += '/' + values.path;
-    }
-    const url = buildUrl(urlString, hostUrl, apiVersion);
-
-    let urlParams = null;
-    if (operationName === 'get' || operationName === 'upsert') {
-      const filters = values.options?.params?.filters;
-      const dimensions = values.options?.params?.dimensions;
-      delete values.options?.params?.filters;
-      delete values.options?.params?.dimensions;
-      urlParams = new URLSearchParams(values.options?.params);
-      filters?.map(f => urlParams.append('filter', f));
-      dimensions?.map(d => urlParams.append('dimension', d));
-    }
-
-    const resourceType = values.resourceType;
-    const data = values.data;
-    const callback = values.callback;
-
-    const extractedValues = {
-      resourceType,
-      data,
-      apiVersion,
-      auth,
-      url,
-      urlParams,
-      callback,
-    };
-
-    return extractedValues;
-  };
-}
-
-export function expandExtractAndLog(operationName, initialParams) {
-  return state => {
-    const {
-      resourceType,
-      data,
-      apiVersion,
-      auth,
-      url,
-      urlParams,
-      callback,
-    } = extractValuesForAxios(
-      operationName,
-      expandReferences(initialParams)(state)
-    )(state);
-
-    log(operationName, apiVersion, url, resourceType, urlParams);
-
-    return { url, data, resourceType, auth, urlParams, callback };
-  };
-}
+import { eq, filter, some, indexOf, lastIndexOf, trim } from 'lodash';
+import { composeNextState } from '@openfn/language-common';
 
 export const CONTENT_TYPES = {
   xml: 'application/xml',
@@ -263,3 +9,144 @@ export const CONTENT_TYPES = {
   csv: 'application/csv',
   xls: 'application/vnd.ms-excel',
 };
+
+export class Log {
+  static success(message) {
+    return console.info(`✓ ${message} @ ${new Date()}`);
+  }
+
+  static warn(message) {
+    return console.warn(`⚠ Warning: ${message} @ ${new Date()}`);
+  }
+
+  static error(message) {
+    return console.error(`✗ Error: ${message} @ ${new Date()}`);
+  }
+}
+
+export function buildUrl(path, hostUrl, apiVersion) {
+  const pathSuffix = apiVersion ? `/${apiVersion}${path}` : `${path}`;
+  return hostUrl + '/api' + pathSuffix;
+}
+
+export function handleResponse(result, state, callback) {
+  // TODO: @Elias, should composeNextState get passed result OR result.data?
+  if (callback) return callback(composeNextState(state, result.data));
+  return composeNextState(state, result.data);
+}
+
+export function prettyJson(data) {
+  return JSON.stringify(data, null, 2);
+}
+
+// =============================================================================
+// TODO: @Elias... what are these functions doing and do they have a place in the new implementation?
+// export function getIndicesOf(string, regex) {
+//   var match,
+//     indexes = {};
+
+//   regex = new RegExp(regex);
+
+//   while ((match = regex.exec(string))) {
+//     let schemaRef;
+//     if (!indexes[match[0]]) {
+//       indexes[match[0]] = {};
+//     }
+//     let hrefString = string.slice(
+//       match.index,
+//       indexOf(string, '}', match.index) - 1
+//     );
+//     let lastIndex = lastIndexOf(hrefString, '/') + 1;
+//     schemaRef = trim(hrefString.slice(lastIndex));
+//     indexes[match[0]][match.index] = schemaRef;
+//   }
+
+//   return indexes;
+// }
+
+// export function isLike(string, words) {
+//   const wordsArrary = words?.match(/([^\W]+[^\s,]*)/)?.splice(0, 1);
+//   const isFound = word => RegExp(word, 'i')?.test(string);
+//   return some(wordsArrary, isFound);
+// }
+
+// export const dhis2OperatorMap = {
+//   eq: eq,
+//   like: isLike,
+// };
+
+// export function applyFilter(
+//   arrObject,
+//   targetProperty,
+//   operator,
+//   valueToCompareWith
+// ) {
+//   if (targetProperty && operator && valueToCompareWith) {
+//     try {
+//       return filter(arrObject, obj =>
+//         Reflect.apply(operator, obj, [obj[targetProperty], valueToCompareWith])
+//       );
+//     } catch (error) {
+//       Log.warn(
+//         `Returned unfiltered data. Failed to apply custom filter(${prettyJson({
+//           targetProperty: targetProperty ?? null,
+//           operator: operator ?? null,
+//           value: valueToCompareWith ?? null,
+//         })}) on this collection. The operator you supplied maybe unsupported on this resource at the moment.`
+//       );
+//       return arrObject;
+//     }
+//   }
+//   console.log('No filters applied; returned all records for this resource.');
+//   return arrObject;
+// }
+
+// export function parseFilter(filterExpression) {
+//   const filterTokens = filterExpression?.split(':');
+//   filterTokens
+//     ? (filterTokens[1] = dhis2OperatorMap[filterTokens[1] ?? null])
+//     : null;
+//   return filterTokens;
+// }
+// // TODO: @Elias, end of the investigation block!
+// =============================================================================
+
+const isArray = variable => !!variable && variable.constructor === Array;
+
+export function nestArray(data, key) {
+  return isArray(data) ? { [key]: data } : data;
+}
+
+export function generateUrl(configuration, options, resourceType) {
+  let { hostUrl, apiVersion } = configuration;
+  const urlString = '/' + resourceType;
+
+  // Note that users can override the apiVersion from configuration with args
+  if (options?.apiVersion) apiVersion = options.apiVersion;
+
+  // TODO: discuss how this actually works on DHIS2. I'm not sure I'm following.
+  const apiMessage = apiVersion
+    ? `Using DHIS2 api version ${apiVersion}`
+    : 'Using latest available version of the DHIS2 api on this server.';
+
+  console.log(apiMessage);
+
+  return buildUrl(urlString, hostUrl, apiVersion);
+}
+
+export function buildUrlParams(options) {
+  const filters = options?.params?.filters;
+  const dimensions = options?.params?.dimensions;
+
+  // We remove filters and dimensions before building standard search params.
+  delete options?.params?.filters;
+  delete options?.params?.dimensions;
+
+  const urlParams = new URLSearchParams(options?.params);
+
+  // Then we re-apply the filters and dimensions in this dhis2-specific way.
+  filters?.map(f => urlParams.append('filter', f));
+  dimensions?.map(d => urlParams.append('dimension', d));
+
+  return urlParams;
+}
