@@ -856,7 +856,7 @@
           },
           {
             "title": "example",
-            "description": "valByName(tei.attributes, 'first name')"
+            "description": "attrVal(tei.attributes, 'first name')"
           },
           {
             "title": "function",
@@ -887,6 +887,59 @@
             "type": {
               "type": "NameExpression",
               "name": "string"
+            }
+          }
+        ]
+      },
+      "valid": true
+    },
+    {
+      "name": "attribute",
+      "params": [
+        "attributeId",
+        "attributeValue"
+      ],
+      "docs": {
+        "description": "Converts an attribute ID and value into a DSHI2 attribute object",
+        "tags": [
+          {
+            "title": "public",
+            "description": null,
+            "type": null
+          },
+          {
+            "title": "example",
+            "description": "attribute('w75KJ2mc4zz', 'Elias')"
+          },
+          {
+            "title": "function",
+            "description": null,
+            "name": null
+          },
+          {
+            "title": "param",
+            "description": "A tracked entity instance (TEI) attribute ID.",
+            "type": {
+              "type": "NameExpression",
+              "name": "string"
+            },
+            "name": "attributeId"
+          },
+          {
+            "title": "param",
+            "description": "The value for that attribute.",
+            "type": {
+              "type": "NameExpression",
+              "name": "string"
+            },
+            "name": "attributeValue"
+          },
+          {
+            "title": "returns",
+            "description": null,
+            "type": {
+              "type": "NameExpression",
+              "name": "object"
             }
           }
         ]

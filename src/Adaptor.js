@@ -546,9 +546,8 @@ export function discover(httpMethod, endpoint) {
                     if (param.schema['$ref']) {
                       let schemaRefIndex =
                         param.schema['$ref'].lastIndexOf('/') + 1;
-                      let schemaRef = param.schema['$ref'].slice(
-                        schemaRefIndex
-                      );
+                      let schemaRef =
+                        param.schema['$ref'].slice(schemaRefIndex);
                       param.schema = tempData.components.schemas[schemaRef];
                     }
 
@@ -770,7 +769,7 @@ export function del(resourceType, path, data, params, options, callback) {
  * Gets an attribute value by its case-insensitive display name
  * @public
  * @example
- * valByName(tei.attributes, 'first name')
+ * attrVal(tei.attributes, 'first name')
  * @function
  * @param {Object} tei - A tracked entity instance (TEI) object
  * @param {string} attributeName - The 'displayName' to search for in the TEI's attributes
@@ -782,6 +781,16 @@ export function attrVal(tei, attributeName) {
   )?.value;
 }
 
+/**
+ * Converts an attribute ID and value into a DSHI2 attribute object
+ * @public
+ * @example
+ * attribute('w75KJ2mc4zz', 'Elias')
+ * @function
+ * @param {string} attributeId - A tracked entity instance (TEI) attribute ID.
+ * @param {string} attributeValue - The value for that attribute.
+ * @returns {object}
+ */
 export function attribute(attributeId, attributeValue) {
   return {
     attribute: attributeId,
