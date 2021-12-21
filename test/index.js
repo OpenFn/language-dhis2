@@ -54,7 +54,33 @@ describe('execute', () => {
   });
 });
 
-describe('CREATE', () => {
+describe('get', () => {
+  const state = {
+    configuration: {
+      username: 'admin',
+      password: 'district',
+      hostUrl: 'https://play.dhis2.org/2.36.4',
+    },
+    data: {},
+  };
+
+  it('should make an authenticated GET to the right url', async () => {
+    const params = new URLSearchParams({ foo: 'bar' });
+
+    testServer
+      .get('/api/events/qAZJCrNJK8H')
+      .matchHeader('authorization', 'Basic YWRtaW46ZGlzdHJpY3Q=')
+      .reply(200, {
+        httpStatus: 'OK',
+        message: 'the response',
+      });
+
+    const response = await execute(update('dataValueSets', {}))(state);
+    expect(response.data).to.eql({ httpStatus: 'OK', message: 'the response' });
+  });
+});
+
+describe('create', () => {
   const state = {
     configuration: {
       username: 'admin',
@@ -107,7 +133,7 @@ describe('CREATE', () => {
   });
 });
 
-describe('UPDATE', () => {
+describe('update', () => {
   const state = {
     configuration: {
       username: 'admin',
@@ -163,7 +189,7 @@ describe('UPDATE', () => {
   });
 });
 
-describe.only('URL builders', () => {
+describe('URL builders', () => {
   const fixture = {};
 
   before(done => {
@@ -177,8 +203,8 @@ describe.only('URL builders', () => {
     done();
   });
 
-  describe.only('buildUrl', () => {
-    it.only('the proper URL gets built from the "entity" string and the config', done => {
+  describe('buildUrl', () => {
+    it('the proper URL gets built from the "entity" string and the config', done => {
       const configuration = { ...fixture.configuration, apiVersion: 33 };
 
       const finalURL = buildUrl(
@@ -195,8 +221,8 @@ describe.only('URL builders', () => {
     });
   });
 
-  describe.only('generateURL', () => {
-    it.only('should generate basic URL', done => {
+  describe('generateURL', () => {
+    it('should generate basic URL', done => {
       const finalURL = generateUrl(
         fixture.configuration,
         fixture.options,
@@ -208,7 +234,7 @@ describe.only('URL builders', () => {
       done();
     });
 
-    it.only('should generate URL with specific api version from configuration', done => {
+    it('should generate URL with specific api version from configuration', done => {
       const configuration = { ...fixture.configuration, apiVersion: 33 };
 
       const finalURL = generateUrl(
@@ -222,7 +248,7 @@ describe.only('URL builders', () => {
       done();
     });
 
-    it.only('should generate URL with specific api version from options', done => {
+    it('should generate URL with specific api version from options', done => {
       const options = { ...fixture.options, apiVersion: 33 };
 
       const finalURL = generateUrl(
@@ -236,7 +262,7 @@ describe.only('URL builders', () => {
       done();
     });
 
-    it.only('should generate URL without caring about other options', done => {
+    it('should generate URL without caring about other options', done => {
       const options = {
         ...fixture.options,
         apiVersion: 33,
@@ -255,8 +281,8 @@ describe.only('URL builders', () => {
     });
   });
 
-  describe.only('buildURLParams', () => {
-    it.only('should handle special filter and dimensions params and build the rest per usual', () => {
+  describe('buildURLParams', () => {
+    it('should handle special filter and dimensions params and build the rest per usual', () => {
       const params = {
         dryRun: true,
         filters: ['sex:eq:male', 'origin:eq:senegal'],
