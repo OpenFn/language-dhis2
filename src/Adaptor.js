@@ -124,24 +124,21 @@ axios.interceptors.response.use(
  * @function
  * @param {string} resourceType - Type of resource to create. E.g. `trackedEntityInstances`, `programs`, `events`, ...
  * @param {Object} data - Data that will be used to create a given instance of resource. To create a single instance of a resource, `data` must be a javascript object, and to create multiple instances of a resources, `data` must be an array of javascript objects.
- * @param {Object} [options] - Optional `options` to control the behavior of the `create` operation and to pass `import parameters` E.g. `{dryRun: true, importStrategy: CREATE}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 API documentation} or {@link discover}..` Defaults to `{operationName: 'create', apiVersion: null, responseType: 'json'}`
+ * @param {Object} [options] - Optional `options` to define URL parameters (E.g. `filters`, `dimensions` and `import parameters`), axios configurations (E.g. `auth`) and DHIS 2 api version to use.
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
- *
  * @example <caption>-a `program`</caption>
  * create('programs', {
  *   name: 'name 20',
  *   shortName: 'n20',
  *   programType: 'WITHOUT_REGISTRATION',
  * });
- *
  * @example <caption>-an `event`</caption>
  * create('events', {
  *   program: 'eBAyeGv0exc',
  *   orgUnit: 'DiszpKrYNg8',
  *   status: 'COMPLETED',
  * });
- *
  * @example <caption>-a `trackedEntityInstance`</caption>
  * create('trackedEntityInstances', {
  *   orgUnit: 'TSyzvBiovKh',
@@ -153,10 +150,8 @@ axios.interceptors.response.use(
  *     },
  *   ]
  * });
- *
  * @example <caption>-a `dataSet`</caption>
  * create('dataSets', { name: 'OpenFn Data Set', periodType: 'Monthly' });
- *
  * @example <caption>-a `dataSetNotification`</caption>
  * create('dataSetNotificationTemplates', {
  *   dataSetNotificationTrigger: 'DATA_SET_COMPLETION',
@@ -166,7 +161,6 @@ axios.interceptors.response.use(
  *   deliveryChannels: ['SMS'],
  *   dataSets: [],
  * });
- *
  * @example <caption>-a `dataElement`</caption>
  * create('dataElements', {
  *   aggregationType: 'SUM',
@@ -175,13 +169,11 @@ axios.interceptors.response.use(
  *   name: 'Paracetamol',
  *   shortName: 'Para',
  * });
- *
  * @example <caption>-a `dataElementGroup`</caption>
  * create('dataElementGroups', {
  *   name: 'Data Element Group 1',
  *   dataElements: [],
  * });
- *
  * @example <caption>-a `dataElementGroupSet`</caption>
  * create('dataElementGroupSets', {
  *   name: 'Data Element Group Set 4',
@@ -189,7 +181,6 @@ axios.interceptors.response.use(
  *   shortName: 'DEGS4',
  *   dataElementGroups: [],
  * });
- *
  * @example <caption>-a `dataValueSet`</caption>
  * create('dataValueSets', {
  *   dataElement: 'f7n9E0hX8qk',
@@ -197,7 +188,6 @@ axios.interceptors.response.use(
  *   orgUnit: 'DiszpKrYNg8',
  *   value: '12',
  * });
- *
  * @example <caption>-a `dataValueSet` with related `dataValues`</caption>
  * create('dataValueSets', {
  *   dataSet: 'pBOMPrpg1QX',
@@ -219,7 +209,6 @@ axios.interceptors.response.use(
  *     },
  *   ],
  * });
- *
  * @example <caption>-an `enrollment`</caption>
  * create('enrollments', {
  *   trackedEntityInstance: 'bmshzEacgxa',
@@ -237,12 +226,15 @@ export function create(resourceType, data, options, callback) {
     data = expandReferences(data)(state);
     options = expandReferences(options)(state);
 
+    const { params, requestConfig } = options || {};
     const { configuration } = state;
 
     return request(configuration, {
       method: 'post',
       url: generateUrl(configuration, options, resourceType),
+      params: params && buildUrlParams(params),
       data: nestArray(data, resourceType),
+      ...requestConfig,
     }).then(result => {
       Log.success(`Created ${resourceType}: ${result.headers.location}`);
       return handleResponse(result, state, callback);
@@ -258,7 +250,7 @@ export function create(resourceType, data, options, callback) {
  * @param {string} resourceType - The type of resource to be updated. E.g. `dataElements`, `organisationUnits`, etc.
  * @param {string} path - The `id` or `path` to the `object` to be updated. E.g. `FTRrcoaog83` or `FTRrcoaog83/{collection-name}/{object-id}`
  * @param {Object} data - Data to update. It requires to send `all required fields` or the `full body`. If you want `partial updates`, use `patch` operation.
- * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional options for update method. Defaults to `{operationName: 'update', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
+ * @param {Object} [options] - Optional `options` to define URL parameters (E.g. `filters`, `dimensions` and `import parameters`), axios configurations (E.g. `auth`) and DHIS 2 api version to use.
  * @param {function} [callback]  - Optional callback to handle the response
  * @returns {Operation}
  * @example <caption>-a program</caption>
@@ -267,7 +259,6 @@ export function create(resourceType, data, options, callback) {
  *   shortName: '14e1aa02',
  *   programType: 'WITHOUT_REGISTRATION',
  * });
- *
  * @example <caption>an `event`</caption>
  * update('events', 'PVqUD2hvU4E', {
  *   program: 'eBAyeGv0exc',
@@ -276,7 +267,6 @@ export function create(resourceType, data, options, callback) {
  *   storedBy: 'admin',
  *   dataValues: [],
  * });
- *
  * @example <caption>a `trackedEntityInstance`</caption>
  * update('trackedEntityInstances', 'IeQfgUtGPq2', {
  *   created: '2015-08-06T21:12:37.256',
@@ -317,10 +307,8 @@ export function create(resourceType, data, options, callback) {
  *     },
  *   ],
  * });
- *
  * @example <caption>-a `dataSet`</caption>
  * update('dataSets', 'lyLU2wR22tC', { name: 'OpenFN Data Set', periodType: 'Weekly' });
- *
  * @example <caption>-a `dataSetNotification`</caption>
  * update('dataSetNotificationTemplates', 'VbQBwdm1wVP', {
  *   dataSetNotificationTrigger: 'DATA_SET_COMPLETION',
@@ -330,7 +318,6 @@ export function create(resourceType, data, options, callback) {
  *   deliveryChannels: ['SMS'],
  *   dataSets: [],
  * });
- *
  * @example <caption>-a `dataElement`</caption>
  * update('dataElements', 'FTRrcoaog83', {
  *   aggregationType: 'SUM',
@@ -339,13 +326,11 @@ export function create(resourceType, data, options, callback) {
  *   name: 'Paracetamol',
  *   shortName: 'Para',
  * });
- *
  * @example <caption>-a `dataElementGroup`</caption>
  * update('dataElementGroups', 'QrprHT61XFk', {
  *   name: 'Data Element Group 1',
  *   dataElements: [],
  * });
- *
  * @example <caption>-a `dataElementGroupSet`</caption>
  * update('dataElementGroupSets', 'VxWloRvAze8', {
  *   name: 'Data Element Group Set 4',
@@ -353,7 +338,6 @@ export function create(resourceType, data, options, callback) {
  *   shortName: 'DEGS4',
  *   dataElementGroups: [],
  * });
- *
  * @example <caption>-a `dataValueSet`</caption>
  * update('dataValueSets', 'AsQj6cDsUq4', {
  *   dataElement: 'f7n9E0hX8qk',
@@ -361,7 +345,6 @@ export function create(resourceType, data, options, callback) {
  *   orgUnit: 'DiszpKrYNg8',
  *   value: '12',
  * });
- *
  * @example <caption>-a `dataValueSet` with related `dataValues`</caption>
  * update('dataValueSets', 'Ix2HsbDMLea', {
  *   dataSet: 'pBOMPrpg1QX',
@@ -383,7 +366,6 @@ export function create(resourceType, data, options, callback) {
  *     },
  *   ],
  * });
- *
  * @example <caption>a single enrollment</caption>
  * update('enrollments', 'CmsHzercTBa' {
  *   trackedEntityInstance: 'bmshzEacgxa',
@@ -402,13 +384,15 @@ export function update(resourceType, path, data, options, callback) {
     data = expandReferences(data)(state);
     options = expandReferences(options)(state);
 
+    const { params, requestConfig } = options || {};
     const { configuration } = state;
 
     return request(configuration, {
       method: 'put',
       url: `${generateUrl(configuration, options, resourceType)}/${path}`,
-      // TODO: @Elias, why no "nestArray" here?
+      params: params && buildUrlParams(params),
       data,
+      ...requestConfig,
     }).then(result => {
       Log.success(`Updated ${resourceType} at ${path}`);
       return handleResponse(result, state, callback);
@@ -422,19 +406,17 @@ export function update(resourceType, path, data, options, callback) {
  * @public
  * @function
  * @param {string} resourceType - The type of resource to get(use its `plural` name). E.g. `dataElements`, `trackedEntityInstances`,`organisationUnits`, etc.
- * @param {{apiVersion: number,operationName: string,responseType: string}}[options] - `Optional` options for `getData` operation. Defaults to `{operationName: 'getData', apiVersion: state.configuration.apiVersion, responseType: 'json'}`.
+ * @param {Object} [options] - Optional `options` to define URL parameters (E.g. `filters`, `dimensions` and `import parameters`), axios configurations (E.g. `auth`) and DHIS 2 api version to use.
  * @param {function} [callback]  - Optional callback to handle the response
  * @returns {Operation} state
  * @example <caption>Example getting one `trackedEntityInstance` with `Id` 'dNpxRu1mWG5' for a given `orgUnit(DiszpKrYNg8)`</caption>
- * getData('trackedEntityInstances', {
+ * get('trackedEntityInstances', {
  *    fields: '*',
  *    ou: 'DiszpKrYNg8',
  *    entityType: 'nEenWmSyUEp',
  *    trackedEntityInstance: 'dNpxRu1mWG5',
  * });
  */
-// TODO: @Elias, I'm not sure "options" is the right name for the second arg here.
-// Isn't this more like the filters that you're using to find the right resources?
 export function get(resourceType, options, callback) {
   return state => {
     console.log(`Preparing get operation...`);
@@ -442,13 +424,15 @@ export function get(resourceType, options, callback) {
     resourceType = expandReferences(resourceType)(state);
     options = expandReferences(options)(state);
 
+    const { params, requestConfig } = options || {};
     const { configuration } = state;
 
     return request(configuration, {
       method: 'get',
       url: generateUrl(configuration, options, resourceType),
-      params: buildUrlParams(options),
+      params: params && buildUrlParams(params),
       responseType: 'json',
+      ...requestConfig,
     }).then(result => {
       Log.success(
         `Retrieved ${result.data[resourceType].length} ${resourceType}.`
@@ -480,10 +464,6 @@ export function get(resourceType, options, callback) {
  *    state.data,
  *    { ou: 'TSyzvBiovKh' }
  * );
- * @todo Tweak/refine to mimic implementation based on the following inspiration: {@link https://sqlite.org/lang_upsert.html sqlite upsert} and {@link https://wiki.postgresql.org/wiki/UPSERT postgresql upsert}
- * @todo Test implementation for upserting metadata
- * @todo Test implementation for upserting data values
- * @todo Implement the updateCondition
  */
 export function upsert(resourceType, data, options, callback) {
   return state => {
@@ -546,8 +526,9 @@ export function discover(httpMethod, endpoint) {
                     if (param.schema['$ref']) {
                       let schemaRefIndex =
                         param.schema['$ref'].lastIndexOf('/') + 1;
-                      let schemaRef =
-                        param.schema['$ref'].slice(schemaRefIndex);
+                      let schemaRef = param.schema['$ref'].slice(
+                        schemaRefIndex
+                      );
                       param.schema = tempData.components.schemas[schemaRef];
                     }
 
@@ -626,6 +607,7 @@ export function discover(httpMethod, endpoint) {
  * });
  */
 // TODO: @Elias, can this be deleted in favor of update? How does DHIS2 handle PATCH vs PUT?
+// I need to investigate on this. But I think DHIS 2 forces to send all properties back when we do an update. If that's confirmed then this may be needed.
 export function patch(resourceType, path, data, params, options, callback) {
   return state => {
     resourceType = expandReferences(resourceType)(state);

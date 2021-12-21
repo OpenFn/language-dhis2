@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { execute, create, update } from '../lib/Adaptor';
 import { dataValue } from '@openfn/language-common';
-import { buildUrl, nestArray } from '../lib/Utils';
+import { buildUrl, buildUrlParams, nestArray } from '../lib/Utils';
 import nock from 'nock';
 
 const testServer = nock('https://play.dhis2.org/2.36.4');
@@ -181,6 +181,31 @@ describe('buildUrl', () => {
     );
 
     expect(url).to.eql('https://dhis2.moh.gov/api/2.36.4/events');
+  });
+});
+
+describe('generateURL', () => {
+  it('should generate a URL properly given ________________'),
+    () => {
+      expect(1).to.eql(2);
+    };
+});
+
+describe.only('buildURLParams', () => {
+  it.only('should handle special filter and dimensions params and build the rest per usual', () => {
+    const params = {
+      dryRun: true,
+      filters: ['sex:eq:male', 'origin:eq:senegal'],
+      someNonesense: 'other',
+      dimensions: ['dx:fbfJHSPpUQD', 'ou:O6uvpzGd5pu;lc3eMKXaEfw'],
+    };
+
+    const finalParams = buildUrlParams(params).toString();
+
+    const expected =
+      'dryRun=true&someNonesense=other&filter=sex%3Aeq%3Amale&filter=origin%3Aeq%3Asenegal&dimension=dx%3AfbfJHSPpUQD&dimension=ou%3AO6uvpzGd5pu%3Blc3eMKXaEfw';
+
+    expect(finalParams).to.eql(expected);
   });
 });
 

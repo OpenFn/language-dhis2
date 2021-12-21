@@ -41,7 +41,7 @@
           },
           {
             "title": "param",
-            "description": "Optional `options` to control the behavior of the `create` operation and to pass `import parameters` E.g. `{dryRun: true, importStrategy: CREATE}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 API documentation} or {@link discover}..` Defaults to `{operationName: 'create', apiVersion: null, responseType: 'json'}`",
+            "description": "Optional `options` to define URL parameters (E.g. `filters`, `dimensions` and `import parameters`), axios configurations (E.g. `auth`) and DHIS 2 api version to use.",
             "type": {
               "type": "OptionalType",
               "expression": {
@@ -181,37 +181,12 @@
           },
           {
             "title": "param",
-            "description": "Optional options for update method. Defaults to `{operationName: 'update', apiVersion: state.configuration.apiVersion, responseType: 'json'}`",
+            "description": "Optional `options` to define URL parameters (E.g. `filters`, `dimensions` and `import parameters`), axios configurations (E.g. `auth`) and DHIS 2 api version to use.",
             "type": {
               "type": "OptionalType",
               "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "operationName",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "resourceType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
+                "type": "NameExpression",
+                "name": "Object"
               }
             },
             "name": "options"
@@ -326,37 +301,12 @@
           },
           {
             "title": "param",
-            "description": "`Optional` options for `getData` operation. Defaults to `{operationName: 'getData', apiVersion: state.configuration.apiVersion, responseType: 'json'}`.",
+            "description": "Optional `options` to define URL parameters (E.g. `filters`, `dimensions` and `import parameters`), axios configurations (E.g. `auth`) and DHIS 2 api version to use.",
             "type": {
               "type": "OptionalType",
               "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "operationName",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
+                "type": "NameExpression",
+                "name": "Object"
               }
             },
             "name": "options"
@@ -383,7 +333,7 @@
           },
           {
             "title": "example",
-            "description": "getData('trackedEntityInstances', {\n   fields: '*',\n   ou: 'DiszpKrYNg8',\n   entityType: 'nEenWmSyUEp',\n   trackedEntityInstance: 'dNpxRu1mWG5',\n});",
+            "description": "get('trackedEntityInstances', {\n   fields: '*',\n   ou: 'DiszpKrYNg8',\n   entityType: 'nEenWmSyUEp',\n   trackedEntityInstance: 'dNpxRu1mWG5',\n});",
             "caption": "Example getting one `trackedEntityInstance` with `Id` 'dNpxRu1mWG5' for a given `orgUnit(DiszpKrYNg8)`"
           }
         ]
@@ -506,22 +456,6 @@
             "title": "example",
             "description": "upsert(\n   'trackedEntityInstances',\n   {\n      attributeId: 'lZGmxYbs97q',\n         attributeValue: state =>\n            state.data.attributes.find(obj => obj.attribute === 'lZGmxYbs97q')\n            .value,\n   },\n   state.data,\n   { ou: 'TSyzvBiovKh' }\n);",
             "caption": "Example `expression.js` of upsert"
-          },
-          {
-            "title": "todo",
-            "description": "Tweak/refine to mimic implementation based on the following inspiration: {@link https://sqlite.org/lang_upsert.html sqlite upsert} and {@link https://wiki.postgresql.org/wiki/UPSERT postgresql upsert}"
-          },
-          {
-            "title": "todo",
-            "description": "Test implementation for upserting metadata"
-          },
-          {
-            "title": "todo",
-            "description": "Test implementation for upserting data values"
-          },
-          {
-            "title": "todo",
-            "description": "Implement the updateCondition"
           }
         ]
       },
