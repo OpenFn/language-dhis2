@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { execute, create, update } from '../lib/Adaptor';
 import { dataValue } from '@openfn/language-common';
-import { buildUrl, buildUrlParams, nestArray } from '../lib/Utils';
+import { buildUrl, buildUrlParams, generateUrl, nestArray } from '../lib/Utils';
 import nock from 'nock';
 
 const testServer = nock('https://play.dhis2.org/2.36.4');
@@ -163,49 +163,114 @@ describe('UPDATE', () => {
   });
 });
 
-describe('buildUrl', () => {
-  it('the proper URL gets built from the "entity" string and the config', async () => {
-    const state = {
-      configuration: {
-        username: 'admin',
-        password: 'district',
-        hostUrl: 'https://dhis2.moh.gov',
-        apiVersion: '2.36.4',
-      },
+describe.only('URL builders', () => {
+  const fixture = {};
+
+  before(done => {
+    fixture.configuration = {
+      username: 'admin',
+      password: 'district',
+      hostUrl: 'https://play.dhis2.org/2.36.4',
     };
-
-    const url = buildUrl(
-      '/' + 'events',
-      state.configuration.hostUrl,
-      state.configuration.apiVersion
-    );
-
-    expect(url).to.eql('https://dhis2.moh.gov/api/2.36.4/events');
+    fixture.options = {};
+    fixture.resourceType = 'dataValueSets';
+    done();
   });
-});
 
-describe('generateURL', () => {
-  it('should generate a URL properly given ________________'),
-    () => {
-      expect(1).to.eql(2);
-    };
-});
+  describe.only('buildUrl', () => {
+    it.only('the proper URL gets built from the "entity" string and the config', done => {
+      const configuration = { ...fixture.configuration, apiVersion: 33 };
 
-describe.only('buildURLParams', () => {
-  it.only('should handle special filter and dimensions params and build the rest per usual', () => {
-    const params = {
-      dryRun: true,
-      filters: ['sex:eq:male', 'origin:eq:senegal'],
-      someNonesense: 'other',
-      dimensions: ['dx:fbfJHSPpUQD', 'ou:O6uvpzGd5pu;lc3eMKXaEfw'],
-    };
+      const finalURL = buildUrl(
+        '/' + 'events',
+        configuration.hostUrl,
+        configuration.apiVersion
+      );
 
-    const finalParams = buildUrlParams(params).toString();
+      const expectedURL = 'https://play.dhis2.org/2.36.4/api/33/events';
 
-    const expected =
-      'dryRun=true&someNonesense=other&filter=sex%3Aeq%3Amale&filter=origin%3Aeq%3Asenegal&dimension=dx%3AfbfJHSPpUQD&dimension=ou%3AO6uvpzGd5pu%3Blc3eMKXaEfw';
+      expect(finalURL).to.eq(expectedURL);
 
-    expect(finalParams).to.eql(expected);
+      done();
+    });
+  });
+
+  describe.only('generateURL', () => {
+    it.only('should generate basic URL', done => {
+      const finalURL = generateUrl(
+        fixture.configuration,
+        fixture.options,
+        fixture.resourceType
+      );
+      const expectedURL = 'https://play.dhis2.org/2.36.4/api/dataValueSets';
+
+      expect(finalURL).to.eq(expectedURL);
+      done();
+    });
+
+    it.only('should generate URL with specific api version from configuration', done => {
+      const configuration = { ...fixture.configuration, apiVersion: 33 };
+
+      const finalURL = generateUrl(
+        configuration,
+        fixture.options,
+        fixture.resourceType
+      );
+      const expectedURL = `https://play.dhis2.org/2.36.4/api/${configuration.apiVersion}/dataValueSets`;
+
+      expect(finalURL).to.eq(expectedURL);
+      done();
+    });
+
+    it.only('should generate URL with specific api version from options', done => {
+      const options = { ...fixture.options, apiVersion: 33 };
+
+      const finalURL = generateUrl(
+        fixture.configuration,
+        options,
+        fixture.resourceType
+      );
+      const expectedURL = 'https://play.dhis2.org/2.36.4/api/33/dataValueSets';
+
+      expect(finalURL).to.eq(expectedURL);
+      done();
+    });
+
+    it.only('should generate URL without caring about other options', done => {
+      const options = {
+        ...fixture.options,
+        apiVersion: 33,
+        params: { filters: ['a:eq:b', 'c:ge:d'] },
+      };
+
+      const finalURL = generateUrl(
+        fixture.configuration,
+        options,
+        fixture.resourceType
+      );
+      const expectedURL = 'https://play.dhis2.org/2.36.4/api/33/dataValueSets';
+
+      expect(finalURL).to.eq(expectedURL);
+      done();
+    });
+  });
+
+  describe.only('buildURLParams', () => {
+    it.only('should handle special filter and dimensions params and build the rest per usual', () => {
+      const params = {
+        dryRun: true,
+        filters: ['sex:eq:male', 'origin:eq:senegal'],
+        someNonesense: 'other',
+        dimensions: ['dx:fbfJHSPpUQD', 'ou:O6uvpzGd5pu;lc3eMKXaEfw'],
+      };
+
+      const finalParams = buildUrlParams(params).toString();
+
+      const expected =
+        'dryRun=true&someNonesense=other&filter=sex%3Aeq%3Amale&filter=origin%3Aeq%3Asenegal&dimension=dx%3AfbfJHSPpUQD&dimension=ou%3AO6uvpzGd5pu%3Blc3eMKXaEfw';
+
+      expect(finalParams).to.eq(expected);
+    });
   });
 });
 

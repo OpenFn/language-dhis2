@@ -74,7 +74,5 @@ export function buildUrlParams(params) {
   filters?.map(f => urlParams.append('filter', f));
   dimensions?.map(d => urlParams.append('dimension', d));
 
-  console.log('after mapping', urlParams);
-
   return urlParams;
 }
