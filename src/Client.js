@@ -11,9 +11,10 @@ import axios from 'axios';
  * @returns {Promise} a promise that will resolve to either a response object or an error object.
  */
 export function request({ username, password }, axiosRequest) {
-  const { method, url } = axiosRequest;
+  const { method, url, params } = axiosRequest;
 
   console.log(`Sending ${method} request to ${url}`);
+  if (params) console.log(` with params: ${params}`);
 
   return axios({
     headers: { 'Content-Type': 'application/json' },
