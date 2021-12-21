@@ -406,7 +406,8 @@ export function update(resourceType, path, data, options, callback) {
  * @public
  * @function
  * @param {string} resourceType - The type of resource to get(use its `plural` name). E.g. `dataElements`, `trackedEntityInstances`,`organisationUnits`, etc.
- * @param {Object} [options] - Optional `options` to define URL parameters (E.g. `filters`, `dimensions` and `import parameters`), axios configurations (E.g. `auth`) and DHIS 2 api version to use.
+ * @param {Object} filters - Filters to limit what resources are retrieved.
+ * @param {Object} [options] - Optional `options` to define URL parameters beyond filters, request configuration (e.g. `auth`) and DHIS2 api version to use.
  * @param {function} [callback]  - Optional callback to handle the response
  * @returns {Operation} state
  * @example <caption>Example getting one `trackedEntityInstance` with `Id` 'dNpxRu1mWG5' for a given `orgUnit(DiszpKrYNg8)`</caption>
@@ -417,11 +418,12 @@ export function update(resourceType, path, data, options, callback) {
  *    trackedEntityInstance: 'dNpxRu1mWG5',
  * });
  */
-export function get(resourceType, options, callback) {
+export function get(resourceType, filters, options, callback) {
   return state => {
     console.log(`Preparing get operation...`);
 
     resourceType = expandReferences(resourceType)(state);
+    filters = expandReferences(filters)(state);
     options = expandReferences(options)(state);
 
     const { params, requestConfig } = options || {};
@@ -430,7 +432,7 @@ export function get(resourceType, options, callback) {
     return request(configuration, {
       method: 'get',
       url: generateUrl(configuration, options, resourceType),
-      params: params && buildUrlParams(params),
+      params: buildUrlParams({ ...filters, ...params }),
       responseType: 'json',
       ...requestConfig,
     }).then(result => {
@@ -471,7 +473,7 @@ export function upsert(resourceType, data, options, callback) {
 
     return get(
       resourceType,
-      options
+      data
     )(state).then(resp => {
       const resources = resp.data[resourceType];
       if (resources.length > 1) {
@@ -526,9 +528,8 @@ export function discover(httpMethod, endpoint) {
                     if (param.schema['$ref']) {
                       let schemaRefIndex =
                         param.schema['$ref'].lastIndexOf('/') + 1;
-                      let schemaRef = param.schema['$ref'].slice(
-                        schemaRefIndex
-                      );
+                      let schemaRef =
+                        param.schema['$ref'].slice(schemaRefIndex);
                       param.schema = tempData.components.schemas[schemaRef];
                     }
 

@@ -274,6 +274,7 @@
       "name": "get",
       "params": [
         "resourceType",
+        "filters",
         "options",
         "callback"
       ],
@@ -301,7 +302,16 @@
           },
           {
             "title": "param",
-            "description": "Optional `options` to define URL parameters (E.g. `filters`, `dimensions` and `import parameters`), axios configurations (E.g. `auth`) and DHIS 2 api version to use.",
+            "description": "Filters to limit what resources are retrieved.",
+            "type": {
+              "type": "NameExpression",
+              "name": "Object"
+            },
+            "name": "filters"
+          },
+          {
+            "title": "param",
+            "description": "Optional `options` to define URL parameters beyond filters, request configuration (e.g. `auth`) and DHIS2 api version to use.",
             "type": {
               "type": "OptionalType",
               "expression": {
