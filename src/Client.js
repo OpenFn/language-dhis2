@@ -16,8 +16,15 @@ export function request({ username, password }, axiosRequest) {
   console.log(`Sending ${method} request to ${url}`);
   if (params) console.log(` with params: ${params}`);
 
+  // NOTE: We don't follow redirects for unsafe methods: https://github.com/axios/axios/issues/2460
+  const safeRedirect = ['get', 'head', 'options', 'trace'].includes(
+    method.toLowerCase()
+  );
+
   return axios({
     headers: { 'Content-Type': 'application/json' },
+    responseType: 'json',
+    maxRedirects: safeRedirect ? 5 : 0,
     auth: { username, password },
     // Note that providing headers or auth in the request object will overwrite.
     ...axiosRequest,
