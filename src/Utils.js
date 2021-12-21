@@ -10,15 +10,15 @@ export const CONTENT_TYPES = {
 
 export class Log {
   static success(message) {
-    return console.info(`✓ ${message} @ ${new Date()}`);
+    return console.info(`✓ Success at ${new Date()}:\n`, message);
   }
 
   static warn(message) {
-    return console.warn(`⚠ Warning: ${message} @ ${new Date()}`);
+    return console.warn(`⚠ Warning at ${new Date()}:\n`, message);
   }
 
   static error(message) {
-    return console.error(`✗ Error: ${message} @ ${new Date()}`);
+    return console.error(`✗ Error at ${new Date()}:\n`, message);
   }
 }
 

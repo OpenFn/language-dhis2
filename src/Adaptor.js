@@ -102,22 +102,20 @@ axios.interceptors.response.use(
     return response;
   },
   function (error) {
-    try {
-      const details = error.toJSON();
-      if (details?.config?.auth) details.config.auth = '--REDACTED--';
-      if (details?.config?.data) details.config.data = '--REDACTED--';
+    if (error.config?.auth) error.config.auth = '--REDACTED--';
+    if (error.config?.data) error.config.data = '--REDACTED--';
 
-      Log.error(JSON.stringify(details, null, 2));
-      return Promise.reject({
-        error: error.message,
-        data: error.response.data,
-      });
-    } catch (e) {
-      // TODO: @Elias, why does this error sometimes already appear to be JSONified?
-      // console.log(e) // "not JSONABLE TypeError: error.toJSON is not a function"
-      Log.error(error.message);
-      return Promise.reject(error);
-    }
+    const details = error.response?.data?.response;
+
+    Log.error(error.message || "That didn't work.");
+
+    if (details) console.log(JSON.stringify(details, null, 2));
+
+    return Promise.reject({
+      request: error.config,
+      error: error.message,
+      response: error.response?.data,
+    });
   }
 );
 
@@ -447,55 +445,55 @@ export function get(resourceType, filters, options, callback) {
   };
 }
 
-/**
- * Upsert a record. A generic helper function used to atomically either insert a row, or on the basis of the row already existing, UPDATE that existing row instead.
- * @public
- * @function
- * @param {string} resourceType - The type of a resource to `insert` or `update`. E.g. `trackedEntityInstances`
- * @param {Object} data - The update data containing new values
- * @param {{replace:boolean, apiVersion: number,strict: boolean,responseType: string}} [options] - `Optional` options for `upsertTEI` operation. Defaults to `{replace: false, apiVersion: state.configuration.apiVersion,strict: true,responseType: 'json'}`.
- * @param {function} [callback] - Optional callback to handle the response
- * @throws {RangeError} - Throws range error
- * @returns {Operation}
- * @example <caption>Example `expression.js` of upsert</caption>
- * upsert(
- *    'trackedEntityInstances',
- *    {
- *       attributeId: 'lZGmxYbs97q',
- *          attributeValue: state =>
- *             state.data.attributes.find(obj => obj.attribute === 'lZGmxYbs97q')
- *             .value,
- *    },
- *    state.data,
- *    { ou: 'TSyzvBiovKh' }
- * );
- */
-export function upsert(resourceType, data, options, callback) {
-  return state => {
-    console.log(`Preparing upsert via 'get' then 'create' OR 'update'...`);
+// /**
+//  * Upsert a record. A generic helper function used to atomically either insert a row, or on the basis of the row already existing, UPDATE that existing row instead.
+//  * @public
+//  * @function
+//  * @param {string} resourceType - The type of a resource to `insert` or `update`. E.g. `trackedEntityInstances`
+//  * @param {Object} data - The update data containing new values
+//  * @param {{replace:boolean, apiVersion: number,strict: boolean,responseType: string}} [options] - `Optional` options for `upsertTEI` operation. Defaults to `{replace: false, apiVersion: state.configuration.apiVersion,strict: true,responseType: 'json'}`.
+//  * @param {function} [callback] - Optional callback to handle the response
+//  * @throws {RangeError} - Throws range error
+//  * @returns {Operation}
+//  * @example <caption>Example `expression.js` of upsert</caption>
+//  * upsert(
+//  *    'trackedEntityInstances',
+//  *    {
+//  *       attributeId: 'lZGmxYbs97q',
+//  *          attributeValue: state =>
+//  *             state.data.attributes.find(obj => obj.attribute === 'lZGmxYbs97q')
+//  *             .value,
+//  *    },
+//  *    state.data,
+//  *    { ou: 'TSyzvBiovKh' }
+//  * );
+//  */
+// export function upsert(resourceType, data, options, callback) {
+//   return state => {
+//     console.log(`Preparing upsert via 'get' then 'create' OR 'update'...`);
 
-    return get(
-      resourceType,
-      data
-    )(state).then(resp => {
-      const resources = resp.data[resourceType];
-      if (resources.length > 1) {
-        throw new RangeError(
-          `Cannot upsert on Non-unique attribute. The operation found more than one records for your request.`
-        );
-      } else if (resources.length <= 0) {
-        return create(resourceType, data, options, callback)(state);
-      } else {
-        const pathName =
-          resourceType === 'trackedEntityInstances'
-            ? 'trackedEntityInstance'
-            : 'id';
-        const path = resources[0][pathName];
-        return update(resourceType, path, data, options, callback)(state);
-      }
-    });
-  };
-}
+//     return get(
+//       resourceType,
+//       data
+//     )(state).then(resp => {
+//       const resources = resp.data[resourceType];
+//       if (resources.length > 1) {
+//         throw new RangeError(
+//           `Cannot upsert on Non-unique attribute. The operation found more than one records for your request.`
+//         );
+//       } else if (resources.length <= 0) {
+//         return create(resourceType, data, options, callback)(state);
+//       } else {
+//         const pathName =
+//           resourceType === 'trackedEntityInstances'
+//             ? 'trackedEntityInstance'
+//             : 'id';
+//         const path = resources[0][pathName];
+//         return update(resourceType, path, data, options, callback)(state);
+//       }
+//     });
+//   };
+// }
 
 /**
  * Discover `DHIS2` `api` `endpoint` `query parameters` and allowed `operators` for a given resource's endpoint.

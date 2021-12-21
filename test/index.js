@@ -192,6 +192,64 @@ describe('update', () => {
   });
 });
 
+// describe('upsert', () => {
+//   const state = {
+//     configuration: {
+//       username: 'admin',
+//       password: 'district',
+//       hostUrl: 'https://play.dhis2.org/2.36.4',
+//     },
+//     data: {
+//       org: 'orgunit',
+//       id: 'k68SkK5yDH9',
+//     },
+//   };
+
+//   it('should make a get and then a create if nothing is found', async () => {
+//     testServer
+//       .get('/api/events/qAZJCrNJK8H', {
+//         program: 'program',
+//         orgUnit: 'hardcoded',
+//         date: '02-02-20',
+//       })
+//       .reply(200, {
+//         httpStatus: 'OK',
+//         message: 'the response',
+//       });
+
+//     const response = await execute(
+//       update('events', 'qAZJCrNJK8H', {
+//         program: dataValue('program'),
+//         orgUnit: 'hardcoded',
+//         date: state => state.data.currentDate,
+//       })
+//     )(state);
+//     expect(response.data).to.eql({ httpStatus: 'OK', message: 'the response' });
+//   });
+
+//   it('should make a get and then an update if one thing is found', async () => {
+//     testServer
+//       .put('/api/events/qAZJCrNJK8H', {
+//         program: 'program',
+//         orgUnit: 'hardcoded',
+//         date: '02-02-20',
+//       })
+//       .reply(200, {
+//         httpStatus: 'OK',
+//         message: 'the response',
+//       });
+
+//     const response = await execute(
+//       update('events', 'qAZJCrNJK8H', {
+//         program: dataValue('program'),
+//         orgUnit: 'hardcoded',
+//         date: state => state.data.currentDate,
+//       })
+//     )(state);
+//     expect(response.data).to.eql({ httpStatus: 'OK', message: 'the response' });
+//   });
+// });
+
 describe('URL builders', () => {
   const fixture = {};
 
