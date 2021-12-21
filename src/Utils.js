@@ -27,6 +27,7 @@ export function buildUrl(path, hostUrl, apiVersion) {
   return hostUrl + '/api' + pathSuffix;
 }
 
+// Write a unit test for this one
 export function handleResponse(result, state, callback) {
   const { data } = result;
   if (callback) return callback(composeNextState(state, data));
@@ -50,7 +51,6 @@ export function generateUrl(configuration, options, resourceType) {
   // Note that users can override the apiVersion from configuration with args
   if (options?.apiVersion) apiVersion = options.apiVersion;
 
-  // TODO: discuss how this actually works on DHIS2. I'm not sure I'm following.
   const apiMessage = apiVersion
     ? `Using DHIS2 api version ${apiVersion}`
     : 'Using latest available version of the DHIS2 api on this server.';
