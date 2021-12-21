@@ -343,8 +343,13 @@
           },
           {
             "title": "example",
-            "description": "get('trackedEntityInstances', {\n   fields: '*',\n   ou: 'DiszpKrYNg8',\n   entityType: 'nEenWmSyUEp',\n   trackedEntityInstance: 'dNpxRu1mWG5',\n});",
-            "caption": "Example getting one `trackedEntityInstance` with `Id` 'dNpxRu1mWG5' for a given `orgUnit(DiszpKrYNg8)`"
+            "description": "get('dataValueSets', {\n  dataSet: 'pBOMPrpg1QX',\n  orgUnit: 'DiszpKrYNg8',\n  period: '201401',\n  fields: '*',\n});",
+            "caption": "Get all data values for the 'pBOMPrpg1QX' dataset."
+          },
+          {
+            "title": "example",
+            "description": "get('programs', { orgUnit: 'TSyzvBiovKh', fields: '*' });",
+            "caption": "get all programs for an organization unit"
           }
         ]
       },

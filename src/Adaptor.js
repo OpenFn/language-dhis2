@@ -107,8 +107,11 @@ axios.interceptors.response.use(
       if (details?.config?.auth) details.config.auth = '--REDACTED--';
       if (details?.config?.data) details.config.data = '--REDACTED--';
 
-      Log.error(details.message);
-      return Promise.reject(details);
+      Log.error(JSON.stringify(details, null, 2));
+      return Promise.reject({
+        error: error.message,
+        data: error.response.data,
+      });
     } catch (e) {
       // TODO: @Elias, why does this error sometimes already appear to be JSONified?
       // console.log(e) // "not JSONABLE TypeError: error.toJSON is not a function"
@@ -410,13 +413,15 @@ export function update(resourceType, path, data, options, callback) {
  * @param {Object} [options] - Optional `options` to define URL parameters beyond filters, request configuration (e.g. `auth`) and DHIS2 api version to use.
  * @param {function} [callback]  - Optional callback to handle the response
  * @returns {Operation} state
- * @example <caption>Example getting one `trackedEntityInstance` with `Id` 'dNpxRu1mWG5' for a given `orgUnit(DiszpKrYNg8)`</caption>
- * get('trackedEntityInstances', {
- *    fields: '*',
- *    ou: 'DiszpKrYNg8',
- *    entityType: 'nEenWmSyUEp',
- *    trackedEntityInstance: 'dNpxRu1mWG5',
+ * @example <caption>Get all data values for the 'pBOMPrpg1QX' dataset.</caption>
+ * get('dataValueSets', {
+ *   dataSet: 'pBOMPrpg1QX',
+ *   orgUnit: 'DiszpKrYNg8',
+ *   period: '201401',
+ *   fields: '*',
  * });
+ * @example <caption>get all programs for an organization unit</caption>
+ * get('programs', { orgUnit: 'TSyzvBiovKh', fields: '*' });
  */
 export function get(resourceType, filters, options, callback) {
   return state => {
@@ -436,9 +441,7 @@ export function get(resourceType, filters, options, callback) {
       responseType: 'json',
       ...requestConfig,
     }).then(result => {
-      Log.success(
-        `Retrieved ${result.data[resourceType].length} ${resourceType}.`
-      );
+      Log.success(`Retrieved ${resourceType}`);
       return handleResponse(result, state, callback);
     });
   };
@@ -528,8 +531,9 @@ export function discover(httpMethod, endpoint) {
                     if (param.schema['$ref']) {
                       let schemaRefIndex =
                         param.schema['$ref'].lastIndexOf('/') + 1;
-                      let schemaRef =
-                        param.schema['$ref'].slice(schemaRefIndex);
+                      let schemaRef = param.schema['$ref'].slice(
+                        schemaRefIndex
+                      );
                       param.schema = tempData.components.schemas[schemaRef];
                     }
 

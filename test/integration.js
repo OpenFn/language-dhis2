@@ -253,39 +253,36 @@ describe('Integration tests', () => {
   });
 });
 
-// describe('get', () => {
-//   const state = {
-//     configuration: {
-//       username: 'admin',
-//       password: 'district',
-//       hostUrl: 'https://play.dhis2.org/2.36.4',
-//     },
-//     data: {},
-//   };
+describe('get', () => {
+  const state = {
+    configuration: {
+      username: 'admin',
+      password: 'district',
+      hostUrl: 'https://play.dhis2.org/2.36.4',
+    },
+    data: {},
+  };
 
-//   it('should get trackedEntityInstances matching the URL parameters specified', async () => {
-//     const response = await execute(
-//       get('trackedEntityInstances', {
-//         params: {
-//           fields: '*',
-//           ou: 'DiszpKrYNg8',
-//           entityType: 'nEenWmSyUEp',
-//           trackedEntityInstance: 'dNpxRu1mWG5',
-//         },
-//       })
-//     )(state);
-//     expect(response.data.trackedEntityInstances.length).to.gte(1);
-//   });
+  it('should get dataValueSets matching the filters specified', async () => {
+    const finalState = await execute(
+      get('dataValueSets', {
+        dataSet: 'pBOMPrpg1QX',
+        orgUnit: 'DiszpKrYNg8',
+        period: '201401',
+        fields: '*',
+      })
+    )(state);
 
-//   it('should get all programs in the organisation unit TSyzvBiovKh', async () => {
-//     const response = await execute(
-//       get('programs', {
-//         params: { orgUnit: 'TSyzvBiovKh', fields: '*' },
-//       })
-//     )(state);
-//     expect(response.data.programs.length).to.gte(1);
-//   });
-// });
+    expect(finalState.data.dataValues.length).to.gte(1);
+  });
+
+  it('should get all programs in the organisation unit TSyzvBiovKh', async () => {
+    const response = await execute(
+      get('programs', { orgUnit: 'TSyzvBiovKh', fields: '*' })
+    )(state);
+    expect(response.data.programs.length).to.gte(1);
+  });
+});
 
 // describe('upsert', () => {
 //   const state = {

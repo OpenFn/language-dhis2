@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { execute, create, update } from '../lib/Adaptor';
+import { execute, create, update, get, upsert } from '../lib/Adaptor';
 import { dataValue } from '@openfn/language-common';
 import { buildUrl, buildUrlParams, generateUrl, nestArray } from '../lib/Utils';
 import nock from 'nock';
@@ -14,15 +14,9 @@ describe('execute', () => {
       },
     };
     let operations = [
-      state => {
-        return { counter: 1 };
-      },
-      state => {
-        return { counter: 2 };
-      },
-      state => {
-        return { counter: 3 };
-      },
+      () => ({ counter: 1 }),
+      () => ({ counter: 2 }),
+      () => ({ counter: 3 }),
     ];
 
     execute(...operations)(state)
@@ -65,17 +59,26 @@ describe('get', () => {
   };
 
   it('should make an authenticated GET to the right url', async () => {
-    const params = new URLSearchParams({ foo: 'bar' });
+    const filter = {
+      dataSet: 'pBOMPrpg1QX',
+      period: 201401,
+      orgUnit: 'DiszpKrYNg8',
+    };
+
+    const params = new URLSearchParams({ ...filter, fields: '*' });
 
     testServer
-      .get('/api/events/qAZJCrNJK8H')
+      .get('/api/dataValueSets')
+      .query(params)
       .matchHeader('authorization', 'Basic YWRtaW46ZGlzdHJpY3Q=')
       .reply(200, {
         httpStatus: 'OK',
         message: 'the response',
       });
 
-    const response = await execute(update('dataValueSets', {}))(state);
+    const response = await execute(
+      get('dataValueSets', filter, { params: { fields: '*' } })
+    )(state);
     expect(response.data).to.eql({ httpStatus: 'OK', message: 'the response' });
   });
 });
