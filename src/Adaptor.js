@@ -128,19 +128,19 @@ axios.interceptors.response.use(
  * @param {Object} [options] - Optional `options` to define URL parameters (E.g. `filters`, `dimensions` and `import parameters`), axios configurations (E.g. `auth`) and DHIS 2 api version to use.
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
- * @example <caption>-a `program`</caption>
+ * @example <caption>a program</caption>
  * create('programs', {
  *   name: 'name 20',
  *   shortName: 'n20',
  *   programType: 'WITHOUT_REGISTRATION',
  * });
- * @example <caption>-an `event`</caption>
+ * @example <caption>an event</caption>
  * create('events', {
  *   program: 'eBAyeGv0exc',
  *   orgUnit: 'DiszpKrYNg8',
  *   status: 'COMPLETED',
  * });
- * @example <caption>-a `trackedEntityInstance`</caption>
+ * @example <caption>a trackedEntityInstance</caption>
  * create('trackedEntityInstances', {
  *   orgUnit: 'TSyzvBiovKh',
  *   trackedEntityType: 'nEenWmSyUEp',
@@ -151,9 +151,9 @@ axios.interceptors.response.use(
  *     },
  *   ]
  * });
- * @example <caption>-a `dataSet`</caption>
+ * @example <caption>a dataSet</caption>
  * create('dataSets', { name: 'OpenFn Data Set', periodType: 'Monthly' });
- * @example <caption>-a `dataSetNotification`</caption>
+ * @example <caption>a dataSetNotification</caption>
  * create('dataSetNotificationTemplates', {
  *   dataSetNotificationTrigger: 'DATA_SET_COMPLETION',
  *   notificationRecipient: 'ORGANISATION_UNIT_CONTACT',
@@ -162,7 +162,7 @@ axios.interceptors.response.use(
  *   deliveryChannels: ['SMS'],
  *   dataSets: [],
  * });
- * @example <caption>-a `dataElement`</caption>
+ * @example <caption>a dataElement</caption>
  * create('dataElements', {
  *   aggregationType: 'SUM',
  *   domainType: 'AGGREGATE',
@@ -170,26 +170,26 @@ axios.interceptors.response.use(
  *   name: 'Paracetamol',
  *   shortName: 'Para',
  * });
- * @example <caption>-a `dataElementGroup`</caption>
+ * @example <caption>a dataElementGroup</caption>
  * create('dataElementGroups', {
  *   name: 'Data Element Group 1',
  *   dataElements: [],
  * });
- * @example <caption>-a `dataElementGroupSet`</caption>
+ * @example <caption>a dataElementGroupSet</caption>
  * create('dataElementGroupSets', {
  *   name: 'Data Element Group Set 4',
  *   dataDimension: true,
  *   shortName: 'DEGS4',
  *   dataElementGroups: [],
  * });
- * @example <caption>-a `dataValueSet`</caption>
+ * @example <caption>a dataValueSet</caption>
  * create('dataValueSets', {
  *   dataElement: 'f7n9E0hX8qk',
  *   period: '201401',
  *   orgUnit: 'DiszpKrYNg8',
  *   value: '12',
  * });
- * @example <caption>-a `dataValueSet` with related `dataValues`</caption>
+ * @example <caption>a dataValueSet with related dataValues</caption>
  * create('dataValueSets', {
  *   dataSet: 'pBOMPrpg1QX',
  *   completeDate: '2014-02-03',
@@ -210,7 +210,7 @@ axios.interceptors.response.use(
  *     },
  *   ],
  * });
- * @example <caption>-an `enrollment`</caption>
+ * @example <caption>an enrollment</caption>
  * create('enrollments', {
  *   trackedEntityInstance: 'bmshzEacgxa',
  *   orgUnit: 'TSyzvBiovKh',
@@ -254,13 +254,13 @@ export function create(resourceType, data, options, callback) {
  * @param {Object} [options] - Optional `options` to define URL parameters (E.g. `filters`, `dimensions` and `import parameters`), axios configurations (E.g. `auth`) and DHIS 2 api version to use.
  * @param {function} [callback]  - Optional callback to handle the response
  * @returns {Operation}
- * @example <caption>-a program</caption>
+ * @example <caption>a program</caption>
  * update('programs', 'qAZJCrNJK8H', {
  *   name: '14e1aa02c3f0a31618e096f2c6d03bed',
  *   shortName: '14e1aa02',
  *   programType: 'WITHOUT_REGISTRATION',
  * });
- * @example <caption>an `event`</caption>
+ * @example <caption>an event</caption>
  * update('events', 'PVqUD2hvU4E', {
  *   program: 'eBAyeGv0exc',
  *   orgUnit: 'Ngelehun CHC',
@@ -268,7 +268,7 @@ export function create(resourceType, data, options, callback) {
  *   storedBy: 'admin',
  *   dataValues: [],
  * });
- * @example <caption>a `trackedEntityInstance`</caption>
+ * @example <caption>a trackedEntityInstance</caption>
  * update('trackedEntityInstances', 'IeQfgUtGPq2', {
  *   created: '2015-08-06T21:12:37.256',
  *   orgUnit: 'TSyzvBiovKh',
@@ -308,9 +308,9 @@ export function create(resourceType, data, options, callback) {
  *     },
  *   ],
  * });
- * @example <caption>-a `dataSet`</caption>
+ * @example <caption>a dataSet</caption>
  * update('dataSets', 'lyLU2wR22tC', { name: 'OpenFN Data Set', periodType: 'Weekly' });
- * @example <caption>-a `dataSetNotification`</caption>
+ * @example <caption>a dataSetNotification</caption>
  * update('dataSetNotificationTemplates', 'VbQBwdm1wVP', {
  *   dataSetNotificationTrigger: 'DATA_SET_COMPLETION',
  *   notificationRecipient: 'ORGANISATION_UNIT_CONTACT',
@@ -319,7 +319,7 @@ export function create(resourceType, data, options, callback) {
  *   deliveryChannels: ['SMS'],
  *   dataSets: [],
  * });
- * @example <caption>-a `dataElement`</caption>
+ * @example <caption>a dataElement</caption>
  * update('dataElements', 'FTRrcoaog83', {
  *   aggregationType: 'SUM',
  *   domainType: 'AGGREGATE',
@@ -327,26 +327,26 @@ export function create(resourceType, data, options, callback) {
  *   name: 'Paracetamol',
  *   shortName: 'Para',
  * });
- * @example <caption>-a `dataElementGroup`</caption>
+ * @example <caption>a dataElementGroup</caption>
  * update('dataElementGroups', 'QrprHT61XFk', {
  *   name: 'Data Element Group 1',
  *   dataElements: [],
  * });
- * @example <caption>-a `dataElementGroupSet`</caption>
+ * @example <caption>a dataElementGroupSet</caption>
  * update('dataElementGroupSets', 'VxWloRvAze8', {
  *   name: 'Data Element Group Set 4',
  *   dataDimension: true,
  *   shortName: 'DEGS4',
  *   dataElementGroups: [],
  * });
- * @example <caption>-a `dataValueSet`</caption>
+ * @example <caption>a dataValueSet</caption>
  * update('dataValueSets', 'AsQj6cDsUq4', {
  *   dataElement: 'f7n9E0hX8qk',
  *   period: '201401',
  *   orgUnit: 'DiszpKrYNg8',
  *   value: '12',
  * });
- * @example <caption>-a `dataValueSet` with related `dataValues`</caption>
+ * @example <caption>a dataValueSet with related dataValues</caption>
  * update('dataValueSets', 'Ix2HsbDMLea', {
  *   dataSet: 'pBOMPrpg1QX',
  *   completeDate: '2014-02-03',
@@ -411,15 +411,20 @@ export function update(resourceType, path, data, options, callback) {
  * @param {Object} [options] - Optional `options` to define URL parameters beyond filters, request configuration (e.g. `auth`) and DHIS2 api version to use.
  * @param {function} [callback]  - Optional callback to handle the response
  * @returns {Operation} state
- * @example <caption>Get all data values for the 'pBOMPrpg1QX' dataset.</caption>
+ * @example <caption>all data values for the 'pBOMPrpg1QX' dataset</caption>
  * get('dataValueSets', {
  *   dataSet: 'pBOMPrpg1QX',
  *   orgUnit: 'DiszpKrYNg8',
  *   period: '201401',
  *   fields: '*',
  * });
- * @example <caption>get all programs for an organization unit</caption>
+ * @example <caption>all programs for an organization unit</caption>
  * get('programs', { orgUnit: 'TSyzvBiovKh', fields: '*' });
+ * @example <caption>a single tracked entity instance by a unique external ID</caption>
+ * get('trackedEntityInstances', {
+ *   ou: 'DiszpKrYNg8',
+ *   filters: ['flGbXLXCrEo:Eq:124'],
+ * });
  */
 export function get(resourceType, filters, options, callback) {
   return state => {
@@ -502,7 +507,7 @@ export function get(resourceType, filters, options, callback) {
  * @param {string} httpMethod - The HTTP to inspect parameter usage for a given endpoint, e.g., `get`, `post`,`put`,`patch`,`delete`
  * @param {string} endpoint - The path for a given endpoint. E.g. `/trackedEntityInstances` or `/dataValueSets`
  * @returns {Operation}
- * @example <caption>Example getting a list of `parameters allowed` on a given `endpoint` for specific `http method`</caption>
+ * @example <caption>a list of parameters allowed on a given endpoint for specific http method</caption>
  * discover('post', '/trackedEntityInstances')
  */
 export function discover(httpMethod, endpoint) {
@@ -603,11 +608,8 @@ export function discover(httpMethod, endpoint) {
  * @param {{apiVersion: number,operationName: string,responseType: string}} [options] - Optional options for update method. Defaults to `{operationName: 'patch', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
- * @example <caption>Example `patching` a `data element`</caption>
- * patch('dataElements', 'FTRrcoaog83',
- * {
- *   name: 'New Name',
- * });
+ * @example <caption>a dataElement</caption>
+ * patch('dataElements', 'FTRrcoaog83', { name: 'New Name' });
  */
 // TODO: @Elias, can this be deleted in favor of update? How does DHIS2 handle PATCH vs PUT?
 // I need to investigate on this. But I think DHIS 2 forces to send all properties back when we do an update. If that's confirmed then this may be needed.
@@ -686,11 +688,11 @@ export function patch(resourceType, path, data, params, options, callback) {
  * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional `options` for `del` operation. Defaults to `{operationName: 'delete', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
- * @example <caption>Example`deleting` a `tracked entity instance`</caption>
- * del('trackedEntityInstances', 'LcRd6Nyaq7T');
+ * @example <caption>a tracked entity instance</caption>
+ * destroy('trackedEntityInstances', 'LcRd6Nyaq7T');
  */
 // TODO: @Elias, can this be implemented using the same pattern as update but without data?
-export function del(resourceType, path, data, params, options, callback) {
+export function destroy(resourceType, path, data, params, options, callback) {
   return state => {
     resourceType = expandReferences(resourceType)(state);
 
@@ -754,15 +756,18 @@ export function del(resourceType, path, data, params, options, callback) {
  * Gets an attribute value by its case-insensitive display name
  * @public
  * @example
- * attrVal(tei.attributes, 'first name')
+ * findAttributeValue(state.data.trackedEntityInstances[0], 'first name')
  * @function
- * @param {Object} tei - A tracked entity instance (TEI) object
- * @param {string} attributeName - The 'displayName' to search for in the TEI's attributes
+ * @param {Object} trackedEntityInstance - A tracked entity instance (TEI) object
+ * @param {string} attributeDisplayName - The 'displayName' to search for in the TEI's attributes
  * @returns {string}
  */
-export function attrVal(tei, attributeName) {
-  return tei?.attributes?.find(
-    a => a?.displayName.toLowerCase() == attributeName.toLowerCase()
+export function findAttributeValue(
+  trackedEntityInstance,
+  attributeDisplayName
+) {
+  return trackedEntityInstance?.attributes?.find(
+    a => a?.displayName.toLowerCase() == attributeDisplayName.toLowerCase()
   )?.value;
 }
 
@@ -770,17 +775,28 @@ export function attrVal(tei, attributeName) {
  * Converts an attribute ID and value into a DSHI2 attribute object
  * @public
  * @example
- * attribute('w75KJ2mc4zz', 'Elias')
+ * attr('w75KJ2mc4zz', 'Elias')
  * @function
- * @param {string} attributeId - A tracked entity instance (TEI) attribute ID.
- * @param {string} attributeValue - The value for that attribute.
+ * @param {string} attribute - A tracked entity instance (TEI) attribute ID.
+ * @param {string} value - The value for that attribute.
  * @returns {object}
  */
-export function attribute(attributeId, attributeValue) {
-  return {
-    attribute: attributeId,
-    value: attributeValue,
-  };
+export function attr(attribute, value) {
+  return { attribute, value };
+}
+
+/**
+ * Converts a dataElement and value into a DSHI2 dataValue object
+ * @public
+ * @example
+ * dv('f7n9E0hX8qk', 12)
+ * @function
+ * @param {string} dataElement - A data element ID.
+ * @param {string} value - The value for that data element.
+ * @returns {object}
+ */
+export function dv(dataElement, value) {
+  return { dataElement, value };
 }
 
 export {

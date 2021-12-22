@@ -74,57 +74,57 @@
           {
             "title": "example",
             "description": "create('programs', {\n  name: 'name 20',\n  shortName: 'n20',\n  programType: 'WITHOUT_REGISTRATION',\n});",
-            "caption": "-a `program`"
+            "caption": "a program"
           },
           {
             "title": "example",
             "description": "create('events', {\n  program: 'eBAyeGv0exc',\n  orgUnit: 'DiszpKrYNg8',\n  status: 'COMPLETED',\n});",
-            "caption": "-an `event`"
+            "caption": "an event"
           },
           {
             "title": "example",
             "description": "create('trackedEntityInstances', {\n  orgUnit: 'TSyzvBiovKh',\n  trackedEntityType: 'nEenWmSyUEp',\n  attributes: [\n    {\n      attribute: 'w75KJ2mc4zz',\n      value: 'Gigiwe',\n    },\n  ]\n});",
-            "caption": "-a `trackedEntityInstance`"
+            "caption": "a trackedEntityInstance"
           },
           {
             "title": "example",
             "description": "create('dataSets', { name: 'OpenFn Data Set', periodType: 'Monthly' });",
-            "caption": "-a `dataSet`"
+            "caption": "a dataSet"
           },
           {
             "title": "example",
             "description": "create('dataSetNotificationTemplates', {\n  dataSetNotificationTrigger: 'DATA_SET_COMPLETION',\n  notificationRecipient: 'ORGANISATION_UNIT_CONTACT',\n  name: 'Notification',\n  messageTemplate: 'Hello',\n  deliveryChannels: ['SMS'],\n  dataSets: [],\n});",
-            "caption": "-a `dataSetNotification`"
+            "caption": "a dataSetNotification"
           },
           {
             "title": "example",
             "description": "create('dataElements', {\n  aggregationType: 'SUM',\n  domainType: 'AGGREGATE',\n  valueType: 'NUMBER',\n  name: 'Paracetamol',\n  shortName: 'Para',\n});",
-            "caption": "-a `dataElement`"
+            "caption": "a dataElement"
           },
           {
             "title": "example",
             "description": "create('dataElementGroups', {\n  name: 'Data Element Group 1',\n  dataElements: [],\n});",
-            "caption": "-a `dataElementGroup`"
+            "caption": "a dataElementGroup"
           },
           {
             "title": "example",
             "description": "create('dataElementGroupSets', {\n  name: 'Data Element Group Set 4',\n  dataDimension: true,\n  shortName: 'DEGS4',\n  dataElementGroups: [],\n});",
-            "caption": "-a `dataElementGroupSet`"
+            "caption": "a dataElementGroupSet"
           },
           {
             "title": "example",
             "description": "create('dataValueSets', {\n  dataElement: 'f7n9E0hX8qk',\n  period: '201401',\n  orgUnit: 'DiszpKrYNg8',\n  value: '12',\n});",
-            "caption": "-a `dataValueSet`"
+            "caption": "a dataValueSet"
           },
           {
             "title": "example",
             "description": "create('dataValueSets', {\n  dataSet: 'pBOMPrpg1QX',\n  completeDate: '2014-02-03',\n  period: '201401',\n  orgUnit: 'DiszpKrYNg8',\n  dataValues: [\n    {\n      dataElement: 'f7n9E0hX8qk',\n      value: '1',\n    },\n    {\n      dataElement: 'Ix2HsbDMLea',\n      value: '2',\n    },\n    {\n      dataElement: 'eY5ehpbEsB7',\n      value: '3',\n    },\n  ],\n});",
-            "caption": "-a `dataValueSet` with related `dataValues`"
+            "caption": "a dataValueSet with related dataValues"
           },
           {
             "title": "example",
             "description": "create('enrollments', {\n  trackedEntityInstance: 'bmshzEacgxa',\n  orgUnit: 'TSyzvBiovKh',\n  program: 'gZBxv9Ujxg0',\n  enrollmentDate: '2013-09-17',\n  incidentDate: '2013-09-17',\n});",
-            "caption": "-an `enrollment`"
+            "caption": "an enrollment"
           }
         ]
       },
@@ -214,52 +214,52 @@
           {
             "title": "example",
             "description": "update('programs', 'qAZJCrNJK8H', {\n  name: '14e1aa02c3f0a31618e096f2c6d03bed',\n  shortName: '14e1aa02',\n  programType: 'WITHOUT_REGISTRATION',\n});",
-            "caption": "-a program"
+            "caption": "a program"
           },
           {
             "title": "example",
             "description": "update('events', 'PVqUD2hvU4E', {\n  program: 'eBAyeGv0exc',\n  orgUnit: 'Ngelehun CHC',\n  status: 'COMPLETED',\n  storedBy: 'admin',\n  dataValues: [],\n});",
-            "caption": "an `event`"
+            "caption": "an event"
           },
           {
             "title": "example",
             "description": "update('trackedEntityInstances', 'IeQfgUtGPq2', {\n  created: '2015-08-06T21:12:37.256',\n  orgUnit: 'TSyzvBiovKh',\n  createdAtClient: '2015-08-06T21:12:37.256',\n  trackedEntityInstance: 'IeQfgUtGPq2',\n  lastUpdated: '2015-08-06T21:12:37.257',\n  trackedEntityType: 'nEenWmSyUEp',\n  inactive: false,\n  deleted: false,\n  featureType: 'NONE',\n  programOwners: [\n    {\n      ownerOrgUnit: 'TSyzvBiovKh',\n      program: 'IpHINAT79UW',\n      trackedEntityInstance: 'IeQfgUtGPq2',\n    },\n  ],\n  enrollments: [],\n  relationships: [],\n  attributes: [\n    {\n      lastUpdated: '2016-01-12T00:00:00.000',\n      displayName: 'Last name',\n      created: '2016-01-12T00:00:00.000',\n      valueType: 'TEXT',\n      attribute: 'zDhUuAYrxNC',\n      value: 'Russell',\n    },\n    {\n      lastUpdated: '2016-01-12T00:00:00.000',\n      code: 'MMD_PER_NAM',\n      displayName: 'First name',\n      created: '2016-01-12T00:00:00.000',\n      valueType: 'TEXT',\n      attribute: 'w75KJ2mc4zz',\n      value: 'Catherine',\n    },\n  ],\n});",
-            "caption": "a `trackedEntityInstance`"
+            "caption": "a trackedEntityInstance"
           },
           {
             "title": "example",
             "description": "update('dataSets', 'lyLU2wR22tC', { name: 'OpenFN Data Set', periodType: 'Weekly' });",
-            "caption": "-a `dataSet`"
+            "caption": "a dataSet"
           },
           {
             "title": "example",
             "description": "update('dataSetNotificationTemplates', 'VbQBwdm1wVP', {\n  dataSetNotificationTrigger: 'DATA_SET_COMPLETION',\n  notificationRecipient: 'ORGANISATION_UNIT_CONTACT',\n  name: 'Notification',\n  messageTemplate: 'Hello Updated,\n  deliveryChannels: ['SMS'],\n  dataSets: [],\n});",
-            "caption": "-a `dataSetNotification`"
+            "caption": "a dataSetNotification"
           },
           {
             "title": "example",
             "description": "update('dataElements', 'FTRrcoaog83', {\n  aggregationType: 'SUM',\n  domainType: 'AGGREGATE',\n  valueType: 'NUMBER',\n  name: 'Paracetamol',\n  shortName: 'Para',\n});",
-            "caption": "-a `dataElement`"
+            "caption": "a dataElement"
           },
           {
             "title": "example",
             "description": "update('dataElementGroups', 'QrprHT61XFk', {\n  name: 'Data Element Group 1',\n  dataElements: [],\n});",
-            "caption": "-a `dataElementGroup`"
+            "caption": "a dataElementGroup"
           },
           {
             "title": "example",
             "description": "update('dataElementGroupSets', 'VxWloRvAze8', {\n  name: 'Data Element Group Set 4',\n  dataDimension: true,\n  shortName: 'DEGS4',\n  dataElementGroups: [],\n});",
-            "caption": "-a `dataElementGroupSet`"
+            "caption": "a dataElementGroupSet"
           },
           {
             "title": "example",
             "description": "update('dataValueSets', 'AsQj6cDsUq4', {\n  dataElement: 'f7n9E0hX8qk',\n  period: '201401',\n  orgUnit: 'DiszpKrYNg8',\n  value: '12',\n});",
-            "caption": "-a `dataValueSet`"
+            "caption": "a dataValueSet"
           },
           {
             "title": "example",
             "description": "update('dataValueSets', 'Ix2HsbDMLea', {\n  dataSet: 'pBOMPrpg1QX',\n  completeDate: '2014-02-03',\n  period: '201401',\n  orgUnit: 'DiszpKrYNg8',\n  dataValues: [\n    {\n      dataElement: 'f7n9E0hX8qk',\n      value: '1',\n    },\n    {\n      dataElement: 'Ix2HsbDMLea',\n      value: '2',\n    },\n    {\n      dataElement: 'eY5ehpbEsB7',\n      value: '3',\n    },\n  ],\n});",
-            "caption": "-a `dataValueSet` with related `dataValues`"
+            "caption": "a dataValueSet with related dataValues"
           },
           {
             "title": "example",
@@ -344,12 +344,17 @@
           {
             "title": "example",
             "description": "get('dataValueSets', {\n  dataSet: 'pBOMPrpg1QX',\n  orgUnit: 'DiszpKrYNg8',\n  period: '201401',\n  fields: '*',\n});",
-            "caption": "Get all data values for the 'pBOMPrpg1QX' dataset."
+            "caption": "all data values for the 'pBOMPrpg1QX' dataset"
           },
           {
             "title": "example",
             "description": "get('programs', { orgUnit: 'TSyzvBiovKh', fields: '*' });",
-            "caption": "get all programs for an organization unit"
+            "caption": "all programs for an organization unit"
+          },
+          {
+            "title": "example",
+            "description": "get('trackedEntityInstances', {\n  ou: 'DiszpKrYNg8',\n  filters: ['flGbXLXCrEo:Eq:124'],\n});",
+            "caption": "a single tracked entity instance by a unique external ID"
           }
         ]
       },
@@ -403,7 +408,7 @@
           {
             "title": "example",
             "description": "discover('post', '/trackedEntityInstances')",
-            "caption": "Example getting a list of `parameters allowed` on a given `endpoint` for specific `http method`"
+            "caption": "a list of parameters allowed on a given endpoint for specific http method"
           }
         ]
       },
@@ -530,15 +535,15 @@
           },
           {
             "title": "example",
-            "description": "patch('dataElements', 'FTRrcoaog83',\n{\n  name: 'New Name',\n});",
-            "caption": "Example `patching` a `data element`"
+            "description": "patch('dataElements', 'FTRrcoaog83', { name: 'New Name' });",
+            "caption": "a dataElement"
           }
         ]
       },
       "valid": true
     },
     {
-      "name": "del",
+      "name": "destroy",
       "params": [
         "resourceType",
         "path",
@@ -661,18 +666,18 @@
           },
           {
             "title": "example",
-            "description": "del('trackedEntityInstances', 'LcRd6Nyaq7T');",
-            "caption": "Example`deleting` a `tracked entity instance`"
+            "description": "destroy('trackedEntityInstances', 'LcRd6Nyaq7T');",
+            "caption": "a tracked entity instance"
           }
         ]
       },
       "valid": true
     },
     {
-      "name": "attrVal",
+      "name": "findAttributeValue",
       "params": [
-        "tei",
-        "attributeName"
+        "trackedEntityInstance",
+        "attributeDisplayName"
       ],
       "docs": {
         "description": "Gets an attribute value by its case-insensitive display name",
@@ -684,7 +689,7 @@
           },
           {
             "title": "example",
-            "description": "attrVal(tei.attributes, 'first name')"
+            "description": "findAttributeValue(state.data.trackedEntityInstances[0], 'first name')"
           },
           {
             "title": "function",
@@ -698,7 +703,7 @@
               "type": "NameExpression",
               "name": "Object"
             },
-            "name": "tei"
+            "name": "trackedEntityInstance"
           },
           {
             "title": "param",
@@ -707,7 +712,7 @@
               "type": "NameExpression",
               "name": "string"
             },
-            "name": "attributeName"
+            "name": "attributeDisplayName"
           },
           {
             "title": "returns",
@@ -722,10 +727,10 @@
       "valid": true
     },
     {
-      "name": "attribute",
+      "name": "attr",
       "params": [
-        "attributeId",
-        "attributeValue"
+        "attribute",
+        "value"
       ],
       "docs": {
         "description": "Converts an attribute ID and value into a DSHI2 attribute object",
@@ -737,7 +742,7 @@
           },
           {
             "title": "example",
-            "description": "attribute('w75KJ2mc4zz', 'Elias')"
+            "description": "attr('w75KJ2mc4zz', 'Elias')"
           },
           {
             "title": "function",
@@ -751,7 +756,7 @@
               "type": "NameExpression",
               "name": "string"
             },
-            "name": "attributeId"
+            "name": "attribute"
           },
           {
             "title": "param",
@@ -760,7 +765,60 @@
               "type": "NameExpression",
               "name": "string"
             },
-            "name": "attributeValue"
+            "name": "value"
+          },
+          {
+            "title": "returns",
+            "description": null,
+            "type": {
+              "type": "NameExpression",
+              "name": "object"
+            }
+          }
+        ]
+      },
+      "valid": true
+    },
+    {
+      "name": "dv",
+      "params": [
+        "dataElement",
+        "value"
+      ],
+      "docs": {
+        "description": "Converts a dataElement and value into a DSHI2 dataValue object",
+        "tags": [
+          {
+            "title": "public",
+            "description": null,
+            "type": null
+          },
+          {
+            "title": "example",
+            "description": "dv('f7n9E0hX8qk', 12)"
+          },
+          {
+            "title": "function",
+            "description": null,
+            "name": null
+          },
+          {
+            "title": "param",
+            "description": "A data element ID.",
+            "type": {
+              "type": "NameExpression",
+              "name": "string"
+            },
+            "name": "dataElement"
+          },
+          {
+            "title": "param",
+            "description": "The value for that data element.",
+            "type": {
+              "type": "NameExpression",
+              "name": "string"
+            },
+            "name": "value"
           },
           {
             "title": "returns",
