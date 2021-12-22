@@ -41,7 +41,7 @@
           },
           {
             "title": "param",
-            "description": "Optional `options` to define URL parameters (E.g. `filter`, `dimension` and other import parameters), request config (E.g. `auth`) and the DHIS2 apiVersion.",
+            "description": "Optional `options` to define URL parameters via params (E.g. `filter`, `dimension` and other import parameters), request config (E.g. `auth`) and the DHIS2 apiVersion.",
             "type": {
               "type": "OptionalType",
               "expression": {
@@ -181,7 +181,7 @@
           },
           {
             "title": "param",
-            "description": "Optional `options` to define URL parameters (E.g. `filter`, `dimension` and other import parameters), request config (E.g. `auth`) and the DHIS2 apiVersion.",
+            "description": "Optional `options` to define URL parameters via params (E.g. `filter`, `dimension` and other import parameters), request config (E.g. `auth`) and the DHIS2 apiVersion.",
             "type": {
               "type": "OptionalType",
               "expression": {
@@ -311,7 +311,7 @@
           },
           {
             "title": "param",
-            "description": "Optional `options` to define URL parameters beyond filters, request configuration (e.g. `auth`) and DHIS2 api version to use.",
+            "description": "Optional `options` to define URL parameters via params beyond filters, request configuration (e.g. `auth`) and DHIS2 api version to use.",
             "type": {
               "type": "OptionalType",
               "expression": {
@@ -420,7 +420,6 @@
         "resourceType",
         "path",
         "data",
-        "params",
         "options",
         "callback"
       ],
@@ -466,49 +465,12 @@
           },
           {
             "title": "param",
-            "description": "Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}",
+            "description": "Optional configuration, including params for the update ({preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}). Defaults to `{operationName: 'patch', apiVersion: state.configuration.apiVersion, responseType: 'json'}`",
             "type": {
               "type": "OptionalType",
               "expression": {
                 "type": "NameExpression",
                 "name": "Object"
-              }
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "Optional options for update method. Defaults to `{operationName: 'patch', apiVersion: state.configuration.apiVersion, responseType: 'json'}`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "operationName",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
               }
             },
             "name": "options"
@@ -548,7 +510,6 @@
         "resourceType",
         "path",
         "data",
-        "params",
         "options",
         "callback"
       ],
@@ -597,19 +558,7 @@
           },
           {
             "title": "param",
-            "description": "Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "Optional `options` for `del` operation. Defaults to `{operationName: 'delete', apiVersion: state.configuration.apiVersion, responseType: 'json'}`",
+            "description": "Optional `options` for `del` operation including params e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}. Defaults to `{operationName: 'delete', apiVersion: state.configuration.apiVersion, responseType: 'json'}`",
             "type": {
               "type": "OptionalType",
               "expression": {

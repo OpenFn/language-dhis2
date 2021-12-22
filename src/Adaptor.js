@@ -1,13 +1,11 @@
 /** @module Adaptor */
 import axios from 'axios';
-import {
-  execute as commonExecute,
-  composeNextState,
-  expandReferences,
-} from '@openfn/language-common';
 import { indexOf } from 'lodash';
 import {
-  buildUrl,
+  execute as commonExecute,
+  expandReferences,
+} from '@openfn/language-common';
+import {
   CONTENT_TYPES,
   generateUrl,
   handleResponse,
@@ -124,7 +122,7 @@ axios.interceptors.response.use(
  * @function
  * @param {string} resourceType - Type of resource to create. E.g. `trackedEntityInstances`, `programs`, `events`, ...
  * @param {Object} data - Data that will be used to create a given instance of resource. To create a single instance of a resource, `data` must be a javascript object, and to create multiple instances of a resources, `data` must be an array of javascript objects.
- * @param {Object} [options] - Optional `options` to define URL parameters (E.g. `filter`, `dimension` and other import parameters), request config (E.g. `auth`) and the DHIS2 apiVersion.
+ * @param {Object} [options] - Optional `options` to define URL parameters via params (E.g. `filter`, `dimension` and other import parameters), request config (E.g. `auth`) and the DHIS2 apiVersion.
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
  * @example <caption>a program</caption>
@@ -218,7 +216,7 @@ axios.interceptors.response.use(
  *   incidentDate: '2013-09-17',
  * });
  */
-export function create(resourceType, data, options, callback) {
+export function create(resourceType, data, options = {}, callback = false) {
   return state => {
     console.log(`Preparing create operation...`);
 
@@ -226,7 +224,7 @@ export function create(resourceType, data, options, callback) {
     data = expandReferences(data)(state);
     options = expandReferences(options)(state);
 
-    const { params, requestConfig } = options || {};
+    const { params, requestConfig } = options;
     const { configuration } = state;
 
     return request(configuration, {
@@ -250,7 +248,7 @@ export function create(resourceType, data, options, callback) {
  * @param {string} resourceType - The type of resource to be updated. E.g. `dataElements`, `organisationUnits`, etc.
  * @param {string} path - The `id` or `path` to the `object` to be updated. E.g. `FTRrcoaog83` or `FTRrcoaog83/{collection-name}/{object-id}`
  * @param {Object} data - Data to update. It requires to send `all required fields` or the `full body`. If you want `partial updates`, use `patch` operation.
- * @param {Object} [options] - Optional `options` to define URL parameters (E.g. `filter`, `dimension` and other import parameters), request config (E.g. `auth`) and the DHIS2 apiVersion.
+ * @param {Object} [options] - Optional `options` to define URL parameters via params (E.g. `filter`, `dimension` and other import parameters), request config (E.g. `auth`) and the DHIS2 apiVersion.
  * @param {function} [callback]  - Optional callback to handle the response
  * @returns {Operation}
  * @example <caption>a program</caption>
@@ -375,7 +373,13 @@ export function create(resourceType, data, options, callback) {
  *   incidentDate: '2013-10-17',
  * });
  */
-export function update(resourceType, path, data, options, callback) {
+export function update(
+  resourceType,
+  path,
+  data,
+  options = {},
+  callback = false
+) {
   return state => {
     console.log(`Preparing update operation...`);
 
@@ -384,12 +388,12 @@ export function update(resourceType, path, data, options, callback) {
     data = expandReferences(data)(state);
     options = expandReferences(options)(state);
 
-    const { params, requestConfig } = options || {};
+    const { params, requestConfig } = options;
     const { configuration } = state;
 
     return request(configuration, {
       method: 'put',
-      url: `${generateUrl(configuration, options, resourceType)}/${path}`,
+      url: generateUrl(configuration, options, resourceType, path),
       params,
       data,
       ...requestConfig,
@@ -407,7 +411,7 @@ export function update(resourceType, path, data, options, callback) {
  * @function
  * @param {string} resourceType - The type of resource to get(use its `plural` name). E.g. `dataElements`, `trackedEntityInstances`,`organisationUnits`, etc.
  * @param {Object} query - A query object that will limit what resources are retrieved when converted into request params.
- * @param {Object} [options] - Optional `options` to define URL parameters beyond filters, request configuration (e.g. `auth`) and DHIS2 api version to use.
+ * @param {Object} [options] - Optional `options` to define URL parameters via params beyond filters, request configuration (e.g. `auth`) and DHIS2 api version to use.
  * @param {function} [callback]  - Optional callback to handle the response
  * @returns {Operation} state
  * @example <caption>all data values for the 'pBOMPrpg1QX' dataset</caption>
@@ -425,15 +429,15 @@ export function update(resourceType, path, data, options, callback) {
  *   filter: ['flGbXLXCrEo:Eq:124', 'w75KJ2mc4zz:Eq:John'],
  * });
  */
-export function get(resourceType, query, options, callback) {
+export function get(resourceType, query, options = {}, callback = false) {
   return state => {
-    console.log(`Preparing get operation...`);
+    console.log('Preparing get operation...');
 
     resourceType = expandReferences(resourceType)(state);
     query = expandReferences(query)(state);
     options = expandReferences(options)(state);
 
-    const { params, requestConfig } = options || {};
+    const { params, requestConfig } = options;
     const { configuration } = state;
 
     return request(configuration, {
@@ -472,7 +476,7 @@ export function get(resourceType, query, options, callback) {
 //  *    { ou: 'TSyzvBiovKh' }
 //  * );
 //  */
-// export function upsert(resourceType, data, options, callback) {
+// export function upsert(resourceType, data, options = {}, callback = false) {
 //   return state => {
 //     console.log(`Preparing upsert via 'get' then 'create' OR 'update'...`);
 
@@ -603,8 +607,7 @@ export function discover(httpMethod, endpoint) {
  * @param {string} resourceType - The type of resource to be updated. E.g. `dataElements`, `organisationUnits`, etc.
  * @param {string} path - The `id` or `path` to the `object` to be updated. E.g. `FTRrcoaog83` or `FTRrcoaog83/{collection-name}/{object-id}`
  * @param {Object} data - Data to update. Include only the fields you want to update. E.g. `{name: "New Name"}`
- * @param {Object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
- * @param {{apiVersion: number,operationName: string,responseType: string}} [options] - Optional options for update method. Defaults to `{operationName: 'patch', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
+ * @param {Object} [options] - Optional configuration, including params for the update ({preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}). Defaults to `{operationName: 'patch', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
  * @example <caption>a dataElement</caption>
@@ -612,67 +615,34 @@ export function discover(httpMethod, endpoint) {
  */
 // TODO: @Elias, can this be deleted in favor of update? How does DHIS2 handle PATCH vs PUT?
 // I need to investigate on this. But I think DHIS 2 forces to send all properties back when we do an update. If that's confirmed then this may be needed.
-export function patch(resourceType, path, data, params, options, callback) {
+export function patch(
+  resourceType,
+  path,
+  data,
+  options = {},
+  callback = false
+) {
   return state => {
+    console.log('Preparing patch operation...');
+
     resourceType = expandReferences(resourceType)(state);
-
     path = expandReferences(path)(state);
-
-    const body = expandReferences(data)(state);
-
-    params = expandReferences(params)(state);
-
+    data = expandReferences(data)(state);
     options = expandReferences(options)(state);
 
-    const operationName = options?.operationName ?? 'patch';
+    const { params, requestConfig } = options;
+    const { configuration } = state;
 
-    const { username, password, hostUrl } = state.configuration;
-
-    const responseType = options?.responseType ?? 'json';
-
-    let queryParams = params;
-
-    const filters = queryParams?.filters;
-
-    delete queryParams?.filters;
-
-    queryParams = new URLSearchParams(queryParams);
-
-    filters?.map(f => queryParams.append('filter', f));
-
-    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
-
-    const url = buildUrl('/' + resourceType + '/' + path, hostUrl, apiVersion);
-
-    const headers = {
-      Accept: CONTENT_TYPES[responseType] ?? 'application/json',
-    };
-
-    return axios
-      .request({
-        method: 'PATCH',
-        url,
-        auth: {
-          username,
-          password,
-        },
-        params: queryParams,
-        data: body,
-        headers,
-      })
-      .then(result => {
-        let resultObject = {
-          status: result.status,
-          statusText: result.statusText,
-        };
-        Log.success(
-          `${operationName} succeeded. Updated ${resourceType}.\nSummary:\n${prettyJson(
-            resultObject
-          )}`
-        );
-        if (callback) return callback(composeNextState(state, resultObject));
-        return composeNextState(state, resultObject);
-      });
+    return request(configuration, {
+      method: 'patch',
+      url: generateUrl(configuration, options, resourceType, path),
+      params,
+      data,
+      ...requestConfig,
+    }).then(result => {
+      Log.success(`Patched ${resourceType} at ${path}`);
+      return handleResponse(result, state, callback);
+    });
   };
 }
 
@@ -683,71 +653,40 @@ export function patch(resourceType, path, data, params, options, callback) {
  * @param {string} resourceType - The type of resource to be deleted. E.g. `trackedEntityInstances`, `organisationUnits`, etc.
  * @param {string} path - Can be an `id` of an `object` or `path` to the `nested object` to `delete`.
  * @param {Object} [data] - Optional. This is useful when you want to remove multiple objects from a collection in one request. You can send `data` as, for example, `{"identifiableObjects": [{"id": "IDA"}, {"id": "IDB"}, {"id": "IDC"}]}`. See more {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#deleting-objects on DHIS2 API docs}
- * @param {Object} [params] - Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}
- * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional `options` for `del` operation. Defaults to `{operationName: 'delete', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
+ * @param {{apiVersion: number,operationName: string,resourceType: string}} [options] - Optional `options` for `del` operation including params e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}. Defaults to `{operationName: 'delete', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
  * @example <caption>a tracked entity instance</caption>
  * destroy('trackedEntityInstances', 'LcRd6Nyaq7T');
  */
-// TODO: @Elias, can this be implemented using the same pattern as update but without data?
-export function destroy(resourceType, path, data, params, options, callback) {
+export function destroy(
+  resourceType,
+  path,
+  data = null,
+  options = {},
+  callback = false
+) {
   return state => {
+    console.log('Preparing destroy operation...');
+
     resourceType = expandReferences(resourceType)(state);
-
     path = expandReferences(path)(state);
-
-    const body = expandReferences(data)(state);
-
-    params = expandReferences(params)(state);
-
+    data = expandReferences(data)(state);
     options = expandReferences(options)(state);
 
-    const operationName = options?.operationName ?? 'delete';
+    const { params, requestConfig } = options;
+    const { configuration } = state;
 
-    const { username, password, hostUrl } = state.configuration;
-
-    const responseType = options?.responseType ?? 'json';
-
-    let queryParams = params;
-
-    const filters = queryParams?.filters;
-
-    delete queryParams?.filters;
-
-    queryParams = new URLSearchParams(queryParams);
-
-    filters?.map(f => queryParams.append('filter', f));
-
-    const apiVersion = options?.apiVersion ?? state.configuration.apiVersion;
-
-    const headers = {
-      Accept: CONTENT_TYPES[responseType] ?? 'application/json',
-    };
-
-    const url = buildUrl('/' + resourceType + '/' + path, hostUrl, apiVersion);
-
-    return axios
-      .request({
-        method: 'DELETE',
-        url,
-        auth: {
-          username,
-          password,
-        },
-        params: queryParams,
-        data: body,
-        headers,
-      })
-      .then(result => {
-        Log.success(
-          `${operationName} succeeded. DELETED ${resourceType}.\nSummary:\n${prettyJson(
-            result.data
-          )}`
-        );
-        if (callback) return callback(composeNextState(state, result.data));
-        return composeNextState(state, result.data);
-      });
+    return request({
+      method: 'delete',
+      url: generateUrl(configuration, options, resourceType, path),
+      params,
+      data,
+      ...requestConfig,
+    }).then(result => {
+      Log.success(`Deleted ${resourceType} at ${path}`);
+      return handleResponse(result, state, callback);
+    });
   };
 }
 

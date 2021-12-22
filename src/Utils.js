@@ -44,7 +44,7 @@ export function nestArray(data, key) {
   return isArray(data) ? { [key]: data } : data;
 }
 
-export function generateUrl(configuration, options, resourceType) {
+export function generateUrl(configuration, options, resourceType, path = null) {
   let { hostUrl, apiVersion } = configuration;
   const urlString = '/' + resourceType;
 
@@ -57,5 +57,8 @@ export function generateUrl(configuration, options, resourceType) {
 
   console.log(apiMessage);
 
-  return buildUrl(urlString, hostUrl, apiVersion);
+  const url = buildUrl(urlString, hostUrl, apiVersion);
+
+  if (path) return `${url}/${path}`;
+  return url;
 }
