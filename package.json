@@ -1,6 +1,6 @@
 {
   "name": "@openfn/language-dhis2",
-  "version": "2.0.11",
+  "version": "3.0.0-3",
   "description": "DHIS2 Language Pack for OpenFn",
   "homepage": "https://docs.openfn.org",
   "repository": {
@@ -9,9 +9,10 @@
   },
   "main": "lib/index.js",
   "scripts": {
-    "test:watch": "mocha -w --require @babel/register",
+    "test:watch": "mocha -w --require @babel/register test/index.js",
     "build": "node_modules/.bin/babel src -d lib && npm run ast",
-    "test": "mocha --require @babel/register",
+    "test": "mocha --require @babel/register test/index.js",
+    "integration-test": "mocha --require @babel/register test/integration.js",
     "ast": "simple-ast --adaptor ./src/Adaptor.js --output ast.json",
     "postversion": "git push && git push --tags",
     "version": "npm run build && git add -A lib ast.json"
@@ -24,7 +25,7 @@
   ],
   "dependencies": {
     "@openfn/language-common": "1.4.1",
-    "axios": "^0.21.1",
+    "axios": "^0.24.0",
     "lodash": "^4.17.19"
   },
   "devDependencies": {
@@ -38,7 +39,7 @@
     "@babel/preset-env": "^7.9.5",
     "@babel/preset-stage-0": "^7.8.3",
     "@babel/register": "^7.9.0",
-    "@openfn/simple-ast": "^0.3.0",
+    "@openfn/simple-ast": "^0.4.0",
     "assertion-error": "^1.0.1",
     "chai": "^3.4.0",
     "chai-http": "^4.3.0",

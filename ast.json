@@ -1,105 +1,15 @@
 {
   "operations": [
     {
-      "name": "getTEIs",
+      "name": "create",
       "params": [
-        "params",
-        "options",
-        "callback"
-      ],
-      "docs": {
-        "description": "Get Tracked Entity Instance(s).",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "Optional `query parameters` e.g. `{ou: 'DiszpKrYNg8', filters: ['lZGmxYbs97q':GT:5']}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 docs} for more details on which params to use when querying tracked entities instances.",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "`Optional` options for `getTEIs` operation. Defaults to `{apiVersion: state.configuration.apiVersion, responseType: 'json'}`.",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Optional callback to handle the response.",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "getTEIs({\n  fields: '*',\n  ou: 'CMqUILyVnBL',\n  trackedEntityInstance: 'HNTA9qD6EEG',\n  skipPaging: true,\n});",
-            "caption": "- Example `getTEIs` `expression.js` for fetching a `single` `Tracked Entity Instance` with all the fields included."
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "upsertTEI",
-      "params": [
-        "uniqueAttributeId",
+        "resourceType",
         "data",
         "options",
         "callback"
       ],
       "docs": {
-        "description": "Update TEI if exists otherwise create.\n- Update if the record exists otherwise insert a new record.\n- This is useful for idempotency and duplicate record management.",
+        "description": "Create a record",
         "tags": [
           {
             "title": "public",
@@ -113,16 +23,16 @@
           },
           {
             "title": "param",
-            "description": "Tracked Entity Instance unique identifier attribute used during matching.",
+            "description": "Type of resource to create. E.g. `trackedEntityInstances`, `programs`, `events`, ...",
             "type": {
               "type": "NameExpression",
               "name": "string"
             },
-            "name": "uniqueAttributeId"
+            "name": "resourceType"
           },
           {
             "title": "param",
-            "description": "Payload data for new tracked entity instance or updated data for an existing tracked entity instance.",
+            "description": "Data that will be used to create a given instance of resource. To create a single instance of a resource, `data` must be a javascript object, and to create multiple instances of a resources, `data` must be an array of javascript objects.",
             "type": {
               "type": "NameExpression",
               "name": "Object"
@@ -131,111 +41,7 @@
           },
           {
             "title": "param",
-            "description": "`Optional` options for `upsertTEI` operation. Defaults to `{apiVersion: state.configuration.apiVersion,strict: true,responseType: 'json'}`.",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "strict",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "boolean"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Optional `callback` to handle the response.",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "throws",
-            "description": "Throws `RangeError` when `uniqueAttributeId` is `invalid` or `not unique`.",
-            "type": {
-              "type": "NameExpression",
-              "name": "RangeError"
-            }
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "upsertTEI('lZGmxYbs97q', {\n  orgUnit: 'TSyzvBiovKh',\n  trackedEntityType: 'nEenWmSyUEp',\n  attributes: [\n    {\n      attribute: 'lZGmxYbs97q',\n      value: '77790012',\n    },\n    {\n      attribute: 'w75KJ2mc4zz',\n      value: 'Gigiwe',\n    },\n    {\n      attribute: 'zDhUuAYrxNC',\n      value: 'Mwanza',\n    },\n  ],\n});",
-            "caption": "- Example `expression.js` for upserting a tracked entity instance on attribute with Id `lZGmxYbs97q`."
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "createTEI",
-      "params": [
-        "data",
-        "params",
-        "options",
-        "callback"
-      ],
-      "docs": {
-        "description": "Create Tracked Entity Instance.",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "The update data containing new values.",
-            "type": {
-              "type": "NameExpression",
-              "name": "Object"
-            },
-            "name": "data"
-          },
-          {
-            "title": "param",
-            "description": "Optional `import parameters` for a given a resource. E.g. `{dryRun: true, importStrategy: CREATE}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#import-parameters_1 DHIS2 Import parameters documentation} or run `discover`. Defauls to `DHIS2 default import parameters`.",
+            "description": "Optional `options` to define URL parameters via params (E.g. `filter`, `dimension` and other import parameters), request config (E.g. `auth`) and the DHIS2 apiVersion.",
             "type": {
               "type": "OptionalType",
               "expression": {
@@ -243,40 +49,11 @@
                 "name": "Object"
               }
             },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "`Optional` options for `createTEI` operation. Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`.",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
             "name": "options"
           },
           {
             "title": "param",
-            "description": "Optional callback to handle the response.",
+            "description": "Optional callback to handle the response",
             "type": {
               "type": "OptionalType",
               "expression": {
@@ -296,24 +73,74 @@
           },
           {
             "title": "example",
-            "description": "createTEI({\n   orgUnit: 'TSyzvBiovKh',\n   trackedEntityType: 'nEenWmSyUEp',\n   attributes: [\n      {\n         attribute: 'lZGmxYbs97q',\n         value: valUpsertTEI,\n      },\n      {\n         attribute: 'w75KJ2mc4zz',\n         value: 'Gigiwe',\n      },\n   ],\n   enrollments: [\n      {\n         orgUnit: 'TSyzvBiovKh',\n         program: 'fDd25txQckK',\n         programState: 'lST1OZ5BDJ2',\n         enrollmentDate: '2021-01-04',\n         incidentDate: '2021-01-04',\n      },\n   ],\n});",
-            "caption": "- Example `expression.js` of `createTEI`."
+            "description": "create('programs', {\n  name: 'name 20',\n  shortName: 'n20',\n  programType: 'WITHOUT_REGISTRATION',\n});",
+            "caption": "a program"
+          },
+          {
+            "title": "example",
+            "description": "create('events', {\n  program: 'eBAyeGv0exc',\n  orgUnit: 'DiszpKrYNg8',\n  status: 'COMPLETED',\n});",
+            "caption": "an event"
+          },
+          {
+            "title": "example",
+            "description": "create('trackedEntityInstances', {\n  orgUnit: 'TSyzvBiovKh',\n  trackedEntityType: 'nEenWmSyUEp',\n  attributes: [\n    {\n      attribute: 'w75KJ2mc4zz',\n      value: 'Gigiwe',\n    },\n  ]\n});",
+            "caption": "a trackedEntityInstance"
+          },
+          {
+            "title": "example",
+            "description": "create('dataSets', { name: 'OpenFn Data Set', periodType: 'Monthly' });",
+            "caption": "a dataSet"
+          },
+          {
+            "title": "example",
+            "description": "create('dataSetNotificationTemplates', {\n  dataSetNotificationTrigger: 'DATA_SET_COMPLETION',\n  notificationRecipient: 'ORGANISATION_UNIT_CONTACT',\n  name: 'Notification',\n  messageTemplate: 'Hello',\n  deliveryChannels: ['SMS'],\n  dataSets: [],\n});",
+            "caption": "a dataSetNotification"
+          },
+          {
+            "title": "example",
+            "description": "create('dataElements', {\n  aggregationType: 'SUM',\n  domainType: 'AGGREGATE',\n  valueType: 'NUMBER',\n  name: 'Paracetamol',\n  shortName: 'Para',\n});",
+            "caption": "a dataElement"
+          },
+          {
+            "title": "example",
+            "description": "create('dataElementGroups', {\n  name: 'Data Element Group 1',\n  dataElements: [],\n});",
+            "caption": "a dataElementGroup"
+          },
+          {
+            "title": "example",
+            "description": "create('dataElementGroupSets', {\n  name: 'Data Element Group Set 4',\n  dataDimension: true,\n  shortName: 'DEGS4',\n  dataElementGroups: [],\n});",
+            "caption": "a dataElementGroupSet"
+          },
+          {
+            "title": "example",
+            "description": "create('dataValueSets', {\n  dataElement: 'f7n9E0hX8qk',\n  period: '201401',\n  orgUnit: 'DiszpKrYNg8',\n  value: '12',\n});",
+            "caption": "a dataValueSet"
+          },
+          {
+            "title": "example",
+            "description": "create('dataValueSets', {\n  dataSet: 'pBOMPrpg1QX',\n  completeDate: '2014-02-03',\n  period: '201401',\n  orgUnit: 'DiszpKrYNg8',\n  dataValues: [\n    {\n      dataElement: 'f7n9E0hX8qk',\n      value: '1',\n    },\n    {\n      dataElement: 'Ix2HsbDMLea',\n      value: '2',\n    },\n    {\n      dataElement: 'eY5ehpbEsB7',\n      value: '3',\n    },\n  ],\n});",
+            "caption": "a dataValueSet with related dataValues"
+          },
+          {
+            "title": "example",
+            "description": "create('enrollments', {\n  trackedEntityInstance: 'bmshzEacgxa',\n  orgUnit: 'TSyzvBiovKh',\n  program: 'gZBxv9Ujxg0',\n  enrollmentDate: '2013-09-17',\n  incidentDate: '2013-09-17',\n});",
+            "caption": "an enrollment"
           }
         ]
       },
       "valid": true
     },
     {
-      "name": "updateTEI",
+      "name": "update",
       "params": [
+        "resourceType",
         "path",
         "data",
-        "params",
         "options",
         "callback"
       ],
       "docs": {
-        "description": "Update a Tracked Entity Instance.",
+        "description": "Update data. A generic helper function to update a resource object of any type.\nUpdating an object requires to send `all required fields` or the `full body`",
         "tags": [
           {
             "title": "public",
@@ -327,7 +154,16 @@
           },
           {
             "title": "param",
-            "description": "Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`).",
+            "description": "The type of resource to be updated. E.g. `dataElements`, `organisationUnits`, etc.",
+            "type": {
+              "type": "NameExpression",
+              "name": "string"
+            },
+            "name": "resourceType"
+          },
+          {
+            "title": "param",
+            "description": "The `id` or `path` to the `object` to be updated. E.g. `FTRrcoaog83` or `FTRrcoaog83/{collection-name}/{object-id}`",
             "type": {
               "type": "NameExpression",
               "name": "string"
@@ -336,7 +172,7 @@
           },
           {
             "title": "param",
-            "description": "The update data containing new values.",
+            "description": "Data to update. It requires to send `all required fields` or the `full body`. If you want `partial updates`, use `patch` operation.",
             "type": {
               "type": "NameExpression",
               "name": "Object"
@@ -345,7 +181,7 @@
           },
           {
             "title": "param",
-            "description": "Optional `import parameters` for a given a resource. E.g. `{dryRun: true, importStrategy: CREATE, filters:[]}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#import-parameters_1 DHIS2 Import parameters documentation} or run `discover`. Defauls to `DHIS2 default import parameters`.",
+            "description": "Optional `options` to define URL parameters via params (E.g. `filter`, `dimension` and other import parameters), request config (E.g. `auth`) and the DHIS2 apiVersion.",
             "type": {
               "type": "OptionalType",
               "expression": {
@@ -353,40 +189,11 @@
                 "name": "Object"
               }
             },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "`Optional` options for `updateTEI` operation. Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`.",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
             "name": "options"
           },
           {
             "title": "param",
-            "description": "Optional callback to handle the response.",
+            "description": "Optional callback to handle the response",
             "type": {
               "type": "OptionalType",
               "expression": {
@@ -406,110 +213,73 @@
           },
           {
             "title": "example",
-            "description": "updateTEI('PVqUD2hvU4E', {\n   orgUnit: 'TSyzvBiovKh',\n   trackedEntityType: 'nEenWmSyUEp',\n   attributes: [\n      {\n         attribute: 'lZGmxYbs97q',\n         value: valUpsertTEI,\n      },\n      {\n         attribute: 'w75KJ2mc4zz',\n         value: 'Gigiwe',\n      },\n   ],\n   enrollments: [\n      {\n         orgUnit: 'TSyzvBiovKh',\n         program: 'fDd25txQckK',\n         programState: 'lST1OZ5BDJ2',\n         enrollmentDate: '2021-01-04',\n         incidentDate: '2021-01-04',\n      },\n   ],\n});",
-            "caption": "- Example `expression.js` of `updateTEI`."
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "getEvents",
-      "params": [
-        "params",
-        "options",
-        "callback"
-      ],
-      "docs": {
-        "description": "Get annonymous events or tracker events.",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "`import` parameters for `getEvents`. See examples here",
-            "type": {
-              "type": "NameExpression",
-              "name": "Object"
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "`Optional` options for `getEvents` operation. Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`.",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Optional callback to handle the response.",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
+            "description": "update('programs', 'qAZJCrNJK8H', {\n  name: '14e1aa02c3f0a31618e096f2c6d03bed',\n  shortName: '14e1aa02',\n  programType: 'WITHOUT_REGISTRATION',\n});",
+            "caption": "a program"
           },
           {
             "title": "example",
-            "description": "getEvents({ orgUnit: 'YuQRtpLP10I', ouMode: 'CHILDREN' });",
-            "caption": "- Query for `all events` with `children` of a certain `organisation unit`"
+            "description": "update('events', 'PVqUD2hvU4E', {\n  program: 'eBAyeGv0exc',\n  orgUnit: 'Ngelehun CHC',\n  status: 'COMPLETED',\n  storedBy: 'admin',\n  dataValues: [],\n});",
+            "caption": "an event"
+          },
+          {
+            "title": "example",
+            "description": "update('trackedEntityInstances', 'IeQfgUtGPq2', {\n  created: '2015-08-06T21:12:37.256',\n  orgUnit: 'TSyzvBiovKh',\n  createdAtClient: '2015-08-06T21:12:37.256',\n  trackedEntityInstance: 'IeQfgUtGPq2',\n  lastUpdated: '2015-08-06T21:12:37.257',\n  trackedEntityType: 'nEenWmSyUEp',\n  inactive: false,\n  deleted: false,\n  featureType: 'NONE',\n  programOwners: [\n    {\n      ownerOrgUnit: 'TSyzvBiovKh',\n      program: 'IpHINAT79UW',\n      trackedEntityInstance: 'IeQfgUtGPq2',\n    },\n  ],\n  enrollments: [],\n  relationships: [],\n  attributes: [\n    {\n      lastUpdated: '2016-01-12T00:00:00.000',\n      displayName: 'Last name',\n      created: '2016-01-12T00:00:00.000',\n      valueType: 'TEXT',\n      attribute: 'zDhUuAYrxNC',\n      value: 'Russell',\n    },\n    {\n      lastUpdated: '2016-01-12T00:00:00.000',\n      code: 'MMD_PER_NAM',\n      displayName: 'First name',\n      created: '2016-01-12T00:00:00.000',\n      valueType: 'TEXT',\n      attribute: 'w75KJ2mc4zz',\n      value: 'Catherine',\n    },\n  ],\n});",
+            "caption": "a trackedEntityInstance"
+          },
+          {
+            "title": "example",
+            "description": "update('dataSets', 'lyLU2wR22tC', { name: 'OpenFN Data Set', periodType: 'Weekly' });",
+            "caption": "a dataSet"
+          },
+          {
+            "title": "example",
+            "description": "update('dataSetNotificationTemplates', 'VbQBwdm1wVP', {\n  dataSetNotificationTrigger: 'DATA_SET_COMPLETION',\n  notificationRecipient: 'ORGANISATION_UNIT_CONTACT',\n  name: 'Notification',\n  messageTemplate: 'Hello Updated,\n  deliveryChannels: ['SMS'],\n  dataSets: [],\n});",
+            "caption": "a dataSetNotification"
+          },
+          {
+            "title": "example",
+            "description": "update('dataElements', 'FTRrcoaog83', {\n  aggregationType: 'SUM',\n  domainType: 'AGGREGATE',\n  valueType: 'NUMBER',\n  name: 'Paracetamol',\n  shortName: 'Para',\n});",
+            "caption": "a dataElement"
+          },
+          {
+            "title": "example",
+            "description": "update('dataElementGroups', 'QrprHT61XFk', {\n  name: 'Data Element Group 1',\n  dataElements: [],\n});",
+            "caption": "a dataElementGroup"
+          },
+          {
+            "title": "example",
+            "description": "update('dataElementGroupSets', 'VxWloRvAze8', {\n  name: 'Data Element Group Set 4',\n  dataDimension: true,\n  shortName: 'DEGS4',\n  dataElementGroups: [],\n});",
+            "caption": "a dataElementGroupSet"
+          },
+          {
+            "title": "example",
+            "description": "update('dataValueSets', 'AsQj6cDsUq4', {\n  dataElement: 'f7n9E0hX8qk',\n  period: '201401',\n  orgUnit: 'DiszpKrYNg8',\n  value: '12',\n});",
+            "caption": "a dataValueSet"
+          },
+          {
+            "title": "example",
+            "description": "update('dataValueSets', 'Ix2HsbDMLea', {\n  dataSet: 'pBOMPrpg1QX',\n  completeDate: '2014-02-03',\n  period: '201401',\n  orgUnit: 'DiszpKrYNg8',\n  dataValues: [\n    {\n      dataElement: 'f7n9E0hX8qk',\n      value: '1',\n    },\n    {\n      dataElement: 'Ix2HsbDMLea',\n      value: '2',\n    },\n    {\n      dataElement: 'eY5ehpbEsB7',\n      value: '3',\n    },\n  ],\n});",
+            "caption": "a dataValueSet with related dataValues"
+          },
+          {
+            "title": "example",
+            "description": "update('enrollments', 'CmsHzercTBa' {\n  trackedEntityInstance: 'bmshzEacgxa',\n  orgUnit: 'TSyzvBiovKh',\n  program: 'gZBxv9Ujxg0',\n  enrollmentDate: '2013-10-17',\n  incidentDate: '2013-10-17',\n});",
+            "caption": "a single enrollment"
           }
         ]
       },
       "valid": true
     },
     {
-      "name": "createEvents",
+      "name": "get",
       "params": [
-        "data",
-        "params",
+        "resourceType",
+        "query",
         "options",
         "callback"
       ],
       "docs": {
-        "description": "Create DHIS2 Events\n- You will need a `program` which can be looked up using the `getPrograms` operation, an `orgUnit` which can be looked up using the `getMetadata` operation and passing `{organisationUnits: true}` as `resources` param, and a list of `valid data element identifiers` which can be looked up using the `getMetadata` passing `{dataElements: true}` as `resources` param.\n- For events with registration, a `tracked entity instance identifier is required`\n- For sending `events` to `programs with multiple stages`, you will need to also include the `programStage` identifier, the identifiers for `programStages` can be found in the `programStages` resource via a call to `getMetadata` operation.",
+        "description": "Get data. Generic helper method for getting data of any kind from DHIS2.\n- This can be used to get `DataValueSets`,`events`,`trackedEntityInstances`,`etc.`",
         "tags": [
           {
             "title": "public",
@@ -523,50 +293,30 @@
           },
           {
             "title": "param",
-            "description": "The payload containing new values",
+            "description": "The type of resource to get(use its `plural` name). E.g. `dataElements`, `trackedEntityInstances`,`organisationUnits`, etc.",
+            "type": {
+              "type": "NameExpression",
+              "name": "string"
+            },
+            "name": "resourceType"
+          },
+          {
+            "title": "param",
+            "description": "A query object that will limit what resources are retrieved when converted into request params.",
             "type": {
               "type": "NameExpression",
               "name": "Object"
             },
-            "name": "data"
+            "name": "query"
           },
           {
             "title": "param",
-            "description": "Optional `import parameters` for events. E.g. `{dryRun: true, importStrategy: CREATE, filters:[]}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#events DHIS2 Event Import parameters documentation} or run `discover`. Defauls to `DHIS2 default import parameters`.",
+            "description": "Optional `options` to define URL parameters via params beyond filters, request configuration (e.g. `auth`) and DHIS2 api version to use.",
             "type": {
               "type": "OptionalType",
               "expression": {
                 "type": "NameExpression",
                 "name": "Object"
-              }
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "Optional `flags` for the behavior of the `createEvents` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
               }
             },
             "name": "options"
@@ -593,1271 +343,18 @@
           },
           {
             "title": "example",
-            "description": "createEvents({\n  program: 'eBAyeGv0exc',\n  orgUnit: 'DiszpKrYNg8',\n  eventDate: date,\n  status: 'COMPLETED',\n  completedDate: date,\n  storedBy: 'admin',\n  coordinate: {\n    latitude: 59.8,\n    longitude: 10.9,\n  },\n  dataValues: [\n    {\n      dataElement: 'qrur9Dvnyt5',\n      value: '33',\n    },\n    {\n      dataElement: 'oZg33kd9taw',\n      value: 'Male',\n    },\n    {\n      dataElement: 'msodh3rEMJa',\n      value: date,\n    },\n  ],\n});",
-            "caption": "- Example `expression.js` of `createEvents` for a `single event` can look like this:"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "updateEvents",
-      "params": [
-        "path",
-        "data",
-        "params",
-        "options",
-        "callback"
-      ],
-      "docs": {
-        "description": "Update DHIS2 Event.\n- To update an existing event, the format of the payload is the same as that of `creating an event` via `createEvents` operations\n- But you should supply the `identifier` of the object you are updating\n- The payload has to contain `all`, even `non-modified`, `attributes`.\n- Attributes that were present before and are not present in the current payload any more will be removed by DHIS2.\n- If you do not want this behavior, please use `upsert` operation to upsert your events.",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)",
-            "type": {
-              "type": "NameExpression",
-              "name": "string"
-            },
-            "name": "path"
-          },
-          {
-            "title": "param",
-            "description": "The update data containing new values",
-            "type": {
-              "type": "NameExpression",
-              "name": "Object"
-            },
-            "name": "data"
-          },
-          {
-            "title": "param",
-            "description": "Optional `import` parameters for `updateEvents`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "Optional `flags` for the behavior of the `updateEvents` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Optional callback to handle the response",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
+            "description": "get('dataValueSets', {\n  dataSet: 'pBOMPrpg1QX',\n  orgUnit: 'DiszpKrYNg8',\n  period: '201401',\n  fields: '*',\n});",
+            "caption": "all data values for the 'pBOMPrpg1QX' dataset"
           },
           {
             "title": "example",
-            "description": "updateEvents('PVqUD2hvU4E', { events: [\n {\n   program: 'eBAyeGv0exc',\n   orgUnit: 'DiszpKrYNg8',\n   eventDate: date,\n   status: 'COMPLETED',\n   storedBy: 'admin',\n   coordinate: {\n     latitude: '59.8',\n     longitude: '10.9',\n   },\n   dataValues: [\n     {\n       dataElement: 'qrur9Dvnyt5',\n       value: '22',\n     },\n     {\n       dataElement: 'oZg33kd9taw',\n       value: 'Male',\n     },\n   ],\n }]\n});",
-            "caption": "- Example `expression.js` of `updateEvents`"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "getPrograms",
-      "params": [
-        "params",
-        "options",
-        "callback"
-      ],
-      "docs": {
-        "description": "Get DHIS2 Tracker Programs.",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "`import` parameters for `getPrograms`. See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#tracker-web-api DHIS2 api documentation for allowed query parameters }",
-            "type": {
-              "type": "NameExpression",
-              "name": "Object"
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "Optional `flags` for the behavior of the `getPrograms` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Optional callback to handle the response",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
+            "description": "get('programs', { orgUnit: 'TSyzvBiovKh', fields: '*' });",
+            "caption": "all programs for an organization unit"
           },
           {
             "title": "example",
-            "description": "getPrograms({ orgUnit: 'DiszpKrYNg8' , fields: '*' });",
-            "caption": "- Query for `all programs` with a certain `organisation unit`"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "createPrograms",
-      "params": [
-        "data",
-        "params",
-        "options",
-        "callback"
-      ],
-      "docs": {
-        "description": "Create a DHIS2 Tracker Program",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "The update data containing new values",
-            "type": {
-              "type": "NameExpression",
-              "name": "Object"
-            },
-            "name": "data"
-          },
-          {
-            "title": "param",
-            "description": "Optional `import` parameters for `createPrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "Optional `flags` for the behavior of the `getPrograms` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Optional callback to handle the response",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "createPrograms(state.data);",
-            "caption": "- Example `expression.js` of `createPrograms` for a `single program` can look like this:"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "updatePrograms",
-      "params": [
-        "path",
-        "data",
-        "params",
-        "options",
-        "callback"
-      ],
-      "docs": {
-        "description": "Update DHIS2 Tracker Programs\n- To update an existing program, the format of the payload is the same as that of `creating an event` via `createEvents` operations\n- But  you should supply the `identifier` of the object you are updating\n- The payload has to contain `all`, even `non-modified`, `attributes`.\n- Attributes that were present before and are not present in the current payload any more will be removed by DHIS2.\n- If you do not want this behavior, please use `upsert` operation to upsert your events.",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)",
-            "type": {
-              "type": "NameExpression",
-              "name": "string"
-            },
-            "name": "path"
-          },
-          {
-            "title": "param",
-            "description": "The update data containing new values",
-            "type": {
-              "type": "NameExpression",
-              "name": "Object"
-            },
-            "name": "data"
-          },
-          {
-            "title": "param",
-            "description": "Optional `import` parameters for `updatePrograms`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "Optional `flags` for the behavior of the `getPrograms` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Optional callback to handle the response",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "updatePrograms('PVqUD2hvU4E', state.data);",
-            "caption": "- Example `expression.js` of `updatePrograms`"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "getEnrollments",
-      "params": [
-        "params",
-        "options",
-        "callback"
-      ],
-      "docs": {
-        "description": "Get DHIS2 Enrollments",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "`Query` parameters for `getEnrollments`. See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#enrollment-management  here}",
-            "type": {
-              "type": "NameExpression",
-              "name": "Object"
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "Optional `flags` for the behavior of the `getEnrollments` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Optional callback to handle the response",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "getEnrollments({\n  ou: 'O6uvpzGd5pu',\n  ouMode: 'DESCENDANTS',\n  program: 'ur1Edk5Oe2n',\n  fields: '*',\n});",
-            "caption": "- To constrain the response to `enrollments` which are part of a `specific program` you can include a `program query parameter`"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "enrollTEI",
-      "params": [
-        "data",
-        "params",
-        "options",
-        "callback"
-      ],
-      "docs": {
-        "description": "Enroll a TEI into a program\n- Enrolling a tracked entity instance into a program\n- For enrolling `persons` into a `program`, you will need to first get the `identifier of the person` from the `trackedEntityInstances resource` via the `getTEIs` operation.\n- Then, you will need to get the `program identifier` from the `programs` resource via the `getPrograms` operation.",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "The enrollment data. See example {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#enrollment-management here }",
-            "type": {
-              "type": "NameExpression",
-              "name": "Object"
-            },
-            "name": "data"
-          },
-          {
-            "title": "param",
-            "description": "Optional `import` parameters for `createEnrollment`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "Optional `flags` for the behavior of the `enrollTEI` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Optional callback to handle the response",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "enrollTEI({\n   trackedEntity: 'tracked-entity-id',\n   orgUnit: 'org-unit-id',\n   attributes: [\n   {\n      attribute: 'attribute-id',\n      value: 'attribute-value',\n   },\n   ],\n   enrollments: [\n   {\n      orgUnit: 'org-unit-id',\n      program: 'program-id',\n      enrollmentDate: '2013-09-17',\n      incidentDate: '2013-09-17',\n   },\n   ],\n});",
-            "caption": "- Example `expression.js` of `createEnrollment` of a `person` into a `program` can look like this:"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "updateEnrollments",
-      "params": [
-        "path",
-        "data",
-        "params",
-        "options",
-        "callback"
-      ],
-      "docs": {
-        "description": "Update a DHIS2 Enrollemts\n- To update an existing enrollment, the format of the payload is the same as that of `creating an event` via `createEvents` operations\n- But  you should supply the `identifier` of the object you are updating\n- The payload has to contain `all`, even `non-modified`, `attributes`.\n- Attributes that were present before and are not present in the current payload any more will be removed by DHIS2.\n- If you do not want this behavior, please use `upsert` operation to upsert your events.",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "Path to the object being updated. This can be an `id` or path to an `object` in a `nested collection` on the object(E.g. `/api/{collection-object}/{collection-object-id}/{collection-name}/{object-id}`)",
-            "type": {
-              "type": "NameExpression",
-              "name": "string"
-            },
-            "name": "path"
-          },
-          {
-            "title": "param",
-            "description": "The update data containing new values",
-            "type": {
-              "type": "NameExpression",
-              "name": "Object"
-            },
-            "name": "data"
-          },
-          {
-            "title": "param",
-            "description": "Optional `import` parameters for `updateEnrollments`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "Optional `flags` for the behavior of the `updateEnrollments` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Optional callback to handle the response",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "updateEnrollments('PVqUD2hvU4E', state.data);",
-            "caption": "- Example `expression.js` of `updateEnromments`"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "cancelEnrollment",
-      "params": [
-        "enrollmentId",
-        "params",
-        "options",
-        "callback"
-      ],
-      "docs": {
-        "description": "Cancel a DHIS2 Enrollment\n- To cancel an existing enrollment, you should supply the `enrollment identifier`(`enrollemt-id`)",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "The `enrollment-id` of the enrollment you wish to cancel",
-            "type": {
-              "type": "NameExpression",
-              "name": "string"
-            },
-            "name": "enrollmentId"
-          },
-          {
-            "title": "param",
-            "description": "Optional `import` parameters for `cancelEnrollment`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "Optional `flags` for the behavior of the `cancelEnrollment` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Optional callback to handle the response",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "cancelEnrollments('PVqUD2hvU4E');",
-            "caption": "- Example `expression.js` of `cancelEnrollment`"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "completeEnrollment",
-      "params": [
-        "enrollmentId",
-        "params",
-        "options",
-        "callback"
-      ],
-      "docs": {
-        "description": "Complete a DHIS2 Enrollment\n- To complete an existing enrollment, you should supply the `enrollment identifier`(`enrollemt-id`)",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "The `enrollment-id` of the enrollment you wish to cancel",
-            "type": {
-              "type": "NameExpression",
-              "name": "string"
-            },
-            "name": "enrollmentId"
-          },
-          {
-            "title": "param",
-            "description": "Optional `import` parameters for `completeEnrollment`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "Optional `flags` for the behavior of the `completeEnrollment` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Optional callback to handle the response",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "completeEnrollment('PVqUD2hvU4E');",
-            "caption": "- Example `expression.js` of `completeEnrollment`"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "getRelationships",
-      "params": [
-        "params",
-        "options",
-        "callback"
-      ],
-      "docs": {
-        "description": "Get DHIS2 Relationships(links) between two entities in tracker. These entities can be tracked entity instances, enrollments and events.\n- All the tracker operations, `getTEIs`, `getEnrollments` and `getEvents` also list their relationships if requested in the `field` filter.\n- To list all relationships, this requires you to provide the UID of the trackedEntityInstance, Enrollment or event that you want to list all the relationships for.",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "`Query` parameters for `getRelationships`. See examples {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#relationships here}",
-            "type": {
-              "type": "NameExpression",
-              "name": "Object"
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "Optional `flags` for the behavior of the `getRelationships` operation.Defaults to `{apiVersion: state.configuration.apiVersion,responseType: 'json'}`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Optional callback to handle the response",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "getRelationships({ tei: 'F8yKM85NbxW', fields: '*' });",
-            "caption": "- A query for `all relationships` associated with a `specific tracked entity instance` can look like this:"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "getDataValues",
-      "params": [
-        "params",
-        "options",
-        "callback"
-      ],
-      "docs": {
-        "description": "Get DHIS2 Data Values.\n- This operation retrives data values from DHIS2 Web API by interacting with the `dataValueSets` resource\n- Data values can be retrieved in XML, JSON and CSV format.",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "`Query` parameters for `getDataValues`. E.g. `{dataset: 'pBOMPrpg1QX', limit: 3, period: 2021, orgUnit: 'DiszpKrYNg8'} Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#data-values DHIS2 API docs} for available `Data Value Set Query Parameters`.",
-            "type": {
-              "type": "NameExpression",
-              "name": "Object"
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "Optional `options` for `getDataValues` operation. Defaults to `{apiVersion: state.configuration.apiVersion, responseType: 'json'}`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Optional `callback` to handle the response",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "getDataValues({\n  orgUnit: 'DiszpKrYNg8',\n  period: '202010',\n  dataSet: 'pBOMPrpg1QX',\n  limit: 2,\n});",
-            "caption": "- Example getting **two** `data values` associated with a specific `orgUnit`, `dataSet`, and `period `"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "createDataValues",
-      "params": [
-        "data",
-        "options",
-        "params",
-        "callback"
-      ],
-      "docs": {
-        "description": "Create DHIS2 Data Values\n- This is used to send aggregated data to DHIS2\n- A data value set represents a set of data values which have a relationship, usually from being captured off the same data entry form.\n- To send a set of related data values sharing the same period and organisation unit, we need to identify the period, the data set, the org unit (facility) and the data elements for which to report.\n- You can also use this operation to send large bulks of data values which don't necessarily are logically related.\n- To send data values that are not linked to a `dataSet`, you do not need to specify the dataSet and completeDate attributes. Instead, you will specify the period and orgUnit attributes on the individual data value elements instead of on the outer data value set element. This will enable us to send data values for various periods and organisation units",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "The `data values` to upload or create. See example shape.",
-            "type": {
-              "type": "NameExpression",
-              "name": "object"
-            },
-            "name": "data"
-          },
-          {
-            "title": "param",
-            "description": "Optional `flags` for the behavior of the `createDataVaues` operation.",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Optional `import` parameters for `createDataValues`. E.g. `{dryRun: true, IdScheme: 'CODE'}. Defaults to DHIS2 `default params`. Run `discover` or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#data-values DHIS2 Docs API} to learn about available data values import parameters.",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "object"
-              }
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "Optional callback to handle the response",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "createDataValues({\n  dataSet: 'pBOMPrpg1QX',\n  completeDate: '2014-02-03',\n  period: '201401',\n  orgUnit: 'DiszpKrYNg8',\n  dataValues: [\n    {\n      dataElement: 'f7n9E0hX8qk',\n      value: '1',\n    },\n    {\n      dataElement: 'Ix2HsbDMLea',\n      value: '2',\n    },\n    {\n      dataElement: 'eY5ehpbEsB7',\n      value: '3',\n    },\n  ],\n});",
-            "caption": "- Example `expression.js` of `createDataValues`  for sending a set of related data values sharing the same period and organisation unit"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "generateDhis2UID",
-      "params": [
-        "options",
-        "callback"
-      ],
-      "docs": {
-        "description": "Generate valid, random DHIS2 identifiers\n- Useful for client generated Ids compatible with DHIS2",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "Optional `options` for `generateDhis2UID` operation. Defaults to `{apiVersion: state.configuration.apiVersion,limit: 1,responseType: 'json'}`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "limit",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Callback to handle response",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "generateDhis2UID({limit: 3});",
-            "caption": "Example generating `three UIDs` from the DHIS2 server"
+            "description": "get('trackedEntityInstances', {\n  ou: 'DiszpKrYNg8',\n  filter: ['flGbXLXCrEo:Eq:124', 'w75KJ2mc4zz:Eq:John'],\n});",
+            "caption": "a single tracked entity instance by a unique external ID"
           }
         ]
       },
@@ -1911,735 +408,7 @@
           {
             "title": "example",
             "description": "discover('post', '/trackedEntityInstances')",
-            "caption": "Example getting a list of `parameters allowed` on a given `endpoint` for specific `http method`"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "getAnalytics",
-      "params": [
-        "params",
-        "options",
-        "callback"
-      ],
-      "docs": {
-        "description": "Get analytical, aggregated data\n- The analytics resource is powerful as it lets you query and retrieve data aggregated along all available data dimensions.\n- For instance, you can ask the analytics resource to provide the aggregated data values for a set of data elements, periods and organisation units.\n- Also, you can retrieve the aggregated data for a combination of any number of dimensions based on data elements and organisation unit group sets.",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "Analytics `query parameters`, e.g. `{dx: 'fbfJHSPpUQD;cYeuwXTCPkU',filters: ['pe:2014Q1;2014Q2','ou:O6uvpzGd5pu;lc3eMKXaEfw']}`. Run `discover` or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#analytics DHIS2 API docs} to get the params available.",
-            "type": {
-              "type": "NameExpression",
-              "name": "Object"
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "`Optional` options for `getAnalytics` operation. Defaults to `{apiVersion: state.configuration.apiVersion, responseType: 'json'}`.",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Callback to handle response",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "getAnalytics({\n  dimensions: [\n   'dx:fbfJHSPpUQD;cYeuwXTCPkU',\n   'pe:2014',\n   'ou:O6uvpzGd5pu;lc3eMKXaEfw',\n  ],\n  measureCriteria: 'GE:6500;LT:33000',\n});",
-            "caption": "Example getting only records where the data value is greater or equal to 6500 and less than 33000"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "getResources",
-      "params": [
-        "params",
-        "options",
-        "callback"
-      ],
-      "docs": {
-        "description": "Get DHIS2 api resources",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "The `optional` query parameters for this endpoint. E.g `{filter: 'singular:like:attribute'}`.",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "The `optional` options, specifiying the filter expression. E.g. `singular:eq:attribute`.",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "filter",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "fields",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "The `optional callback function that will be called to handle data returned by this function.",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "getResources('dataElement', {\n     filter: 'singular:eq:attribute',\n     fields: '*',\n     responseType: 'xml',\n});",
-            "caption": "Example getting a resource named `attribute`, in `xml` format, returning all the fields"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "getSchema",
-      "params": [
-        "resourceType",
-        "params",
-        "options",
-        "callback"
-      ],
-      "docs": {
-        "description": "Get schema of a given resource type, in any data format supported by DHIS2",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "The type of resource to be updated(`singular` version of the `resource name`). E.g. `dataElement`, `organisationUnit`, etc. Run `getResources` to see available resources and their corresponding `singular` names.",
-            "type": {
-              "type": "NameExpression",
-              "name": "string"
-            },
-            "name": "resourceType"
-          },
-          {
-            "title": "param",
-            "description": "Optional `query parameters` for the `getSchema` operation. e.g. `{ fields: 'properties' ,skipPaging: true}`. Run`discover` or See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#metadata-export-examples DHIS2 API Docs}",
-            "type": {
-              "type": "NameExpression",
-              "name": "Object"
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "Optional options for `getSchema` method. Defaults to `{apiVersion: state.configuration.apiVersion, responseType: 'json'}`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "resourceType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Optional `callback` to handle the response",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "getSchema('dataElement', '{ fields: '*' }, { responseType: 'xml' });",
-            "caption": "Example getting the `schema` for `dataElement` in XML"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "getData",
-      "params": [
-        "resourceType",
-        "params",
-        "options",
-        "callback"
-      ],
-      "docs": {
-        "description": "Get data. Generic helper method for getting data of any kind from DHIS2.\n- This can be used to get `DataValueSets`,`events`,`trackedEntityInstances`,`etc.`",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "The type of resource to get(use its `plural` name). E.g. `dataElements`, `trackedEntityInstances`,`organisationUnits`, etc.",
-            "type": {
-              "type": "NameExpression",
-              "name": "string"
-            },
-            "name": "resourceType"
-          },
-          {
-            "title": "param",
-            "description": "Optional `query parameters` e.g. `{ou: 'DiszpKrYNg8'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 docs} for more details on which params to use for a given type of resource.",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "`Optional` options for `getData` operation. Defaults to `{operationName: 'getData', apiVersion: state.configuration.apiVersion, responseType: 'json'}`.",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "operationName",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Optional callback to handle the response",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": "state",
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "getData('trackedEntityInstances', {\n   fields: '*',\n   ou: 'DiszpKrYNg8',\n   entityType: 'nEenWmSyUEp',\n   trackedEntityInstance: 'dNpxRu1mWG5',\n});",
-            "caption": "Example getting one `trackedEntityInstance` with `Id` 'dNpxRu1mWG5' for a given `orgUnit(DiszpKrYNg8)`"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "getMetadata",
-      "params": [
-        "resources",
-        "params",
-        "options",
-        "callback"
-      ],
-      "docs": {
-        "description": "Get metadata. A generic helper function to get metadata records from a given DHIS2 instance",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "Required. List of metadata resources to fetch. E.g. `['organisationUnits', 'attributes']` or like `'dataSets'` if you only want a single type of resource. See `getResources` to see the types of resources available.",
-            "type": {
-              "type": "TypeApplication",
-              "expression": {
-                "type": "NameExpression",
-                "name": "Array"
-              },
-              "applications": [
-                {
-                  "type": "NameExpression",
-                  "name": "string"
-                }
-              ]
-            },
-            "name": "resources"
-          },
-          {
-            "title": "param",
-            "description": "Optional `query parameters` e.g. `{filters: ['name:like:ANC'],fields:'*'}`. See `discover` or visit {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#metadata-export DHIS2 API docs}",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "Optional `options` for `getMetadata` operation. Defaults to `{operationName: 'getMetadata', apiVersion: state.configuration.apiVersion, responseType: 'json'}`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "operationName",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "resourceType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Optional `callback` to handle the response",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "getMetadata(['dataElements', 'indicators'], {\n     filters: ['name:like:ANC'],\n});",
-            "caption": "Example getting a list of `data elements` and `indicators` where `name` includes the word **ANC**"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "create",
-      "params": [
-        "resourceType",
-        "data",
-        "options",
-        "params",
-        "callback"
-      ],
-      "docs": {
-        "description": "create data. A generic helper method to create a record of any kind in DHIS2",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "Type of resource to create. E.g. `trackedEntityInstances`",
-            "type": {
-              "type": "NameExpression",
-              "name": "string"
-            },
-            "name": "resourceType"
-          },
-          {
-            "title": "param",
-            "description": "Data that will be used to create a given instance of resource",
-            "type": {
-              "type": "NameExpression",
-              "name": "Object"
-            },
-            "name": "data"
-          },
-          {
-            "title": "param",
-            "description": "Optional `options` to control the behavior of the `create` operation.` Defaults to `{operationName: 'create', apiVersion: null, responseType: 'json'}`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Optional `import parameters` for a given a resource. E.g. `{dryRun: true, importStrategy: CREATE}` See {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html DHIS2 API documentation} or {@link discover}. Defauls to `DHIS2 default params` for a given resource type.",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "Optional callback to handle the response",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "create('events', {\n  program: 'eBAyeGv0exc',\n  orgUnit: 'DiszpKrYNg8',\n  eventDate: date,\n  status: 'COMPLETED',\n  completedDate: date,\n  storedBy: 'admin',\n  coordinate: {\n    latitude: 59.8,\n    longitude: 10.9,\n  },\n  dataValues: [\n    {\n      dataElement: 'qrur9Dvnyt5',\n      value: '33',\n    },\n    {\n      dataElement: 'oZg33kd9taw',\n      value: 'Male',\n    },\n    {\n      dataElement: 'msodh3rEMJa',\n      value: date,\n    },\n  ],\n});",
-            "caption": "- Example `expression.js` of `create`"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "update",
-      "params": [
-        "resourceType",
-        "path",
-        "data",
-        "params",
-        "options",
-        "callback"
-      ],
-      "docs": {
-        "description": "Update data. A generic helper function to update a resource object of any type.\n- It requires to send `all required fields` or the `full body`",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "The type of resource to be updated. E.g. `dataElements`, `organisationUnits`, etc.",
-            "type": {
-              "type": "NameExpression",
-              "name": "string"
-            },
-            "name": "resourceType"
-          },
-          {
-            "title": "param",
-            "description": "The `id` or `path` to the `object` to be updated. E.g. `FTRrcoaog83` or `FTRrcoaog83/{collection-name}/{object-id}`",
-            "type": {
-              "type": "NameExpression",
-              "name": "string"
-            },
-            "name": "path"
-          },
-          {
-            "title": "param",
-            "description": "Data to update. It requires to send `all required fields` or the `full body`. If you want `partial updates`, use `patch` operation.",
-            "type": {
-              "type": "NameExpression",
-              "name": "Object"
-            },
-            "name": "data"
-          },
-          {
-            "title": "param",
-            "description": "Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "Optional options for update method. Defaults to `{operationName: 'update', apiVersion: state.configuration.apiVersion, responseType: 'json'}`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "operationName",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "resourceType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Optional callback to handle the response",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "update('dataElements', 'FTRrcoaog83',\n{\n  displayName: 'New display name',\n  aggregationType: 'SUM',\n  domainType: 'AGGREGATE',\n  valueType: 'NUMBER',\n  name: 'Accute Flaccid Paralysis (Deaths < 5 yrs)',\n  shortName: 'Accute Flaccid Paral (Deaths < 5 yrs)',\n});",
-            "caption": "Example `updating` a `data element`"
+            "caption": "a list of parameters allowed on a given endpoint for specific http method"
           }
         ]
       },
@@ -2651,7 +420,6 @@
         "resourceType",
         "path",
         "data",
-        "params",
         "options",
         "callback"
       ],
@@ -2697,49 +465,12 @@
           },
           {
             "title": "param",
-            "description": "Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}",
+            "description": "Optional configuration, including params for the update ({preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}). Defaults to `{operationName: 'patch', apiVersion: state.configuration.apiVersion, responseType: 'json'}`",
             "type": {
               "type": "OptionalType",
               "expression": {
                 "type": "NameExpression",
                 "name": "Object"
-              }
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "Optional options for update method. Defaults to `{operationName: 'patch', apiVersion: state.configuration.apiVersion, responseType: 'json'}`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "operationName",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
               }
             },
             "name": "options"
@@ -2766,20 +497,19 @@
           },
           {
             "title": "example",
-            "description": "patch('dataElements', 'FTRrcoaog83',\n{\n  name: 'New Name',\n});",
-            "caption": "Example `patching` a `data element`"
+            "description": "patch('dataElements', 'FTRrcoaog83', { name: 'New Name' });",
+            "caption": "a dataElement"
           }
         ]
       },
       "valid": true
     },
     {
-      "name": "del",
+      "name": "destroy",
       "params": [
         "resourceType",
         "path",
         "data",
-        "params",
         "options",
         "callback"
       ],
@@ -2828,19 +558,7 @@
           },
           {
             "title": "param",
-            "description": "Optional `update` parameters e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "Optional `options` for `del` operation. Defaults to `{operationName: 'delete', apiVersion: state.configuration.apiVersion, responseType: 'json'}`",
+            "description": "Optional `options` for `del` operation including params e.g. `{preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}`. Run `discover` or see {@link https://docs.dhis2.org/2.34/en/dhis2_developer_manual/web-api.html#create-update-parameters DHIS2 documentation}. Defaults to `{operationName: 'delete', apiVersion: state.configuration.apiVersion, responseType: 'json'}`",
             "type": {
               "type": "OptionalType",
               "expression": {
@@ -2897,195 +615,18 @@
           },
           {
             "title": "example",
-            "description": "del('trackedEntityInstances', 'LcRd6Nyaq7T');",
-            "caption": "Example`deleting` a `tracked entity instance`"
+            "description": "destroy('trackedEntityInstances', 'LcRd6Nyaq7T');",
+            "caption": "a tracked entity instance"
           }
         ]
       },
       "valid": true
     },
     {
-      "name": "upsert",
+      "name": "findAttributeValue",
       "params": [
-        "resourceType",
-        "uniqueAttribute",
-        "data",
-        "params",
-        "options",
-        "callback"
-      ],
-      "docs": {
-        "description": "Upsert a record. A generic helper function used to atomically either insert a row, or on the basis of the row already existing, UPDATE that existing row instead.",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "The type of a resource to `insert` or `update`. E.g. `trackedEntityInstances`",
-            "type": {
-              "type": "NameExpression",
-              "name": "string"
-            },
-            "name": "resourceType"
-          },
-          {
-            "title": "param",
-            "description": "An object containing a `attributeId` and `attributeValue` which will be used to uniquely identify the record",
-            "type": {
-              "type": "RecordType",
-              "fields": [
-                {
-                  "type": "FieldType",
-                  "key": "attributeId",
-                  "value": {
-                    "type": "NameExpression",
-                    "name": "string"
-                  }
-                },
-                {
-                  "type": "FieldType",
-                  "key": "attributeValue",
-                  "value": {
-                    "type": "NameExpression",
-                    "name": "any"
-                  }
-                }
-              ]
-            },
-            "name": "uniqueAttribute"
-          },
-          {
-            "title": "param",
-            "description": "The update data containing new values",
-            "type": {
-              "type": "NameExpression",
-              "name": "Object"
-            },
-            "name": "data"
-          },
-          {
-            "title": "param",
-            "description": "Optional `import` parameters e.g. `{ou: 'lZGmxYbs97q', filters: ['w75KJ2mc4zz:EQ:Jane']}`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            },
-            "name": "params"
-          },
-          {
-            "title": "param",
-            "description": "`Optional` options for `upsertTEI` operation. Defaults to `{replace: false, apiVersion: state.configuration.apiVersion,strict: true,responseType: 'json'}`.",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "RecordType",
-                "fields": [
-                  {
-                    "type": "FieldType",
-                    "key": "replace",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "boolean"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "apiVersion",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "number"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "strict",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "boolean"
-                    }
-                  },
-                  {
-                    "type": "FieldType",
-                    "key": "responseType",
-                    "value": {
-                      "type": "NameExpression",
-                      "name": "string"
-                    }
-                  }
-                ]
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Optional callback to handle the response",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "throws",
-            "description": "Throws range error",
-            "type": {
-              "type": "NameExpression",
-              "name": "RangeError"
-            }
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "upsert(\n   'trackedEntityInstances',\n   {\n      attributeId: 'lZGmxYbs97q',\n         attributeValue: state =>\n            state.data.attributes.find(obj => obj.attribute === 'lZGmxYbs97q')\n            .value,\n   },\n   state.data,\n   { ou: 'TSyzvBiovKh' }\n);",
-            "caption": "- Example `expression.js` of upsert"
-          },
-          {
-            "title": "todo",
-            "description": "Tweak/refine to mimic implementation based on the following inspiration: {@link https://sqlite.org/lang_upsert.html sqlite upsert} and {@link https://wiki.postgresql.org/wiki/UPSERT postgresql upsert}"
-          },
-          {
-            "title": "todo",
-            "description": "Test implementation for upserting metadata"
-          },
-          {
-            "title": "todo",
-            "description": "Test implementation for upserting data values"
-          },
-          {
-            "title": "todo",
-            "description": "Implement the updateCondition"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
-      "name": "attrVal",
-      "params": [
-        "tei",
-        "attributeName"
+        "trackedEntityInstance",
+        "attributeDisplayName"
       ],
       "docs": {
         "description": "Gets an attribute value by its case-insensitive display name",
@@ -3097,7 +638,7 @@
           },
           {
             "title": "example",
-            "description": "valByName(tei.attributes, 'first name')"
+            "description": "findAttributeValue(state.data.trackedEntityInstances[0], 'first name')"
           },
           {
             "title": "function",
@@ -3111,7 +652,7 @@
               "type": "NameExpression",
               "name": "Object"
             },
-            "name": "tei"
+            "name": "trackedEntityInstance"
           },
           {
             "title": "param",
@@ -3120,7 +661,7 @@
               "type": "NameExpression",
               "name": "string"
             },
-            "name": "attributeName"
+            "name": "attributeDisplayName"
           },
           {
             "title": "returns",
@@ -3128,6 +669,112 @@
             "type": {
               "type": "NameExpression",
               "name": "string"
+            }
+          }
+        ]
+      },
+      "valid": true
+    },
+    {
+      "name": "attr",
+      "params": [
+        "attribute",
+        "value"
+      ],
+      "docs": {
+        "description": "Converts an attribute ID and value into a DSHI2 attribute object",
+        "tags": [
+          {
+            "title": "public",
+            "description": null,
+            "type": null
+          },
+          {
+            "title": "example",
+            "description": "attr('w75KJ2mc4zz', 'Elias')"
+          },
+          {
+            "title": "function",
+            "description": null,
+            "name": null
+          },
+          {
+            "title": "param",
+            "description": "A tracked entity instance (TEI) attribute ID.",
+            "type": {
+              "type": "NameExpression",
+              "name": "string"
+            },
+            "name": "attribute"
+          },
+          {
+            "title": "param",
+            "description": "The value for that attribute.",
+            "type": {
+              "type": "NameExpression",
+              "name": "string"
+            },
+            "name": "value"
+          },
+          {
+            "title": "returns",
+            "description": null,
+            "type": {
+              "type": "NameExpression",
+              "name": "object"
+            }
+          }
+        ]
+      },
+      "valid": true
+    },
+    {
+      "name": "dv",
+      "params": [
+        "dataElement",
+        "value"
+      ],
+      "docs": {
+        "description": "Converts a dataElement and value into a DSHI2 dataValue object",
+        "tags": [
+          {
+            "title": "public",
+            "description": null,
+            "type": null
+          },
+          {
+            "title": "example",
+            "description": "dv('f7n9E0hX8qk', 12)"
+          },
+          {
+            "title": "function",
+            "description": null,
+            "name": null
+          },
+          {
+            "title": "param",
+            "description": "A data element ID.",
+            "type": {
+              "type": "NameExpression",
+              "name": "string"
+            },
+            "name": "dataElement"
+          },
+          {
+            "title": "param",
+            "description": "The value for that data element.",
+            "type": {
+              "type": "NameExpression",
+              "name": "string"
+            },
+            "name": "value"
+          },
+          {
+            "title": "returns",
+            "description": null,
+            "type": {
+              "type": "NameExpression",
+              "name": "object"
             }
           }
         ]
