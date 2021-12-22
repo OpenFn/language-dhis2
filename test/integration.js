@@ -263,7 +263,7 @@ describe('get', () => {
     data: {},
   };
 
-  it('should get dataValueSets matching the filters specified', async () => {
+  it('should get dataValueSets matching the query specified', async () => {
     const finalState = await execute(
       get('dataValueSets', {
         dataSet: 'pBOMPrpg1QX',

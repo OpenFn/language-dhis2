@@ -59,20 +59,3 @@ export function generateUrl(configuration, options, resourceType) {
 
   return buildUrl(urlString, hostUrl, apiVersion);
 }
-
-export function buildUrlParams(params) {
-  const filters = params?.filters;
-  const dimensions = params?.dimensions;
-
-  // We remove filters and dimensions before building standard search params.
-  delete params?.filters;
-  delete params?.dimensions;
-
-  const urlParams = new URLSearchParams(params);
-
-  // Then we re-apply the filters and dimensions in this dhis2-specific way.
-  filters?.map(f => urlParams.append('filter', f));
-  dimensions?.map(d => urlParams.append('dimension', d));
-
-  return urlParams;
-}

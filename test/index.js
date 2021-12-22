@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { execute, create, update, get, upsert } from '../lib/Adaptor';
 import { dataValue } from '@openfn/language-common';
-import { buildUrl, buildUrlParams, generateUrl, nestArray } from '../lib/Utils';
+import { buildUrl, generateUrl, nestArray } from '../lib/Utils';
 import nock from 'nock';
 
 const testServer = nock('https://play.dhis2.org/2.36.4');
@@ -327,7 +327,7 @@ describe('URL builders', () => {
       const options = {
         ...fixture.options,
         apiVersion: 33,
-        params: { filters: ['a:eq:b', 'c:ge:d'] },
+        params: { filter: ['a:eq:b', 'c:ge:d'] },
       };
 
       const finalURL = generateUrl(
@@ -335,28 +335,11 @@ describe('URL builders', () => {
         options,
         fixture.resourceType
       );
+
       const expectedURL = 'https://play.dhis2.org/2.36.4/api/33/dataValueSets';
 
       expect(finalURL).to.eq(expectedURL);
       done();
-    });
-  });
-
-  describe('buildURLParams', () => {
-    it('should handle special filter and dimensions params and build the rest per usual', () => {
-      const params = {
-        dryRun: true,
-        filters: ['sex:eq:male', 'origin:eq:senegal'],
-        someNonesense: 'other',
-        dimensions: ['dx:fbfJHSPpUQD', 'ou:O6uvpzGd5pu;lc3eMKXaEfw'],
-      };
-
-      const finalParams = buildUrlParams(params).toString();
-
-      const expected =
-        'dryRun=true&someNonesense=other&filter=sex%3Aeq%3Amale&filter=origin%3Aeq%3Asenegal&dimension=dx%3AfbfJHSPpUQD&dimension=ou%3AO6uvpzGd5pu%3Blc3eMKXaEfw';
-
-      expect(finalParams).to.eq(expected);
     });
   });
 });

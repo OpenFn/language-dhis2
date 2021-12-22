@@ -8,7 +8,6 @@ import {
 import { indexOf } from 'lodash';
 import {
   buildUrl,
-  buildUrlParams,
   CONTENT_TYPES,
   generateUrl,
   handleResponse,
@@ -125,7 +124,7 @@ axios.interceptors.response.use(
  * @function
  * @param {string} resourceType - Type of resource to create. E.g. `trackedEntityInstances`, `programs`, `events`, ...
  * @param {Object} data - Data that will be used to create a given instance of resource. To create a single instance of a resource, `data` must be a javascript object, and to create multiple instances of a resources, `data` must be an array of javascript objects.
- * @param {Object} [options] - Optional `options` to define URL parameters (E.g. `filters`, `dimensions` and `import parameters`), axios configurations (E.g. `auth`) and DHIS 2 api version to use.
+ * @param {Object} [options] - Optional `options` to define URL parameters (E.g. `filter`, `dimension` and other import parameters), request config (E.g. `auth`) and the DHIS2 apiVersion.
  * @param {function} [callback] - Optional callback to handle the response
  * @returns {Operation}
  * @example <caption>a program</caption>
@@ -233,7 +232,7 @@ export function create(resourceType, data, options, callback) {
     return request(configuration, {
       method: 'post',
       url: generateUrl(configuration, options, resourceType),
-      params: params && buildUrlParams(params),
+      params,
       data: nestArray(data, resourceType),
       ...requestConfig,
     }).then(result => {
@@ -251,7 +250,7 @@ export function create(resourceType, data, options, callback) {
  * @param {string} resourceType - The type of resource to be updated. E.g. `dataElements`, `organisationUnits`, etc.
  * @param {string} path - The `id` or `path` to the `object` to be updated. E.g. `FTRrcoaog83` or `FTRrcoaog83/{collection-name}/{object-id}`
  * @param {Object} data - Data to update. It requires to send `all required fields` or the `full body`. If you want `partial updates`, use `patch` operation.
- * @param {Object} [options] - Optional `options` to define URL parameters (E.g. `filters`, `dimensions` and `import parameters`), axios configurations (E.g. `auth`) and DHIS 2 api version to use.
+ * @param {Object} [options] - Optional `options` to define URL parameters (E.g. `filter`, `dimension` and other import parameters), request config (E.g. `auth`) and the DHIS2 apiVersion.
  * @param {function} [callback]  - Optional callback to handle the response
  * @returns {Operation}
  * @example <caption>a program</caption>
@@ -391,7 +390,7 @@ export function update(resourceType, path, data, options, callback) {
     return request(configuration, {
       method: 'put',
       url: `${generateUrl(configuration, options, resourceType)}/${path}`,
-      params: params && buildUrlParams(params),
+      params,
       data,
       ...requestConfig,
     }).then(result => {
@@ -407,7 +406,7 @@ export function update(resourceType, path, data, options, callback) {
  * @public
  * @function
  * @param {string} resourceType - The type of resource to get(use its `plural` name). E.g. `dataElements`, `trackedEntityInstances`,`organisationUnits`, etc.
- * @param {Object} filters - Filters to limit what resources are retrieved.
+ * @param {Object} query - A query object that will limit what resources are retrieved when converted into request params.
  * @param {Object} [options] - Optional `options` to define URL parameters beyond filters, request configuration (e.g. `auth`) and DHIS2 api version to use.
  * @param {function} [callback]  - Optional callback to handle the response
  * @returns {Operation} state
@@ -423,15 +422,15 @@ export function update(resourceType, path, data, options, callback) {
  * @example <caption>a single tracked entity instance by a unique external ID</caption>
  * get('trackedEntityInstances', {
  *   ou: 'DiszpKrYNg8',
- *   filters: ['flGbXLXCrEo:Eq:124'],
+ *   filter: ['flGbXLXCrEo:Eq:124', 'w75KJ2mc4zz:Eq:John'],
  * });
  */
-export function get(resourceType, filters, options, callback) {
+export function get(resourceType, query, options, callback) {
   return state => {
     console.log(`Preparing get operation...`);
 
     resourceType = expandReferences(resourceType)(state);
-    filters = expandReferences(filters)(state);
+    query = expandReferences(query)(state);
     options = expandReferences(options)(state);
 
     const { params, requestConfig } = options || {};
@@ -440,7 +439,7 @@ export function get(resourceType, filters, options, callback) {
     return request(configuration, {
       method: 'get',
       url: generateUrl(configuration, options, resourceType),
-      params: buildUrlParams({ ...filters, ...params }),
+      params: { ...query, ...params },
       responseType: 'json',
       ...requestConfig,
     }).then(result => {
