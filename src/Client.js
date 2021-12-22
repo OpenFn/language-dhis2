@@ -14,7 +14,7 @@ export function request({ username, password }, axiosRequest) {
   const { method, url, params } = axiosRequest;
 
   console.log(`Sending ${method} request to ${url}`);
-  if (params) console.log(` with params: ${params}`);
+  if (params) console.log(` with params:`, params);
 
   // NOTE: We don't follow redirects for unsafe methods: https://github.com/axios/axios/issues/2460
   const safeRedirect = ['get', 'head', 'options', 'trace'].includes(

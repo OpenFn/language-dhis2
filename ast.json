@@ -41,7 +41,7 @@
           },
           {
             "title": "param",
-            "description": "Optional `options` to define URL parameters (E.g. `filters`, `dimensions` and `import parameters`), axios configurations (E.g. `auth`) and DHIS 2 api version to use.",
+            "description": "Optional `options` to define URL parameters (E.g. `filter`, `dimension` and other import parameters), request config (E.g. `auth`) and the DHIS2 apiVersion.",
             "type": {
               "type": "OptionalType",
               "expression": {
@@ -181,7 +181,7 @@
           },
           {
             "title": "param",
-            "description": "Optional `options` to define URL parameters (E.g. `filters`, `dimensions` and `import parameters`), axios configurations (E.g. `auth`) and DHIS 2 api version to use.",
+            "description": "Optional `options` to define URL parameters (E.g. `filter`, `dimension` and other import parameters), request config (E.g. `auth`) and the DHIS2 apiVersion.",
             "type": {
               "type": "OptionalType",
               "expression": {
@@ -274,7 +274,7 @@
       "name": "get",
       "params": [
         "resourceType",
-        "filters",
+        "query",
         "options",
         "callback"
       ],
@@ -302,12 +302,12 @@
           },
           {
             "title": "param",
-            "description": "Filters to limit what resources are retrieved.",
+            "description": "A query object that will limit what resources are retrieved when converted into request params.",
             "type": {
               "type": "NameExpression",
               "name": "Object"
             },
-            "name": "filters"
+            "name": "query"
           },
           {
             "title": "param",
@@ -353,7 +353,7 @@
           },
           {
             "title": "example",
-            "description": "get('trackedEntityInstances', {\n  ou: 'DiszpKrYNg8',\n  filters: ['flGbXLXCrEo:Eq:124'],\n});",
+            "description": "get('trackedEntityInstances', {\n  ou: 'DiszpKrYNg8',\n  filter: ['flGbXLXCrEo:Eq:124', 'w75KJ2mc4zz:Eq:John'],\n});",
             "caption": "a single tracked entity instance by a unique external ID"
           }
         ]
