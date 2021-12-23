@@ -148,7 +148,7 @@ describe('Integration tests', () => {
       expect(response.data.status).to.eq('OK');
     });
 
-    it.only('should update a single event', async () => {
+    it('should update a single event', async () => {
       const state = {
         ...fixture.initialState,
         event: 'rBjxtO8npTb',
@@ -263,6 +263,41 @@ describe('Integration tests', () => {
       )(state);
 
       expect(finalState.data.dataValues.length).to.gte(1);
+    });
+
+    it('should get a single TEI based on multiple filters', async () => {
+      const finalState = await execute(
+        get('trackedEntityInstances', {
+          ou: 'DiszpKrYNg8',
+          filter: ['w75KJ2mc4zz:Eq:John', 'zDhUuAYrxNC:Eq:Doe'],
+        })
+      )(state);
+
+      expect(finalState.data.trackedEntityInstances.length).to.eq(1);
+
+      const finalState2 = await execute(
+        get('trackedEntityInstances', {
+          ou: 'DiszpKrYNg8',
+          filter: ['w75KJ2mc4zz:Eq:John', 'zDhUuAYrxNC:Eq:NotDoe'],
+        })
+      )(state);
+
+      expect(finalState2.data.trackedEntityInstances.length).to.eq(0);
+    });
+
+    it('should get a no TEIs if non match the filters', async () => {
+      const finalState = await execute(
+        get('trackedEntityInstances', {
+          ou: 'DiszpKrYNg8',
+          filter: [
+            'w75KJ2mc4zz:Eq:John',
+            'flGbXLXCrEo:Eq:124-not-a-real-id', // case ID
+            'zDhUuAYrxNC:Eq:Doe',
+          ],
+        })
+      )(state);
+
+      expect(finalState.data.trackedEntityInstances.length).to.eq(0);
     });
 
     it('should get all programs in the organisation unit TSyzvBiovKh', async () => {
