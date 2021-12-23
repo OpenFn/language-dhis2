@@ -191,24 +191,34 @@ needs to be added.
 
 ### End-to-end integration tests
 
-Integration tests allow us to test the end-to-end behavior of the helper functions
-and also to test the examples we provide via inline documentation.
+Integration tests allow us to test the end-to-end behavior of the helper
+functions and also to test the examples we provide via inline documentation.
 
 For example with integration tests we answer the following question:
 
 > Does `create('events', eventPayload)` actually create a new event in a live
 > DHIS2 system?
 
-To run integration tests, execute `npm run integration-test`. These
-tests use network I/O and a public connection to a DHIS2 "play" server so their
-timing and performance is unpredictable. Consider adding an increased timeout,
-and modifying the orgUnit, program, etc., IDs set in `globalState`.
+To run integration tests, execute `npm run integration-test`. These tests use
+network I/O and a public connection to a DHIS2 "play" server so their timing and
+performance is unpredictable. Consider adding an increased timeout, and
+modifying the orgUnit, program, etc., IDs set in `globalState`.
 
 #### Important
 
-- Depending on your internet strength please consider changing the global timeout in the `test/mocha.opts` file to avoid faillures related to network timeouts.
+- Depending on your internet strength please consider changing the global
+  timeout in the `test/mocha.opts` file to avoid faillures related to network
+  timeouts.
 
-- In `test/integration.js` you have all the code of the integration tests. These tests behavior are very unpredictable cause they depend on the configuration of the DHIS2 instance they're being ran on. Currently you need to have at least one organisation unit with one program, one trackedEntityInstance and one programStage in it. These components need to be well configured for the integration tests to work. For example: the trackedEntityInstance need to be enrolled to the program, which should be created in that organisation unit and contains at least that programStage. Consider adjusting these in the before hook. See example below:
+- In `test/integration.js` you have all the code of the integration tests. These
+  tests behavior are very unpredictable cause they depend on the configuration
+  of the DHIS2 instance they're being ran on. Currently you need to have at
+  least one organisation unit with one program, one trackedEntityInstance and
+  one programStage in it. These components need to be well configured for the
+  integration tests to work. For example: the trackedEntityInstance need to be
+  enrolled to the program, which should be created in that organisation unit and
+  contains at least that programStage. Consider adjusting these in the before
+  hook. See example below:
 
 ```javascript
 before(done => {
@@ -227,7 +237,10 @@ before(done => {
 });
 ```
 
-- Make sure the update and upsert integration tests doesn't affect those initial organisation units, programs, programStage and trackedEntityInstance required. Otherwise the create integration tests would be broken again; and that's an endless faillure loop :(
+- Make sure the update and upsert integration tests doesn't affect those initial
+  organisation units, programs, programStage and trackedEntityInstance required.
+  Otherwise the create integration tests would be broken again; and that's an
+  endless faillure loop :(
 
 Anytime a new example is added in the documentation of a helper function, a new
 integration test should be done.
