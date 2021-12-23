@@ -227,6 +227,8 @@ before(done => {
 });
 ```
 
+- Make sure the update and upsert integration tests doesn't affect those initial organisation units, programs, programStage and trackedEntityInstance required. Otherwise the create integration tests would be broken again; and that's an endless faillure loop :(
+
 Anytime a new example is added in the documentation of a helper function, a new
 integration test should be done.
 
