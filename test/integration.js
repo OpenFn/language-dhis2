@@ -148,7 +148,7 @@ describe('Integration tests', () => {
       expect(response.data.status).to.eq('OK');
     });
 
-    it('should update a single event', async () => {
+    it.only('should update a single event', async () => {
       const state = {
         ...fixture.initialState,
         event: 'rBjxtO8npTb',

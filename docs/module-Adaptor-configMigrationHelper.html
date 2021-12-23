@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Global</title>
+    <title>JSDoc: Class: configMigrationHelper</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Global</h1>
+    <h1 class="page-title">Class: configMigrationHelper</h1>
 
     
 
@@ -28,7 +28,8 @@
 
 <header>
     
-        <h2></h2>
+        <h2><span class="attribs"><span class="type-signature"></span></span>
+            <span class="ancestors"><a href="module-Adaptor.html">Adaptor</a>~</span>configMigrationHelper<span class="signature">(state)</span><span class="type-signature"> &rarr; {object}</span></h2>
         
     
 </header>
@@ -38,73 +39,10 @@
     
         
 
-        
-
-
-<dl class="details">
-
     
 
     
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="request"><span class="type-signature"></span>request<span class="signature">(configuration, axiosRequest)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+    <h4 class="name" id="configMigrationHelper"><span class="type-signature"></span>new configMigrationHelper<span class="signature">(state)</span><span class="type-signature"> &rarr; {object}</span></h4>
     
 
     
@@ -112,10 +50,8 @@
 
 
 <div class="description">
-    The request client takes configuration from state and an axios request object
-then (1) logs the method and URL, (2) applies standard headers and auth
-before spreading the rest of the axios configuration, and (3) executes an
-axios request.
+    Migrates `apiUrl` to `hostUrl` if `hostUrl` is `blank`.
+For `OpenFn.org` users with the `old-style configuration`.
 </div>
 
 
@@ -151,7 +87,7 @@ axios request.
 
         <tr>
             
-                <td class="name"><code>configuration</code></td>
+                <td class="name"><code>state</code></td>
             
 
             <td class="type">
@@ -167,30 +103,7 @@ axios request.
 
             
 
-            <td class="description last">configuration must have a username and password</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>axiosRequest</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">the axiosRequest contains valid axios params: https://axios-http.com/docs/req_config</td>
+            <td class="description last">the runtime state</td>
         </tr>
 
     
@@ -231,7 +144,7 @@ axios request.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Client.js.html">Client.js</a>, <a href="Client.js.html#line22">line 22</a>
+        <a href="Adaptor.js.html">Adaptor.js</a>, <a href="Adaptor.js.html#line131">line 131</a>
     </li></ul></dd>
     
 
@@ -259,10 +172,6 @@ axios request.
 <h5>Returns:</h5>
 
         
-<div class="param-desc">
-    a promise that will resolve to either a response object or an error object.
-</div>
-
 
 
 <dl>
@@ -271,7 +180,7 @@ axios request.
     </dt>
     <dd>
         
-<span class="param-type">Promise</span>
+<span class="param-type">object</span>
 
 
     </dd>
@@ -282,8 +191,29 @@ axios request.
 
 
 
+    <h5>Example</h5>
+    
+    <pre class="prettyprint"><code>configMigrationHelper(state)</code></pre>
 
-        
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
     
 
     
