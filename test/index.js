@@ -34,7 +34,7 @@ describe('execute', () => {
       },
     };
 
-    let finalState = execute()(state);
+    const finalState = execute()(state);
 
     execute()(state).then(finalState => {
       expect(finalState).to.eql({
@@ -58,28 +58,55 @@ describe('get', () => {
     data: {},
   };
 
-  it('should make an authenticated GET to the right url', async () => {
-    const filter = {
+  it('should make an authenticated GET to the right url when params are specified inside options as well as inside query', async () => {
+    const query = {
       dataSet: 'pBOMPrpg1QX',
       period: 201401,
       orgUnit: 'DiszpKrYNg8',
+      filter: ['this:Eq:that', 'then:gt:2'],
     };
 
-    const params = new URLSearchParams({ ...filter, fields: '*' });
+    // NOTE: It appears that this is the dhis2-desired format for array params.
+    const queryString =
+      'dataSet=pBOMPrpg1QX&period=201401&orgUnit=DiszpKrYNg8' +
+      '&filter[]=this:Eq:that&filter[]=then:gt:2' +
+      '&fields=*';
 
     testServer
-      .get('/api/dataValueSets')
-      .query(params)
+      .get(`/api/dataValueSets?${queryString}`)
       .matchHeader('authorization', 'Basic YWRtaW46ZGlzdHJpY3Q=')
       .reply(200, {
         httpStatus: 'OK',
-        message: 'the response',
+        message: "you've got multiple filters and that's OK!",
       });
 
-    const response = await execute(
-      get('dataValueSets', filter, { params: { fields: '*' } })
+    const finalState = await execute(
+      get('dataValueSets', query, { params: { fields: '*' } })
     )(state);
-    expect(response.data).to.eql({ httpStatus: 'OK', message: 'the response' });
+
+    expect(finalState.data).to.eql({
+      httpStatus: 'OK',
+      message: "you've got multiple filters and that's OK!",
+    });
+  });
+
+  it('should make an authenticated GET to the right url no query', async () => {
+    testServer
+      .get('/api/dataValueSets')
+      .matchHeader('authorization', 'Basic YWRtaW46ZGlzdHJpY3Q=')
+      .reply(200, {
+        httpStatus: 'OK',
+        message:
+          'no filters applied, dhis2 might complain about needing "at least one orgUnit"',
+      });
+
+    const finalState = await execute(get('dataValueSets'))(state);
+
+    expect(finalState.data).to.eql({
+      httpStatus: 'OK',
+      message:
+        'no filters applied, dhis2 might complain about needing "at least one orgUnit"',
+    });
   });
 });
 
@@ -113,9 +140,12 @@ describe('create', () => {
         message: 'the response',
       });
 
-    const response = await execute(create('events', state.data))(state);
+    const finalState = await execute(create('events', state.data))(state);
 
-    expect(response.data).to.eql({ httpStatus: 'OK', message: 'the response' });
+    expect(finalState.data).to.eql({
+      httpStatus: 'OK',
+      message: 'the response',
+    });
   });
 
   it('should recursively expand references', async () => {
@@ -129,10 +159,14 @@ describe('create', () => {
         message: 'the response',
       });
 
-    const response = await execute(
+    const finalState = await execute(
       create('events', { program: 'abc', orgUnit: state => state.data.orgUnit })
     )(state);
-    expect(response.data).to.eql({ httpStatus: 'OK', message: 'the response' });
+
+    expect(finalState.data).to.eql({
+      httpStatus: 'OK',
+      message: 'the response',
+    });
   });
 });
 
@@ -160,13 +194,17 @@ describe('update', () => {
         message: 'the response',
       });
 
-    const response = await execute(
+    const finalState = await execute(
       update('events', 'qAZJCrNJK8H', state => ({
         ...state.data,
         date: state.data.currentDate,
       }))
     )(state);
-    expect(response.data).to.eql({ httpStatus: 'OK', message: 'the response' });
+
+    expect(finalState.data).to.eql({
+      httpStatus: 'OK',
+      message: 'the response',
+    });
   });
 
   it('should recursively expand refs', async () => {
@@ -181,14 +219,18 @@ describe('update', () => {
         message: 'the response',
       });
 
-    const response = await execute(
+    const finalState = await execute(
       update('events', 'qAZJCrNJK8H', {
         program: dataValue('program'),
         orgUnit: 'hardcoded',
-        date: state => state.data.currentDate,
+        date: resp => resp.data.currentDate,
       })
     )(state);
-    expect(response.data).to.eql({ httpStatus: 'OK', message: 'the response' });
+    
+    expect(finalState.data).to.eql({
+      httpStatus: 'OK',
+      message: 'the response',
+    });
   });
 });
 
