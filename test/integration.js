@@ -3,20 +3,6 @@ const { create, execute, get, update } = require('../src/Adaptor');
 const crypto = require('crypto');
 const { upsert } = require('../lib/Adaptor');
 
-// const getRandomOrganisationUnitPayload = user => {
-//   const name = crypto.randomBytes(16).toString('hex');
-//   const shortName = name.substring(0, 5);
-//   const displayName = name;
-//   const openingDate = new Date().toISOString();
-//   return { name, shortName, displayName, openingDate, users: [user] };
-// };
-
-// const getRandomProgramStagePayload = program => {
-//   const name = crypto.randomBytes(16).toString('hex');
-//   const displayName = name;
-//   return { name, displayName, program };
-// };
-
 const getRandomProgramPayload = () => {
   const name = crypto.randomBytes(16).toString('hex');
   const shortName = name.substring(0, 5);
@@ -34,6 +20,10 @@ describe('Integration tests', () => {
         password: 'district',
         hostUrl: 'https://play.dhis2.org/2.36.6',
       },
+      program: 'IpHINAT79UW',
+      orgUnit: 'DiszpKrYNg8',
+      trackedEntityInstance: 'uhubxsfLanV',
+      programStage: 'eaDHS084uMp',
     };
     done();
   });
@@ -42,31 +32,28 @@ describe('Integration tests', () => {
     it('should create an event program', async () => {
       const state = {
         ...fixture.initialState,
-        data: { program: getRandomProgramPayload() },
+        data: getRandomProgramPayload(),
       };
 
-      const finalState = await execute(
-        create('programs', state => state.data.program)
-      )(state);
+      const finalState = await execute(create('programs', state => state.data))(
+        state
+      );
 
       expect(finalState.data.status).to.eq('OK');
     });
 
     it('should create a single event', async () => {
-      const state = {
-        ...fixture.initialState,
-        data: {
-          program: 'eBAyeGv0exc',
-          orgUnit: 'DiszpKrYNg8',
+      const state = { ...fixture.initialState };
+
+      const finalState = await execute(
+        create('events', state => ({
+          program: state.program,
+          orgUnit: state.orgUnit,
+          trackedEntityInstance: state.trackedEntityInstance,
+          programStage: state.programStage,
           status: 'COMPLETED',
-        },
-      };
-
-      const finalState = await execute(create('events', state => state.data))(
-        state
-      );
-
-      console.log('FINAL STATE', finalState);
+        }))
+      )(state);
 
       expect(finalState.data.status).to.eq('OK');
     });
@@ -148,28 +135,51 @@ describe('Integration tests', () => {
     it('should update an event program', async () => {
       const state = {
         ...fixture.initialState,
-        program: 'eBAyeGv0exc',
-        data: { program: getRandomProgramPayload() },
+        eventProgram: 'ZHXVrZu5K90',
       };
 
       const response = await execute(
         update(
           'programs',
-          state => state.program,
-          state => state.data.program
+          state => state.eventProgram,
+          getRandomProgramPayload()
         )
       )(state);
       expect(response.data.status).to.eq('OK');
     });
 
-    it('should update a single event', async () => {
+    it.only('should update a single event', async () => {
       const state = {
         ...fixture.initialState,
-        event: 'OZ3mVgaIAqw',
+        event: 'rBjxtO8npTb',
         data: {
-          program: 'eBAyeGv0exc',
+          href: 'https://play.dhis2.org/2.36.6/api/events/rBjxtO8npTb',
+          event: 'rBjxtO8npTb',
+          status: 'ACTIVE',
+          program: 'M3xtLkYBlKI',
+          programStage: 'CWaAcQYKVpq',
+          enrollment: 'V8uPJuhvlL7',
+          enrollmentStatus: 'ACTIVE',
           orgUnit: 'DiszpKrYNg8',
-          status: 'COMPLETED',
+          orgUnitName: 'Ngelehun CHC',
+          trackedEntityInstance: 'dNpxRu1mWG5',
+          relationships: [],
+          eventDate: '2021-09-26T00:00:00.000',
+          dueDate: '2021-09-27T00:00:00.000',
+          storedBy: 'system',
+          dataValues: [],
+          notes: [],
+          followup: false,
+          deleted: false,
+          created: '2019-09-26T23:58:59.641',
+          lastUpdated: '2019-09-27T00:02:11.604',
+          createdAtClient: '2019-09-26T23:58:59.641',
+          lastUpdatedAtClient: '2019-09-27T00:02:11.604',
+          attributeOptionCombo: 'HllvX50cXC0',
+          attributeCategoryOptions: 'xYerKDKCefk',
+          assignedUser: 'DXyJmlo9rge',
+          assignedUserUsername: 'android',
+          assignedUserDisplayName: 'John Barnes',
         },
       };
       const finalState = await execute(
@@ -204,83 +214,63 @@ describe('Integration tests', () => {
       expect(finalState.data.status).to.eq('OK');
     });
 
-    it('should update a single dataValueSet', async () => {
+    it('should update a single dataSet', async () => {
       const state = {
         ...fixture.initialState,
         data: {
-          dataElement: 'f7n9E0hX8qk',
-          period: '201401',
-          orgUnit: 'DiszpKrYNg8',
-          value: '12',
-        },
-      };
-      const finalState = await execute(
-        update('dataValueSets', 'pBOMPrpg1QX', state => state.data)
-      )(state);
-      expect(finalState.data.status).to.eql('SUCCESS');
-    });
-
-    it('should update a set of related data values sharing the same period and organisation unit', async () => {
-      const state = {
-        ...fixture.initialState,
-        data: {
-          dataSet: 'pBOMPrpg1QX',
-          completeDate: '2014-02-03',
-          period: '201401',
-          orgUnit: 'DiszpKrYNg8',
-          dataValues: [
+          name: 'Reproductive Health',
+          shortName: 'Reproductive Health',
+          displayFormName: 'Reproductive Health',
+          displayName: 'Reproductive Health',
+          periodType: 'Monthly',
+          dataSetElements: [
             {
-              dataElement: 'f7n9E0hX8qk',
-              value: '1',
-            },
-            {
-              dataElement: 'Ix2HsbDMLea',
-              value: '2',
-            },
-            {
-              dataElement: 'eY5ehpbEsB7',
-              value: '3',
+              dataElement: {
+                id: 'FE82N2sA0YI',
+              },
+              dataSet: {
+                id: 'QX4ZTUbOt3a',
+              },
             },
           ],
         },
       };
-
       const finalState = await execute(
-        update('dataValueSets', 'pBOMPrpg1QX', state => state.data)
+        update('dataSets', 'QX4ZTUbOt3a', state => state.data)
       )(state);
-      expect(finalState.data.status).to.eq('SUCCESS');
+      expect(finalState.data.status).to.eql('OK');
     });
   });
-});
 
-describe('get', () => {
-  const state = {
-    configuration: {
-      username: 'admin',
-      password: 'district',
-      hostUrl: 'https://play.dhis2.org/2.36.4',
-    },
-    data: {},
-  };
+  describe('get', () => {
+    const state = {
+      configuration: {
+        username: 'admin',
+        password: 'district',
+        hostUrl: 'https://play.dhis2.org/2.36.4',
+      },
+      data: {},
+    };
 
-  it('should get dataValueSets matching the query specified', async () => {
-    const finalState = await execute(
-      get('dataValueSets', {
-        dataSet: 'pBOMPrpg1QX',
-        orgUnit: 'DiszpKrYNg8',
-        period: '201401',
-        fields: '*',
-      })
-    )(state);
+    it('should get dataValueSets matching the query specified', async () => {
+      const finalState = await execute(
+        get('dataValueSets', {
+          dataSet: 'pBOMPrpg1QX',
+          orgUnit: 'DiszpKrYNg8',
+          period: '201401',
+          fields: '*',
+        })
+      )(state);
 
-    expect(finalState.data.dataValues.length).to.gte(1);
-  });
+      expect(finalState.data.dataValues.length).to.gte(1);
+    });
 
-  it('should get all programs in the organisation unit TSyzvBiovKh', async () => {
-    const response = await execute(
-      get('programs', { orgUnit: 'TSyzvBiovKh', fields: '*' })
-    )(state);
-    expect(response.data.programs.length).to.gte(1);
+    it('should get all programs in the organisation unit TSyzvBiovKh', async () => {
+      const response = await execute(
+        get('programs', { orgUnit: 'TSyzvBiovKh', fields: '*' })
+      )(state);
+      expect(response.data.programs.length).to.gte(1);
+    });
   });
 });
 

@@ -44,144 +44,92 @@
 
     <section>
         <article><h1>Language DHIS2 <a href="https://travis-ci.org/OpenFn/language-dhis2"><img src="https://travis-ci.org/OpenFn/language-dhis2.svg?branch=main" alt="Build Status"></a></h1>
-<p>Language Pack for building expressions and operations for working with
-the <a href="http://dhis2.github.io/dhis2-docs/master/en/developer/html/dhis2_developer_manual.html">DHIS2 API</a>.</p>
+<p>Language Pack for building expressions and operations for working with the
+<a href="http://dhis2.github.io/dhis2-docs/master/en/developer/html/dhis2_developer_manual.html">DHIS2 API</a>.</p>
 <h2>Documentation</h2>
 <p>View the <a href="https://openfn.github.io/language-dhis2/">docs site</a> for full
-technical documentation. Below, find a samples of the most commonly used helper
-functions.</p>
+technical documentation and <strong>lots of examples</strong> for how to use the various
+helper functions.</p>
 <h2>Sample State</h2>
 <pre class="prettyprint source lang-json"><code>{
   &quot;configuration&quot;: {
     &quot;username&quot;: &quot;admin&quot;,
     &quot;password&quot;: &quot;district&quot;,
-    &quot;hostUrl&quot;: &quot;https://play.dhis2.org/2.35.1&quot;
+    &quot;hostUrl&quot;: &quot;https://play.dhis2.org/2.36.6&quot;
   },
-  &quot;data&quot;: {
-    &quot;a&quot;: 1,
-    &quot;b&quot;: 2
-  }
+  &quot;data&quot;: { &quot;a&quot;: 1, &quot;b&quot;: 2 }
 }
 </code></pre>
-<h2>Analytics API</h2>
-<h4>Fetch analytics data for PMTCT data over last 6 months.</h4>
-<pre class="prettyprint source lang-js"><code>fetchAnalytics({
-  query: {
-    dimension: ['dx:CYI5LEmm3cG;GDVU1o5rTNF', 'pe:LAST_6_MONTHS'],
-    filter: 'ou:GHlyx9Pg9mn',
-    displayProperty: 'NAME',
-    outputIdScheme: 'UID',
-  },
-});
-</code></pre>
-<h2>Tracked Entity API</h2>
-<h4>Create a new tracked entity instance and enroll them from a CommCare form submission.</h4>
-<pre class="prettyprint source lang-js"><code>createTEI({
-  trackedEntityType: 'nEenWmSyUEp',
-  orgUnit: 'g8upMTyEZGZ',
-  attributes: [
-    {
-      attribute: 'w75KJ2mc4zz',
-      value: dataValue('form.first_name')(state),
-    },
-    {
-      attribute: 'zDhUuAYrxNC',
-      value: dataValue('form.last_name')(state),
-    },
-  ],
-  enrollments: [
-    {
-      orgUnit: 'g8upMTyEZGZ',
-      program: 'IpHINAT79UW',
-      enrollmentDate: '2019-04-08',
-      incidentDate: '2019-04-08',
-    },
-  ],
-});
-</code></pre>
-<h4>Upsert a tracked entity instance from a CommCare form submission.</h4>
-<pre class="prettyprint source lang-js"><code>upsertTEI(
-  'w75KJ2mc4zz', // match on 'patientID', a custom external ID in dhis2
-  {
-    trackedEntityType: 'nEenWmSyUEp',
-    orgUnit: 'g8upMTyEZGZ',
-    attributes: [
-      {
-        attribute: 'w75KJ2mc4zz',
-        value: dataValue('form.first_name')(state),
-      },
-      {
-        attribute: 'zDhUuAYrxNC',
-        value: dataValue('form.last_name')(state),
-      },
-    ],
-  }
-);
-</code></pre>
-<h2>Events API</h2>
-<h4><code>Events API</code> expression</h4>
-<pre class="prettyprint source lang-js"><code>event(
-  fields(
-    field(&quot;program&quot;, &quot;eBAyeGv0exc&quot;),
-    field(&quot;orgUnit&quot;, &quot;DiszpKrYNg8&quot;),
-    field(&quot;eventDate&quot;, dataValue(&quot;date&quot;)),
-    field(&quot;status&quot;, &quot;COMPLETED&quot;),
-    field(&quot;storedBy&quot;, &quot;admin&quot;),
-    field(&quot;coordinate&quot;, {
-      &quot;latitude&quot;: &quot;59.8&quot;,
-      &quot;longitude&quot;: &quot;10.9&quot;
-    }),
-    field(&quot;dataValues&quot;, function(state) {
-      return [
-        dataElement(&quot;qrur9Dvnyt5&quot;, dataValue(&quot;prop_a&quot;))(state)
-        dataElement(&quot;oZg33kd9taw&quot;, dataValue(&quot;prop_b&quot;))(state)
-        dataElement(&quot;msodh3rEMJa&quot;, dataValue(&quot;prop_c&quot;))(state)
-      ]
-    })
-  )
-)
-</code></pre>
-<h4>Current <code>fetchEvents API</code> expression (Optional <code>postUrl</code> for a complete fetch)</h4>
-<pre class="prettyprint source lang-js"><code>fetchEvents({
-  fields: {
-    orgUnit: 'DiszpKrYNg8',
-    program: 'eBAyeGv0exc',
-    endDate: '2016-01-01',
-  },
-  postUrl: 'https://www.openfn.org/inbox/123',
-});
-</code></pre>
-<h4>Reference on how to query and read events https://docs.dhis2.org/2.22/en/developer/html/ch01s15.html#d5e1994</h4>
-<h2>Data Values / Data Value Sets API</h2>
-<h4>Current <code>DataValueSets API</code> expression</h4>
-<pre class="prettyprint source lang-js"><code>dataValueSet({
-  dataSet: dataValue('set'),
-  orgUnit: 'DiszpKrYNg8',
-  period: '201402',
-  completeData: '2014-03-03',
-  dataValues: [
-    dataElement('f7n9E0hX8qk', dataValue('data[0].site_school_number')),
-    dataElement('Ix2HsbDMLea', dataValue('age')),
-    dataElement('eY5ehpbEsB7', 30),
-  ],
-});
-</code></pre>
-<h4>Current <code>fetchData API</code> expression (Optional <code>postUrl</code> for a complete fetch)</h4>
-<pre class="prettyprint source lang-js"><code>fetchData({
-  fields: {
-    dataSet: 'pBOMPrpg1QX',
-    orgUnit: 'DiszpKrYNg8',
-    period: '201711',
-  },
-  postUrl: 'https://www.openfn.org/inbox/123',
-});
-</code></pre>
-<h4>Reference on how to read data values https://docs.dhis2.org/2.22/en/developer/html/ch01s13.html#d5e1642</h4>
-<p><a href="docs/index">Docs</a></p>
 <h2>Development</h2>
-<p>Clone the repo, run <code>npm install</code>.</p>
-<p>Run tests using <code>npm run test</code> or <code>npm run test:watch</code></p>
-<p>Build the project using <code>make</code>.</p></article>
+<p>Clone the repo and run <code>npm install</code>.</p>
+<p>Run tests using <code>npm run test</code> or <code>npm run test:watch</code>. (NB: that this repo also
+contain integration tests which can be run with <code>npm run integration-test</code>.)</p>
+<p><strong><em>Make your changes to the files in <code>src/</code> and then use <code>npm run build</code> to
+generate output files in <code>lib/</code>.</em></strong></p>
+<h3>Unit Tests</h3>
+<p>Unit tests allows to test the functionalities of the adaptor helper functions
+such as:</p>
+<blockquote>
+<p>Does <code>create('events', payload)</code> perform a post request to the correct DHIS2
+API?</p>
+</blockquote>
+<p>To run unit tests execute <code>npm run test</code> (they're the default tests).</p>
+<p>Anytime a new functionality is added to the helper functions, more unit tests
+needs to be added.</p>
+<h3>End-to-end integration tests</h3>
+<p>Integration tests allow us to test the end-to-end behavior of the helper
+functions and also to test the examples we provide via inline documentation.</p>
+<p>For example with integration tests we answer the following question:</p>
+<blockquote>
+<p>Does <code>create('events', eventPayload)</code> actually create a new event in a live
+DHIS2 system?</p>
+</blockquote>
+<p>To run integration tests, execute <code>npm run integration-test</code>. These tests use
+network I/O and a public connection to a DHIS2 &quot;play&quot; server so their timing and
+performance is unpredictable. Consider adding an increased timeout, and
+modifying the orgUnit, program, etc., IDs set in <code>globalState</code>.</p>
+<h4>Troubleshooting the tests</h4>
+<ul>
+<li>
+<p>Depending on your internet strength please consider changing the <strong>global
+timeout</strong> in the <code>test/mocha.opts</code> file to avoid faillures related to network
+timeouts.</p>
+</li>
+<li>
+<p>The behavior of the tests in <code>test/integration.js</code> is very unpredictable; they
+depend on the <strong>configuration of a target DHIS2 instance</strong>. Currently you need
+to have at least one organisation unit with one program, one
+trackedEntityInstance and one programStage in it. These components need to be
+well configured for the integration tests to work. For example: the
+trackedEntityInstance need to be enrolled to the program, which should be
+created in that organisation unit and contains at least that programStage. If
+the tests fail, you must adjust these attributes in the
+<a href="test/integration.js">before hook</a>:</p>
+</li>
+</ul>
+<pre class="prettyprint source lang-javascript"><code>before(done => {
+  fixture.initialState = {
+    configuration: {
+      username: 'admin',
+      password: 'district',
+      hostUrl: 'https://play.dhis2.org/2.36.6',
+    },
+    program: 'IpHINAT79UW',
+    orgUnit: 'DiszpKrYNg8',
+    trackedEntityInstance: 'uhubxsfLanV',
+    programStage: 'eaDHS084uMp',
+  };
+  done();
+});
+</code></pre>
+<ul>
+<li>Make sure the <code>update</code> and <code>upsert</code> integration tests don't affect those
+initial organisation units, programs, programStage and trackedEntityInstance
+required. Otherwise the create integration tests would be broken again; and
+that's an endless faillure loop :(</li>
+</ul>
+<p>Anytime a new example is added in the documentation of a helper function, a new
+integration test should be built.</p></article>
     </section>
 
 
@@ -192,13 +140,13 @@ functions.</p>
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="configMigrationHelper.html">configMigrationHelper</a></li><li><a href="execute.html">execute</a></li></ul><h3>Global</h3><ul><li><a href="global.html#cancelEnrollment">cancelEnrollment</a></li><li><a href="global.html#completeEnrollment">completeEnrollment</a></li><li><a href="global.html#create">create</a></li><li><a href="global.html#createDataValues">createDataValues</a></li><li><a href="global.html#createEvents">createEvents</a></li><li><a href="global.html#createPrograms">createPrograms</a></li><li><a href="global.html#createTEI">createTEI</a></li><li><a href="global.html#del">del</a></li><li><a href="global.html#discover">discover</a></li><li><a href="global.html#enrollTEI">enrollTEI</a></li><li><a href="global.html#generateDhis2UID">generateDhis2UID</a></li><li><a href="global.html#getAnalytics">getAnalytics</a></li><li><a href="global.html#getData">getData</a></li><li><a href="global.html#getDataValues">getDataValues</a></li><li><a href="global.html#getEnrollments">getEnrollments</a></li><li><a href="global.html#getEvents">getEvents</a></li><li><a href="global.html#getMetadata">getMetadata</a></li><li><a href="global.html#getPrograms">getPrograms</a></li><li><a href="global.html#getRelationships">getRelationships</a></li><li><a href="global.html#getResources">getResources</a></li><li><a href="global.html#getSchema">getSchema</a></li><li><a href="global.html#getTEIs">getTEIs</a></li><li><a href="global.html#patch">patch</a></li><li><a href="global.html#update">update</a></li><li><a href="global.html#updateEnrollments">updateEnrollments</a></li><li><a href="global.html#updateEvents">updateEvents</a></li><li><a href="global.html#updatePrograms">updatePrograms</a></li><li><a href="global.html#updateTEI">updateTEI</a></li><li><a href="global.html#upsert">upsert</a></li><li><a href="global.html#upsertTEI">upsertTEI</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Adaptor.html">Adaptor</a></li></ul><h3>Classes</h3><ul><li><a href="module-Adaptor-configMigrationHelper.html">configMigrationHelper</a></li><li><a href="module-Adaptor-execute.html">execute</a></li></ul><h3>Global</h3><ul><li><a href="global.html#request">request</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Tue Mar 09 2021 16:30:47 GMT+0000 (Greenwich Mean Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.6</a> on Thu Dec 23 2021 06:44:11 GMT-0700 (Mountain Standard Time)
 </footer>
 
 <script> prettyPrint(); </script>

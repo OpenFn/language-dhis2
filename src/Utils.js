@@ -22,8 +22,8 @@ export class Log {
   }
 }
 
-export function buildUrl(path, hostUrl, apiVersion) {
-  const pathSuffix = apiVersion ? `/${apiVersion}${path}` : `${path}`;
+export function buildUrl(urlString, hostUrl, apiVersion) {
+  const pathSuffix = apiVersion ? `/${apiVersion}${urlString}` : `${urlString}`;
   return hostUrl + '/api' + pathSuffix;
 }
 

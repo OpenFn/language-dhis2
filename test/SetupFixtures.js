@@ -189,7 +189,7 @@ export const permissions = {
   jobTitle: 'Super user',
   lastUpdated: '2021-03-08T08:36:44.531',
   employer: 'DHIS',
-  introduction: 'I am the super user of DHIS 2',
+  introduction: 'I am a super user of DHIS2',
   languages: 'English',
   created: '2013-04-18T17:15:08.407',
   lastCheckedInterpretations: '2021-03-08T08:36:44.531',
