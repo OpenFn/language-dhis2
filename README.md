@@ -204,6 +204,29 @@ tests use network I/O and a public connection to a DHIS2 "play" server so their
 timing and performance is unpredictable. Consider adding an increased timeout,
 and modifying the orgUnit, program, etc., IDs set in `globalState`.
 
+#### Important
+
+- Depending on your internet strength please consider changing the global timeout in the `test/mocha.opts` file to avoid faillures related to network timeouts.
+
+- In `test/integration.js` you have all the code of the integration tests. These tests behavior are very unpredictable cause they depend on the configuration of the DHIS 2 instance they're being ran on. Currently you need to have at least one organisation unit with one program, one trackedEntityInstance and one programStage in it. These components need to be well configured for the integration tests to work. For example: the trackedEntityInstance need to be enrolled to the program, which should be created in that organisation unit and contains at least that programStage. Consider adjusting these in the before hook. See example below:
+
+```javascript
+before(done => {
+  fixture.initialState = {
+    configuration: {
+      username: 'admin',
+      password: 'district',
+      hostUrl: 'https://play.dhis2.org/2.36.6',
+    },
+    program: 'IpHINAT79UW',
+    orgUnit: 'DiszpKrYNg8',
+    trackedEntityInstance: 'uhubxsfLanV',
+    programStage: 'eaDHS084uMp',
+  };
+  done();
+});
+```
+
 Anytime a new example is added in the documentation of a helper function, a new
 integration test should be done.
 
