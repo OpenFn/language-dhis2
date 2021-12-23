@@ -614,7 +614,7 @@ export function discover(httpMethod, endpoint) {
  * patch('dataElements', 'FTRrcoaog83', { name: 'New Name' });
  */
 // TODO: @Elias, can this be deleted in favor of update? How does DHIS2 handle PATCH vs PUT?
-// I need to investigate on this. But I think DHIS 2 forces to send all properties back when we do an update. If that's confirmed then this may be needed.
+// I need to investigate on this. But I think DHIS2 forces to send all properties back when we do an update. If that's confirmed then this may be needed.
 export function patch(
   resourceType,
   path,
