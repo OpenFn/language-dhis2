@@ -480,35 +480,41 @@ export function get(resourceType, query, options = {}, callback = false) {
  * });
  */
 export function upsert(
-  resourceType,
-  query,
-  data,
-  options = {},
-  callback = false
+  resourceType, // resourceType supplied to both the `get` and the `create/update`
+  query, // query supplied to the `get`
+  data, // data supplied to the `create/update`
+  options = {}, // options supplied to both the `get` and the `create/update`
+  callback = false // callback for the upsert itself.
 ) {
   return state => {
     console.log(`Preparing upsert via 'get' then 'create' OR 'update'...`);
 
     return get(
       resourceType,
-      query
-    )(state).then(resp => {
-      const resources = resp.data[resourceType];
-      if (resources.length > 1) {
-        throw new RangeError(
-          `Cannot upsert on Non-unique attribute. The operation found more than one records for your request.`
-        );
-      } else if (resources.length <= 0) {
-        return create(resourceType, data, options, callback)(state);
-      } else {
-        const pathName =
-          resourceType === 'trackedEntityInstances'
-            ? 'trackedEntityInstance'
-            : 'id';
-        const path = resources[0][pathName];
-        return update(resourceType, path, data, options, callback)(state);
-      }
-    });
+      query,
+      options
+    )(state)
+      .then(resp => {
+        const resources = resp.data[resourceType];
+        if (resources.length > 1) {
+          throw new RangeError(
+            `Cannot upsert on Non-unique attribute. The operation found more than one records for your request.`
+          );
+        } else if (resources.length <= 0) {
+          return create(resourceType, data, options)(state);
+        } else {
+          const pathName =
+            resourceType === 'trackedEntityInstances'
+              ? 'trackedEntityInstance'
+              : 'id';
+          const path = resources[0][pathName];
+          return update(resourceType, path, data, options)(state);
+        }
+      })
+      .then(result => {
+        Log.success(`Performed a "composed upsert" on ${resourceType}`);
+        return handleResponse(result, state, callback);
+      });
   };
 }
 
