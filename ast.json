@@ -411,12 +411,37 @@
           },
           {
             "title": "param",
-            "description": "`Optional` more options for `upsert` operation.",
+            "description": "Optional configuration that will be applied to both the `get` and the `create` or `update` operations.",
             "type": {
               "type": "OptionalType",
               "expression": {
-                "type": "NameExpression",
-                "name": "Object"
+                "type": "RecordType",
+                "fields": [
+                  {
+                    "type": "FieldType",
+                    "key": "apiVersion",
+                    "value": {
+                      "type": "NameExpression",
+                      "name": "object"
+                    }
+                  },
+                  {
+                    "type": "FieldType",
+                    "key": "requestConfig",
+                    "value": {
+                      "type": "NameExpression",
+                      "name": "object"
+                    }
+                  },
+                  {
+                    "type": "FieldType",
+                    "key": "params",
+                    "value": {
+                      "type": "NameExpression",
+                      "name": "object"
+                    }
+                  }
+                ]
               }
             },
             "name": "options"

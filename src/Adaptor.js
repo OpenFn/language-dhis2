@@ -460,7 +460,7 @@ export function get(resourceType, query, options = {}, callback = false) {
  * @param {string} resourceType - The type of a resource to `upsert`. E.g. `trackedEntityInstances`
  * @param {Object} query - A query object that allows to uniquely identify the resource to update. If no matches found, then the resource will be created.
  * @param {Object} data - The data to use for update or create depending on the result of the query.
- * @param {Object} [options] - `Optional` more options for `upsert` operation.
+ * @param {{ apiVersion: object, requestConfig: object, params: object }} [options] - Optional configuration that will be applied to both the `get` and the `create` or `update` operations.
  * @param {function} [callback] - Optional callback to handle the response
  * @throws {RangeError} - Throws range error
  * @returns {Operation}
