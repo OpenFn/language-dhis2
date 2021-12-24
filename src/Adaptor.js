@@ -453,55 +453,63 @@ export function get(resourceType, query, options = {}, callback = false) {
   };
 }
 
-// /**
-//  * Upsert a record. A generic helper function used to atomically either insert a row, or on the basis of the row already existing, UPDATE that existing row instead.
-//  * @public
-//  * @function
-//  * @param {string} resourceType - The type of a resource to `insert` or `update`. E.g. `trackedEntityInstances`
-//  * @param {Object} data - The update data containing new values
-//  * @param {{replace:boolean, apiVersion: number,strict: boolean,responseType: string}} [options] - `Optional` options for `upsertTEI` operation. Defaults to `{replace: false, apiVersion: state.configuration.apiVersion,strict: true,responseType: 'json'}`.
-//  * @param {function} [callback] - Optional callback to handle the response
-//  * @throws {RangeError} - Throws range error
-//  * @returns {Operation}
-//  * @example <caption>Example `expression.js` of upsert</caption>
-//  * upsert(
-//  *    'trackedEntityInstances',
-//  *    {
-//  *       attributeId: 'lZGmxYbs97q',
-//  *          attributeValue: state =>
-//  *             state.data.attributes.find(obj => obj.attribute === 'lZGmxYbs97q')
-//  *             .value,
-//  *    },
-//  *    state.data,
-//  *    { ou: 'TSyzvBiovKh' }
-//  * );
-//  */
-// export function upsert(resourceType, data, options = {}, callback = false) {
-//   return state => {
-//     console.log(`Preparing upsert via 'get' then 'create' OR 'update'...`);
+/**
+ * Upsert a record. A generic helper function used to atomically either insert a row, or on the basis of the row already existing, UPDATE that existing row instead.
+ * @public
+ * @function
+ * @param {string} resourceType - The type of a resource to `insert` or `update`. E.g. `trackedEntityInstances`
+ * @param {Object} data - The update data containing new values
+ * @param {{replace:boolean, apiVersion: number,strict: boolean,responseType: string}} [options] - `Optional` options for `upsertTEI` operation. Defaults to `{replace: false, apiVersion: state.configuration.apiVersion,strict: true,responseType: 'json'}`.
+ * @param {function} [callback] - Optional callback to handle the response
+ * @throws {RangeError} - Throws range error
+ * @returns {Operation}
+ * @example <caption>Example `expression.js` of upsert</caption>
+ * upsert('trackedEntityInstances', {
+ *  ou: 'TSyzvBiovKh',
+ *  filter: ['w75KJ2mc4zz:Eq:Qassim'],
+ * }, {
+ *  orgUnit: 'TSyzvBiovKh',
+ *  trackedEntityType: 'nEenWmSyUEp',
+ *  attributes: [
+ *    {
+ *      attribute: 'w75KJ2mc4zz',
+ *      value: 'Qassim',
+ *    },
+ *  ],
+ * });
+ */
+export function upsert(
+  resourceType,
+  query,
+  data,
+  options = {},
+  callback = false
+) {
+  return state => {
+    console.log(`Preparing upsert via 'get' then 'create' OR 'update'...`);
 
-//     return get(
-//       resourceType,
-//       data
-//     )(state).then(resp => {
-//       const resources = resp.data[resourceType];
-//       if (resources.length > 1) {
-//         throw new RangeError(
-//           `Cannot upsert on Non-unique attribute. The operation found more than one records for your request.`
-//         );
-//       } else if (resources.length <= 0) {
-//         return create(resourceType, data, options, callback)(state);
-//       } else {
-//         const pathName =
-//           resourceType === 'trackedEntityInstances'
-//             ? 'trackedEntityInstance'
-//             : 'id';
-//         const path = resources[0][pathName];
-//         return update(resourceType, path, data, options, callback)(state);
-//       }
-//     });
-//   };
-// }
+    return get(
+      resourceType,
+      query
+    )(state).then(resp => {
+      const resources = resp.data[resourceType];
+      if (resources.length > 1) {
+        throw new RangeError(
+          `Cannot upsert on Non-unique attribute. The operation found more than one records for your request.`
+        );
+      } else if (resources.length <= 0) {
+        return create(resourceType, data, options, callback)(state);
+      } else {
+        const pathName =
+          resourceType === 'trackedEntityInstances'
+            ? 'trackedEntityInstance'
+            : 'id';
+        const path = resources[0][pathName];
+        return update(resourceType, path, data, options, callback)(state);
+      }
+    });
+  };
+}
 
 /**
  * Discover `DHIS2` `api` `endpoint` `query parameters` and allowed `operators` for a given resource's endpoint.

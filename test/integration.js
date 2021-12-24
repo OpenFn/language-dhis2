@@ -135,7 +135,7 @@ describe('Integration tests', () => {
     it('should update an event program', async () => {
       const state = {
         ...fixture.initialState,
-        eventProgram: 'ZHXVrZu5K90',
+        eventProgram: 'N6gnRnuz8Mw',
       };
 
       const response = await execute(
@@ -273,7 +273,7 @@ describe('Integration tests', () => {
         })
       )(state);
 
-      expect(finalState.data.trackedEntityInstances.length).to.eq(1);
+      expect(finalState.data.trackedEntityInstances.length).to.eq(4);
 
       const finalState2 = await execute(
         get('trackedEntityInstances', {
@@ -307,130 +307,119 @@ describe('Integration tests', () => {
       expect(response.data.programs.length).to.gte(1);
     });
   });
+
+  describe('upsert', () => {
+    it('should upsert a trackedEntityInstance via create as query matches no data', async () => {
+      const state = {
+        ...fixture.initialState,
+        data: {
+          orgUnit: 'DiszpKrYNg8',
+          trackedEntityType: 'nEenWmSyUEp',
+          attributes: [
+            {
+              lastUpdated: '2016-01-12T00:00:00.000',
+              code: 'MMD_PER_NAM',
+              displayName: 'First name',
+              created: '2016-01-12T00:00:00.000',
+              valueType: 'TEXT',
+              attribute: 'w75KJ2mc4zz',
+              value: 'Elias',
+            },
+            {
+              lastUpdated: '2016-01-12T00:00:00.000',
+              displayName: 'Last name',
+              created: '2016-01-12T00:00:00.000',
+              valueType: 'TEXT',
+              attribute: 'zDhUuAYrxNC',
+              value: 'BA',
+            },
+          ],
+        },
+      };
+      const finalState = await execute(
+        upsert(
+          'trackedEntityInstances',
+          {
+            ou: 'DiszpKrYNg8',
+            filter: ['w75KJ2mc4zz:Eq:Johns', 'zDhUuAYrxNC:Eq:Doe'],
+          },
+          state => state.data
+        )
+      )(state);
+
+      expect(finalState.data.httpStatus).to.eq('OK');
+    });
+
+    it('should upsert a trackedEntityInstance via update as query matches one data', async () => {
+      const state = {
+        ...fixture.initialState,
+        data: {
+          orgUnit: 'TSyzvBiovKh',
+          trackedEntityType: 'nEenWmSyUEp',
+          attributes: [
+            {
+              attribute: 'w75KJ2mc4zz',
+              value: 'Qassim',
+            },
+          ],
+        },
+      };
+      const finalState = await execute(
+        upsert(
+          'trackedEntityInstances',
+          {
+            ou: 'TSyzvBiovKh',
+            filter: ['w75KJ2mc4zz:Eq:Qassim'],
+          },
+          state => state.data
+        )
+      )(state);
+
+      expect(finalState.data.httpStatus).to.eq('OK');
+    });
+
+    it('should fail upserting a trackedEntityInstance by throwing rangeError as query matches many data', async () => {
+      const state = {
+        ...fixture.initialState,
+        data: {
+          orgUnit: 'TSyzvBiovKh',
+          trackedEntityType: 'nEenWmSyUEp',
+          attributes: [
+            {
+              attribute: 'w75KJ2mc4zz',
+              value: 'Qassim',
+            },
+          ],
+        },
+      };
+
+      const expectThrowsAsync = async (method, errorMessage) => {
+        let error = null;
+        try {
+          await method();
+        } catch (err) {
+          error = err;
+        }
+        expect(error).to.be.an('Error');
+        if (errorMessage) {
+          expect(error.message).to.equal(errorMessage);
+        }
+      };
+
+      await expectThrowsAsync(
+        () =>
+          execute(
+            upsert(
+              'trackedEntityInstances',
+              {
+                ou: 'DiszpKrYNg8',
+                filter: ['w75KJ2mc4zz:Eq:John', 'zDhUuAYrxNC:Eq:Doe'],
+              },
+              state => state.data
+            )
+          )(state),
+        'Cannot upsert on Non-unique attribute. The operation found more than one records for your request.'
+      );
+    });
+  });
 });
-
-// describe('upsert', () => {
-//   const state = {
-//     configuration: {
-//       username: 'admin',
-//       password: 'district',
-//       hostUrl: 'https://play.dhis2.org/2.36.4',
-//     },
-//     data: {},
-//   };
-
-//   it('should upsert a trackedEntityInstance matching the URL parameters', async () => {
-//     const response = await execute(
-//       upsert(
-//         'trackedEntityInstances',
-//         {
-//           created: '2019-08-21T13:27:51.119',
-//           orgUnit: 'DiszpKrYNg8',
-//           createdAtClient: '2019-03-19T01:11:03.924',
-//           trackedEntityInstance: 'dNpxRu1mWG5',
-//           lastUpdated: '2019-09-27T00:02:11.604',
-//           trackedEntityType: 'We9I19a3vO1',
-//           lastUpdatedAtClient: '2019-03-19T01:11:03.924',
-//           coordinates:
-//             '[[[-11.8049,8.3374],[-11.8032,8.3436],[-11.8076,8.3441],[-11.8096,8.3387],[-11.8049,8.3374]]]',
-//           inactive: false,
-//           deleted: false,
-//           featureType: 'POLYGON',
-//           geometry: {
-//             type: 'Polygon',
-//             coordinates: [
-//               [
-//                 [-11.8049, 8.3374],
-//                 [-11.8032, 8.3436],
-//                 [-11.8076, 8.3441],
-//                 [-11.8096, 8.3387],
-//                 [-11.8049, 8.3374],
-//               ],
-//             ],
-//           },
-//           programOwners: [
-//             {
-//               ownerOrgUnit: 'DiszpKrYNg8',
-//               program: 'M3xtLkYBlKI',
-//               trackedEntityInstance: 'dNpxRu1mWG5',
-//             },
-//           ],
-//           enrollments: [],
-//           relationships: [
-//             {
-//               lastUpdated: '2019-08-21T00:00:00.000',
-//               created: '2019-08-21T00:00:00.000',
-//               relationshipName: 'Focus to Case',
-//               bidirectional: false,
-//               relationshipType: 'Mv8R4MPcNcX',
-//               relationship: 'EDfZpCLcEVN',
-//               from: {
-//                 trackedEntityInstance: {
-//                   trackedEntityInstance: 'dNpxRu1mWG5',
-//                   programOwners: [],
-//                 },
-//               },
-//               to: {
-//                 trackedEntityInstance: {
-//                   trackedEntityInstance: 'Fbru4rg4dYV',
-//                   programOwners: [],
-//                 },
-//               },
-//             },
-//             {
-//               lastUpdated: '2019-08-21T00:00:00.000',
-//               created: '2019-08-21T00:00:00.000',
-//               relationshipName: 'Focus to Case',
-//               bidirectional: false,
-//               relationshipType: 'Mv8R4MPcNcX',
-//               relationship: 'z4ItJx8ul3Z',
-//               from: {
-//                 trackedEntityInstance: {
-//                   trackedEntityInstance: 'dNpxRu1mWG5',
-//                   programOwners: [],
-//                 },
-//               },
-//               to: {
-//                 trackedEntityInstance: {
-//                   trackedEntityInstance: 'RHA9RWNvAnC',
-//                   programOwners: [],
-//                 },
-//               },
-//             },
-//             {
-//               lastUpdated: '2019-08-21T00:00:00.000',
-//               created: '2019-08-21T00:00:00.000',
-//               relationshipName: 'Focus to Case',
-//               bidirectional: false,
-//               relationshipType: 'Mv8R4MPcNcX',
-//               relationship: 'XIfv95ZiM4H',
-//               from: {
-//                 trackedEntityInstance: {
-//                   trackedEntityInstance: 'dNpxRu1mWG5',
-//                   programOwners: [],
-//                 },
-//               },
-//               to: {
-//                 trackedEntityInstance: {
-//                   trackedEntityInstance: 'jZRaFaYkAtE',
-//                   programOwners: [],
-//                 },
-//               },
-//             },
-//           ],
-//           attributes: [],
-//         },
-//         {
-//           params: {
-//             fields: '*',
-//             ou: 'DiszpKrYNg8',
-//             entityType: 'nEenWmSyUEp',
-//             trackedEntityInstance: 'dNpxRu1mWG5',
-//           },
-//         }
-//       )
-//     )(state);
-//     expect(response.data.httpStatusCode).to.eq(200);
-//     expect(response.data.httpStatus).to.eq('OK');
-//   });
-// });
