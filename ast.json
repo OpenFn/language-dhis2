@@ -5,8 +5,8 @@
       "params": [
         "resourceType",
         "data",
-        null,
-        null
+        "options",
+        "callback"
       ],
       "docs": {
         "description": "Create a record",
@@ -128,7 +128,7 @@
           }
         ]
       },
-      "valid": false
+      "valid": true
     },
     {
       "name": "update",
@@ -136,8 +136,8 @@
         "resourceType",
         "path",
         "data",
-        null,
-        null
+        "options",
+        "callback"
       ],
       "docs": {
         "description": "Update data. A generic helper function to update a resource object of any type.\nUpdating an object requires to send `all required fields` or the `full body`",
@@ -268,15 +268,15 @@
           }
         ]
       },
-      "valid": false
+      "valid": true
     },
     {
       "name": "get",
       "params": [
         "resourceType",
         "query",
-        null,
-        null
+        "options",
+        "callback"
       ],
       "docs": {
         "description": "Get data. Generic helper method for getting data of any kind from DHIS2.\n- This can be used to get `DataValueSets`,`events`,`trackedEntityInstances`,`etc.`",
@@ -358,7 +358,7 @@
           }
         ]
       },
-      "valid": false
+      "valid": true
     },
     {
       "name": "upsert",
@@ -366,8 +366,8 @@
         "resourceType",
         "query",
         "data",
-        null,
-        null
+        "options",
+        "callback"
       ],
       "docs": {
         "description": "Upsert a record. A generic helper function used to atomically either insert a row, or on the basis of the row already existing, UPDATE that existing row instead.",
@@ -456,7 +456,7 @@
           }
         ]
       },
-      "valid": false
+      "valid": true
     },
     {
       "name": "discover",
@@ -518,8 +518,8 @@
         "resourceType",
         "path",
         "data",
-        null,
-        null
+        "options",
+        "callback"
       ],
       "docs": {
         "description": "Patch a record. A generic helper function to send partial updates on one or more object properties.\n- You are not required to send the full body of object properties.\n- This is useful for cases where you don't want or need to update all properties on a object.",
@@ -600,16 +600,16 @@
           }
         ]
       },
-      "valid": false
+      "valid": true
     },
     {
       "name": "destroy",
       "params": [
         "resourceType",
         "path",
-        null,
-        null,
-        null
+        "data",
+        "options",
+        "callback"
       ],
       "docs": {
         "description": "Delete a record. A generic helper function to delete an object",
@@ -718,7 +718,7 @@
           }
         ]
       },
-      "valid": false
+      "valid": true
     },
     {
       "name": "findAttributeValue",

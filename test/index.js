@@ -226,7 +226,7 @@ describe('update', () => {
         date: resp => resp.data.currentDate,
       })
     )(state);
-    
+
     expect(finalState.data).to.eql({
       httpStatus: 'OK',
       message: 'the response',
@@ -234,63 +234,81 @@ describe('update', () => {
   });
 });
 
-// describe('upsert', () => {
-//   const state = {
-//     configuration: {
-//       username: 'admin',
-//       password: 'district',
-//       hostUrl: 'https://play.dhis2.org/2.36.4',
-//     },
-//     data: {
-//       org: 'orgunit',
-//       id: 'k68SkK5yDH9',
-//     },
-//   };
+describe('upsert', () => {
+  const state = {
+    configuration: {
+      username: 'admin',
+      password: 'district',
+      hostUrl: 'https://play.dhis2.org/2.36.4',
+    },
+    data: {
+      org: 'orgunit',
+      id: 'k68SkK5yDH9',
+    },
+  };
 
-//   it('should make a get and then a create if nothing is found', async () => {
-//     testServer
-//       .get('/api/events/qAZJCrNJK8H', {
-//         program: 'program',
-//         orgUnit: 'hardcoded',
-//         date: '02-02-20',
-//       })
-//       .reply(200, {
-//         httpStatus: 'OK',
-//         message: 'the response',
-//       });
+  it('should make a get and then an update if one item is found', async () => {
+    testServer
+      .get(
+        '/api/trackedEntityInstances?ou=DiszpKrYNg8&filter[]=w75KJ2mc4zz:Eq:Johns&filter[]=zDhUuAYrxNC:Eq:Doe'
+      )
+      .reply(200, {
+        httpStatus: 'OK',
+        message: 'the response',
+        trackedEntityInstances: [{ trackedEntityInstance: 123 }],
+      })
+      .put('/api/trackedEntityInstances/123')
+      .reply(200, { httpStatus: 'OK', message: 'updated tei' });
 
-//     const response = await execute(
-//       update('events', 'qAZJCrNJK8H', {
-//         program: dataValue('program'),
-//         orgUnit: 'hardcoded',
-//         date: state => state.data.currentDate,
-//       })
-//     )(state);
-//     expect(response.data).to.eql({ httpStatus: 'OK', message: 'the response' });
-//   });
+    const finalState = await execute(
+      upsert(
+        'trackedEntityInstances',
+        {
+          ou: 'DiszpKrYNg8',
+          filter: ['w75KJ2mc4zz:Eq:Johns', 'zDhUuAYrxNC:Eq:Doe'],
+        },
+        {
+          orgUnit: 'DiszpKrYNg8',
+          trackedEntityType: 'nEenWmSyUEp',
+          attributes: [
+            {
+              lastUpdated: '2016-01-12T00:00:00.000',
+              code: 'MMD_PER_NAM',
+              displayName: 'First name',
+              created: '2016-01-12T00:00:00.000',
+              valueType: 'TEXT',
+              attribute: 'w75KJ2mc4zz',
+              value: 'Elias',
+            },
+          ],
+        }
+      )
+    )(state);
 
-//   it('should make a get and then an update if one thing is found', async () => {
-//     testServer
-//       .put('/api/events/qAZJCrNJK8H', {
-//         program: 'program',
-//         orgUnit: 'hardcoded',
-//         date: '02-02-20',
-//       })
-//       .reply(200, {
-//         httpStatus: 'OK',
-//         message: 'the response',
-//       });
+    expect(finalState.references).to.eql([
+      {
+        org: 'orgunit',
+        id: 'k68SkK5yDH9',
+      },
+    ]);
 
-//     const response = await execute(
-//       update('events', 'qAZJCrNJK8H', {
-//         program: dataValue('program'),
-//         orgUnit: 'hardcoded',
-//         date: state => state.data.currentDate,
-//       })
-//     )(state);
-//     expect(response.data).to.eql({ httpStatus: 'OK', message: 'the response' });
-//   });
-// });
+    expect(finalState.data).to.eql({
+      httpStatus: 'OK',
+      message: 'updated tei',
+    });
+  });
+
+  // it('should make a get and then a create nothing is found', async () => {});
+
+  // it('should make a get and FAIL if more than one thing is found', async () => {
+  //   // Maybe something like this?
+  //   // https://www.chaijs.com/plugins/chai-as-promised/
+  //   // https://stackoverflow.com/questions/45466040/verify-that-an-exception-is-thrown-using-mocha-chai-and-async-await
+  //   // await expect(
+  //   //   execute(...)(state)
+  //   // ).to.be.rejectedWith(Error);
+  // });
+});
 
 describe('URL builders', () => {
   const fixture = {};
