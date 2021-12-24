@@ -5,8 +5,8 @@
       "params": [
         "resourceType",
         "data",
-        "options",
-        "callback"
+        null,
+        null
       ],
       "docs": {
         "description": "Create a record",
@@ -128,7 +128,7 @@
           }
         ]
       },
-      "valid": true
+      "valid": false
     },
     {
       "name": "update",
@@ -136,8 +136,8 @@
         "resourceType",
         "path",
         "data",
-        "options",
-        "callback"
+        null,
+        null
       ],
       "docs": {
         "description": "Update data. A generic helper function to update a resource object of any type.\nUpdating an object requires to send `all required fields` or the `full body`",
@@ -268,15 +268,15 @@
           }
         ]
       },
-      "valid": true
+      "valid": false
     },
     {
       "name": "get",
       "params": [
         "resourceType",
         "query",
-        "options",
-        "callback"
+        null,
+        null
       ],
       "docs": {
         "description": "Get data. Generic helper method for getting data of any kind from DHIS2.\n- This can be used to get `DataValueSets`,`events`,`trackedEntityInstances`,`etc.`",
@@ -358,7 +358,7 @@
           }
         ]
       },
-      "valid": true
+      "valid": false
     },
     {
       "name": "discover",
@@ -415,103 +415,13 @@
       "valid": true
     },
     {
-      "name": "patch",
-      "params": [
-        "resourceType",
-        "path",
-        "data",
-        "options",
-        "callback"
-      ],
-      "docs": {
-        "description": "Patch a record. A generic helper function to send partial updates on one or more object properties.\n- You are not required to send the full body of object properties.\n- This is useful for cases where you don't want or need to update all properties on a object.",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "The type of resource to be updated. E.g. `dataElements`, `organisationUnits`, etc.",
-            "type": {
-              "type": "NameExpression",
-              "name": "string"
-            },
-            "name": "resourceType"
-          },
-          {
-            "title": "param",
-            "description": "The `id` or `path` to the `object` to be updated. E.g. `FTRrcoaog83` or `FTRrcoaog83/{collection-name}/{object-id}`",
-            "type": {
-              "type": "NameExpression",
-              "name": "string"
-            },
-            "name": "path"
-          },
-          {
-            "title": "param",
-            "description": "Data to update. Include only the fields you want to update. E.g. `{name: \"New Name\"}`",
-            "type": {
-              "type": "NameExpression",
-              "name": "Object"
-            },
-            "name": "data"
-          },
-          {
-            "title": "param",
-            "description": "Optional configuration, including params for the update ({preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}). Defaults to `{operationName: 'patch', apiVersion: state.configuration.apiVersion, responseType: 'json'}`",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "Object"
-              }
-            },
-            "name": "options"
-          },
-          {
-            "title": "param",
-            "description": "Optional callback to handle the response",
-            "type": {
-              "type": "OptionalType",
-              "expression": {
-                "type": "NameExpression",
-                "name": "function"
-              }
-            },
-            "name": "callback"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "patch('dataElements', 'FTRrcoaog83', { name: 'New Name' });",
-            "caption": "a dataElement"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
       "name": "destroy",
       "params": [
         "resourceType",
         "path",
-        "data",
-        "options",
-        "callback"
+        null,
+        null,
+        null
       ],
       "docs": {
         "description": "Delete a record. A generic helper function to delete an object",
@@ -620,7 +530,7 @@
           }
         ]
       },
-      "valid": true
+      "valid": false
     },
     {
       "name": "findAttributeValue",

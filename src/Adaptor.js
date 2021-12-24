@@ -599,54 +599,6 @@ export function discover(httpMethod, endpoint) {
 }
 
 /**
- * Patch a record. A generic helper function to send partial updates on one or more object properties.
- * - You are not required to send the full body of object properties.
- * - This is useful for cases where you don't want or need to update all properties on a object.
- * @public
- * @function
- * @param {string} resourceType - The type of resource to be updated. E.g. `dataElements`, `organisationUnits`, etc.
- * @param {string} path - The `id` or `path` to the `object` to be updated. E.g. `FTRrcoaog83` or `FTRrcoaog83/{collection-name}/{object-id}`
- * @param {Object} data - Data to update. Include only the fields you want to update. E.g. `{name: "New Name"}`
- * @param {Object} [options] - Optional configuration, including params for the update ({preheatCache: true, strategy: 'UPDATE', mergeMode: 'REPLACE'}). Defaults to `{operationName: 'patch', apiVersion: state.configuration.apiVersion, responseType: 'json'}`
- * @param {function} [callback] - Optional callback to handle the response
- * @returns {Operation}
- * @example <caption>a dataElement</caption>
- * patch('dataElements', 'FTRrcoaog83', { name: 'New Name' });
- */
-// TODO: @Elias, can this be deleted in favor of update? How does DHIS2 handle PATCH vs PUT?
-// I need to investigate on this. But I think DHIS2 forces to send all properties back when we do an update. If that's confirmed then this may be needed.
-export function patch(
-  resourceType,
-  path,
-  data,
-  options = {},
-  callback = false
-) {
-  return state => {
-    console.log('Preparing patch operation...');
-
-    resourceType = expandReferences(resourceType)(state);
-    path = expandReferences(path)(state);
-    data = expandReferences(data)(state);
-    options = expandReferences(options)(state);
-
-    const { params, requestConfig } = options;
-    const { configuration } = state;
-
-    return request(configuration, {
-      method: 'patch',
-      url: generateUrl(configuration, options, resourceType, path),
-      params,
-      data,
-      ...requestConfig,
-    }).then(result => {
-      Log.success(`Patched ${resourceType} at ${path}`);
-      return handleResponse(result, state, callback);
-    });
-  };
-}
-
-/**
  * Delete a record. A generic helper function to delete an object
  * @public
  * @function
