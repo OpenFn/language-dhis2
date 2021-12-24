@@ -27,6 +27,25 @@ export function buildUrl(urlString, hostUrl, apiVersion) {
   return hostUrl + '/api' + pathSuffix;
 }
 
+/**
+ * Determines the attribute name for a DHIS2 system ID given a resource type.
+ * @param {string} resourceType
+ * @returns {string}
+ */
+export function selectId(resourceType) {
+  switch (resourceType) {
+    case 'trackedEntityInstances':
+      return 'trackedEntityInstance';
+
+    // We can extend here if we find other special kinds of resourceType
+    // case 'other-special-case':
+    //   return 'other-special-id';
+
+    default:
+      return 'id';
+  }
+}
+
 // Write a unit test for this one
 export function handleResponse(result, state, callback) {
   const { data } = result;

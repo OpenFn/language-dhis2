@@ -12,6 +12,7 @@ import {
   Log,
   nestArray,
   prettyJson,
+  selectId,
 } from './Utils';
 import { request } from './Client';
 
@@ -503,11 +504,10 @@ export function upsert(
         } else if (resources.length <= 0) {
           return create(resourceType, data, options)(state);
         } else {
-          const pathName =
-            resourceType === 'trackedEntityInstances'
-              ? 'trackedEntityInstance'
-              : 'id';
-          const path = resources[0][pathName];
+          // Pick out the first (and only) resource in the array and grab its
+          // ID to be used in the subsequent `update` by the path determined
+          // by the `selectId(...)` function.
+          const path = resources[0][selectId(resourceType)];
           return update(resourceType, path, data, options)(state);
         }
       })
