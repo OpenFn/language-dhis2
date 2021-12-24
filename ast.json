@@ -5,8 +5,8 @@
       "params": [
         "resourceType",
         "data",
-        "options",
-        "callback"
+        null,
+        null
       ],
       "docs": {
         "description": "Create a record",
@@ -128,7 +128,7 @@
           }
         ]
       },
-      "valid": true
+      "valid": false
     },
     {
       "name": "update",
@@ -136,8 +136,8 @@
         "resourceType",
         "path",
         "data",
-        "options",
-        "callback"
+        null,
+        null
       ],
       "docs": {
         "description": "Update data. A generic helper function to update a resource object of any type.\nUpdating an object requires to send `all required fields` or the `full body`",
@@ -268,15 +268,15 @@
           }
         ]
       },
-      "valid": true
+      "valid": false
     },
     {
       "name": "get",
       "params": [
         "resourceType",
         "query",
-        "options",
-        "callback"
+        null,
+        null
       ],
       "docs": {
         "description": "Get data. Generic helper method for getting data of any kind from DHIS2.\n- This can be used to get `DataValueSets`,`events`,`trackedEntityInstances`,`etc.`",
@@ -358,61 +358,7 @@
           }
         ]
       },
-      "valid": true
-    },
-    {
-      "name": "discover",
-      "params": [
-        "httpMethod",
-        "endpoint"
-      ],
-      "docs": {
-        "description": "Discover `DHIS2` `api` `endpoint` `query parameters` and allowed `operators` for a given resource's endpoint.",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "The HTTP to inspect parameter usage for a given endpoint, e.g., `get`, `post`,`put`,`patch`,`delete`",
-            "type": {
-              "type": "NameExpression",
-              "name": "string"
-            },
-            "name": "httpMethod"
-          },
-          {
-            "title": "param",
-            "description": "The path for a given endpoint. E.g. `/trackedEntityInstances` or `/dataValueSets`",
-            "type": {
-              "type": "NameExpression",
-              "name": "string"
-            },
-            "name": "endpoint"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "discover('post', '/trackedEntityInstances')",
-            "caption": "a list of parameters allowed on a given endpoint for specific http method"
-          }
-        ]
-      },
-      "valid": true
+      "valid": false
     },
     {
       "name": "patch",
@@ -420,8 +366,8 @@
         "resourceType",
         "path",
         "data",
-        "options",
-        "callback"
+        null,
+        null
       ],
       "docs": {
         "description": "Patch a record. A generic helper function to send partial updates on one or more object properties.\n- You are not required to send the full body of object properties.\n- This is useful for cases where you don't want or need to update all properties on a object.",
@@ -502,16 +448,16 @@
           }
         ]
       },
-      "valid": true
+      "valid": false
     },
     {
       "name": "destroy",
       "params": [
         "resourceType",
         "path",
-        "data",
-        "options",
-        "callback"
+        null,
+        null,
+        null
       ],
       "docs": {
         "description": "Delete a record. A generic helper function to delete an object",
@@ -620,7 +566,7 @@
           }
         ]
       },
-      "valid": true
+      "valid": false
     },
     {
       "name": "findAttributeValue",
