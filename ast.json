@@ -361,60 +361,6 @@
       "valid": true
     },
     {
-      "name": "discover",
-      "params": [
-        "httpMethod",
-        "endpoint"
-      ],
-      "docs": {
-        "description": "Discover `DHIS2` `api` `endpoint` `query parameters` and allowed `operators` for a given resource's endpoint.",
-        "tags": [
-          {
-            "title": "public",
-            "description": null,
-            "type": null
-          },
-          {
-            "title": "function",
-            "description": null,
-            "name": null
-          },
-          {
-            "title": "param",
-            "description": "The HTTP to inspect parameter usage for a given endpoint, e.g., `get`, `post`,`put`,`patch`,`delete`",
-            "type": {
-              "type": "NameExpression",
-              "name": "string"
-            },
-            "name": "httpMethod"
-          },
-          {
-            "title": "param",
-            "description": "The path for a given endpoint. E.g. `/trackedEntityInstances` or `/dataValueSets`",
-            "type": {
-              "type": "NameExpression",
-              "name": "string"
-            },
-            "name": "endpoint"
-          },
-          {
-            "title": "returns",
-            "description": null,
-            "type": {
-              "type": "NameExpression",
-              "name": "Operation"
-            }
-          },
-          {
-            "title": "example",
-            "description": "discover('post', '/trackedEntityInstances')",
-            "caption": "a list of parameters allowed on a given endpoint for specific http method"
-          }
-        ]
-      },
-      "valid": true
-    },
-    {
       "name": "patch",
       "params": [
         "resourceType",
