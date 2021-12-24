@@ -298,16 +298,109 @@ describe('upsert', () => {
     });
   });
 
-  // it('should make a get and then a create nothing is found', async () => {});
+  it('should make a get and then a create if nothing is found', async () => {
+    testServer
+      .get(
+        '/api/trackedEntityInstances?ou=DiszpKrYNg8&filter[]=w75KJ2mc4zz:Eq:No&filter[]=zDhUuAYrxNC:Eq:One'
+      )
+      .reply(200, {
+        httpStatus: 'OK',
+        message: 'the response',
+        trackedEntityInstances: [],
+      })
+      .post('/api/trackedEntityInstances')
+      .reply(201, { httpStatus: 'OK', message: 'created tei' });
 
-  // it('should make a get and FAIL if more than one thing is found', async () => {
-  //   // Maybe something like this?
-  //   // https://www.chaijs.com/plugins/chai-as-promised/
-  //   // https://stackoverflow.com/questions/45466040/verify-that-an-exception-is-thrown-using-mocha-chai-and-async-await
-  //   // await expect(
-  //   //   execute(...)(state)
-  //   // ).to.be.rejectedWith(Error);
-  // });
+    const finalState = await execute(
+      upsert(
+        'trackedEntityInstances',
+        {
+          ou: 'DiszpKrYNg8',
+          filter: ['w75KJ2mc4zz:Eq:No', 'zDhUuAYrxNC:Eq:One'],
+        },
+        {
+          orgUnit: 'DiszpKrYNg8',
+          trackedEntityType: 'nEenWmSyUEp',
+          attributes: [
+            {
+              lastUpdated: '2016-01-12T00:00:00.000',
+              code: 'MMD_PER_NAM',
+              displayName: 'First name',
+              created: '2016-01-12T00:00:00.000',
+              valueType: 'TEXT',
+              attribute: 'w75KJ2mc4zz',
+              value: 'Elias',
+            },
+          ],
+        }
+      )
+    )(state);
+
+    expect(finalState.references).to.eql([
+      {
+        org: 'orgunit',
+        id: 'k68SkK5yDH9',
+      },
+    ]);
+
+    expect(finalState.data).to.eql({
+      httpStatus: 'OK',
+      message: 'created tei',
+    });
+  });
+
+  it('should make a get and FAIL if more than one thing is found', async () => {
+    testServer
+      .get(
+        '/api/trackedEntityInstances?ou=DiszpKrYNg8&filter[]=w75KJ2mc4zz:Eq:John&filter[]=zDhUuAYrxNC:Eq:Doe'
+      )
+      .reply(200, {
+        httpStatus: 'OK',
+        message: 'the response',
+        trackedEntityInstances: [
+          { trackedEntityInstance: 1 },
+          { trackedEntityInstance: 2 },
+          { trackedEntityInstance: 3 },
+        ],
+      });
+
+    const expectThrowsAsync = async (method, errorMessage) => {
+      let error = null;
+      try {
+        await method();
+      } catch (err) {
+        error = err;
+      }
+      expect(error).to.be.an('Error');
+      if (errorMessage) {
+        expect(error.message).to.equal(errorMessage);
+      }
+    };
+
+    await expectThrowsAsync(
+      () =>
+        execute(
+          upsert(
+            'trackedEntityInstances',
+            {
+              ou: 'DiszpKrYNg8',
+              filter: ['w75KJ2mc4zz:Eq:John', 'zDhUuAYrxNC:Eq:Doe'],
+            },
+            {
+              orgUnit: 'TSyzvBiovKh',
+              trackedEntityType: 'nEenWmSyUEp',
+              attributes: [
+                {
+                  attribute: 'w75KJ2mc4zz',
+                  value: 'Qassim',
+                },
+              ],
+            }
+          )
+        )(state),
+      'Cannot upsert on Non-unique attribute. The operation found more than one records for your request.'
+    );
+  });
 });
 
 describe('URL builders', () => {
