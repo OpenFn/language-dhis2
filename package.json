@@ -24,7 +24,7 @@
     "ast.json"
   ],
   "dependencies": {
-    "@openfn/language-common": "1.4.1",
+    "@openfn/language-common": "1.6.2",
     "axios": "^0.24.0",
     "lodash": "^4.17.19"
   },
