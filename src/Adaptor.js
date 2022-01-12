@@ -753,15 +753,16 @@ export function dv(dataElement, value) {
 }
 
 export {
-  field,
-  fields,
-  sourceValue,
-  merge,
-  each,
+  alterState,
   dataPath,
   dataValue,
-  lastReferenceValue,
-  alterState,
+  dateFns,
+  each,
+  field,
+  fields,
   fn,
   http,
+  lastReferenceValue,
+  merge,
+  sourceValue,
 } from '@openfn/language-common';
