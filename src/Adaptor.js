@@ -235,7 +235,10 @@ export function create(resourceType, data, options = {}, callback = false) {
       data: nestArray(data, resourceType),
       ...requestConfig,
     }).then(result => {
-      Log.success(`Created ${resourceType}: ${result.headers.location}`);
+      Log.success(
+        `Created ${resourceType}` +
+          (result.headers.location ? `: ${result.headers.location}` : ``)
+      );
       return handleResponse(result, state, callback);
     });
   };
