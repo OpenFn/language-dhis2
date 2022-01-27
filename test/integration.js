@@ -247,7 +247,7 @@ describe('Integration tests', () => {
       configuration: {
         username: 'admin',
         password: 'district',
-        hostUrl: 'https://play.dhis2.org/2.36.4',
+        hostUrl: 'https://play.dhis2.org/2.37.2',
       },
       data: {},
     };

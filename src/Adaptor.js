@@ -235,10 +235,13 @@ export function create(resourceType, data, options = {}, callback = false) {
       data: nestArray(data, resourceType),
       ...requestConfig,
     }).then(result => {
-      Log.success(
-        `Created ${resourceType}` +
-          (result.headers.location ? `: ${result.headers.location}` : ``)
-      );
+      const { location } = result.headers;
+      
+      const details = location
+        ? `@ ${location}`
+        : `with response ${JSON.stringify(result.data, null, 2)}`;
+
+      Log.success(`Created ${resourceType} ${details}`);
       return handleResponse(result, state, callback);
     });
   };
