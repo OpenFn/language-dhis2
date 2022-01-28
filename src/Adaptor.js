@@ -235,11 +235,8 @@ export function create(resourceType, data, options = {}, callback = false) {
       data: nestArray(data, resourceType),
       ...requestConfig,
     }).then(result => {
-      const { location } = result.headers;
-      
-      const details = location
-        ? `@ ${location}`
-        : `with response ${JSON.stringify(result.data, null, 2)}`;
+      const { data } = result;
+      const details = `with response ${JSON.stringify(data, null, 2)}`;
 
       Log.success(`Created ${resourceType} ${details}`);
       return handleResponse(result, state, callback);
