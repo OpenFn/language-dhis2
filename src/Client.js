@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Qs from 'qs';
 
 /**
  * The request client takes configuration from state and an axios request object
@@ -26,6 +27,7 @@ export function request({ username, password }, axiosRequest) {
     responseType: 'json',
     maxRedirects: safeRedirect ? 5 : 0,
     auth: { username, password },
+    paramsSerializer: (params) => Qs.stringify(params, {arrayFormat: 'repeat'}),
     // Note that providing headers or auth in the request object will overwrite.
     ...axiosRequest,
   });

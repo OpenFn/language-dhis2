@@ -69,7 +69,37 @@ describe('get', () => {
     // NOTE: It appears that this is the dhis2-desired format for array params.
     const queryString =
       'dataSet=pBOMPrpg1QX&period=201401&orgUnit=DiszpKrYNg8' +
-      '&filter[]=this:Eq:that&filter[]=then:gt:2' +
+      '&filter=this:Eq:that&filter=then:gt:2' +
+      '&fields=*';
+
+    testServer
+      .get(`/api/dataValueSets?${queryString}`)
+      .matchHeader('authorization', 'Basic YWRtaW46ZGlzdHJpY3Q=')
+      .reply(200, {
+        httpStatus: 'OK',
+        message: "you've got multiple filters and that's OK!",
+      });
+
+    const finalState = await execute(
+      get('dataValueSets', query, { params: { fields: '*' } })
+    )(state);
+
+    expect(finalState.data).to.eql({
+      httpStatus: 'OK',
+      message: "you've got multiple filters and that's OK!",
+    });
+  });
+
+  it('should handle arrays of params, like orgUnit', async () => {
+    const query = {
+      dataSet: 'pBOMPrpg1QX',
+      period: 201401,
+      orgUnit: ['DiszpKrYNg8', 'otherThing'],
+    };
+
+    // NOTE: It appears that this is the dhis2-desired format for array params.
+    const queryString =
+      'dataSet=pBOMPrpg1QX&period=201401&orgUnit=DiszpKrYNg8&orgUnit=otherThing' +
       '&fields=*';
 
     testServer
@@ -250,7 +280,7 @@ describe('upsert', () => {
   it('should make a get and then an update if one item is found', async () => {
     testServer
       .get(
-        '/api/trackedEntityInstances?ou=DiszpKrYNg8&filter[]=w75KJ2mc4zz:Eq:Johns&filter[]=zDhUuAYrxNC:Eq:Doe'
+        '/api/trackedEntityInstances?ou=DiszpKrYNg8&filter=w75KJ2mc4zz:Eq:Johns&filter=zDhUuAYrxNC:Eq:Doe'
       )
       .reply(200, {
         httpStatus: 'OK',
@@ -301,7 +331,7 @@ describe('upsert', () => {
   it('should make a get and then a create if nothing is found', async () => {
     testServer
       .get(
-        '/api/trackedEntityInstances?ou=DiszpKrYNg8&filter[]=w75KJ2mc4zz:Eq:No&filter[]=zDhUuAYrxNC:Eq:One'
+        '/api/trackedEntityInstances?ou=DiszpKrYNg8&filter=w75KJ2mc4zz:Eq:No&filter=zDhUuAYrxNC:Eq:One'
       )
       .reply(200, {
         httpStatus: 'OK',
@@ -352,7 +382,7 @@ describe('upsert', () => {
   it('should make a get and FAIL if more than one thing is found', async () => {
     testServer
       .get(
-        '/api/trackedEntityInstances?ou=DiszpKrYNg8&filter[]=w75KJ2mc4zz:Eq:John&filter[]=zDhUuAYrxNC:Eq:Doe'
+        '/api/trackedEntityInstances?ou=DiszpKrYNg8&filter=w75KJ2mc4zz:Eq:John&filter=zDhUuAYrxNC:Eq:Doe'
       )
       .reply(200, {
         httpStatus: 'OK',
