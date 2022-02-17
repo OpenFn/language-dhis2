@@ -9,7 +9,7 @@ Used most commonly via OpenFn.org or by hand with
 ```sh
 core execute \
  -l ../language-dhis2 \
- -e ./tmp/myExpressions.js \
+ -e ./tmp/expression.js \
  -s ./tmp/state.json \
  -o ./tmp/output.json
 ```
