@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Class: update</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Class: update</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2><span class="attribs"><span class="type-signature"></span></span>
+            <span class="ancestors"><a href="module-Adaptor.html">Adaptor</a>.</span>update<span class="signature">(resourceType, path, data, options<span class="signature-attributes">opt</span>, callback<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Operation}</span></h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+
+    
+    <h4 class="name" id="update"><span class="type-signature"></span>new update<span class="signature">(resourceType, path, data, options<span class="signature-attributes">opt</span>, callback<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Operation}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Update data. A generic helper function to update a resource object of any type.
+Updating an object requires to send `all required fields` or the `full body`
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>resourceType</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The type of resource to be updated. E.g. `dataElements`, `organisationUnits`, etc.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>path</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The `id` or `path` to the `object` to be updated. E.g. `FTRrcoaog83` or `FTRrcoaog83/{collection-name}/{object-id}`</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Data to update. It requires to send `all required fields` or the `full body`. If you want `partial updates`, use `patch` operation.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Optional `options` to define URL parameters via params (E.g. `filter`, `dimension` and other import parameters), request config (E.g. `auth`) and the DHIS2 apiVersion.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Optional callback to handle the response</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Adaptor.js.html">Adaptor.js</a>, <a href="Adaptor.js.html#line382">line 382</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Operation</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">a program</p>
+    
+    <pre class="prettyprint"><code>update('programs', 'qAZJCrNJK8H', {
+  name: '14e1aa02c3f0a31618e096f2c6d03bed',
+  shortName: '14e1aa02',
+  programType: 'WITHOUT_REGISTRATION',
+});</code></pre>
+
+        <p class="code-caption">an event</p>
+    
+    <pre class="prettyprint"><code>update('events', 'PVqUD2hvU4E', {
+  program: 'eBAyeGv0exc',
+  orgUnit: 'Ngelehun CHC',
+  status: 'COMPLETED',
+  storedBy: 'admin',
+  dataValues: [],
+});</code></pre>
+
+        <p class="code-caption">a trackedEntityInstance</p>
+    
+    <pre class="prettyprint"><code>update('trackedEntityInstances', 'IeQfgUtGPq2', {
+  created: '2015-08-06T21:12:37.256',
+  orgUnit: 'TSyzvBiovKh',
+  createdAtClient: '2015-08-06T21:12:37.256',
+  trackedEntityInstance: 'IeQfgUtGPq2',
+  lastUpdated: '2015-08-06T21:12:37.257',
+  trackedEntityType: 'nEenWmSyUEp',
+  inactive: false,
+  deleted: false,
+  featureType: 'NONE',
+  programOwners: [
+    {
+      ownerOrgUnit: 'TSyzvBiovKh',
+      program: 'IpHINAT79UW',
+      trackedEntityInstance: 'IeQfgUtGPq2',
+    },
+  ],
+  enrollments: [],
+  relationships: [],
+  attributes: [
+    {
+      lastUpdated: '2016-01-12T00:00:00.000',
+      displayName: 'Last name',
+      created: '2016-01-12T00:00:00.000',
+      valueType: 'TEXT',
+      attribute: 'zDhUuAYrxNC',
+      value: 'Russell',
+    },
+    {
+      lastUpdated: '2016-01-12T00:00:00.000',
+      code: 'MMD_PER_NAM',
+      displayName: 'First name',
+      created: '2016-01-12T00:00:00.000',
+      valueType: 'TEXT',
+      attribute: 'w75KJ2mc4zz',
+      value: 'Catherine',
+    },
+  ],
+});</code></pre>
+
+        <p class="code-caption">a dataSet</p>
+    
+    <pre class="prettyprint"><code>update('dataSets', 'lyLU2wR22tC', { name: 'OpenFN Data Set', periodType: 'Weekly' });</code></pre>
+
+        <p class="code-caption">a dataSetNotification</p>
+    
+    <pre class="prettyprint"><code>update('dataSetNotificationTemplates', 'VbQBwdm1wVP', {
+  dataSetNotificationTrigger: 'DATA_SET_COMPLETION',
+  notificationRecipient: 'ORGANISATION_UNIT_CONTACT',
+  name: 'Notification',
+  messageTemplate: 'Hello Updated,
+  deliveryChannels: ['SMS'],
+  dataSets: [],
+});</code></pre>
+
+        <p class="code-caption">a dataElement</p>
+    
+    <pre class="prettyprint"><code>update('dataElements', 'FTRrcoaog83', {
+  aggregationType: 'SUM',
+  domainType: 'AGGREGATE',
+  valueType: 'NUMBER',
+  name: 'Paracetamol',
+  shortName: 'Para',
+});</code></pre>
+
+        <p class="code-caption">a dataElementGroup</p>
+    
+    <pre class="prettyprint"><code>update('dataElementGroups', 'QrprHT61XFk', {
+  name: 'Data Element Group 1',
+  dataElements: [],
+});</code></pre>
+
+        <p class="code-caption">a dataElementGroupSet</p>
+    
+    <pre class="prettyprint"><code>update('dataElementGroupSets', 'VxWloRvAze8', {
+  name: 'Data Element Group Set 4',
+  dataDimension: true,
+  shortName: 'DEGS4',
+  dataElementGroups: [],
+});</code></pre>
+
+        <p class="code-caption">a dataValueSet</p>
+    
+    <pre class="prettyprint"><code>update('dataValueSets', 'AsQj6cDsUq4', {
+  dataElement: 'f7n9E0hX8qk',
+  period: '201401',
+  orgUnit: 'DiszpKrYNg8',
+  value: '12',
+});</code></pre>
+
+        <p class="code-caption">a dataValueSet with related dataValues</p>
+    
+    <pre class="prettyprint"><code>update('dataValueSets', 'Ix2HsbDMLea', {
+  dataSet: 'pBOMPrpg1QX',
+  completeDate: '2014-02-03',
+  period: '201401',
+  orgUnit: 'DiszpKrYNg8',
+  dataValues: [
+    {
+      dataElement: 'f7n9E0hX8qk',
+      value: '1',
+    },
+    {
+      dataElement: 'Ix2HsbDMLea',
+      value: '2',
+    },
+    {
+      dataElement: 'eY5ehpbEsB7',
+      value: '3',
+    },
+  ],
+});</code></pre>
+
+        <p class="code-caption">a single enrollment</p>
+    
+    <pre class="prettyprint"><code>update('enrollments', 'CmsHzercTBa' {
+  trackedEntityInstance: 'bmshzEacgxa',
+  orgUnit: 'TSyzvBiovKh',
+  program: 'gZBxv9Ujxg0',
+  enrollmentDate: '2013-10-17',
+  incidentDate: '2013-10-17',
+});</code></pre>
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Adaptor.html">Adaptor</a></li></ul><h3>Classes</h3><ul><li><a href="module-Adaptor.attr.html">attr</a></li><li><a href="module-Adaptor.create.html">create</a></li><li><a href="module-Adaptor.destroy.html">destroy</a></li><li><a href="module-Adaptor.discover.html">discover</a></li><li><a href="module-Adaptor.dv.html">dv</a></li><li><a href="module-Adaptor.execute.html">execute</a></li><li><a href="module-Adaptor.findAttributeValue.html">findAttributeValue</a></li><li><a href="module-Adaptor.get.html">get</a></li><li><a href="module-Adaptor.patch.html">patch</a></li><li><a href="module-Adaptor.update.html">update</a></li><li><a href="module-Adaptor.upsert.html">upsert</a></li><li><a href="module-Adaptor-configMigrationHelper.html">configMigrationHelper</a></li></ul><h3>Global</h3><ul><li><a href="global.html#request">request</a></li><li><a href="global.html#selectId">selectId</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Mon Jul 18 2022 17:23:21 GMT+0100 (British Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

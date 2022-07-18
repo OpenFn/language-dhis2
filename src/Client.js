@@ -27,7 +27,7 @@ export function request({ username, password }, axiosRequest) {
     responseType: 'json',
     maxRedirects: safeRedirect ? 5 : 0,
     auth: { username, password },
-    paramsSerializer: (params) => Qs.stringify(params, {arrayFormat: 'repeat'}),
+    paramsSerializer: params => Qs.stringify(params, { arrayFormat: 'repeat' }),
     // Note that providing headers or auth in the request object will overwrite.
     ...axiosRequest,
   });

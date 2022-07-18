@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Class: configMigrationHelper</title>
+    <title>JSDoc: Class: execute</title>
 
     <script src="scripts/prettify/prettify.js"> </script>
     <script src="scripts/prettify/lang-css.js"> </script>
@@ -17,7 +17,7 @@
 
 <div id="main">
 
-    <h1 class="page-title">Class: configMigrationHelper</h1>
+    <h1 class="page-title">Class: execute</h1>
 
     
 
@@ -29,7 +29,7 @@
 <header>
     
         <h2><span class="attribs"><span class="type-signature"></span></span>
-            <span class="ancestors"><a href="module-Adaptor.html">Adaptor</a>~</span>configMigrationHelper<span class="signature">(state)</span><span class="type-signature"> &rarr; {object}</span></h2>
+            <span class="ancestors"><a href="module-Adaptor.html">Adaptor</a>.</span>execute<span class="signature">(operations)</span><span class="type-signature"> &rarr; {Operation}</span></h2>
         
     
 </header>
@@ -42,7 +42,7 @@
     
 
     
-    <h4 class="name" id="configMigrationHelper"><span class="type-signature"></span>new configMigrationHelper<span class="signature">(state)</span><span class="type-signature"> &rarr; {object}</span></h4>
+    <h4 class="name" id="execute"><span class="type-signature"></span>new execute<span class="signature">(operations)</span><span class="type-signature"> &rarr; {Operation}</span></h4>
     
 
     
@@ -50,8 +50,8 @@
 
 
 <div class="description">
-    Migrates `apiUrl` to `hostUrl` if `hostUrl` is `blank`.
-For `OpenFn.org` users with the `old-style configuration`.
+    Execute a sequence of operations.
+Wraps `language-common/execute`, and prepends initial state for DHIS2.
 </div>
 
 
@@ -87,13 +87,13 @@ For `OpenFn.org` users with the `old-style configuration`.
 
         <tr>
             
-                <td class="name"><code>state</code></td>
+                <td class="name"><code>operations</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">object</span>
+<span class="param-type">Operations</span>
 
 
             
@@ -103,7 +103,7 @@ For `OpenFn.org` users with the `old-style configuration`.
 
             
 
-            <td class="description last">the runtime state</td>
+            <td class="description last">Operations to be performed.</td>
         </tr>
 
     
@@ -144,7 +144,7 @@ For `OpenFn.org` users with the `old-style configuration`.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="Adaptor.js.html">Adaptor.js</a>, <a href="Adaptor.js.html#line54">line 54</a>
+        <a href="Adaptor.js.html">Adaptor.js</a>, <a href="Adaptor.js.html#line31">line 31</a>
     </li></ul></dd>
     
 
@@ -180,7 +180,7 @@ For `OpenFn.org` users with the `old-style configuration`.
     </dt>
     <dd>
         
-<span class="param-type">object</span>
+<span class="param-type">Operation</span>
 
 
     </dd>
@@ -193,7 +193,10 @@ For `OpenFn.org` users with the `old-style configuration`.
 
     <h5>Example</h5>
     
-    <pre class="prettyprint"><code>configMigrationHelper(state)</code></pre>
+    <pre class="prettyprint"><code>execute(
+  create('foo'),
+  delete('bar')
+)(state)</code></pre>
 
 
 

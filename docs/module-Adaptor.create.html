@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Class: create</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Class: create</h1>
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2><span class="attribs"><span class="type-signature"></span></span>
+            <span class="ancestors"><a href="module-Adaptor.html">Adaptor</a>.</span>create<span class="signature">(resourceType, data, options<span class="signature-attributes">opt</span>, callback<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Operation}</span></h2>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+
+    
+    <h4 class="name" id="create"><span class="type-signature"></span>new create<span class="signature">(resourceType, data, options<span class="signature-attributes">opt</span>, callback<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Operation}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Create a record
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>resourceType</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Type of resource to create. E.g. `trackedEntityInstances`, `programs`, `events`, ...</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Data that will be used to create a given instance of resource. To create a single instance of a resource, `data` must be a javascript object, and to create multiple instances of a resources, `data` must be an array of javascript objects.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>options</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Optional `options` to define URL parameters via params (E.g. `filter`, `dimension` and other import parameters), request config (E.g. `auth`) and the DHIS2 apiVersion.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>callback</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Optional callback to handle the response</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="Adaptor.js.html">Adaptor.js</a>, <a href="Adaptor.js.html#line220">line 220</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Operation</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+    <h5>Examples</h5>
+    
+        <p class="code-caption">a program</p>
+    
+    <pre class="prettyprint"><code>create('programs', {
+  name: 'name 20',
+  shortName: 'n20',
+  programType: 'WITHOUT_REGISTRATION',
+});</code></pre>
+
+        <p class="code-caption">an event</p>
+    
+    <pre class="prettyprint"><code>create('events', {
+  program: 'eBAyeGv0exc',
+  orgUnit: 'DiszpKrYNg8',
+  status: 'COMPLETED',
+});</code></pre>
+
+        <p class="code-caption">a trackedEntityInstance</p>
+    
+    <pre class="prettyprint"><code>create('trackedEntityInstances', {
+  orgUnit: 'TSyzvBiovKh',
+  trackedEntityType: 'nEenWmSyUEp',
+  attributes: [
+    {
+      attribute: 'w75KJ2mc4zz',
+      value: 'Gigiwe',
+    },
+  ]
+});</code></pre>
+
+        <p class="code-caption">a dataSet</p>
+    
+    <pre class="prettyprint"><code>create('dataSets', { name: 'OpenFn Data Set', periodType: 'Monthly' });</code></pre>
+
+        <p class="code-caption">a dataSetNotification</p>
+    
+    <pre class="prettyprint"><code>create('dataSetNotificationTemplates', {
+  dataSetNotificationTrigger: 'DATA_SET_COMPLETION',
+  notificationRecipient: 'ORGANISATION_UNIT_CONTACT',
+  name: 'Notification',
+  messageTemplate: 'Hello',
+  deliveryChannels: ['SMS'],
+  dataSets: [],
+});</code></pre>
+
+        <p class="code-caption">a dataElement</p>
+    
+    <pre class="prettyprint"><code>create('dataElements', {
+  aggregationType: 'SUM',
+  domainType: 'AGGREGATE',
+  valueType: 'NUMBER',
+  name: 'Paracetamol',
+  shortName: 'Para',
+});</code></pre>
+
+        <p class="code-caption">a dataElementGroup</p>
+    
+    <pre class="prettyprint"><code>create('dataElementGroups', {
+  name: 'Data Element Group 1',
+  dataElements: [],
+});</code></pre>
+
+        <p class="code-caption">a dataElementGroupSet</p>
+    
+    <pre class="prettyprint"><code>create('dataElementGroupSets', {
+  name: 'Data Element Group Set 4',
+  dataDimension: true,
+  shortName: 'DEGS4',
+  dataElementGroups: [],
+});</code></pre>
+
+        <p class="code-caption">a dataValueSet</p>
+    
+    <pre class="prettyprint"><code>create('dataValueSets', {
+  dataElement: 'f7n9E0hX8qk',
+  period: '201401',
+  orgUnit: 'DiszpKrYNg8',
+  value: '12',
+});</code></pre>
+
+        <p class="code-caption">a dataValueSet with related dataValues</p>
+    
+    <pre class="prettyprint"><code>create('dataValueSets', {
+  dataSet: 'pBOMPrpg1QX',
+  completeDate: '2014-02-03',
+  period: '201401',
+  orgUnit: 'DiszpKrYNg8',
+  dataValues: [
+    {
+      dataElement: 'f7n9E0hX8qk',
+      value: '1',
+    },
+    {
+      dataElement: 'Ix2HsbDMLea',
+      value: '2',
+    },
+    {
+      dataElement: 'eY5ehpbEsB7',
+      value: '3',
+    },
+  ],
+});</code></pre>
+
+        <p class="code-caption">an enrollment</p>
+    
+    <pre class="prettyprint"><code>create('enrollments', {
+  trackedEntityInstance: 'bmshzEacgxa',
+  orgUnit: 'TSyzvBiovKh',
+  program: 'gZBxv9Ujxg0',
+  enrollmentDate: '2013-09-17',
+  incidentDate: '2013-09-17',
+});</code></pre>
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-Adaptor.html">Adaptor</a></li></ul><h3>Classes</h3><ul><li><a href="module-Adaptor.attr.html">attr</a></li><li><a href="module-Adaptor.create.html">create</a></li><li><a href="module-Adaptor.destroy.html">destroy</a></li><li><a href="module-Adaptor.discover.html">discover</a></li><li><a href="module-Adaptor.dv.html">dv</a></li><li><a href="module-Adaptor.execute.html">execute</a></li><li><a href="module-Adaptor.findAttributeValue.html">findAttributeValue</a></li><li><a href="module-Adaptor.get.html">get</a></li><li><a href="module-Adaptor.patch.html">patch</a></li><li><a href="module-Adaptor.update.html">update</a></li><li><a href="module-Adaptor.upsert.html">upsert</a></li><li><a href="module-Adaptor-configMigrationHelper.html">configMigrationHelper</a></li></ul><h3>Global</h3><ul><li><a href="global.html#request">request</a></li><li><a href="global.html#selectId">selectId</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Mon Jul 18 2022 17:23:21 GMT+0100 (British Summer Time)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
